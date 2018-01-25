@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="bjsxt.mapper.DatCheckDataMapper" >
+  <resultMap id="BaseResultMap" type="bjsxt.entity.DatCheckData" >
+    <id column="CHECK_NO" property="checkNo" jdbcType="VARCHAR" />
+    <result column="CHECK_TYPE" property="checkType" jdbcType="VARCHAR" />
+    <result column="SITE_ID" property="siteId" jdbcType="VARCHAR" />
+    <result column="EQUIP_ID" property="equipId" jdbcType="VARCHAR" />
+    <result column="LINE" property="line" jdbcType="VARCHAR" />
+    <result column="VEHICLE_NO" property="vehicleNo" jdbcType="VARCHAR" />
+    <result column="VEHICLE_TYPE" property="vehicleType" jdbcType="VARCHAR" />
+    <result column="AXLES" property="axles" jdbcType="INTEGER" />
+    <result column="TYRES" property="tyres" jdbcType="INTEGER" />
+    <result column="CHECK_RESULT" property="checkResult" jdbcType="VARCHAR" />
+    <result column="CHECK_BY" property="checkBy" jdbcType="VARCHAR" />
+    <result column="CHECK_TIME" property="checkTime" jdbcType="TIMESTAMP" />
+    <result column="SPEED" property="speed" jdbcType="DOUBLE" />
+    <result column="TOTAL" property="total" jdbcType="INTEGER" />
+    <result column="DESC_INFO" property="descInfo" jdbcType="VARCHAR" />
+    <result column="CREATE_BY" property="createBy" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_BY" property="updateBy" jdbcType="VARCHAR" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="SYNC" property="sync" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    CHECK_NO, CHECK_TYPE, SITE_ID, EQUIP_ID, LINE, VEHICLE_NO, VEHICLE_TYPE, AXLES, TYRES, 
+    CHECK_RESULT, CHECK_BY, CHECK_TIME, SPEED, TOTAL, DESC_INFO, CREATE_BY, CREATE_TIME, 
+    UPDATE_BY, UPDATE_TIME, SYNC
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from dat_check_data
+    where CHECK_NO = #{checkNo,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from dat_check_data
+    where CHECK_NO = #{checkNo,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="bjsxt.entity.DatCheckData" >
+    insert into dat_check_data (CHECK_NO, CHECK_TYPE, SITE_ID, 
+      EQUIP_ID, LINE, VEHICLE_NO, 
+      VEHICLE_TYPE, AXLES, TYRES, 
+      CHECK_RESULT, CHECK_BY, CHECK_TIME, 
+      SPEED, TOTAL, DESC_INFO, 
+      CREATE_BY, CREATE_TIME, UPDATE_BY, 
+      UPDATE_TIME, SYNC)
+    values (#{checkNo,jdbcType=VARCHAR}, #{checkType,jdbcType=VARCHAR}, #{siteId,jdbcType=VARCHAR}, 
+      #{equipId,jdbcType=VARCHAR}, #{line,jdbcType=VARCHAR}, #{vehicleNo,jdbcType=VARCHAR}, 
+      #{vehicleType,jdbcType=VARCHAR}, #{axles,jdbcType=INTEGER}, #{tyres,jdbcType=INTEGER}, 
+      #{checkResult,jdbcType=VARCHAR}, #{checkBy,jdbcType=VARCHAR}, #{checkTime,jdbcType=TIMESTAMP}, 
+      #{speed,jdbcType=DOUBLE}, #{total,jdbcType=INTEGER}, #{descInfo,jdbcType=VARCHAR}, 
+      #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{sync,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="bjsxt.entity.DatCheckData" >
+    insert into dat_check_data
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="checkNo != null" >
+        CHECK_NO,
+      </if>
+      <if test="checkType != null" >
+        CHECK_TYPE,
+      </if>
+      <if test="siteId != null" >
+        SITE_ID,
+      </if>
+      <if test="equipId != null" >
+        EQUIP_ID,
+      </if>
+      <if test="line != null" >
+        LINE,
+      </if>
+      <if test="vehicleNo != null" >
+        VEHICLE_NO,
+      </if>
+      <if test="vehicleType != null" >
+        VEHICLE_TYPE,
+      </if>
+      <if test="axles != null" >
+        AXLES,
+      </if>
+      <if test="tyres != null" >
+        TYRES,
+      </if>
+      <if test="checkResult != null" >
+        CHECK_RESULT,
+      </if>
+      <if test="checkBy != null" >
+        CHECK_BY,
+      </if>
+      <if test="checkTime != null" >
+        CHECK_TIME,
+      </if>
+      <if test="speed != null" >
+        SPEED,
+      </if>
+      <if test="total != null" >
+        TOTAL,
+      </if>
+      <if test="descInfo != null" >
+        DESC_INFO,
+      </if>
+      <if test="createBy != null" >
+        CREATE_BY,
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME,
+      </if>
+      <if test="updateBy != null" >
+        UPDATE_BY,
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME,
+      </if>
+      <if test="sync != null" >
+        SYNC,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="checkNo != null" >
+        #{checkNo,jdbcType=VARCHAR},
+      </if>
+      <if test="checkType != null" >
+        #{checkType,jdbcType=VARCHAR},
+      </if>
+      <if test="siteId != null" >
+        #{siteId,jdbcType=VARCHAR},
+      </if>
+      <if test="equipId != null" >
+        #{equipId,jdbcType=VARCHAR},
+      </if>
+      <if test="line != null" >
+        #{line,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleNo != null" >
+        #{vehicleNo,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleType != null" >
+        #{vehicleType,jdbcType=VARCHAR},
+      </if>
+      <if test="axles != null" >
+        #{axles,jdbcType=INTEGER},
+      </if>
+      <if test="tyres != null" >
+        #{tyres,jdbcType=INTEGER},
+      </if>
+      <if test="checkResult != null" >
+        #{checkResult,jdbcType=VARCHAR},
+      </if>
+      <if test="checkBy != null" >
+        #{checkBy,jdbcType=VARCHAR},
+      </if>
+      <if test="checkTime != null" >
+        #{checkTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="speed != null" >
+        #{speed,jdbcType=DOUBLE},
+      </if>
+      <if test="total != null" >
+        #{total,jdbcType=INTEGER},
+      </if>
+      <if test="descInfo != null" >
+        #{descInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sync != null" >
+        #{sync,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="bjsxt.entity.DatCheckData" >
+    update dat_check_data
+    <set >
+      <if test="checkType != null" >
+        CHECK_TYPE = #{checkType,jdbcType=VARCHAR},
+      </if>
+      <if test="siteId != null" >
+        SITE_ID = #{siteId,jdbcType=VARCHAR},
+      </if>
+      <if test="equipId != null" >
+        EQUIP_ID = #{equipId,jdbcType=VARCHAR},
+      </if>
+      <if test="line != null" >
+        LINE = #{line,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleNo != null" >
+        VEHICLE_NO = #{vehicleNo,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleType != null" >
+        VEHICLE_TYPE = #{vehicleType,jdbcType=VARCHAR},
+      </if>
+      <if test="axles != null" >
+        AXLES = #{axles,jdbcType=INTEGER},
+      </if>
+      <if test="tyres != null" >
+        TYRES = #{tyres,jdbcType=INTEGER},
+      </if>
+      <if test="checkResult != null" >
+        CHECK_RESULT = #{checkResult,jdbcType=VARCHAR},
+      </if>
+      <if test="checkBy != null" >
+        CHECK_BY = #{checkBy,jdbcType=VARCHAR},
+      </if>
+      <if test="checkTime != null" >
+        CHECK_TIME = #{checkTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="speed != null" >
+        SPEED = #{speed,jdbcType=DOUBLE},
+      </if>
+      <if test="total != null" >
+        TOTAL = #{total,jdbcType=INTEGER},
+      </if>
+      <if test="descInfo != null" >
+        DESC_INFO = #{descInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        CREATE_BY = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        UPDATE_BY = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sync != null" >
+        SYNC = #{sync,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where CHECK_NO = #{checkNo,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="bjsxt.entity.DatCheckData" >
+    update dat_check_data
+    set CHECK_TYPE = #{checkType,jdbcType=VARCHAR},
+      SITE_ID = #{siteId,jdbcType=VARCHAR},
+      EQUIP_ID = #{equipId,jdbcType=VARCHAR},
+      LINE = #{line,jdbcType=VARCHAR},
+      VEHICLE_NO = #{vehicleNo,jdbcType=VARCHAR},
+      VEHICLE_TYPE = #{vehicleType,jdbcType=VARCHAR},
+      AXLES = #{axles,jdbcType=INTEGER},
+      TYRES = #{tyres,jdbcType=INTEGER},
+      CHECK_RESULT = #{checkResult,jdbcType=VARCHAR},
+      CHECK_BY = #{checkBy,jdbcType=VARCHAR},
+      CHECK_TIME = #{checkTime,jdbcType=TIMESTAMP},
+      SPEED = #{speed,jdbcType=DOUBLE},
+      TOTAL = #{total,jdbcType=INTEGER},
+      DESC_INFO = #{descInfo,jdbcType=VARCHAR},
+      CREATE_BY = #{createBy,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      UPDATE_BY = #{updateBy,jdbcType=VARCHAR},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      SYNC = #{sync,jdbcType=VARCHAR}
+    where CHECK_NO = #{checkNo,jdbcType=VARCHAR}
+  </update>
+  
+  
+  <!-- *********************************************************************************** -->
+  <!--  
+  <select id="generateKeyPreFix" resultType="java.lang.String" >
+  		SELECT CONCAT('0000',DATE_FORMAT(CURRENT_TIMESTAMP,'%Y%m%d')) FROM DUAL
+  </select>
+  -->
+  <select id="findNeedSync" resultMap="BaseResultMap">
+		SELECT * FROM DAT_CHECK_DATA WHERE SYNC = 0; 	
+  </select>  
+  
+  <select id="updateSync" parameterType="java.lang.String" >
+		UPDATE DAT_CHECK_DATA SET SYNC = '1' WHERE CHECK_NO = #{checkNo};	
+  </select>  
+  
+  
+  
+  
+  
+</mapper>
