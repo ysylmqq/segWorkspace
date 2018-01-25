@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>配件</title>
+</head>
+
+<body style="padding: 0px;margin: 0px;">
+ <div id="dgd_part" class="datagrid"></div>
+</body>
+<script type="text/javascript">
+    (function($){
+    	
+    	var cancelOften = function(){
+	    	var obj = $('#dgd_part');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>=1){
+	            var ids=[];
+	            var oftenId=null;
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){ 
+	                	oftenId=$(this).data('data').oftenId;
+	                	if(oftenId){
+	                		ids.push(oftenId);
+	                	}
+	                }
+	            }); 
+	                $(document).sgConfirm({text: '确定取消设置这些商品为常用商品吗?',cfn:function(r){ 
+	    		     	if(r){
+				               $.ajax( {
+					       		  type : 'post', 
+					       		  async: false,   
+					       		  contentType : 'application/json',     
+					       		  dataType : 'json',     
+					       		  url : '../../product/delProductOftens',   
+					       		  data:JSON.stringify(ids),
+					       		  success : function(data) {
+					       			  if(data){
+					       				  if(data.success){
+					       					  $(document).sgWindow('close',{id:'win_product_often'}); 
+					   	          		 	  $('#dgd_part').sgDatagrid('reload','sgDatagrid');
+					       				  }
+					       				 $(document).sgPup({message:'message_info',text: data.msg});
+					       			  }else{
+					       				  $(document).sgPup({message:'message_info',text: data});
+					       			  }
+					       		  } ,     
+					       		  error : function(res,error) { 
+					       		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					       		  }    
+				       		}); 
+			               }
+           }});
+	        }else{
+ 	            $(document).sgPup({message:'message_info',text: "请选择要取消设置的选项！"});
+ 	        }
+ 	  }
+ 	   var setOften = function(){
+	    	var obj = $('#dgd_part');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>=1){
+	            var selectedObjs=[];
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){    
+	                	selectedObjs.push($(this).data('data'));
+	                }
+	            });
+	            var winOftenLoadSuccess=function(){
+	            	$('#dgd_product_often','#win_product_often').sgDatagrid('appendData',selectedObjs);
+	            	//设置排序号 默认值为序号
+	            	$('input[name=orderNo]',$('#dgd_product_often','#win_product_often')).val(1);
+	            }
+	            var save=function(){
+	            	//做表单提交
+	   	 		   var params=[];
+	   	 		   var obj = $('#dgd_product_often','#win_product_often');
+	   	           var bDiv = $('.bDiv',obj);
+	   	           var rowObj=null;
+	   	           var ptr=null;
+	   	           $('input[type=checkbox]',bDiv).each(function(i){
+	   	        	    rowObj=$(this).data('data');
+	   	        	    ptr=$(this).parents('tr');
+	   	        	    params.push({
+	   	        	    	productId:rowObj.id,
+	   	        	    	type:1,
+	   	        	    	orderNo:ptr.find('input[name=orderNo]').val(),
+	   	        	    	remark:ptr.find('input[name=remark]').val()
+	   	        	    });
+	   	        });
+	   	        	 $(document).sgConfirm({text: '确定添加常用商品信息吗?',cfn:function(r){ 
+		    		     	if(r){
+					               $.ajax( {
+						       		  type : 'post', 
+						       		  async: false,   
+						       		  contentType : 'application/json',     
+						       		  dataType : 'json',     
+						       		  url : '../../product/addProductOftens',   
+						       		  data:JSON.stringify(params),
+						       		  success : function(data) {
+						       			  if(data){
+						       				  if(data.success){
+						       					  $(document).sgWindow('close',{id:'win_product_often'}); 
+						   	          		 	  $('#dgd_part').sgDatagrid('reload','sgDatagrid');
+						       				  }
+						       				 $(document).sgPup({message:'message_info',text: data.msg});
+						       			  }else{
+						       				  $(document).sgPup({message:'message_info',text: data});
+						       			  }
+						       		  } ,     
+						       		  error : function(res,error) { 
+						       		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+						       		  }    
+					       		}); 
+				               }
+	           }});
+	              
+	            }
+	            var defaults = {
+	 	                title:'常用商品设置',
+	 	                id:'win_product_often',
+	 	                form:'form_product_often',
+	 	               url:'product_setoften.html',
+	 	                success: winOftenLoadSuccess,
+	 	               width: 828,
+		                 height: 445,
+	 	                buttons : [
+	 	                           {name: '确定', type: 'submit', onpress : save},
+	 	                           {name: '关闭', onpress : function(){
+	 	                        	  $(document).sgWindow('close',{id:'win_product_often'}); 
+	 	                           }}
+	 	                       ]
+	 	            };
+	 	        $(document).sgWindow(defaults);
+	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择要设置的选项！"});
+	        }
+	    }
+    	var defaults = {
+   		        width:  '100%',
+   		        height: 318,
+   		        //url: '../../product/findParts',
+   		        url:'',
+   		        colid:'id',  //主键
+		        rownumbers:true,//序号
+   		        colModel : [
+   		            {display: '编码', name : 'code', width : 140, sortable : false},
+    		            {display: '名称', name : 'name', width : 140, sortable : false},
+    		            {display: '规格', name : 'norm', width :200, sortable : false},
+    		            {display: '单位', name : 'unit', width : 50, sortable : false},
+    		            {display: '数量', name : 'num', width : 50, sortable : false},
+    		            {display: '级别', name : 'level', width : 70, sortable : true,formatter:function(value,row){
+    		            	if(value==0){
+    		            		return '主料';
+    		            	}else if(value==1){
+    		            		return '替代料';
+    		            	}else{
+    		            		return '';
+    		            	}
+    		            }},
+    		            {display: '备注', name : 'remark', width : 100, sortable : false},
+    		            {display: '常用排序号', name : 'orderNo', width : 70, sortable : true,formatter:function(value,row){
+    		            	if(row.oftenId){
+    		            		return value;
+    		            	}else{
+    		            		return '';
+    		            	}
+    		            }}
+   		        ],
+   		        buttons : [
+   		                {name: '设置常用商品', bclass: 'edit', onpress : setOften},
+    		            {separator: true},
+    		            {name: '取消常用设置', bclass: 'edit', onpress : cancelOften},
+    		            {separator: true}
+   		        ],
+   		        searchitems :[
+						{display:'编码',name:'code',type:'text'},
+   		            	{display:'名称',name:'name',type:'text'},
+   		             	{display:'规格',name:'norm',type:'text'}
+   		        ]
+   		    };
+   		    $('#dgd_part').sgDatagrid(defaults);
+   		    
+    })(jQuery)
+    
+</script>
+</html>

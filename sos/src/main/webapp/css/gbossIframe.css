@@ -1,0 +1,398 @@
+/*fast.html css*/
+html,body{height: 100%;}
+#nw_fast_form {
+	position: relative;
+	display: block;
+	/*width: 95.5%;*/
+	background: #fff;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px;	
+	margin: 5px 0 0 5px;
+	/*max-height: 664px;*/
+	overflow-y:auto;
+	overflow-x:hidden;
+	/*height: 664px;*/
+	height: 99%;
+}
+/*largecustmanager.html css
+#nw_largecustmng_form {
+	position: relative;
+	display: block;
+	width: 870px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;	
+	margin: 5px 0 0 5px;	
+	max-height: 585px;
+	overflow-y:auto;
+	overflow-x:hidden;
+}*/
+/* 设置滚动条的样式 */
+#nw_largecustmng_form::-webkit-scrollbar {
+    width: 12px;
+}
+/* 滚动槽 */
+#nw_largecustmng_form::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
+/* 滚动条滑块 */
+#nw_largecustmng_form::-webkit-scrollbar-thumb {
+	height:20px;
+    background: rgba(0,0,0,0.1);
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+#nw_largecustmng_form:hover::-webkit-scrollbar-thumb {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+#nw_largecustmng_form::-webkit-scrollbar-thumb:window-inactive {
+    background: rgba(255,0,0,0.4);
+}
+/*private.html css
+#nw_private_form {
+	position: relative;
+	display: block;
+	width: 870px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;	
+	margin: 5px 0 0 5px;	
+	max-height: 585px;
+	overflow-y:auto;
+	overflow-x:hidden;
+}*/
+/*largecust.html css
+#nw_largecust_all {
+	position: relative;
+	display: block;
+	width: 870px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;	
+	margin: 5px 0 0 5px;	
+	max-height: 585px;
+	overflow-y:auto;
+	overflow-x:hidden;
+}*/
+/*documents.html css*/
+#nw_document_all {
+	position: relative;
+	display: block;
+	/*width: 95.5%;*/
+	background: #fff;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px;	
+	margin: 5px 0 0 5px;	
+	/*max-height: 664px;*/
+	overflow-y:auto;
+	overflow-x:hidden;
+	color: #000;
+	font-size: 12px;
+	/*height: 664px;*/
+	height: 99%;
+}
+/*customer.html css
+#customer_form {
+	position: relative;
+	display: block;
+	width: 870px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;	
+	margin: 5px 0 0 5px;	
+	max-height: 585px;
+	overflow-y:auto;
+	overflow-x:hidden;
+}*/
+/*taskmanagement.html css*/
+#bsp_taskmanagement_all {
+	position: relative;
+	display: block;
+	/*width: 95.5%;*/
+	background: #fff;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px;
+	margin: 5px 0 0 5px;	
+	overflow:auto;
+	/*max-height: 664px;*/
+	overflow-y:auto;
+	overflow-x:hidden;
+	/*height: 664px;*/
+	height: 99%;
+}
+/*insurancehandled.html css*/
+#som_insure_form {
+	position: relative;
+	display: block;
+	width: 870px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;	
+	margin: 5px 0 0 5px;	
+	max-height: 585px;
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+/*policymanagement.html css*/
+#bsp_pm_all {
+	position: relative;
+	display: block;
+	width: 935px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;	
+	margin: 5px 0 0 5px;	
+	overflow-y:auto;
+	overflow-x:hidden;
+	max-height: 585px;
+}
+/*service.html css*/
+#service_form {
+	position: relative;
+	display: block;
+	width: 870px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;	
+	margin: 5px 0 0 5px;	
+	max-height: 585px;	
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+/*largecustsales.html css*/
+#fee_ls_all {
+	position: relative;
+	display: block;
+	width: 870px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;	
+	margin: 5px 0 0 5px;	
+	max-height: 585px;
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+/*innetwork.html css*/
+#rp_innetwork_all {
+	position: relative;
+	display: block;
+	width: 870px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;	
+	margin: 5px 0 0 5px;	
+	max-height: 585px;
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+.hDiv table th,.hDiv table td {
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #fff;
+	overflow: hidden;
+	vertical-align: top !important;
+	padding-left: 4px;
+	padding-right: 4px;
+	line-height: 30px;
+}
+.hDiv table th{
+	line-height: 33px;
+}
+
+.hDiv table thead th[rowspan],.hDiv th[colspan] {
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #fff;
+	overflow: hidden;
+	vertical-align: middle !important;
+	text-align: center !important;
+	line-height: 28px;
+}
+
+.hDiv table tbody {
+	border: 1px solid #cbcbd5;
+	border-top: 0px;
+	overflow-y: scroll;
+	border-bottom: 1px solid #ccc;
+	background-color: #fff;
+}
+
+.hDiv table tbody tr.normalRow {
+	background-color: #dfe6ef;
+}
+
+.hDiv table tbody tr:hover {
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4791d2),
+		to(#4791d2), color-stop(.6, #4791d2));
+	background: -moz-linear-gradient(0% 65% 90deg, #4791d2, #4791d2, #4791d2 100%);
+	color: #fff;
+}
+/*summary.html css*/
+#summary_form {
+	position: relative;
+	display: block;
+	width: 870px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;	
+	margin: 5px 0 0 5px;	
+	max-height: 585px;
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+/*monitoring.html css*/
+#monitoring {
+	position: relative;
+	display: block;
+	/*width: 95.5%;*/
+	background: #fff;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px;
+	margin: 5px 0 0 5px;	
+	overflow:auto;
+	/*max-height: 636px;*/
+	overflow-y:auto;
+	overflow-x:hidden;
+	/*height: 664px;*/
+	height: 99%;
+}
+/*content.html css*/
+#sys_memo_grid {
+	position: relative;
+	display: block;
+	/*width: 870px;*/
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;	
+	margin: 5px 0 0 5px;	
+	overflow:auto;
+	/*max-height: 585px;*/
+	overflow-y:auto;
+	overflow-x:hidden;
+	/*height: 664px;*/
+	height: 99%;
+}
+/*faq.html css*/
+/*#order_add_form {
+	position: relative;
+	display: block;
+	width: 870px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;	
+	margin: 5px 0 0 5px;	
+	overflow:auto;
+	max-height: 585px;
+	overflow-y:auto;
+	overflow-x:hidden;
+}*/
+/*manual.html css*/
+#hp_manual_all {
+	position: relative;
+	display: block;
+	width: 870px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;	
+	margin: 5px 0 0 5px;	
+	overflow:auto;
+	max-height: 585px;
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+/*about.html css*/
+#order_add_form {
+	position: relative;
+	display: block;
+	/*width: 95.5%;*/
+	background: #fff;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px;	
+	margin: 5px 0 0 5px;	
+	overflow:auto;
+	/*max-height: 664px;*/
+	overflow-y:auto;
+	overflow-x:hidden;
+	/*height: 642px;*/
+	height: 99%;
+}
+/*news_add.html css*/
+#news_form {
+	position: relative;
+	display: block;
+	width: 870px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;
+	margin: 5px 0 0 5px;
+	max-height: 585px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+#sim_form {
+	position: relative;
+	display: block;
+	width: 870px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;
+	margin: 5px 0 0 5px;
+	max-height: 585px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+#insurance_form {
+	position: relative;
+	display: block;
+	width: 870px;
+	background: #e2e5ec;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px 10px 20px;
+	margin: 5px 0 0 5px;
+	max-height: 585px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+#rp_innetwork {
+	position: relative;
+	display: block;
+	/*width: 95.5%;*/
+	background: #fff;
+	border: 1px solid #CFCFCF;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+	padding: 10px 20px;
+	margin: 5px 0 0 5px;	
+	overflow:auto;
+	/*max-height: 636px;*/
+	overflow-y:auto;
+	overflow-x:hidden;
+	/*height: 664px;*/
+	height: 99%;
+}

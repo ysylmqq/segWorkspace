@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>新产品入库</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+<div id="nw_document_all">
+ <div id="dgd_stock_purchase" class="datagrid"></div>
+ <datalist id="productDataList">
+</div>
+            </datalist>
+ <!-- 打印iframe -->
+	<iframe id="ifm_print_si_p_m" name="ifm_print_si_p_m" style="display: none"></iframe>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+	(function($){
+		var productDataList=[];//商品数组 key:商品名称,value code:productId
+		var lastMonthDay=new Date();//上个月的今天
+    	//lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+		lastMonthDay.setDate(1);
+    	lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+    	
+		var today=new Date().format('yyyy-MM-dd');
+		var purchaseList = null;
+		  //修改表格的宽度
+        var height =$('#main_bd',window.parent.document).height()-288;
+    	//初始化表格
+    	 var defaults = {
+    		        title: "新产品入库",
+    		        width:  '100%',
+    		        dataTblWidth:  900,
+    		        fitColumn:  false,
+    		        height: height,
+    		        url: '../../stock/findStockIn4Report',
+    		        usepager: true,
+    		        rownumbers:true,
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '日期', name : 'stamp', width : 70, sortable : false},
+						{display: '商品编码', name : 'productCode', width : 100, sortable : false},
+    		            {display: '商品名称', name : 'productName', width : 100, sortable : false},
+    		            {display: '商品规格', name : 'norm', width : 120, sortable : false},
+    		            {display: '单位', name : 'unit', width : 46, sortable : false},
+    		            {display: '数量', name : 'inNum', width : 46, sortable : false,isAdd:true},
+    		            {display: '单价', name : 'price', width : 46, sortable : false},
+    		            {display: '送货单号', name : 'code', width : 130, sortable : false},
+    		            {display: '仓库', name : 'whsName', width : 100, sortable : false},
+    		            {display: '备注', name : 'remark', width : 80, sortable : false}
+    		        ],
+    		        buttons : [
+    		        ],
+    		        searchitems :[
+						{display:'营业处仓库',html:'<select size="1" name="whsId" id="whsId" style="width:142px"><option value="">--请选择--</option> </select>'},
+						{display:'商品名称',html:'<input type="text" name="productNameCondn" list="productDataList" style="width:150px;" /> <input type="hidden" id="productId" name="productId" />'},
+    		            {display:'送货单号',html:'<input type="text" id="purchaseNO" name="purchaseNO" list="purchaseList"  required="true" style="width:163px;" /><input type="hidden" name="orderId" id="orderId" required="true" /><datalist id="purchaseList"></datalist>'},
+						{display:'开始日期',name:'startDate',type:'date',width:150,value:lastMonthDay},
+				      	{display:'结束日期',name:'endDate',type:'date',width:150,value:today}
+    		        ],
+    		        query:{startDate:lastMonthDay,endDate:today,type:0},
+    		        exporturl:'./../../stock/exportExcel4StockIn',//导出excel
+    		        isCount:true//是否合计
+    		    };
+    		    $('#dgd_stock_purchase').sgDatagrid(defaults); 
+    		    
+    		  //填充仓库
+			    $.ajax( {
+				  type : 'post', 
+				  async: false,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : './../../stock/findWarehouses',   
+				  data:JSON.stringify({}),//除开本仓库
+				  success : function(data) {
+					  if(data){
+						  var whsId=$("#whsId");
+						  if(whsId.get(0)){
+							  $.each(data,function(k,v){
+								  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+							  }); 
+						  }
+						 
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+    		  //自动查询商品
+       			var checkProduct = function(){
+       				/* var text=this.value;
+       				text = text.replace(/\s/g,''); //去除空格
+       				if(text!=this.value){//有空格
+       					this.value=text;
+       					$(this).trigger('change');
+       					return false;
+       				} */
+       				var params = {};
+       				params.pageNo = 1;
+       				params.pageSize = 15;
+       				params.filter = {};
+       				params.filter.nameOrCode = this.value;
+       				var obj = $(this);
+       				$.ajax({
+       					  type : 'post', 
+       					  async: true,   
+       					  contentType : 'application/json',     
+       					  dataType : 'json',     
+       					  url : '../../product/findProducts',   
+       					  data:JSON.stringify(params),
+       					  success : function(data) {
+       						  if(data){
+       							  var products = data.items;
+       							  if(products.length>0){
+       								  $("#productDataList").empty();
+       							      productDataList=[];
+       							  }
+       							  var key=null;
+       							  $.each( products, function(key,value){
+       								  var op = $("<option></option>");
+       								  key=value.code;
+       								  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+       									 
+       								  $("#productDataList").append(op);
+       								  productDataList[key]=value.id;
+       							 });
+       						  }else{
+       							  $(document).sgPup({message:'message_info',text: data});
+       						  }
+       					  } ,     
+       					  error : function(res,error) { 
+       					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+       					  }    
+       					});
+       			};
+       			
+       		  //填充商品
+       			$.ajax({
+       				  type : 'post', 
+       				  async: true,   
+       				  contentType : 'application/json',     
+       				  dataType : 'json',     
+       				  url : '../../product/findProducts',   
+       				  data:JSON.stringify({pageNo:1,pageSize:15,filter:{type:0}}),
+       				  success : function(data) {
+       					  if(data){
+       						  var products = data.items;
+       						  $("#productDataList").empty();
+       						  var key=null;
+       						  productDataList=[];
+       						  $.each( products, function(key,value){
+       							  var op = $("<option></option>");
+       							  key=value.code;
+       							  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+       							  
+       							  $("#productDataList").append(op);
+       							  productDataList[key]=value.id;
+       						 });
+       						var productNameCondn=$('input[name=productNameCondn]',$('#dgd_stock_purchase'));
+       						productNameCondn.on('keyup',checkProduct);
+       						
+       						productNameCondn.on('change',function(){
+       							var strs = this.value.split(" ");
+       							$(this).val(strs[strs.length-3]);
+       							if($(this).val()){
+    								$("#productId",$('#dgd_stock_purchase')).val(productDataList[strs[strs.length-2]]);
+    								if($("#productId",$('#dgd_stock_purchase')).val().length==0){
+    									$("#productNameCondn",$('#dgd_stock_purchase')).val("");
+    								}
+    						    }else{
+    						    	$(this).val('');
+    						    	$("#productId",$('#dgd_stock_purchase')).val("");
+    						    }
+    						
+    							});
+
+       					  }else{
+       						  $(document).sgPup({message:'message_info',text: data});
+       					  }
+       				  } ,     
+       				  error : function(res,error) { 
+       				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+       				  }    
+       				}); 
+       		  
+    		    var checkPurchase = function(){
+    				var params = {};
+    				params.pageNo = 1;
+    				params.pageSize = 10;
+    				params.filter = {};
+    				params.filter.orderNo = this.value;
+    				params.filter.status = 1;
+    				var obj = $(this);
+    			
+    				$.ajax({
+    					  type : 'post', 
+    					  async: true,   
+    					  contentType : 'application/json',     
+    					  dataType : 'json',     
+    					  url : '../../order/findOrdersByPage',   
+    					  data:JSON.stringify(params),
+    					  success : function(data) {
+    						  if(data){
+    							  //var purchase = $("#purchaseNO","#dgd_stock_purchase");
+    							  $("#purchaseList").empty();
+    							  purchaseList = {};
+    							  $.each( data.items, function(key,value){
+    								  var op = $("<option></option>");
+    								  op.val(obj.val()+" "+value.orderNo);
+    								  $("#purchaseList").append(op);
+    								  
+    								  purchaseList[value.orderNo] = value.id;
+    								});
+
+    						  }else{
+    							  $(document).sgPup({message:'message_info',text: data});
+    						  }
+    					  } ,     
+    					  error : function(res,error) { 
+    					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+    					  }    
+    					});
+    			};
+    			
+    			
+    			$.ajax({
+    				  type : 'post', 
+    				  async: true,   
+    				  contentType : 'application/json',     
+    				  dataType : 'json',     
+    				  url : '../../order/findOrdersByPage',   
+    				  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompleted:0,status:1}}),
+    				  success : function(data) {
+    					  if(data){
+    						  var purchase = $("#purchaseNO","#dgd_stock_purchase");
+    						  $("#purchaseList").empty();
+    						  purchaseList = {};
+    						  $.each( data.items, function(key,value){
+    							  var op = $("<option></option>");
+    							  op.val(value.orderNo);
+    							  $("#purchaseList").append(op);
+    							  
+    							  purchaseList[value.orderNo] = value.id;
+    							});
+    						  purchase.on('keyup',checkPurchase);
+    						  purchase.on('change',function(){
+    							  var strs = this.value.split(" ");
+    							  $(this).val(strs[strs.length-1]);
+    							  $("#orderId","#dgd_stock_purchase").val(purchaseList[strs[strs.length-1]]);
+    								if($("#orderId","#dgd_stock_purchase").val().length==0){
+    									$("#purchaseNO","#dgd_stock_purchase").val("");
+    								}
+    							  
+    							});
+
+    					  }else{
+    						  $(document).sgPup({message:'message_info',text: data});
+    					  }
+    				  } ,     
+    				  error : function(res,error) { 
+    				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+    				  }    
+    				});
+    			 
+    		  //复制一个导出->打印,再把它插入到原来导出的后面
+			  $("#dgd_stock_purchase .sDiv>.pGroup:first").clone().insertAfter($("#dgd_stock_purchase .sDiv>.pGroup:last"));
+			  $("#dgd_stock_purchase .sDiv>.pGroup:last a.button").attr('id','aprint');
+			  $("#dgd_stock_purchase .sDiv>.pGroup:last span.button_span span").html('打印');
+			  //打印
+			 $('#aprint').on('click',function(){
+				 //$('#ifm_print_si_p_m').attr('src','stock_print2.html');
+				 var	sName='winPrint';
+   					var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+   					if (isChrome){
+   					  sName='ifm_print_si_p_m';
+   					}
+   					window.open('../whs/print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+   					if (!isChrome){
+   						//新增遮罩层
+   		  				var mask=$('<div id="print_mask"></div>');
+   		  				mask.addClass('window-mask');
+   		  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+   		  		        var span=$('<span></span');
+   		  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+   		  		        span.text('正在打印中...');
+   		  		        mask.append(span);
+   		  			    $(window.document.body).append(mask);
+					    } 
+			 });
+			  
+	})(jQuery)
+	
+	
+//打印页面元素设置
+  var callback=function(subWinBody,subWin){
+	 var wareHouseName=null;//仓库名称
+		//得到仓库名称
+	         $.ajax({
+			  type : 'POST', 
+			  async: false,   
+			  url : '../../stock/getWarehouseName', 
+			  dataType : 'json',  
+			  data:{},
+			  success : function(data) {
+				  if(data){
+					wareHouseName=data.name;
+				  }else{
+					wareHouseName='&nbsp;';
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }   
+			  
+		    });
+         if(!wareHouseName){
+	        	wareHouseName='&nbsp;';
+	        }
+	         //查询数据
+	         var param={};
+	        param.whsId=$("select[name=whsId]").val();
+	 		param.startDate=$("input[name=startDate]").val();
+	 		param.endDate=$("input[name=endDate]").val();
+	 		param.productId=$("input[name=productId]").val();
+	 		param.orderId=$("input[name=orderId]").val();
+	 		param.type=0;//采购入库
+	 		var resultData=null;//查询结果数据
+	 		
+	 		 $.ajax({
+	 	            type: "POST",
+	 	            async:false,
+	 	            contentType : 'application/json',
+	 	            //url:'../../stock/findStockIn4Report',
+	 	            url: '../../stock/findAllStockIn4Report',
+	 	            data: JSON.stringify(param),
+	 	            dataType : 'json',
+	 	            success: function(data){
+	 	            	resultData=data;
+	 	            } ,     
+	 	  		  error : function(res,error) { 
+	 	 		  }  
+	 	        });
+	 
+	$.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCurrentCompany',   
+		  data:JSON.stringify({}),
+		  success : function(data) {
+			  if(data){
+				  var total = 0;
+				  //公司中文名字
+				  $("#cname",subWinBody).empty();
+				  $("#cname",subWinBody).append(data.cnfullname);
+				  //公司英文名字
+				  $("#ename",subWinBody).empty();
+				  $("#ename",subWinBody).append(data.enfullname);
+				  //表单名字
+				  $("#orderTitle",subWinBody).empty();
+				  $("#orderTitle",subWinBody).append("新产品入库");
+				  //表单日期
+				  $("#orderDate",subWinBody).empty();
+				  $("#orderDate",subWinBody).append(new Date().format('yyyy-MM-dd'));
+				  //表单单号
+				  $("#orderNo",subWinBody).empty();
+				  $("#orderNo",subWinBody).append('&nbsp;');
+				  
+				  //表前输入单
+				  var outWhs ='<span style="width:10%;">入库仓库：</span>';
+				  outWhs=outWhs+'<div style="width:20%;">'+wareHouseName+'</div>';
+				 
+				  $("#headInput",subWinBody).append(outWhs);
+				  
+				  var startDate = '<span style="width:10%;">开始日期：</span>';
+				  startDate=startDate+'<div style="width:20%">'+$("input[name=startDate]").val()+'</div>';
+				  $("#headInput",subWinBody).append(startDate);
+				  
+				  var endDate = '<span style="width:10%;">结束日期：</span>';
+				  endDate = endDate+'<div style="width:30%">'+$("input[name=endDate]").val()+'</div>';
+				  $("#headInput",subWinBody).append(endDate);
+				  
+				  //表头
+				  $("#tbHead",subWinBody).append('<td style="width: 6%;" axis="rownumbers"><div>序号</div></td>'+
+						  									'<td style="width: 10%;" axis="stamp"><div>日期</div></td>'+
+														  '<td style="width: 10%;" axis="productCode"><div>商品编码</div></td>'+
+														  '<td style="width: 10%;" axis="productName"><div>商品名称</div></td>'+
+														  '<td style="width: 20%;" axis="norm"><div>商品规格</div></td>'+
+														  '<td style="width: 4%;" axis="unit"><div>单位</div></td>'+
+														  '<td style="width: 5%;" axis="inNum"><div>数量</div></td>'+
+														  '<td style="width: 5%;" axis="price"><div>单价</div></td>'+
+														  '<td style="width: 10%;" axis="code"><div>送货单号</div></td>'+
+														  '<td style="width: 10%;" axis="whsName"><div>仓库</div></td>'+
+														  '<td style="width: 10%;" axis="remark"><div>备注</div></td>');
+				  
+				  if(resultData){
+					//列头
+		           		var colModel=[];
+		           		colModel.push({name:'rownumbers'});
+		           		colModel.push({name:'stamp'});
+		           		colModel.push({name:'productCode'});
+		           		colModel.push({name:'productName'});
+		           		colModel.push({name:'norm'});
+		           		colModel.push({name:'unit'});
+		           		colModel.push({name:'inNum'});
+		           		colModel.push({name:'price'});
+		           		colModel.push({name:'code'});
+		           		colModel.push({name:'whsName'});
+		           		colModel.push({name:'remark'});
+		           		
+		           	   var tr=null;
+		    	        var td=null;
+		    	      var inNum=0;//合计入库数量
+		    	        $.each(resultData,function(i,row){
+		    	            tr = '<tr>';
+		                	$.each(colModel,function(k,v){
+		                		td ='<td>';
+		    	                var tdx = v.name;
+
+		    	            	if(tdx=='rownumbers'){
+		    	                 	var num = i+1;
+		    	                 	td=td+num+'</td>';              	
+		    	                 }else{
+		    	                	 if(row[tdx]=='null' || row[tdx]==null){
+		    	                		 row[tdx]='';
+		    	                	 }
+		    	                	 td=td+row[tdx];
+		    	                	 td=td+'</td>';
+		    	                	 
+		    	                	 if(tdx=='inNum'){
+		    	                		 inNum=Number(inNum)+Number(row[tdx]);
+		    	                	 }
+		    	                 }
+		    	           
+		    	            	tr=tr+td;
+		                	});
+		                	tr=tr+'</tr>';
+		                	$("#tbBody",subWinBody).append(tr);
+		    	        });
+		    	      
+		    	        if(resultData.length>0){
+		    	        	 //表合计
+		  				  var tbfoot = '<tr>';
+		  				  tbfoot=tbfoot+'<td colspan="6"><div style="text-align:right">小计:</div></td>';
+		  				  tbfoot=tbfoot+'<td colspan="1">'+inNum+'</td>';
+		  				  tbfoot=tbfoot+'<td colspan="4"></td>';
+		  				  tbfoot=tbfoot+'</tr>';
+		  				  $("#tbBody",subWinBody).append(tbfoot);
+		    	        }
+				  }
+				 
+				  //表尾输入单
+				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+													  '<span>复核人：</span><div>&nbsp;</div>'+
+													  '<span>仓管员：</span><div>&nbsp;</div>'+
+													  '<span>制单：</span><div>&nbsp;</div>');
+				  
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+	
+    if (navigator.appName == 'Microsoft Internet Explorer'){
+    	subWin.print();  
+    }else{ 
+    	subWin.focus();
+    	subWin.print();  
+    }
+}
+</script>
+</html>

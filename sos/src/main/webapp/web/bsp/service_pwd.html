@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>修改服务密码</title>
+<style type="text/css">
+</style>
+</head>
+<body>
+	<form id='sys_pwd_form' method='post' class="form" style="width:290px;">
+		<fieldset style="width:280px;">
+			<div class="panel">
+                <span class="title">密码:</span>
+                <input type='password' id="service_pwd" name='service_pwd' required="true" style="width:160px;" onblur="checknum()"/>
+            </div>
+            <div class="panel">
+                <span class="title">确认密码:</span>
+                <input type='password' id="service_pwd_cf" name='service_pwd_cf' required="true" style="width:160px;" onblur="checkpwd()"/>
+            </div>
+		</fieldset>
+	</form>
+</body>
+</html>

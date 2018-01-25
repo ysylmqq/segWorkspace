@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>订单审核</title>
+</head>
+<body>
+	<div id="order_grid" class="datagird"></div>
+<!-- 打印iframe -->
+	<iframe id="ifm_print_order_check" name="ifm_print_order_check" style="display: none"></iframe>
+</body>
+<script type="text/javascript">
+	(function($){
+		var lastMonthDay=new Date();//上个月的今天
+    	//lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+		lastMonthDay.setDate(1);
+    	lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+	 var now =new Date().format('yyyy-MM-dd');
+	 
+	 var editId=null;//编辑时选中行ID
+	 var editobj = null; //编辑时选中的对象
+	 
+	 var loadSuccess = function(){
+		 $('#orderId','#order_edit_form').val(editobj['id']);
+		 $('#orderNo','#order_edit_form').val(editobj['orderNo']);
+		 $('#totalPrice','#order_edit_form').val(editobj['totalPrice']);
+		 $('#stamp','#order_edit_form').val(editobj['stamp']);
+		 $("#receiptName",'#order_edit_form').val(editobj['receiptName']);
+		 $("#remark",'#order_edit_form').val(editobj['remark']);		   
+		 //初始化表格
+	   	 var detail_defaults = {
+	   		        width:  840,
+	   		        height: 100,
+	   		        url: '../../order/findOrderDetailsByOrderId ',
+	   		        query:{orderId:editobj['id']},
+	   		        rownumbers:true,//序号
+	   		        colModel : [
+	   		            {display: '商品名称', name : 'productName', width : 160, sortable : false},
+	   		            {display: '商品规格', name : 'norm', width : 160, sortable : false},
+	   		            {display: '价格(元)', name : 'price', width : 70, sortable : false},
+	   		            {display: '采购数量', name : 'num', width : 70, sortable : false},
+	   		         	{display: '已采购数量', name : 'inNum', width : 70, sortable : false},
+	   		         	{display: '备注', name : 'remark', width : 160, sortable : false}	   		         	
+	   		        ]
+	   		    };
+		   $('#order_detail_grid').sgDatagrid(detail_defaults); 
+		   
+		   var customer_defaults = {
+	   		        width:  840,
+	   		        height: 100,
+	   		        url: '../../order/findCustomerAddress',
+	   		        query:{orderId:editobj['id']},
+	   		        rownumbers:true,//序号
+	   		        colModel : [
+	   		            	{display: '收货人', name : 'name', width : 100, sortable : false},
+		   		            {display: '联系电话', name : 'phone', width : 80, sortable : false},
+		   		         	{display: '收货地址', name : 'address', width : 200, sortable : false},
+		   		         	{display: '运输方式', name : 'transportType', width : 80, sortable : false,formatter:function(value,row){
+	    		                if(value==0){
+	    		                    value = '航空';
+	    		                }else if(value==1){
+	    		                    value = '汽运';
+	    		                }else if(value==2){
+	    		                    value = '中铁';
+	    		                }else if(value==3){
+	    		                    value = '快递';
+	    		                }else if(value==4){
+	    		                    value = '指定货运';
+	    		                }else{
+	    		                	value ="";
+	    		                }
+	    		                return value;
+	    		            }},
+		   		         	{display: '指定货运', name : 'specifyFreight', width : 80, sortable : false},
+		   		         	{display: '运费承接方', name : 'payType', width : 80, sortable : false,formatter:function(value,row){
+	    		                if(value==0){
+	    		                    value = '客户提付';
+	    		                }else if(value==1){
+	    		                    value = '赛格支付';
+	    		                }else if(value==2){
+	    		                    value = '赛格垫付';
+	    		                }else if(value==3){
+	    		                    value = '送货上门';
+	    		                }else{
+	    		                	value ="";
+	    		                }
+	    		                return value;
+	    		            }},
+	    		            {display: '备注', name : 'oremark', width : 80, sortable : false}
+	   		        ]
+	   		    };
+		   $('#order_customer_grid').sgDatagrid(customer_defaults);
+		   
+		   editId=null;
+		   editobj = null;
+	   }
+	 var toClose = function(){
+		 $(document).sgWindow('close',{id:'order_add_window'});
+	 }
+	 var checkItem = function(){
+		 var obj = $('#order_grid');
+	        var bDiv = $('.bDiv',obj);
+
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){
+	                	var params = {};
+	                	editId=this.value;
+	                	params.id = editId;
+	                	//$(document).sgPup({message:'message_info',text: JSON.stringify($(this).data('data')));
+	                	editobj = $(this).data('data');
+	                	if(editobj.status==0){
+	                	if(window.confirm('审核后订单生效，将不能删除,确定审核通过?')){
+	                		//审核所选项
+		                	$.ajax( {
+					       		  type : 'post', 
+					       		  async: false,   
+					       		  contentType : 'application/json',     
+					       		  dataType : 'json',     
+					       		  url : '../../order/updateStatus',   
+					       		  data:JSON.stringify(params),
+					       		  success : function(data) {
+					       			  if(data){
+					       				  if(data.success){
+					       					  $(document).sgPup({message:'message_info',text: "审核成功！"})
+					       				  }else{
+					       					 $(document).sgPup({message:'message_info',text: data.msg})
+					       				  }
+					       				 
+					       			  }else{
+					       				  $(document).sgPup({message:'message_info',text: data});
+					       			  }
+					       		  } ,     
+					       		  error : function(res,error) { 
+					       		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					       		  }    
+				       		});
+		                	$('#order_grid').sgDatagrid('reload','sgDatagrid');
+	                	}
+	                	}else{
+	                		$(document).sgPup({message:'message_info',text: "该订单已生效!"});
+	                	}		                	
+	                }
+	            });
+	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }
+	 }
+	 var exportOrderDetail = function(){
+		 var url="order/exportExcel4OrderDetail?orderId="+$('#orderId','#order_edit_form').val();
+         window.location.href=url;
+	 }
+	 var editItem = function(){
+	        var obj = $('#order_grid');
+	        var bDiv = $('.bDiv',obj);
+
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){    
+	                	editId=this.value;
+	                	//$(document).sgPup({message:'message_info',text: JSON.stringify($(this).data('data'))});
+	                	editobj = $(this).data('data');
+	                	//打开窗口
+		                var defaults = {
+		    	                title:'订单查看',
+		    	                id:'order_add_window',
+		    	                form:'order_edit_form',
+		    	                url:'web/order/order_detail_form.html',
+		    	                success: loadSuccess,
+		    	                width: 861,
+		    	                height: 530,
+		    	                buttons : [
+		    	                           {name: '关闭', type: 'submit', onpress : toClose },
+		    	                           {name: '导出Excel',  onpress : exportOrderDetail }
+		    	                       ]
+		    	            };
+		    	        $(document).sgWindow(defaults);
+	                }
+	            });
+	        }
+	    }
+		//初始化表格
+   	 var defaults = {
+   		        title: "订单审核",
+   		     	width:  870,
+		        height: 387,
+   		        url: '../../order/findOrdersByPage',
+	   		    usepager: true,
+	 	        rownumbers:true,
+	 	        useRp: true,
+	 	        colid:'id',  //主键
+	 	        query:{startDate:lastMonthDay,endDate:now,status:0},
+   		        colModel : [
+   		            {display: '订单号', name : 'orderNo', width : 130, sortable : false},
+   		         	{display: '订单接收人', name : 'receiptName', width : 80, sortable : false}, 
+   		            {display: '总金额(元)', name : 'totalPrice', width : 80, sortable : false},   		            
+   		            {display: '订单日期', name : 'stamp', width : 80, sortable : true},
+   		         	{display: '备注', name : 'remark', width : 240, sortable : false},
+   		         	{display: '是否生效', name : 'status', width : 50, sortable : false,formatter:function(value,row){
+	   		         	if(value==0){
+		                    value = '<font color="red">否</font>';
+		                }else if(value==1){
+		                    value = '<font color="green">是</font>';
+		                }else{
+   		                	value ='<font color="red">否</font>';
+   		                }
+   		                return value;
+   		            	}
+   		         	},
+   		         	{display: '是否完成', name : 'isCompleted', width : 50, sortable : false,formatter:function(value,row){
+	   		         	if(value==0){
+		                    value = '<font color="red">否</font>';
+		                }else if(value==1){
+		                    value = '<font color="green">是</font>';
+		                }else{
+		                	value ='<font color="red">否</font>';
+		                }
+   		                return value;
+   		            	}
+   		         	},
+   		         {display: '仓库', name : 'whsName', width : 80, sortable : false}
+   		        ],
+   		     	buttons : [
+   		     	       {name: '审核', bclass: 'check', onpress : checkItem},
+  			         	{separator: true},
+   			            {name: '查看', bclass: 'view', onpress : editItem},   			         	
+			            {separator: true}
+   			        ],
+   		        searchitems :[
+					{display:'营业处仓库',html:'<select size="1" name="whsId" id="whsId" style="width:150px"><option value="">--请选择--</option> </select>'},
+   		            {display:'开始日期',name:'startDate',type:'date',value:lastMonthDay},
+			      	{display:'结束日期',name:'endDate',type:'date',value:now},
+			      	{display:'是否生效',name:'status',html:'<select name="status" ><option value="">请选择...</option><option value="0" selected>否</option><option value="1" >是</option></select>'},
+			        {display:'是否完成',name:'isCompleted',html:'<select name="isCompleted" ><option value="">请选择...</option><option value="0">否</option><option value="1" >是</option></select>'},
+   		        ],
+   		        exporturl:'../../order/exportOrders',
+   		     	order:true,
+   		        sortname: "stamp",
+   		        sortorder: "asc"
+   		    };
+   		    $('#order_grid').sgDatagrid(defaults); 
+   		    
+   		 //填充营业处仓库
+   		    $.ajax( {
+   			  type : 'post', 
+   			  async: false,   
+   			  contentType : 'application/json',     
+   			  dataType : 'json',     
+   			  url : './../../stock/findWarehouses',   
+   			  data:JSON.stringify({}),
+   			  success : function(data) {
+   				  if(data){
+   					  var whsId=$("#whsId",$('#order_grid'));
+   					  if(whsId.get(0)){
+   						  $.each(data,function(k,v){
+   							  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+   						  }); 
+   					  }
+   					 
+   				  }else{
+   					  $(document).sgPup({message:'message_info',text: data});
+   				  }
+   			  } ,     
+   			  error : function(res,error) { 
+   			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+   			  }    
+   			});	
+	})(jQuery)
+	
+	//打印页面元素设置
+	    var callback=function(subWinBody,subWin){
+	  	$.ajax( {
+	  		  type : 'post', 
+	  		  async: false,   
+	  		  contentType : 'application/json',     
+	  		  dataType : 'json',     
+	  		  url : '../../getCurrentCompany',   
+	  		  data:JSON.stringify({}),
+	  		  success : function(data) {
+	  			  if(data){
+	  				  var total = 0;
+	  				  var rowtotal = 0;
+	  				  //公司中文名字
+	  				  $("#cname",subWinBody).empty();
+	  				  $("#cname",subWinBody).append(data.cnfullname);
+	  				  //公司英文名字
+	  				  $("#ename",subWinBody).empty();
+	  				  $("#ename",subWinBody).append(data.enfullname);
+	  				  //表单名字
+	  				  $("#orderTitle",subWinBody).empty();
+	  				  $("#orderTitle",subWinBody).append("产品订单");
+	  				  
+	  				  //表单日期
+	  				  $("#orderDate",subWinBody).empty();
+	  				  $("#orderDate",subWinBody).append($("#stamp","#order_add_form").val());
+	  				  //表单单号
+	  				  $("#orderNo",subWinBody).empty();
+	  				  $("#orderNo",subWinBody).append($("#orderNo","#order_add_form").val());
+	  				  
+	  				  //表前输入单
+	  				  var str = '<span>客户名称：</span><div>&nbsp;</div>';
+	       			  $("#headInput",subWinBody).append(str);
+	  				  
+	  				  var order = '<span>订单接收人：</span><div>'+$("#receiptName","#order_add_form").val()+'</div>';
+	  				  $("#headInput",subWinBody).append(order);
+	  				  
+	  				  var remark = '<span>备注：</span><div style="width:700px">'+$("#orderRemark","#order_add_form").val()+'</div>';
+	  				  $("#headInput",subWinBody).append(remark);
+	  			
+	  				  //表头
+	  				  $("#tbHead",subWinBody).append('<td style="width: 10%;"><div>序号</div></td>'+
+	  														  '<td style="width: 15%;"><div>商品编码</div></td>'+
+	  														  '<td style="width: 15%;"><div>商品名称</div></td>'+
+	  														  '<td style="width: 20%;" ><div>商品规格</div></td>'+
+	  														  '<td style="width: 10%;"><div>价格(元)</div></td>'+
+	  														  '<td style="width: 10%;"><div>数量</div></td>'+
+	  														  '<td style="width: 10%;"><div>金额</div></td>'+
+	  														  '<td style="width: 10%;"><div>备注</div></td>');
+	  				  
+	  				  //表格主体
+	  				  var productIds = $('input[name=productId]','#order_add_form');
+               		  var productNames=$('input[name=productName]','#order_add_form');
+               		  var productCodes=$('input[name=productCode]','#order_add_form');
+          		      var productNorms=$('input[name=productNorm]','#order_add_form');
+               		  var productNums= $('input[name=num]','#order_add_form');
+               		  var productPrices= $('input[name=price]','#order_add_form');
+              	      var remarks= $('input[name=remark]','#order_add_form');
+            		  
+             	  
+	  	              $.each(productIds,function(k,v){
+	  	            	rowtotal = Number(productPrices[k].value)*Number(productNums[k].value);
+	  	               	total = total +rowtotal;
+	  	               	var tbbody_tr = '<tr><td>'+(k+1)+'</td>'
+										+'<td>'+productCodes[k].value+'</td>'
+	  	               	                +'<td>'+productNames[k].value+'</td>'
+	  	                                +'<td>'+productNorms[k].value+'</td>'
+	  	                                +'<td>'+productPrices[k].value+'</td>'
+	  	               	                +'<td>'+productNums[k].value+'</td>'
+	  	               	           		+'<td>'+rowtotal+'</td>'
+	  	               					+'<td>'+remarks[k].value+'</td></tr>';	  
+
+	  	               	$("#tbBody",subWinBody).append(tbbody_tr);
+	  	              })
+	  				  
+	  				/*   //表合计	  				  
+	  				  var tbfoot = '<tr><td style="width:428px;"><div style="text-align:right;">小计:</div></td><td style="width:447px;"><div style="text-align:right;padding-right:37px;">'+total+'</div></td><td style="width: 70px"><div>&nbsp;</div></td></tr>';
+	  				  			  
+	  				  $("#tbFoot",subWinBody).append(tbfoot); */
+	  				  //表合计
+					  var tbfoot = '<tr>';
+					  tbfoot=tbfoot+'<td colspan="6"><div style="text-align:right">小计:</div></td>';
+					  tbfoot=tbfoot+'<td colspan="1"><div style="text-align:right">'+total+'</div></td>';
+					  tbfoot=tbfoot+'<td colspan="1"></td>';
+					  tbfoot=tbfoot+'</tr>';
+		               
+					  $("#tbBody",subWinBody).append(tbfoot);
+	  				  
+	  				  //表尾输入单
+	  				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+	  													  '<span>经办人：</span><div>&nbsp;</div>'+
+	  													  '<span>制单：</span><div>&nbsp;</div>');
+	  				  $(document).sgWindow('close',{id:'order_add_window'});
+	  				  
+	  			  }else{
+	  				  $(document).sgPup({message:'message_info',text: data});
+	  			  }
+	  		  } ,     
+	  		  error : function(res,error) { 
+	  		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  		  }    
+	  		});
+	  	
+	      if (navigator.appName == 'Microsoft Internet Explorer'){
+	      	subWin.print();  
+	      }else{ 
+	      	subWin.focus();
+	      	subWin.print();  
+	      }
+	      
+	      
+	  }
+</script>
+</html>

@@ -1,0 +1,192 @@
+package com.gboss.service;
+
+import java.util.HashMap;
+import java.util.List;
+
+import com.gboss.comm.SystemException;
+import com.gboss.pojo.Backup;
+import com.gboss.pojo.Collection;
+import com.gboss.pojo.Collectionbk;
+import com.gboss.pojo.Customer;
+import com.gboss.pojo.Customerbk;
+import com.gboss.pojo.Driver;
+import com.gboss.pojo.Driverbk;
+import com.gboss.pojo.FeeInfo;
+import com.gboss.pojo.FeeInfobk;
+import com.gboss.pojo.Unit;
+import com.gboss.pojo.Unitbk;
+import com.gboss.pojo.Vehicle;
+import com.gboss.pojo.Vehiclebk;
+import com.gboss.util.PageSelect;
+import com.gboss.util.page.Page;
+
+/**
+ * @Package:com.gboss.service
+ * @ClassName:BackupService
+ * @Description:TODO
+ * @author:xiaoke
+ * @date:2014-7-10 下午3:12:08
+ */
+public interface BackupService extends BaseService {
+	
+	/**
+	 * 通过id获取历史记录
+	 * @param bk_id
+	 * @return
+	 */
+	public Backup getBackupByid(Long bk_id)throws SystemException;
+	
+	/**
+	 * 添加备份历史记录
+	 * @param backup
+	 * @return
+	 */
+	public Long addBackup(Backup backup)throws SystemException;
+	
+	/**
+	 * 添加客户记录
+	 * @param customer
+	 * @return
+	 */
+	public Long addCustomerbk(Customerbk customer)throws SystemException;
+	
+	/**
+	 * 添加车辆历史记录
+	 * @param vehicle
+	 * @return
+	 */
+	public Long addVehiclebk(Vehiclebk vehicle)throws SystemException;
+	
+	/**
+	 * 添加车台历史记录
+	 * @param unit
+	 * @return
+	 */
+	public Long addUnitbk(Unitbk unit)throws SystemException;
+	
+	/**
+	 * 添加托收资料历史记录
+	 * @param collection
+	 * @return
+	 */
+	public Long addCollectionbk(Collectionbk collection)throws SystemException;
+	
+	/**
+	 * 添加计费信息历史记录
+	 * @param feeInfo
+	 * @return
+	 */
+	public Long addFeeInfobk(FeeInfobk feeInfo)throws SystemException;
+	
+	/**
+	 * 添加司机信息历史记录
+	 * @param driverbk
+	 * @return
+	 */
+	public Long addDriverbk(Driverbk driverbk)throws SystemException;
+	
+	/**
+	 * 分页查询历史记录
+	 * @param pageSelect
+	 * @return
+	 */
+	public Page<Backup> findBackup(PageSelect<Backup> pageSelect)throws SystemException;
+	
+	/**
+	 * 查询开通、办停记录
+	 * @param pageSelect
+	 * @return
+	 */
+	public Page<Backup> findStopAndOpen(PageSelect<Backup> pageSelect)throws SystemException;
+	
+	/**
+	 * 获取客户历史记录
+	 * @param customer
+	 * @return
+	 */
+	public Customerbk getCustomerbk(Customer customer)throws SystemException;
+	
+	/**
+	 * 获取车辆历史记录
+	 * @param vehicle
+	 * @return
+	 */
+	public Vehiclebk getVehiclebk(Vehicle vehicle)throws SystemException;
+	
+	/**
+	 * 获取车台历史记录
+	 * @param unit
+	 * @return
+	 */
+	public Unitbk getUnitbk(Unit unit)throws SystemException;
+	
+	/**
+	 * 获取托收资料历史记录
+	 * @param collection
+	 * @return
+	 */
+	public Collectionbk getCollectionbk(Collection collection)throws SystemException;
+	
+	/**
+	 * 获取计费信息历史记录
+	 * @param feeInfo
+	 * @return
+	 */
+	public FeeInfobk getFeeInfobk(FeeInfo feeInfo)throws SystemException;
+	
+	/**
+	 * 获取司机历史记录
+	 * @param driver
+	 * @return
+	 */
+	public Driverbk getDriverbk(Driver driver)throws SystemException;
+	
+	/**
+	 * 通过备份记录id获取客户历史记录
+	 * @param bkc_id
+	 * @return
+	 */
+	public Customerbk getCustomerbkbyid(Long bkc_id)throws SystemException;
+	
+	/**
+	 * 通过备份记录id获取车辆历史记录
+	 * @param bkv_id
+	 * @return
+	 */
+	public Vehiclebk getVehiclebkbyid(Long bkv_id)throws SystemException;
+	
+	/**
+	 * 通过备份记录id获取车台历史记录
+	 * @param bkv_id
+	 * @return
+	 */
+	public Unitbk getUnitbkbyid(Long bku_id)throws SystemException;
+	
+	/**
+	 * 通过备份记录id获取托收资料历史记录
+	 * @param bkv_id
+	 * @return
+	 */
+	public Collectionbk getCollectionbkbyid(Long bkfc_id)throws SystemException;
+	
+	/**
+	 * 通过备份记录id获取计费信息历史记录
+	 * @param bkv_id
+	 * @return
+	 */
+	public FeeInfobk getFeeInfobkbyid(Long bkf_id)throws SystemException;
+	
+	/**
+	 * 通过备份记录id获取司机历史记录
+	 * @param bkv_id
+	 * @return
+	 */
+	public Driverbk getDriverbkbyid(Long bkd_id)throws SystemException;
+	
+	/**
+	 * 查询所有的记录
+	 * @return
+	 */
+	public List<HashMap<String, Object>> getListBk(HashMap<String, Object> map)throws SystemException;
+
+}

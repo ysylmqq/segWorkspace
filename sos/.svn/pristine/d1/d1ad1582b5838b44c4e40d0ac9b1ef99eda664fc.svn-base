@@ -1,0 +1,276 @@
+package com.gboss.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import ldap.objectClasses.CommonCompany;
+import ldap.oper.OpenLdap;
+import ldap.oper.OpenLdapManager;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.gboss.comm.SystemConst;
+import com.gboss.comm.SystemException;
+import com.gboss.pojo.Backup;
+import com.gboss.pojo.Collectionbk;
+import com.gboss.pojo.Customerbk;
+import com.gboss.pojo.FeeInfobk;
+import com.gboss.pojo.Unit;
+import com.gboss.pojo.Unitbk;
+import com.gboss.pojo.Vehiclebk;
+import com.gboss.pojo.web.CustInfo;
+import com.gboss.pojo.web.Oldview;
+import com.gboss.service.BackupService;
+import com.gboss.service.ModelService;
+import com.gboss.service.UnitTypeService;
+import com.gboss.util.LogOperation;
+import com.gboss.util.PageSelect;
+import com.gboss.util.StringUtils;
+import com.gboss.util.excel.CreateExcel_PDF_CSV;
+import com.gboss.util.page.Page;
+
+/**
+ * @Package:com.gboss.controller
+ * @ClassName:BackupController
+ * @Description:TODO
+ * @author:xiaoke
+ * @date:2014-7-11 下午3:28:35
+ */
+@Controller
+public class BackupController extends BaseController {
+	
+	@Autowired
+	@Qualifier("BackupService")
+	private BackupService backupService;
+	
+	@Autowired
+	private ModelService modelService;
+	
+	@Autowired
+	private UnitTypeService unitTypeService;
+	
+	@RequestMapping(value = "/backup/findBackup", method = RequestMethod.POST)
+	public @ResponseBody Page<Backup> findBackup(@RequestBody PageSelect<Backup> pageSelect,
+			HttpServletRequest request) throws SystemException {
+		CustInfo custInfo = (CustInfo) request.getSession().getAttribute(SystemConst.CUST_INFO);
+		Unit unit = custInfo.getUnit();
+		Map filter = pageSelect.getFilter();
+		filter.put("unit_id", unit.getUnit_id());
+		pageSelect.setFilter(filter);
+		pageSelect.setOrder("stamp");
+		pageSelect.setIs_desc(true);
+		Page<Backup> result = backupService.findBackup(pageSelect);
+		return result;
+	}
+	
+	@RequestMapping(value = "/backup/exportBk")
+	@LogOperation(description = "导出备份信息", type = SystemConst.OPERATELOG_SEARCHKEY, model_id =20061)
+	public @ResponseBody
+	void exportBk(
+			HttpServletRequest request, HttpServletResponse response)
+			throws SystemException {
+		try {
+			Map returnMap =   request.getParameterMap();
+			//将request.getParameterMap()转换成可操作的普通Map
+			// 返回值Map
+		    Map map = new HashMap();
+		    Iterator entries =returnMap.entrySet().iterator();
+		    Map.Entry entry = null;
+		    String name = "";
+		    String value = "";
+		    while (entries.hasNext()) {
+		        entry = (Map.Entry) entries.next();
+		        name = (String) entry.getKey();
+		        Object valueObj = entry.getValue();
+		        if(null == valueObj){
+		            value = "";
+		        }else if(valueObj instanceof String[]){
+		            String[] values = (String[])valueObj;
+		            for(int i=0;i<values.length;i++){
+		                value = values[i] + ",";
+		            }
+		            value = value.substring(0, value.length()-1);
+		        }else{
+		            value = valueObj.toString();
+		        }
+		        if("null".equals(value)){
+		        	value="";
+		        }
+		        if(StringUtils.isNotBlank(name) && StringUtils.isNotBlank(value)){
+		        	map.put(name, value);
+		        }
+		    }
+			String compannyId = (String) request.getSession().getAttribute(
+					SystemConst.ACCOUNT_COMPANYID);
+			Long id = compannyId == null ? null : Long.valueOf(compannyId);
+		    
+			String[][] title = {{"序号","10"},{"车台id","20"},{"车辆id","20"},{"业务类型","30"},{"历史客户名","15"},
+					{"历史车辆车牌","15"},{"历史车台ID","15"},{"历史托收资料ID","15"},{"历史计费信息ID","15"},{"历史司机资料ID","15"},
+					{"经办人id","15"},{"经办人姓名","20"},
+					{"备注","60"},{"操作时间","30"}
+				};
+			/*
+			private Long bk_id;//'历史版本id',
+			private Long unit_id;//车台id
+			private Long vehicle_id;//车辆id
+			private String bk_type;//'业务类型，有可能多个type,逗号隔开，0=维修, 1=换装, 2= 过户, 3=换号, 4=升级, 5=更改资料, 6=新业务办理',
+			private Long bkc_id;//'历史客户ID',
+			private Long bkv_id;//'历史车辆ID',
+			private Long bku_id;//'历史车台ID',
+			private Long bkfc_id;//'历史托收资料ID',
+			private String bkf_ids;//'历史计费信息ID,有可能多个ID，逗号隔开',	  
+			private String bkd_ids;//'历史司机资料ID,有可能多个ID，逗号隔开,预留',          	
+			private Long op_id;//'经办人id',
+			private String op_name;//'经办人姓名',
+			private String remark;//'称呼/备注',
+			private Date stamp;//'时间戳',
+			*/
+			// bk_id,unit_id,vehicle_id, bk_type,bkc_id,bkv_id,bku_id,bkfc_id,
+			//bkf_ids,bkd_ids,bkis_id,op_id,op_name,stamp,remark
+			List<HashMap<String, Object>> list = backupService.getListBk(null);
+			List valueList = new ArrayList();
+			HashMap<String, Object> upgrade = null;
+			String[] values = null;
+			int listLenth=list.size();
+			for(int i=0; i<listLenth; i++){
+				values = new String[title.length];
+				upgrade = list.get(i);
+				values[0] = String.valueOf(i+1);
+				values[1] = upgrade.get("unit_id")==null?"":upgrade.get("unit_id").toString();
+				values[2] = upgrade.get("vehicle_id")==null?"":upgrade.get("vehicle_id").toString();
+				Object bkType = upgrade.get("bk_type");
+				String bkTypeTips ="";
+				if( bkType != null){
+					String  bkTypeStr = bkType.toString();
+					if( bkTypeStr !=null && !"".equalsIgnoreCase(bkTypeStr)){
+						String  bkTypeArry[]= bkTypeStr.split(",");
+						for (int j = 0; j < bkTypeArry.length; j++) {
+							String tempTips = bkTypeArry[j];
+							if( tempTips !=null && !"".equalsIgnoreCase(tempTips) ){
+								//0=维修, 1=换装, 2= 过户, 3=换号, 4=升级, 5=更改资料, 6=新业务办理
+							/*	if( j == 0){
+									
+									
+								}else{
+									
+								}*/
+								if( Integer.parseInt(tempTips) == 0){
+									bkTypeTips +="维修,";
+								}else if( Integer.parseInt(tempTips) == 1){
+									bkTypeTips +="换装,";
+								}else if( Integer.parseInt(tempTips) == 2){
+									bkTypeTips +="过户,";
+								}else if( Integer.parseInt(tempTips) == 3){
+									bkTypeTips +="换号,";
+								}else if( Integer.parseInt(tempTips) == 4){
+									bkTypeTips +="升级,";
+								}else if( Integer.parseInt(tempTips) == 5){
+									bkTypeTips +="更改资料,";
+								}else if( Integer.parseInt(tempTips) == 6){
+									bkTypeTips +="新业务办理,";
+								}
+							}
+						}
+					}
+				}
+				values[3] = bkTypeTips;
+				values[4] = upgrade.get("customer_name")==null?"":upgrade.get("customer_name").toString();
+				values[5] = upgrade.get("plate_no")==null?"":upgrade.get("plate_no").toString();
+				values[6] = upgrade.get("bku_id")==null?"":upgrade.get("bku_id").toString();				
+				values[7] = upgrade.get("bkfc_id")==null ?"":upgrade.get("bkfc_id").toString();
+				values[8] = upgrade.get("bkf_ids")==null ?"":upgrade.get("bkf_ids").toString();
+				values[9] = upgrade.get("bkd_ids")==null ?"":upgrade.get("bkd_ids").toString();
+				values[10] = upgrade.get("op_id")==null ?"":upgrade.get("op_id").toString();
+				values[11] = upgrade.get("op_name")==null ?"":upgrade.get("op_name").toString();
+				values[12] = upgrade.get("remark")==null ?"":upgrade.get("remark").toString();
+				values[13] = upgrade.get("stamp")==null ?"":upgrade.get("stamp").toString();
+				valueList.add(values);
+			}
+			OpenLdap openLdap = OpenLdapManager.getInstance();
+			CommonCompany commonCompany =  openLdap.getCompanyById(compannyId);
+			CreateExcel_PDF_CSV.createExcel(valueList, response, "业务历史记录", title,commonCompany.getCnfullname(),commonCompany.getEnfullname(),false);
+		} catch (Exception e) {
+			// 打印
+			e.printStackTrace();
+			// 同时把异常抛到前台
+			throw new SystemException();
+		}
+	}
+	
+	
+	
+	@RequestMapping(value = "/backup/findStopAndOpen", method = RequestMethod.POST)
+	public @ResponseBody Page<Backup> findStopAndOpen(@RequestBody PageSelect<Backup> pageSelect,
+			HttpServletRequest request) throws SystemException {
+		CustInfo custInfo = (CustInfo) request.getSession().getAttribute(SystemConst.CUST_INFO);
+		Unit unit = custInfo.getUnit();
+		Map filter = pageSelect.getFilter();
+		filter.put("unit_id", unit.getUnit_id());
+		pageSelect.setFilter(filter);
+		pageSelect.setOrder("stamp");
+		pageSelect.setIs_desc(true);
+		Page<Backup> result = backupService.findStopAndOpen(pageSelect);
+		return result;
+	}
+	
+	@RequestMapping(value = "/backup/getOldview", method = RequestMethod.POST)
+	public @ResponseBody Oldview getOldview(@RequestBody Backup backup,
+			HttpServletRequest request) throws SystemException {
+		Oldview result = new Oldview();
+		backup = backupService.getBackupByid(backup.getBk_id());
+		Customerbk customer = backupService.getCustomerbkbyid(backup.getBkc_id());
+		Vehiclebk vehicle = backupService.getVehiclebkbyid(backup.getBkv_id());
+		Unitbk unit = backupService.getUnitbkbyid(backup.getBku_id());
+		Collectionbk collection = backupService.getCollectionbkbyid(backup.getBkfc_id());
+		List<FeeInfobk> list = new ArrayList<FeeInfobk>();
+		String bkf_ids = backup.getBkf_ids();
+		if(StringUtils.isNotBlank(bkf_ids)){
+			String[] ids = bkf_ids.split(",");
+			for(int i=0;i<ids.length;i++){
+				if(StringUtils.isNotBlank(ids[i])){
+					Long id = Long.valueOf(ids[i]);
+					FeeInfobk feeInfo = backupService.getFeeInfobkbyid(id);
+					list.add(feeInfo);
+				}
+			}
+		}
+		if(unit!=null){
+			String unittype = unitTypeService.getUnittypeByid(unit.getUnittype_id());
+			result.setUnittype(unittype);
+		}
+		if(vehicle!=null){
+			String model = modelService.getModelByid(vehicle.getModel());
+			result.setModel(model);
+		}
+		result.setCustomer(customer);
+		result.setVehicle(vehicle);
+		result.setUnit(unit);
+		result.setCollection(collection);
+		for(FeeInfobk feeInfo:list){
+			if(feeInfo.getFeetype_id()==1){
+				result.setServiceInfo(feeInfo);
+			}else if(feeInfo.getFeetype_id()==2){
+				result.setSimfeeInfo(feeInfo);
+			}else if(feeInfo.getFeetype_id()==3){
+				result.setInsuranceInfo(feeInfo);
+			}else if(feeInfo.getFeetype_id()==4){
+				result.setWebgisInfo(feeInfo);
+			}
+		}
+		return result;
+	}
+
+}
+

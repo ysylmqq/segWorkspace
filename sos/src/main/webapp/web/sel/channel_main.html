@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>代理商管理</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+
+<body>
+<div id="monitoring"><!-- id="nw_document_all" -->
+ <div id="dgd_channel" class="datagrid"></div>
+</div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script>
+	<script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+(function($){
+	var editId=null;//编辑时选中行ID
+	var editObj=null;//编辑时选中行对象
+	var loadSuccess = function(){
+		//填充编辑前的值
+		if(editId){
+			$("#id",$("#form_channel")).val(editId);
+			$.ajax({
+				type : 'post', 
+				async: false,   
+				contentType : 'application/json',     
+				dataType : 'json',     
+				url : '../../sell/getChannel',   
+				data:JSON.stringify({id:editId}),
+				success : function(data){
+					if(data){
+						var channel=data.channel;
+						$("#id",$("#form_channel")).val(editId);
+						$("#name",$("#form_channel")).val(channel.name);
+						$("#address",$("#form_channel")).val(channel.address);
+						$("#orgId",$("#form_channel")).val(channel.orgId);
+						$("#monthSell",$("#form_channel")).val(channel.monthSell);
+						$("#dictId",$("#form_channel")).val(channel.dictId);
+						$("#groupId",$("#form_channel")).val(channel.groupId);
+						$("#groupName",$("#form_channel")).val(channel.groupName);
+						$("#remark",$("#form_channel")).val(channel.remark);
+						//销售经理文本框
+						$("#managerName",$("#form_channel")).val(channel.salesManagerName);
+						$("#managerId",$("#form_channel")).val(channel.salesManagerId);
+						//联系人
+						if(channel.channelcontacts){
+						$('#dgd_channelcontacts').sgDatagrid('appendData',channel.channelcontacts);
+						}
+						//销售经理历史列表
+						if(data.salesManagers){
+						$('#dgd_channelmanagers').sgDatagrid('appendData',data.salesManagers);
+						}
+						$('#dictId').trigger('change');
+						$("#orgId",$("#form_channel")).val(channel.orgId);
+						$("#orgName",$("#form_channel")).val(channel.orgName);
+						$("#name",$("#form_channel")).val(channel.name);
+					}else{
+						$(document).sgPup({message:'message_info',text: data});
+					}
+				},     
+				error : function(res,error) { 
+					if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}
+				}
+			}); 
+		}
+		//进入销售合同 按钮宽度修改
+		$('input[value=进入销售合同]','#win_channel').width(110);
+		editId=null;
+	}
+	
+	var winClose = function (){
+		$(document).sgWindow('close',{id:'win_channel'});
+	}
+   
+	var toSalesContract = function (){
+		$(document).sgWindow('close',{id:'win_channel'});
+		$('#sel_menu ul li img[alt=销售合同管理]').parents('a').trigger('click');
+	}
+	var save = function(){
+		$("#form_channel").unbind('submit');
+		$("#form_channel").on('submit',function(e){
+			//做表单提交
+			var params = {};
+			/*  $.each($("#form_channel").serializeArray(),function(k,v){
+			  	params[v.name]= v.value;
+			}); */
+			var url='../../sell/addChannelAndContracts';
+			var id=$('#id','#form_channel').val();
+			if(id){
+				url='../../sell/updateChannelAndContracts';
+			}
+			params.id=id;
+			params.name=$('#name','#form_channel').val();
+			if(!params.name){
+				return;
+			}
+			params.address=$('#address','#form_channel').val();
+			params.monthSell=$('#monthSell','#form_channel').val();
+			params.dictId=$('#dictId','#form_channel').val();
+			//params.groupName=$('#groupName','#form_channel').val();
+			params.groupId=$('#groupId','#form_channel').val();
+			params.salesManagerId=$('#managerId','#form_channel').val();
+			params.salesManagerName=$('#managerName','#form_channel').val();
+			params.remark=$('#remark','#form_channel').val();
+			//代理商与联系人的关系数据
+			var channelcontacts=[];
+			var names = $('input[name=name]','#dgd_channelcontacts');
+			var depts=$('input[name=dept]','#dgd_channelcontacts');
+			var postions= $('input[name=postion]','#dgd_channelcontacts');
+			var phones= $('input[name=phone]','#dgd_channelcontacts');
+			var emails=$('input[name=email]','#dgd_channelcontacts');
+			var qqs= $('input[name=qq]','#dgd_channelcontacts');
+			var remarks= $('input[name=remark]','#dgd_channelcontacts');
+			$.each(names,function(k,v){
+				var obj = {};
+				obj.name = v.value;
+				obj.dept = depts[k].value;
+				obj.postion = postions[k].value;
+				obj.phone = phones[k].value;
+				obj.email = emails[k].value;
+				obj.qq= qqs[k].value;
+				obj.remark= remarks[k].value;
+				channelcontacts.push(obj);
+			});
+			params.channelcontacts=channelcontacts;
+			//alert(JSON.stringify(params));
+			//保存代理商与销售经理的关系
+			//如果是自身营业处，只有且只有一个，需提示用户
+			var tip='';
+			if(params.dictId=='5'){
+				tip='类型为营业处的代理商每个营业处有且只有一个,如要保存，会覆盖之前的营业处代理商。';
+				//机构、机构id
+				params.orgId=$('#orgId','#form_channel').val();
+				params.orgName=$('#orgName','#form_channel').val();
+			}
+			$(document).sgConfirm({text: tip+'确定保存代理商信息吗?',cfn:function(r){ 
+				if(r){
+					$.ajax({
+						type : 'post', 
+						async: false,   
+						contentType : 'application/json',     
+						dataType : 'json',     
+						url : url,   
+						data:JSON.stringify(params),
+						success : function(data){
+							if(data){
+								if(data.success){
+									$(document).sgWindow('close',{id:'win_channel'}); 
+									$('#dgd_channel').sgDatagrid('reload','sgDatagrid');
+								}
+								$(document).sgPup({message:'message_info',text: data.msg});
+							}
+						},     
+						error : function(res,error) { 
+							if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}
+						}
+					}); 
+				}
+			}});
+			$('#form_channel').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+			e.stopPropagation();
+			return false;
+		})
+	};
+
+	var addItem = function(){
+	    editId=null;
+	   	editObj=null;
+	    var defaults = {
+            title:'代理商管理',
+            id:'win_channel',
+            form:'form_channel',
+            url:'channel_form.html',
+            success: loadSuccess,
+       		width: 820,
+	  	    height:550,
+            buttons : [
+               {name: '确定', type: 'submit', onpress : save},
+               /* {name: '进入销售合同',  onpress : toSalesContract}, */
+               {name: '关闭', onpress : winClose},
+               {name: '重置', type: 'reset', onpress : reset}
+           ]
+        };
+	    $(document).sgWindow(defaults);
+	}
+
+    var editItem = function(){
+    	var obj = $('#dgd_channel');
+        var bDiv = $('.bDiv',obj);
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+                if($(this).attr("checked")){  
+                	editId=this.value;
+                	
+                	var defaults = {
+        	                title:'代理商编辑',
+        	                id:'win_channel',
+        	                form:'form_channel',
+        	                url:'channel_form.html',
+        	                success: loadSuccess,
+        	                width: 820,
+      	               	    height:590,
+        	                buttons : [
+        	                           {name: '确定', type: 'submit', onpress : save},
+        	                           /* {name: '进入销售合同',  onpress : toSalesContract}, */
+        	                           {name: '关闭', onpress : winClose},
+        	                           {name: '重置', type: 'reset', onpress : reset}
+        	                       ]
+        	            };
+                	
+	    	        $(document).sgWindow(defaults);
+                }
+            });
+        }else{
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }
+    	
+    }
+	    
+	var delItem = function(){
+    	var obj = $('#dgd_channel');
+        var bDiv = $('.bDiv',obj);
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+                if($(this).attr("checked")){  
+                	if(this.value){
+				 $(document).sgConfirm({text: '此操作将该代理商和与之关联的销售经理、联系人的关系一同删除,且删除后不可恢复,确定删除?',cfn:function(r){ 
+	    		     	if(r){
+     	        		 $.ajax( {
+    	            		  type : 'post', 
+    	            		  async: false,   
+    	            		  dataType : 'json',     
+    	            		  url : '../../sell/deleteChannelAndcontracts',   
+    	            		  data:{id:this.value},
+    	            		  success : function(data) {
+    	            			  if(data){
+    	            				 if(data.success){
+    	    	          		 		 $('#dgd_channel').sgDatagrid('reload','sgDatagrid');
+    	            				 }
+    	            				$(document).sgPup({message:'message_info',text: data.msg});
+    	            			  }
+    	            		  } ,     
+    	            		  error : function(res,error) { 
+    	            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+    	            		  }    
+    	            		}); 
+     	        	};
+     	        }});
+				}
+                }
+            });
+        }else{
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }
+    	
+    }
+	   
+	var reset= function(){
+		var phones= $('input[name=phone]','#dgd_channelcontacts');
+		var emails=$('input[name=email]','#dgd_channelcontacts');
+		var qqs= $('input[name=qq]','#dgd_channelcontacts');
+		if(phones.get(0)){
+			phones.attr('value','');
+			emails.attr('value','');
+			qqs.attr('value','');
+		}
+		//销售经理删除
+		$('#dgd_channelmanagers tr').remove();
+	}
+	     
+	//修改表格的宽度
+	// var height =$('#main_bd',window.parent.document).height()-288;
+	var height = 395;
+	//初始化表格
+	var defaults = {
+        title: "代理商管理",
+        width:  '100%',
+        height: height,
+        url: '../../sell/findChannels',
+        usepager: true,
+        rownumbers:true,
+        useRp: true,
+        autoLoad: false,//不自动查询
+        colid:'id',  //主键
+        colModel : [
+			{display: '名称', name : 'name', width : 120, sortable : true},
+            {display: '地址', name : 'address', width : 120, sortable : true},
+            {display: '月销售量', name : 'monthSell', width : 120, sortable : true},
+            {display: '类型', name : 'dictName', width : 80, sortable : true},
+            {display: '所属集团', name : 'groupName', width : 120, sortable : false},
+            {display: '备注', name : 'remark', width : 120, sortable : false}
+        ],
+        buttons : [
+            {name: '增加', bclass: 'add', onpress : addItem},
+            {separator: true},
+            {name: '编辑', bclass: 'edit', onpress : editItem},
+            {separator: true}
+        ],
+        searchitems :[
+            {display:'名称',html:'<span class="ltext"><input type="text" name="name" class="form-control"/></span>'},
+            {display:'类型',html:'<span class="ltext"><select name="dictId" class="form-control"><option value="" selected>请选择...</option></select></span>'}
+        ],
+        exporturl:'../../sell/exportExcel4Channel',//导出excel
+        //query:{name:''},//查询默认参数
+        order:true,
+        sortname: "name",
+        sortorder: "asc"
+	};
+	$('#dgd_channel').sgDatagrid(defaults); 
+
+	//填充类型下拉框
+	$.ajax({
+		type : 'post', 
+		async: false,   
+		contentType : 'application/json',     
+		dataType : 'json',     
+		url : '../../sys/findSysValue',   
+		data:JSON.stringify({stype:1000,sname:''}),
+		success : function(data) {
+			if(data){
+				//alert(JSON.stringify(data));
+				var type=$('#dgd_channel .sDiv select[name=dictId]');
+				if(type){
+					$.each(data,function(k,v){
+					type.append("<option value='" +v.svalue+"'>" + v.sname+"</option>");
+					});
+				}
+
+			}else{
+				$(document).sgPup({message:'message_info',text: data});
+			}
+		},     
+		error : function(res,error) { 
+			if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}
+		}    
+	});
+
+})(jQuery)
+</script>
+</html>

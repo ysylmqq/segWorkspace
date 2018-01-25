@@ -1,0 +1,566 @@
+package com.chinagps.center.service.impl;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import ldap.oper.OpenLdap;
+import ldap.oper.OpenLdapManager;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.exception.LockTimeoutException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+
+import com.chinagps.center.common.SystemCache;
+import com.chinagps.center.common.SystemException;
+import com.chinagps.center.dao.CustomerDao;
+import com.chinagps.center.dao.LinkmanDao;
+import com.chinagps.center.dao.ModelDao;
+import com.chinagps.center.dao.OperatorUnitDao;
+import com.chinagps.center.dao.SynUrlDao;
+import com.chinagps.center.dao.UnitDao;
+import com.chinagps.center.dao.UnittypeDao;
+import com.chinagps.center.dao.VehicleDao;
+import com.chinagps.center.pojo.CustVehicle;
+import com.chinagps.center.pojo.Customer;
+import com.chinagps.center.pojo.Linkman;
+import com.chinagps.center.pojo.Model;
+import com.chinagps.center.pojo.SynHistory;
+import com.chinagps.center.pojo.SynUrl;
+import com.chinagps.center.pojo.Unit;
+import com.chinagps.center.pojo.UnitType;
+import com.chinagps.center.pojo.Vehicle;
+import com.chinagps.center.utils.DESPlus;
+import com.chinagps.center.utils.DateUtil;
+import com.chinagps.center.utils.HibernateUtil;
+import com.chinagps.center.utils.SpringContext;
+import com.chinagps.center.utils.StringUtils;
+
+@Service("DataService")
+public class DataService extends BaseServiceImpl {
+
+	static Logger logger = LoggerFactory.getLogger(DataService.class);
+
+	@Autowired
+	private UnitDao unitDao;
+
+	@Autowired
+	private VehicleDao vehicleDao;
+
+	@Autowired
+	CustomerDao customerDao;
+
+	@Autowired
+	private LinkmanDao linkmanDao;
+
+	@Autowired
+	private SynUrlDao synUrlDao;
+
+	@Autowired
+	private UnittypeDao utDao;
+
+	@Autowired
+	private ModelDao modelDao;
+
+	@Autowired
+	private OperatorUnitDao operatorUnitDao;
+
+	public List<SynUrl> listSynUrl() throws SystemException {
+		return synUrlDao.listAll();
+	}
+
+	public List<SynUrl> listByCompanyId(Long subco_no) throws SystemException {
+		return synUrlDao.listByCompanyId(subco_no);
+	}
+
+	public void initCache() throws SystemException {
+		List<UnitType> ulist = utDao.listByName(null);  // select * from t_ba_unittype
+		for (UnitType ut : ulist) {
+			SystemCache.utMap.put(ut.getUnittype(), ut.getUnittype_id());
+		}
+		List<Model> mlist = modelDao.listByModelName(null); // 车型 
+		for (Model m : mlist) {
+			SystemCache.mdMap.put(m.getName(), m.getId());
+		}
+	}
+
+	private Long obj2long(Object obj) {
+		if (obj == null) {
+			return 0L;
+		}
+		if ("null".equals(obj.toString())) {
+			return null;
+		}
+		if ("".equals(obj.toString().trim())) {
+			return null;
+		}
+		return Long.valueOf(obj.toString());
+	}
+
+	private String obj2str(Object obj) {
+		if (obj == null) {
+			return null;
+		}
+		if ("null".equals(obj.toString())) {
+			return null;
+		}
+		return String.valueOf(obj);
+	}
+
+	private Integer obj2int(Object obj) {
+		if (obj == null) {
+			return null;
+		}
+		if ("null".equals(obj.toString())) {
+			return null;
+		}
+
+		if ("".equals(obj.toString().trim())) {
+			return null;
+		}
+		return Integer.valueOf(obj.toString());
+	}
+
+	private Date obj2date(Object obj) {
+		if (obj == null) {
+			return null;
+		}
+		if ("null".equals(obj.toString())) {
+			return null;
+		}
+		if ("".equals(obj.toString().trim())) {
+			return null;
+		}
+		String data_str = obj.toString();
+		if (data_str.length() == 10) {
+			data_str = data_str + " 00:00:00";
+		}
+		return DateUtil.parse(data_str, DateUtil.YMD_DASH_WITH_FULLTIME24);
+	}
+
+	public void synDataDetail(List<Map<String, Object>> dataList, boolean isLastList, Long subcoNo, String subcoName,
+			Map<String, Object> hisMap, Map<String, Long> utMap, Map<String, Long> mdMap)
+					throws LockTimeoutException, SystemException {
+		HibernateUtil hibernateUtil = (HibernateUtil) SpringContext.getBean("HibernateUtil");
+		Session session = hibernateUtil.getSession(); // 获取Session
+		Map<String, String> call_map = new HashMap<String, String>();
+		OpenLdap ldap = OpenLdapManager.getInstance();
+		try {
+			String now = DateUtil.formatNowTime();
+			session.beginTransaction(); // 开启事物
+			for (int i = 0; i < dataList.size(); i++) {
+				Map<String, Object> map = dataList.get(i);
+				String call_letter = obj2str(map.get("CALL_LETTER"));
+
+				Map<String, Object> uvMap = unitDao.getByCallLetter(call_letter);
+				// 同步过来的字段
+				String customer_name = obj2str(map.get("CUSTOMER_NAME")); // 客户名称
+				String id_no = obj2str(map.get("ID_NO")); // 身份证
+				if (StringUtils.isNotBlank(id_no) && id_no.length() > 32) {
+					id_no = id_no.substring(0, 32);
+				}
+				String sex_n = obj2str(map.get("SEX")); // 性别
+				Integer sex = null;
+				if (sex_n != null) {
+					sex = (sex_n == "男" ? 1 : 2);
+				}
+				String address = obj2str(map.get("ADDRESS")); // 客户地址
+				if (StringUtils.isNotBlank(address) && address.length() > 100) {
+					address = address.substring(0, 100);
+				}
+				String plate_no = obj2str(map.get("PLATE_NO")); // 车牌
+				if (plate_no != null && plate_no.length() > 20) {
+					plate_no = plate_no.substring(0, 20);
+				}
+				String model_name = obj2str(map.get("MODEL_NAME")); // 车型
+				Long model = null;
+				if (StringUtils.isNotBlank(model_name)) {
+					model = mdMap.get(model_name);
+				}
+				String plate_color = obj2str(map.get("PLATE_COLOR")); // 车身颜色
+				Integer color = 9;
+				if (StringUtils.isNotBlank(plate_color)) {
+					if (plate_color.startsWith("蓝")) {
+						color = 1;
+					} else if (plate_color.startsWith("黄")) {
+						color = 2;
+					} else if (plate_color.startsWith("黑")) {
+						color = 3;
+					} else if (plate_color.startsWith("白")) {
+						color = 4;
+					}
+				}
+				String vin = obj2str(map.get("VIN")); // 车架号
+				if (StringUtils.isBlank(vin)) {
+					vin = "";
+				}
+				String engine_no = obj2str(map.get("ENGINE_NO")); // 发动机号
+				if (StringUtils.isBlank(engine_no)) {
+					engine_no = "";
+				}
+				String service_pwd = obj2str(map.get("SERVICE_PWD")); // 服务密码
+				String servicePwdOrgi = service_pwd;
+				if (StringUtils.isNotNullOrEmpty(service_pwd)) {
+					service_pwd = DESPlus.getEncPWD(service_pwd); // 密码命名加密
+				}
+				String unittype = obj2str(map.get("UNITTYPE_NAME")); // 车台类型
+				Long unittype_id = obj2long(map.get("UNITTYPE_ID"));
+				Long unittype_id2 = 31l;
+				if (StringUtils.isNotBlank(unittype)) {
+					unittype_id2 = utMap.get(unittype);
+					if (unittype_id2 == null) {
+						unittype_id = 31L;
+					} else {
+						unittype_id = unittype_id2;
+					}
+				} else {
+					if (unittype_id == null) {
+						unittype_id = unittype_id2;
+					}
+				}
+				String productName = unittype;
+				if (StringUtils.isNotBlank(productName) && productName.length() > 32) {
+					productName = productName.substring(0, 32);
+				}
+				Integer mode = obj2int(map.get("MODE_ID")); // 通信模式
+				if (mode == null)
+					mode = 0;
+				Integer sms_node = obj2int(map.get("SMS_NODE")); // 短信通道网关编号
+				Integer data_node = obj2int(map.get("DATA_NODE")); // 流量通道网关编号
+				if (sms_node == null) {
+					sms_node = 0;
+				}
+				if (data_node == null) {
+					data_node = 0;
+				}
+				String worker = obj2str(map.get("WORKER")); // 安装电工
+				Date fix_time = obj2date(map.get("FIX_TIME")); // 安装时间
+				String sales = obj2str(map.get("SALES")); // 营销经理
+				Date service_date = obj2date(map.get("SERVICE_DATE")); // 开通时间
+				Integer reg_status = obj2int(map.get("REG_STATUS")); // 是否离网 0:否
+																		// 1:离网
+				String phones = obj2str(map.get("LINKPHONE"));
+				if (StringUtils.isNotBlank(call_map.get(call_letter))) {
+					continue;
+				}
+				
+				if (i != 0 && (i % 100 == 0 || i == dataList.size() - 1)) {// 每一百条提交一次
+					SynHistory sh = getFromSession(session, subcoNo, obj2int(hisMap.get("type")));
+					if (sh == null) {
+						sh = new SynHistory();
+					}
+					sh.setSubco_no(subcoNo);
+					sh.setType(obj2int(hisMap.get("type")));
+					sh.setUnit_id(obj2long(map.get("UNIT_ID")));
+					session.saveOrUpdate(sh);
+					session.flush();
+					session.clear();
+					session.getTransaction().commit();// 提交事物
+					session.beginTransaction();
+				}
+				Long customerId = null;
+				Long vehicleId = null;
+				Long unitId = null;
+				if (uvMap.get("unit_id") != null) { // 已存在相同的呼号
+					Long customer_id = obj2long(uvMap.get("customer_id"));
+					Long vehicle_id = obj2long(uvMap.get("vehicle_id"));
+					Long unit_id = obj2long(uvMap.get("unit_id"));
+
+					vehicleId = vehicle_id;
+					customerId = customer_id;
+					unitId = unit_id;
+
+					Long usubco_no = obj2long(uvMap.get("subco_no"));
+					if (usubco_no.compareTo(subcoNo) != 0) {// 车辆非同一公司跳过
+						call_map.put(call_letter, "has");
+						continue;
+					}
+					Integer cust_type = obj2int(uvMap.get("cust_type"));
+					if (cust_type != 0) {// 存在的车辆非私家车
+						call_map.put(call_letter, "has");
+						continue;
+					}
+
+					Unit unit = unitDao.getUnitById(unit_id);
+					// 离网或者删除处理
+					if (reg_status == 1) { // 无计费项不做处理
+						logger.info("离网车台" + call_letter);
+						unit.setReg_status(1);
+						unit.setFlag(1);
+						unit.setStamp(new Date());
+						unitDao.update(unit);
+						call_map.put(call_letter, "has");
+						continue;
+					}
+					// 更新客户信息
+					Customer customer = customerDao.getCustById(customer_id); // 查询客户信息
+					if (customer != null) {
+						customer.setCustomer_name(customer_name);
+						customer.setAddress(address);
+						customer.setId_no(id_no);
+						customer.setSex(sex);
+						customer.setService_pwd(service_pwd);
+						customer.setStamp(new Date());
+						customerDao.update(customer);
+					} else {
+
+					}
+					// 更新车辆
+					Vehicle vehicle = vehicleDao.getByPlateNo(plate_no);
+					if (vehicle != null) {
+						if (vehicle_id == vehicle.getVehicle_id()) { // vehicle_id一致则更新
+							vehicle.setModel(model);
+							vehicle.setModel_name(model_name);
+							vehicle.setPlate_no(plate_no);
+							vehicle.setPlate_color(color);
+							vehicle.setVin(vin);
+							vehicle.setEngine_no(engine_no);
+							vehicle.setService_pwd(service_pwd);
+							vehicle.setStamp(new Date());
+							vehicleDao.update(vehicle);
+						} else {// 不一致，车牌数据存在于大平台其他终端
+
+						}
+					} else {
+						// 为空代表更换了新的车牌号
+						vehicle = vehicleDao.get(Vehicle.class, vehicle_id);
+						vehicle.setModel(model);
+						vehicle.setModel_name(model_name);
+						vehicle.setPlate_no(plate_no);
+						vehicle.setPlate_color(color);
+						vehicle.setVin(vin);
+						vehicle.setEngine_no(engine_no);
+						vehicle.setService_pwd(service_pwd);
+						vehicle.setStamp(new Date());
+						vehicleDao.update(vehicle);
+					}
+					// 更新车台
+					if (unit != null) {
+						logger.info("更新车台" + call_letter);
+						unit.setProduct_name(productName);
+						unit.setMode(mode);
+						unit.setSms_node(sms_node);
+						unit.setData_node(data_node);
+						unit.setWorker(worker);
+						unit.setUnittype_id(unittype_id);
+						unit.setSales(sales);
+						unit.setFix_time(fix_time);
+						unit.setService_date(service_date);
+						unit.setStamp(new Date());
+						unitDao.update(unit);
+						call_map.put(call_letter, "has");
+					} else {
+
+					}
+					// 更新联系人
+					if (StringUtils.isNotBlank(phones)) {
+						String[] phoneArr = phones.split(",");
+						List<Linkman> lks = linkmanDao.listByVehicleId(vehicle_id);
+						Map<String, String> pmap = new HashMap<String, String>();
+						for (Linkman l : lks) {
+							pmap.put(l.getPhone(), l.getLinkman());
+						}
+						for (String phone : phoneArr) {
+							if (StringUtils.isNotBlank(pmap.get(phone))) {
+								continue;
+							}
+							Linkman lk = new Linkman();
+							lk.setCustomer_id(customer_id);
+							lk.setVehicle_id(vehicle_id);
+							lk.setLinkman_type(2);
+							lk.setLinkman(customer_name);
+							lk.setPhone(phone);
+							session.save(lk);
+							pmap.put(phone, customer_name);// 已添加的做标记
+						}
+					}
+
+				} else { // 不存在则新增
+					if (reg_status == 1) { // 未插入就已经删除或者离网，不再插入
+						call_map.put(call_letter, "has");
+						continue;
+					}
+					// 插入客户
+					Vehicle vehicle = vehicleDao.getByPlateNo(plate_no);
+					if (vehicle != null) { // 车牌已存在
+						call_map.put(call_letter, "has");
+						continue;
+					}
+					Customer customer = new Customer();
+					customer.setSubco_no(subcoNo);
+					customer.setSubco_code("0");
+					customer.setSubco_name(subcoName);
+					customer.setCustco_no(0L);
+					customer.setCustco_code("0");
+					customer.setCustomer_name(customer_name);
+					if (StringUtils.isNotBlank(service_pwd)) {
+						customer.setService_pwd(service_pwd);
+					}
+					customer.setCust_type(0);
+					customer.setId_no(id_no);
+					customer.setSex(sex);
+					customer.setVip(1);
+					customer.setRemark("大平台同步程序添加,时间:" + now);
+					customer.setAddress(address);
+					customer.setOp_id(0L);
+					customer.setIdtype(1);
+					customer.setTrade(0);
+					customer.setFlag(0);
+					customer.setPay_model(0);
+					session.save(customer);
+
+					Long cust_id = customer.getCustomer_id();
+					customerId = cust_id;
+					// 插入车辆
+					vehicle = new Vehicle();
+					vehicle.setSubco_no(subcoNo);
+					vehicle.setPlate_no(plate_no);
+					vehicle.setPlate_color(color);
+					vehicle.setVehicle_type(1);
+					vehicle.setBrand(null);
+					vehicle.setSeries(null);
+					vehicle.setModel(model);
+					vehicle.setModel_name(model_name);
+					vehicle.setVin(vin);
+					vehicle.setEngine_no(engine_no);
+					vehicle.setOp_id(0L);
+					vehicle.setVehicle_status(0);
+					vehicle.setFlag(1);
+					vehicle.setVload(5);
+					if (StringUtils.isNotBlank(service_pwd)) {
+						vehicle.setService_pwd(service_pwd);
+					}
+					session.save(vehicle);
+					Long vehicle_id = vehicle.getVehicle_id();
+					vehicleId = vehicle_id;
+					// 客户车辆关系
+					CustVehicle custVehicle = new CustVehicle();
+					custVehicle.setCustomer_id(cust_id);
+					custVehicle.setVehicle_id(vehicle_id);
+					session.save(custVehicle);
+					// 插入终端
+					Unit unit = new Unit();
+					unit.setSubco_no(subcoNo);
+					unit.setCustomer_id(cust_id);
+					unit.setVehicle_id(vehicle_id);
+					unit.setUnittype_id(unittype_id);
+					unit.setCall_letter(call_letter);
+					unit.setProduct_name(productName);
+					unit.setTelecom(0);
+					unit.setSim_type(2);
+					unit.setSales_id(0L);
+					unit.setSales(sales);
+					unit.setWorker(worker);
+					unit.setMode(mode);
+					unit.setData_node(data_node);
+					unit.setSms_node(sms_node);
+					unit.setFix_time(fix_time);
+					unit.setService_date(service_date);
+					unit.setArchive_time(new Date());
+					unit.setFlag(0);
+					unit.setPay_model(0);
+					unit.setReg_status(0);
+					unit.setTrade(0);
+					unit.setCreate_date(new Date());
+					unit.setOp_id(0L);
+					session.save(unit);
+					unitId = unit.getUnit_id();
+					// 插入联系人
+					if (StringUtils.isNotBlank(phones)) {
+						String[] phoneArr = phones.split(",");
+						for (String phone : phoneArr) {
+							Linkman lk = new Linkman();
+							lk.setCustomer_id(cust_id);
+							lk.setVehicle_id(vehicle_id);
+							lk.setLinkman_type(2);
+							lk.setLinkman(customer_name);
+							lk.setPhone(phone);
+							session.save(lk);
+						}
+					}
+					call_map.put(call_letter, "has");
+				}
+
+			}
+			if (isLastList) {
+				SynHistory sh = getFromSession(session, subcoNo, obj2int(hisMap.get("type")));
+				if (sh == null) {
+					sh = new SynHistory();
+				}
+				sh.setSubco_no(subcoNo);
+				sh.setSyn_time(DateUtil.parse(hisMap.get("syn_time").toString(), DateUtil.YMD_DASH_WITH_FULLTIME24));// 同步时间
+				sh.setStart_time(
+						DateUtil.parse(hisMap.get("start_time").toString(), DateUtil.YMD_DASH_WITH_FULLTIME24));// 开始运行时间
+				sh.setEnd_time(new Date()); // 结束时间
+				sh.setType(obj2int(hisMap.get("type")));
+				sh.setUnit_id(0l);
+				session.saveOrUpdate(sh);
+			}
+			session.flush();
+			session.clear();
+			session.getTransaction().commit();
+		} catch (LockTimeoutException le) {
+			logger.error("执行session超时", le);
+			hibernateUtil.closeSession(session);
+			//这个是手动控制的事物 
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			throw new SystemException();
+		} catch (Exception e) {
+			logger.error("synDataDetail", e);
+			e.printStackTrace();
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			throw new SystemException();
+		} finally {
+			hibernateUtil.closeSession(session);
+		}
+	}
+
+	public void doUnitStop(List<Map<String, Object>> unitDelList) throws SystemException {
+		UnitDao unitDao = (UnitDao) SpringContext.getBean("UnitDao");
+		HibernateUtil hibernateUtil = (HibernateUtil) SpringContext.getBean("HibernateUtil");
+		Session session = hibernateUtil.getSession(); // 获取Session
+		session.beginTransaction(); // 开启事物
+
+		for (Map<String, Object> m : unitDelList) {
+
+			Object oFlag = m.get("FLAG");
+
+			String flag = null;
+			if (oFlag != null)
+				flag = oFlag.toString();
+
+			if (flag != null && "1".equals(flag)) {
+				continue;
+			}
+			String call_letter = m.get("CALL_LETTER").toString();
+			Unit unit = unitDao.getUnitByCallLetter(call_letter);
+			if (unit != null) {
+				unit.setFlag(1);
+				unit.setReg_status(1);
+				unit.setStamp(new Date());
+				// unitDao.update(unit);
+			}
+		}
+		session.flush();
+		session.clear();
+		session.getTransaction().commit();
+		hibernateUtil.closeSession(session);
+	}
+
+	public SynHistory getFromSession(Session session, Long subco_no, Integer type) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" from SynHistory s where s.subco_no=").append(subco_no).append(" and s.type=").append(type);
+		Query query = session.createQuery(sb.toString());
+		List<SynHistory> synList = query.list();
+		if (synList != null && !synList.isEmpty()) {
+			return synList.get(0);
+		}
+		return null;
+	}
+}

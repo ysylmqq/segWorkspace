@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>常用车牌号码、车载电话</title>
+    <link rel="stylesheet" type="text/css" href="css/datagrid.css">
+    <style type="text/css"></style>
+</head>
+
+<body style="padding: 0px;margin: 0px;">
+ 		<section id="dgd_often_vehicle" class="datagrid"></section>
+</body>
+<script type="text/javascript" src="jscript/datagrid.js"></script>
+<script type="text/javascript">
+    (function($){
+    	var defaults = {
+   		        width: 420,
+   		        height: 220,
+   		        url:'',
+	   		    datatype: "json",
+	 			//usepager: true,
+	 			useRp: true,
+		        rownumbers:true,//序号
+   		        colModel : [
+					{
+					display: '车牌号码',
+					name: 'plateNo',
+					width: 104,
+					sortable: false
+				},{
+					display: '车载电话',
+					name: 'callLetter',
+					width: 104,
+					sortable: false
+				},{
+					display: '时间',
+					name: 'stamp',
+					width: 135,
+					sortable: false,
+					formatter: function(value, row) {
+						return value;
+					}
+				}
+   		        ]
+   		    };
+   		    $('#dgd_often_vehicle').sgDatagrid(defaults);
+   		    
+   		    //查询按钮隐藏
+   		    $('#dgd_often_vehicle section:first').empty();
+   		    
+    })(jQuery)
+    
+</script>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>销售经理管理</title>
+</head>
+<body>
+	<div id="som_seller_grid" class="datagird"></div>
+</body>
+<script type="text/javascript">
+	(function($){
+		var now =new Date().format('yyyy-MM-dd');
+		 
+		var editId=null;//编辑时选中行ID
+		var editobj = null; //编辑时选中的对象
+		
+		var toAdd = function(){
+    		//备忘保存
+		   	$('#som_seller_form').on('submit',function(e){
+		   		//做表单提交
+	            var params = {};
+
+	            params.content = $('#sys_memo_remark','#som_seller_form').val();
+	            params.isAlert= 1;
+
+	            //alert(JSON.stringify(params));
+	            $.ajax( {
+	    		  type : 'post', 
+	    		  async: false,   
+	    		  contentType : 'application/json',     
+	    		  dataType : 'json',     
+	    		  url : 'sys/addUserRemark',   
+	    		  data:JSON.stringify(params),
+	    		  success : function(data) {
+	    			  if(data){
+	       				  if(data.success){
+	       					  alert(data.msg);
+	       				  }else{
+	       					  alert("增加销售经理失败！")
+	       				  }
+	       				 
+	       			  }else{
+	       				  alert(data);
+	       			  }
+	    		  } ,     
+	    		  error : function(res,error) { 
+	    		  	 alert("responseText="+res.responseText+";error="+error);     
+	    		  }    
+	    		});
+	            
+	            $(document).sgWindow('close',{id:'som_seller_window'}); 
+	            $('#som_seller_grid').sgDatagrid('reload','sgDatagrid');
+	   		    $("#som_seller_form").unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+			    e.stopPropagation();	
+			    return false;
+		   	});
+    	}
+		
+		var toClose = function(){
+	   		 $("#som_seller_window"+"_mask").remove();
+	   		 $("#som_seller_window").remove();
+	   	}
+		 
+		var addItem = function(){
+			var adddefaults = {
+	                title:'增加销售经理',
+	                id:'som_seller_window',
+	                form:'som_seller_form',
+	                url:'web/som/seller_add_form.html',
+	                width: 400,
+	                height: 270,
+	                buttons : [
+	                           {name: '确定', type: 'submit', onpress : toAdd},
+	                           {name: '关闭', type: 'submit', onpress : toClose }
+	                       ]
+	            };
+	   		$(document).sgWindow(adddefaults);      	        
+		}
+		
+		var delItem = function(){
+	        var obj = $('#som_seller_grid');
+	        var bDiv = $('.bDiv',obj);
+
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            alert("请选择一个选项！");
+	        }else{
+	        	if(window.confirm('确定删除所选销售经理?')){
+	        		var flag = false;
+	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){    
+		                	editId=this.value;
+		                	var params=[];
+							params.push(editId);
+		                	//打开窗口
+		                	$.ajax( {
+			            		  type : 'post', 
+			            		  async: false,   
+			            		  contentType : 'application/json',     
+			            		  dataType : 'json',     
+			            		  url : 'sys/deleteUserRemarks',   
+			            		  data:JSON.stringify(params),
+			            		  success : function(data) {
+			            			  if(data){
+			            				 if(data.success){
+			    	          		 		flag = true; 
+			            				 }else{
+			            					flag = false; 
+			            				 }
+			            			  }
+			            		  } ,     
+			            		  error : function(res,error) { 
+			            		  	 alert("responseText="+res.responseText+";error="+error);     
+			            		  }    
+			            		}); 
+		                }
+		            });
+	        		if(flag){
+	        			alert("删除成功！");
+	        		}else{
+	        			alert("删除不成功！");
+	        		}
+	        		$('#sys_memo_grid').sgDatagrid('reload','sgDatagrid');
+	        	}	            
+	        }
+	    }
+		
+		//初始化表格
+	   	 var defaults = {
+	   		        title: "销售经理列表",
+	   		     	width:  870,
+			        height: 420,
+	   		        url: '',
+		   		    usepager: true,
+		 	        rownumbers:true,
+		 	        useRp: true,
+		 	        colid:'id',  //主键
+		 	        //query:{startDate:now,endDate:now},
+	   		        colModel : [
+	   		            {display: '姓名', name : 'name', width : 80, sortable : true},
+	   		            {display: '性别', name : 'sex', width : 50, sortable : false},
+	   		         	{display: '身份证', name : 'sno', width : 160, sortable : false},
+	   		         	{display: '手机', name : 'mobile', width : 140, sortable : false},
+	   		         	{display: '邮箱', name : 'email', width : 100, sortable : false},	   		              		            
+	   		            {display: '日期', name : 'stamp', width : 120, sortable : false},
+	   		         	{display: '状态', name : 'isAlert', width : 50, sortable : false,formatter:function(value,row){
+	   		                if(value==0){
+	   		                    value = '离职';
+	   		                }else if(value==1){
+	   		                    value = '在职';
+	   		                }else{
+	   		                	value ="离职";
+	   		                }
+	   		                return value;
+	   		            }}
+	   		        ],
+	   		     	buttons : [
+	   			            {name: '增加', bclass: 'add', onpress : addItem},
+	   			         	{separator: true},
+				            {name: '修改', bclass: 'edit', onpress : delItem},
+	   			            {separator: true},
+				            {name: '删除', bclass: 'delete', onpress : delItem}
+	   			        ],
+	   		        searchitems :[
+	   		            {display:'姓名',name:'startDate',type:'text'},
+				      	{display:'手机',name:'endDate',type:'text'}
+	   		        ],
+	   		     	order:true,
+	   		        sortname: "name",
+	   		        sortorder: "asc"
+	   		    };
+	   		    $('#som_seller_grid').sgDatagrid(defaults); 
+		})(jQuery)
+	</script>	
+	
+</html>

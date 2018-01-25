@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <div id="answergrid" class="datagrid"></div>
+</body>
+
+<script type="text/javascript">
+(function($){
+    var winClose = function() {
+		$(document).sgWindow('close', {
+			id : 'answer'
+		});
+	}
+    
+    
+
+    var toSubmit = function(){
+	    	//做表单提交
+            var params = {};
+            var obj = $('#order_address_detail');
+	        var bDiv = $('.bDiv',obj);
+	        var details = new Array();
+	        
+     	    var types = $('select[name=type]','#answer_task');
+	        var fittings = $('input[name=fittings]','#answer_task');
+            var oldcodes= $('input[name=oldcode]','#answer_task');
+            var newcodes = $('input[name=newcode]','#answer_task');
+            
+            $.each(types,function(k,v){
+            	var obj = {};
+            	obj.fitting = fittings[k].value;
+            	obj.type = v.value
+            	obj.oldcode = oldcodes[k].value;
+            	obj.newcode = newcodes[k].value;
+            	details.push(obj);
+              });
+            
+            var chwckk_bu = document.getElementById("isturnout");
+          	if(chwckk_bu.checked){
+          		params.isturnout="1";
+    	    }else{
+    	    	params.isturnout="0";
+    	    }
+          	params.mileage = $('#mileages','#answer_task').val();
+          	params.phenomenon = $('#phenomenon','#answer_task').val();
+          	params.situation = $('#exclude','#answer_task').val();
+          	params.remark = $('#remark','#answer_task').val();
+          	params.answer_userid = $('#answer_userid','#answer_task').val();
+          	params.answer_time = $('#answer_time','#answer_task').val();
+        	params.task_id = $('#taskId','#answer_task').val();
+          	
+          	params.answerDetails = details;
+	    	var url='answer/add';
+  		 	alert(JSON.stringify(params));
+  		 	if(window.confirm('确定保存接单吗?')){
+  		 	 if(!params.answer_userid){
+          	   alert('请选择电工！');
+          	   return false;
+             }
+  		 	 
+  		 	if(!params.answer_time){
+           	   alert('请输入回单时间！');
+           	   return false;
+              }
+  		 
+  		 	if(!params.task_id){
+  		 	 alert('请选择工单！');
+           	   return false;
+              } 
+  		 		
+                 $.ajax( {
+	           		  type : 'post', 
+	           		  async: false,   
+	           		  contentType : 'application/json',     
+	           		  dataType : 'json',     
+	           		  url : url,   
+	           		  data:JSON.stringify(params),
+	           		  success : function(data) {
+	           			  if(data){
+	           				 if(data.success){
+	           					 $('#answergrid').sgDatagrid('reload','sgDatagrid');
+	           				 }
+	           				 alert(data.msg);
+	           			  }
+	           		  } ,     
+	           		  error : function(res,error) { 
+	           		  	 alert(res.responseText);     
+	           		  }    
+	           		}); 
+  		 	}
+	        $('#answer_task').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	        $(document).sgWindow('close', {id : 'answer'});
+	    	return false;
+	 	   }; 
+    
+    
+    
+    
+    
+    
+    var answerItem = function(){
+    	var defaults = {
+   			title : '新增回单',
+   			id : 'answer',
+   			form : 'answer_form',
+   			url : 'web/bsp/answer/answer_repair.html',
+   			width : 710,
+   			height : 450,
+   			buttons : [ {
+   				name : '保存',
+   				type : 'submit',
+   			    onpress : toSubmit
+   			}, {
+   				name : '发送短信',
+   				onpress : winClose
+   			}, {
+   				name : '打印',
+   				onpress : winClose
+   			} ]
+   		};
+   		$(document).sgWindow(defaults);
+    }
+    
+    var today = new Date().format('yyyy-MM-dd');
+    var twoDayBefore = GetDateStr(-2);
+
+    var defaults = {
+        title: "回单管理",
+        id: 'grid',
+        width:  720,
+        height: 395,
+        url: 'answer/findAnswersByPage',
+        datatype:"json",
+        usepager: true,
+	    rownumbers:true,
+        useRp: true,
+        colid:'id',  //主键
+        colModel : [
+            {display: '工单号', name : 'billno', width : 100, sortable : false},
+            {display: '业务', name : 'type', width : 60, sortable : false,formatter:function(value,row){
+                if(value==0){
+                    value = '新装';
+                }else if(value==1){
+                    value = '维修';
+                }else if(value==2){
+                    value = '回收';
+                }else if(value==3){
+                    value = '拆除';
+                }else if(value==4){
+                    value = '抢修';
+                }else if(value==5){
+                    value = '换装';
+                }else if(value==6){
+                    value = '过户';
+                }else if(value==7){
+                    value = '升级';
+                }else if(value==8){
+                    value = '换号';
+                }else if(value==9){
+                    value = '办停';
+                }else if(value==10){
+                    value = '其他业务';
+                }else if(value==11){
+                    value = '更改资料';
+                }else if(value==12){
+                    value = '重新开通';
+                }else if(value==13){
+                    value = '新业务办理';
+                }
+                return value;
+            }},
+            {display: '客户', name : 'name', width : 60, sortable : false},
+            {display: '车牌号', name : 'carNum', width : 60, sortable : false},
+            {display: '电工', name : 'eName', width : 60, sortable : false},
+            {display: '电工里程', name : 'mileage', width : 60, sortable : false},
+            {display: '地点', name : 'place', width : 60, sortable : false},
+            {display: '日期', name : 'time', width : 60, sortable : false}
+        ],
+        buttons : [
+            {name: '新增回单', bclass: 'add', onpress : answerItem},
+            {separator: true}
+        ],
+        searchitems :[
+            {display:'车牌号',name:'carNum',type:'text',width:'100'},
+            {display:'电工',name:'eName',type:'text',width:'100'},
+            
+            {display:'业务',name:'type',html:'<select name="type"><option value="" selected>请选择...</option><option value="0">新装</option><option value="1">维修</option><option value="2">回收</option><option value="3">拆除</option><option value="4">抢修</option><option value="5">换装</option><option value="6">过户</option><option value="7">升级</option><option value="8">换号</option><option value="9">办停</option><option value="10">其他业务</option><option value="11">更改资料</option><option value="12">重新开通</option><option value="13">新业务办理</option></select>'},
+            {display:'开始时间',name:'startDate',type:'date',width:'130px',value:twoDayBefore},
+	      	{display:'结束时间',name:'endDate',type:'date',width:'130px',value:today}
+        ],
+        sortname: "id",
+        sortorder: "desc"
+    };
+    $('#answergrid').sgDatagrid(defaults);
+})(jQuery);
+</script>
+</html>

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>销账记录查询</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+<div id="nw_document_all">
+	<div id="dgd_writeoffs" class="datagird" ></div>
+		<datalist id="userDataList"></datalist>
+		<datalist id="channeDataList">
+		        </datalist>
+</div>		        
+	<!-- 打印iframe -->
+	<iframe id="ifm_print" style="display: none;width: 100px;height: 100px;"></iframe>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script>
+	<script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+	var selectedObj=null;//选择行的值
+	(function($){
+     var channeDataList={};//代理商 key:名称,value:id
+	 var userDataList = {};//销售经理 key:name,value:id
+	 
+	 var lastMonthDay=new Date();//上个月的今天
+ 	 //lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+	 lastMonthDay.setDate(1);
+ 	 lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+ 	 
+	 var now =new Date();
+	 //now.setYear(2013);
+	 //now.setMonth(5);
+	 now=now.format('yyyy-MM-dd');
+	
+	//明细窗口加载成功后
+	  var loadSuccess4View = function(){
+			if(selectedObj==null){
+				return false;
+			}
+		
+			$("#id",$("#form_writeoffs4View")).val(selectedObj.id);
+			  $("#managerId",$("#form_writeoffs4View")).val(selectedObj.managerId);
+			  $("#managerName",$("#form_writeoffs4View")).val(selectedObj.managerName);
+			  $("#channelName",$("#form_writeoffs4View")).val(selectedObj.channelName);
+			  $("#writeoffNo",$("#form_writeoffs4View")).val(selectedObj.writeoffNo);
+			  $("#ticketno",$("#form_writeoffs4View")).val(selectedObj.ticketno);
+			  $("#offAmount",$("#form_writeoffs4View")).val(selectedObj.offAmount);
+			  $("#lastBalance",$("#form_writeoffs4View")).val(selectedObj.lastBalance);
+			  $("#balance",$("#form_writeoffs4View")).val(selectedObj.balance);
+			  $("#stamp",$("#form_writeoffs4View")).val(selectedObj.stamp);
+			  $("#remark",$("#form_writeoffs4View")).val(selectedObj.remark);
+	    	  if($('#dgd_product').get(0)){
+	        	var params={writeoffsId:selectedObj.id};
+	        	
+	       		 $.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../stock/findWriteoffsDetailsXz',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  selectedObj.details=data;
+							  $('#dgd_product').sgDatagrid('appendData',data);
+						  }else{
+						  	$(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					});
+	    	}
+	 	}
+	 //打印
+	var detailPrint=function(){
+		 //$('#ifm_print').attr('src','web/whs/stock_print2.html');
+		window.open('web/whs/print.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+		//新增遮罩层
+		var mask=$('<div id="print_mask"></div>');
+		mask.addClass('window-mask');
+		mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+        var span=$('<span></span');
+        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+        span.text('正在打印中...');
+        mask.append(span);
+	    $(document.body).append(mask);
+	}
+	 
+	var exportWriteOffExcel = function(){
+		 var url="../../stock/exportExcel4WriteoffDetail?writeOffId="+$('#id','#form_writeoffs4View').val();
+        window.location.href=url;
+	 }
+	 //查询成品的配件信息
+	 function viewItem(){
+	   	 var obj = $('#dgd_writeoffs');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){
+	             	selectedObj=$(this).data('data');
+		 	   		//alert(writeoffsId);
+		 	    	//打开窗口
+		 	         var defaults = {
+		 		                title:'销账明细',
+		 		                id:'win_writeoffs_detail',
+		 		                url:'writeoffs_detail.html',
+		 		                success: loadSuccess4View,
+		 		                width: 826,
+		 		                height:540,
+		 		                buttons : [
+										   {name: '打印', onpress : detailPrint},
+										   {name: '导出Excel', onpress : exportWriteOffExcel},
+		 		                           {name: '关闭', type: 'button', onpress : function (){
+		 		                               $(document).sgWindow('close',{id:'win_writeoffs_detail'});
+		 		                            }
+		 		                           }
+		 		                       ]
+		 		            };
+		 		        $(document).sgWindow(defaults);
+	                }
+	            });
+	        }
+	   	}
+		//初始化表格
+   	 var defaults = {
+   		        title: "销账信息",
+   		     	width:  '100%',
+		        height: 388,
+   		        url: '../../stock/findWriteoffsXz',
+	   		    usepager: true,
+	 	        rownumbers:true,
+	 	        useRp: true,
+	 	        colid:'id',  //主键
+	 	        query:{startDate:lastMonthDay,endDate:now},
+   		        colModel : [
+					{display: '销账单号', name : 'writeoffNo', width : 140, sortable : false},
+					{display: '客户', name : 'channelName', width : 100, sortable : false},
+					{display: '经办人', name : 'managerName', width : 70, sortable : false},
+				   	{display: '转账票号', name : 'ticketno', width : 120, sortable : false},
+				   	{display: '上次销账金额', name : 'lastBalance', width : 120, sortable : false},
+				   	{display: '本次销账金额', name : 'offAmount', width : 120, sortable : false},
+					{display: '本次结余金额', name : 'balance', width : 120, sortable : false},
+		         	{display: '日期', name : 'stamp', width : 80, sortable : false},
+		         	{display: '备注', name : 'remark', width : 90, sortable : false}
+   		        ],
+		        searchitems :[	            
+		            {display:'销账单号',name:'writeoffNo',type:'text',width:150},
+		         	{display:'经办人',html:'<input type="text" name="managerName" id="managerName" style="width:150px;" list="userDataList"/><input type="hidden" name="managerId" id="managerId" />'},
+		         	{display:'代理商',html:'<input type="text" name="channelName" id="channelName" list="channeDataList"/><input type="hidden"  id="channelId" name="channelId" />'},
+		         	{display:'开始日期',name:'startDate',type:'date',value:lastMonthDay,width:150},
+			      	{display:'结束日期',name:'endDate',type:'date',value:now,width:150}
+		        ],
+		        buttons : [
+	    		            {name: '查看', bclass: 'view', onpress : viewItem},
+	    		            {separator: true}
+	    		        ],
+		        exporturl:'../../stock/exportExcel4WriteoffsXz',
+		        order: true,
+   		        sortname: "stamp",
+   		        sortorder: "desc",
+   		        isCount:true
+   		    };
+   		    $('#dgd_writeoffs').sgDatagrid(defaults); 
+   		  
+   		//自动查询代理商
+   		 	var checkChannel = function(){
+   		 		/* var text=this.value;
+   		 		text = text.replace(/\s/g,''); //去除空格
+   		 		if(text!=this.value){//有空格
+   		 			this.value=text;
+   		 			//$(this).trigger('change');
+   		 			return false;
+   		 		} */
+   		 		var params = {};
+   		 		params.pageNo = 1;
+   		 		params.pageSize = 10;
+   		 		params.filter = {};
+   		 		params.filter.name = this.value;
+   		 		params.filter.exceptDicId='5';
+   		 		var obj = $(this);
+   		 		$.ajax({
+   		 			  type : 'post', 
+   		 			  async: false,   
+   		 			  contentType : 'application/json',     
+   		 			  dataType : 'json',     
+   		 			  url : '../../sell/findChannels',   
+   		 			  data:JSON.stringify(params),
+   		 			  success : function(data) {
+   		 				  if(data){
+   		 					 var channels = data.items;
+   		 					 if(channels.length>0){
+   		 					     $("#channeDataList").empty();
+   		 					     channeDataList = {};
+   		 					  }
+   		 					  $.each( channels, function(key,value){
+   		 						  var op = $("<option></option>");
+   		 						  op.val(obj.val()+" "+value.name);
+   		 						  $("#channeDataList").append(op);
+   		 						  
+   		 						  channeDataList[value.name]=value;
+   		 						}); 
+   		 						
+   		 				  }else{
+   		 					  $(document).sgPup({message:'message_info',text: data});
+   		 				  }
+   		 			  } ,     
+   		 			  error : function(res,error) { 
+   		 			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+   		 			  }    
+   		 			});
+   		 	};
+   		   	   
+   		 	//填充代理商
+   			$.ajax({
+   				  type : 'post', 
+   				  async: false,   
+   				  contentType : 'application/json',     
+   				  dataType : 'json',     
+   				  url : '../../sell/findChannels',   
+   				  data:JSON.stringify({pageNo:1,pageSize:10,filter:{exceptDicId:'5'}}),
+   				  success : function(data) {
+   					  if(data){
+   						  var channels = data.items;
+   						   $("#channeDataList").empty();
+   						  channeDataList = {};
+   						  $.each( channels, function(key,value){
+   							  var op = $("<option></option>");
+   							  op.val(value.name);
+   							  $("#channeDataList").append(op);
+   							  channeDataList[value.name]=value;
+   							});
+   						  $("#channelName","#dgd_writeoffs").on('keyup',checkChannel);
+   						  $("#channelName","#dgd_writeoffs").on('change',function(){
+   							    var strs = this.value.split(" ");
+   							    if(channeDataList[strs[strs.length-1]]){
+	   								$(this).val(strs[strs.length-1]);
+	   								$("#channelId","#dgd_writeoffs").val(channeDataList[strs[strs.length-1]].id);
+	   								
+	   								if($("#channelId","#dgd_writeoffs").val().length==0){
+	   									$("#channelName","#dgd_writeoffs").val("");
+	   								}
+   							    }else{
+   							    	$(this).val('');
+   							    	$("#channelId","#dgd_writeoffs").val("");
+   							    }
+   							});
+   						  
+   					  }else{
+   						  $(document).sgPup({message:'message_info',text: data});
+   					  }
+   				  } ,     
+   				  error : function(res,error) { 
+   				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+   				  }    
+   				});
+   		//自动查询经办人
+			var checkUser = function(){
+				/* var text=this.value;
+				text = text.replace(/\s/g,''); //去除空格
+				if(text!=this.value){//有空格
+					this.value=text;
+					$(this).trigger('change');
+					return false;
+				} */
+				var params = {};
+				params.pageNo = 1;
+				params.pageSize = 10;
+				params.filter = {};
+				params.filter.opname = this.value;
+				params.filter.isCompany = true;//查询机构下的的所有操作人
+				var obj = $(this);
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../getOrgOperators',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  var manager = $("#managerName","#dgd_writeoffs");
+							  						  
+							  if(manager){
+								  if(data.items.length>0){
+							  		  userDataList = {};
+									  $("#userDataList").empty();
+								  }
+								  $.each(data.items,function(k,v){
+									  var op = $("<option></option>");
+									  op.val(obj.val()+" "+v.opname);
+									  $("#userDataList").append(op);
+									  
+									  userDataList[v.opname] = v.opid;
+			 				  	 }); 
+								}
+						  }else{
+						  	$(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					});
+			}
+			
+		  //填充经办人
+		    $.ajax( {
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../getOrgOperators',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#managerName","#dgd_writeoffs");
+					  if(manager){
+						  if(data.items.length>0){
+					  		  userDataList = {};
+							  $("#userDataList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(v.opname);
+							  $("#userDataList").append(op);
+							  
+							  userDataList[v.opname] = v.opid;
+						  	 }); 
+						  manager.on('keyup',checkUser);
+						  manager.on('change',function(){
+							  	var strs = this.value.split(" ");
+								 if(userDataList[strs[strs.length-1]]){
+										$(this).val(strs[strs.length-1]);
+										$("#managerId","#dgd_writeoffs").val(userDataList[strs[strs.length-1]]);
+										if($("#managerId","#dgd_writeoffs").val().length==0){
+											$("#managerName","#dgd_writeoffs").val("");
+										}
+								    }else{
+								    	$(this).val('');
+								    	$("#managerId","#dgd_writeoffs").val("");
+								    }
+								
+							});
+
+						};
+				  }else{
+				  	$(document).sgPup({message:'message_info',text: data});
+				  }
+			  },     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+			
+	})(jQuery)
+	
+	//打印页面元素设置
+  var callback=function(subWinBody,subWin){
+		
+	$.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : 'getCurrentCompany',   
+		  data:JSON.stringify({}),
+		  success : function(data) {
+			  if(data){
+				  var total = 0;
+				  var money = 0;
+				  try{
+				  //公司中文名字
+				  $("#cname",subWinBody).empty();
+				  $("#cname",subWinBody).append(data.cnfullname);
+				  //公司英文名字
+				  $("#ename",subWinBody).empty();
+				  $("#ename",subWinBody).append(data.enfullname);
+				  //表单名字
+				  $("#orderTitle",subWinBody).empty();
+				  $("#orderTitle",subWinBody).append("销账单");
+				  //表单日期
+				  $("#orderDate",subWinBody).empty();
+				  $("#orderDate",subWinBody).append(new Date().format('yyyy-MM-dd'));
+				  //表单单号
+				  $("#orderNo",subWinBody).empty();
+				  $("#orderNo",subWinBody).append(selectedObj.writeoffNo);
+				  
+				 //表前输入单
+				  $("#headInput",subWinBody).append('<span style="width:10%;">转账票号：</span>');
+				  var ticketnoStr=selectedObj.ticketno;
+				  if(!ticketnoStr){
+					  ticketnoStr='&nbsp;';
+				  }
+				  $("#headInput",subWinBody).append('<div style="width:15%;">'+ticketnoStr+'</div>');
+				  
+				  $("#headInput",subWinBody).append('<span style="width:10%;">代理商：</span>');
+				  var channelNameStr=selectedObj.channelName;
+				  if(!channelNameStr){
+					  channelNameStr='&nbsp;';
+				  }
+				  $("#headInput",subWinBody).append('<div style="width:15%;">'+channelNameStr+'</div>');
+				  
+				  $("#headInput",subWinBody).append('<span style="width:10%;">销售经理：</span>');
+				  var managerNameStr=selectedObj.managerName;
+				  if(!managerNameStr){
+					  managerNameStr='&nbsp;';
+				  }
+				  $("#headInput",subWinBody).append('<div style="width:15%;">'+managerNameStr+'</div>');
+				  //表头
+				  $("#tbHead",subWinBody).append('<td style="width:6%;" axis="rownumbers">序号</td>'+
+						   								  '<td style="width: 10%;" axis="productCode">商品编码</td>'+
+														  '<td style="width: 10%;" axis="productName">商品名称</td>'+
+														  '<td style="width: 20%;" axis="norm">商品规格</td>'+
+														  '<td style="width: 10%;" axis="quantity">挂账数量</td>'+
+														  '<td style="width: 10%;" axis="num">本次销账数量</td>'+
+														  '<td style="width: 10%;" axis="remainQuantity">剩余数量</td>'+
+														  '<td style="width: 10%;" axis="money">金额</td>');
+				  
+				  if(selectedObj.details){
+						//列头
+			           		var colModel=[];
+			           		colModel.push({name:'rownumbers'});
+			           		colModel.push({name:'productCode'});
+			           		colModel.push({name:'productName'});
+			           		colModel.push({name:'norm'});
+			           		colModel.push({name:'quantity'});
+			           		colModel.push({name:'num'});
+			           		colModel.push({name:'remainQuantity'});
+			           		colModel.push({name:'money'});
+			           		
+			           	   var tr=null;
+			    	        var td=null;
+			    	        var qnum=0;//合计挂账数量
+			    	        var wnum=0;//合计本次销账数量
+			    	      var rnum=0;//合计剩余数量
+			    	      var money=0;//金额
+			    	        $.each(selectedObj.details,function(i,row){
+			    	            tr = '<tr>';
+			                	$.each(colModel,function(k,v){
+			                		td ='<td>';
+			    	                var tdx = v.name;
+
+			    	            	if(tdx=='rownumbers'){
+			    	                 	var num = i+1;
+			    	                 	td=td+num+'</td>';              	
+			    	                 }else{
+			    	                	 if(row[tdx]=='null' || row[tdx]==null){
+			    	                		 row[tdx]='';
+			    	                	 }
+			    	                	 td=td+row[tdx];
+			    	                	 td=td+'</td>';
+			    	                	 
+			    	                	 if(tdx=='quantity'){
+			    	                		 qnum=Number(qnum)+Number(row[tdx]);
+			    	                	 }else if(tdx=='num'){
+			    	                		 wnum=Number(wnum)+Number(row[tdx]);
+			    	                	 }else if(tdx=='remainQuantity'){
+			    	                		 rnum=Number(rnum)+Number(row[tdx]);
+			    	                	 }else if(tdx=='money'){
+			    	                		 money=Number(money)+Number(row[tdx]);
+			    	                	 }
+			    	                 }
+			    	           
+			    	            	tr=tr+td;
+			                	});
+			                	tr=tr+'</tr>';
+			                	$("#tbBody",subWinBody).append(tr);
+			    	        });
+			    	      
+			    	        if(selectedObj.details.length>0){
+			    	        	 //表合计
+			  				  var tbfoot = '<tr>';
+			  				  tbfoot=tbfoot+'<td colspan="4"><div style="text-align:right">小计:</div></td>';
+			  				  tbfoot=tbfoot+'<td colspan="1">'+qnum+'</td>';
+			  				  tbfoot=tbfoot+'<td colspan="1">'+wnum+'</td>';
+			  				  tbfoot=tbfoot+'<td colspan="1">'+rnum+'</td>';
+			  				  tbfoot=tbfoot+'<td colspan="1">'+money.toFixed(2)+'</td>';
+			  				  tbfoot=tbfoot+'</tr>';
+			  				  $("#tbBody",subWinBody).append(tbfoot);
+			    	        }
+					  }
+	               
+				  //表尾输入单
+				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+													  '<span>复核人：</span><div>&nbsp;</div>'+
+													  '<span>仓管员：</span><div>&nbsp;</div>'+
+													  '<span>制单：</span><div>&nbsp;</div>');
+				  }catch(e){
+					  $(document).sgPup({message:'message_info',text: e});
+				  }
+				  
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+	
+    if (navigator.appName == 'Microsoft Internet Explorer'){
+    	subWin.print();  
+    }else{ 
+    	subWin.focus();
+    	subWin.print();  
+    }
+}
+</script>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>银行托收数据下载</title>
+</head>
+<body>
+	<form id='whs_stockin_allocated_form' method='post' class="form" style="width:870px;">
+		<div class='title'>银行托收数据下载></div>
+		<fieldset style="width:850px;">
+			<div class="panel">
+	            <div style="width:100%;color: #1b1d20;font-size: 14px;font-weight: bold">特别说明：</div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">1：下载后生成的文件只可以做校验，不可以做任何修改，如发现的文件有误确需要修改，需要在计费系统中修改完成后再下载。</div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">2：下载生成文件并送银联，而银联没有返回文件，这段时间不能修改套餐、服务截止日期、托收频率、托收银行、帐户、帐号、合同号等与托收有关的数据，如确需要修改请先做记录，待银联返回文件并上传至计费系统后再做处理。</div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">3：下载后生成的文件并确定报送银联后，应点击添加数据锁，锁定数据库中的关键数据。</div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">4：下面的年月日指的是要下载的年份和月份的托收数据、日期是服务截止的日期。请以固定的日期进行托收。</div>
+	        </div>
+	    </fieldset>
+	    
+	    <fieldset style="width:850px;">
+			<div class="panel">					
+	            	<span>日期:</span>
+	                <input type='date' id="stamp" required="true" name='stamp' style="width:165px;" />
+	                
+					<span>批次:</span>
+	                <select style="width:60px;">
+	                	<option>1</option>
+	                	<option>2</option>
+	                	<option>3</option>
+	                	<option>4</option>
+	                	<option>5</option>
+	                	<option>6</option>
+	                </select>
+	        </div>
+	     </fieldset>
+	    
+	    <fieldset style="width:850px;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="stockin_detail_submit" type="submit" style="width:150px;">下载金融中心交易文件</button>
+	            <button id="stockin_detail_submit" type="submit" style="width:150px;">下载金融中心总结文件</button>  
+	            <button id="stockin_detail_submit" type="submit" style="width:130px;">下载银盛交易文件</button>
+	            <button id="stockin_detail_submit" type="submit" style="width:130px;">下载银盛总结文件</button> 
+	            <button id="datalock" type="button" style="width:90px;">添加数据锁</button>
+	        </div>
+        </fieldset>
+	</form>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>营业处收款－－检测费</title>
+<style type="text/css">
+.hDiv table th,td {
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #fff;
+	overflow: hidden;
+	vertical-align: top !important;
+	padding-left: 4px;
+	padding-right: 4px;
+	line-height: 18px;
+}
+
+.hDiv table thead th[rowspan],.hDiv th[colspan] {
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #fff;
+	overflow: hidden;
+	vertical-align: middle !important;
+	text-align: center !important;
+	line-height: 18px;
+}
+
+/* 表格主体 */
+.hDiv table tbody {
+	border: 1px solid #cbcbd5;
+	border-top: 0px;
+	overflow-y: scroll;
+	border-bottom: 1px solid #ccc;
+	background-color: #fff;
+}
+
+.hDiv table tbody tr.normalRow {
+	background-color: #dfe6ef;
+}
+
+.hDiv table tbody tr:hover {
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4791d2),
+		to(#4791d2), color-stop(.6, #4791d2));
+	background: -moz-linear-gradient(0% 65% 90deg, #4791d2, #4791d2, #4791d2 100%);
+	color: #fff;
+}
+</style>
+</head>
+<body>
+	<div class="sDiv">
+		<div class="hDiv" style="margin: 0px; padding: 0px;min-height:447px;max-height:447px;overflow: auto;">
+			<table style="width: 1600px;">
+				<thead>
+					<tr>
+					   <th style="" rowspan="2" axis="rownumbers" width="30px">序号</th>
+						<th style="" rowspan="2" axis="productCode" width="80px">日期</th>
+						<th style="" rowspan="2" axis="productName" width="80px" >票号</th>
+						<th style="" rowspan="2" axis="productNorm" width="60px" >客户名称</th>
+						<th style="" rowspan="2" axis="unit" width="90px">车牌</th>
+						<th style="" rowspan="2" axis="lastSaveNum" width="90px">车载电话</th>
+						<th style="" colspan="3">合计</th>
+						<th style="" rowspan="2" axis="changeNum" width="60px">开票</th>
+						<th style="width:100px;" rowspan="2" axis="remark" width="90px">备注</th>
+					</tr>
+					<tr>
+						<th style="" axis="upgradeOutNum" width="50px">现金</th>
+						<th style="" axis="curBorrowNum" width="50px">刷卡</th>
+						<th style="" axis="otherOutNum" width="50px">转帐</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</body>
+</html>

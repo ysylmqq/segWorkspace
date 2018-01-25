@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>保险清单汇总</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap-datetimepicker.css" /><!-- +++++ -->
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+	<div class='datagrid' id="monitoring">
+    </div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../bslib/js/bootstrap-datetimepicker.js"></script><!-- ++++ -->
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/index.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript">
+    (function($) {
+    	 var now =new Date().format('yyyy-MM-dd');
+    	var today=new Date().format('yyyy-MM');
+    	 var twoDayBefore = GetDateStr(-30);
+    	var height = 476;
+    	//初始化表格
+    	var defaults = {
+    		        title: "保险清单汇总",
+    		        width:  '100%',
+    		        height: height,
+    		        rownumbers:true,
+    		        usepager: true,
+    		        url:'../../policy/findPolicysByPage',
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '保单号', name : 'policy_no', width : 110},
+						{display: '入网名', name : 'loginname', width : 100},
+						{display: '投保人', name : 'policyholder', width : 90},
+						{display: '车牌号', name : 'carNum', width : 100},
+    		            {display: '销售员', name : 'sales_person', width : 90},
+    		            {display: '投保公司', name : 'company', width : 100, sortable : true,formatter:function(value,row){
+    	  	                if(value==1){
+    	  	                    value = '太平洋保险';
+    	  	                }else if(value==2){
+    	  	                    value = '深圳平安保险';
+    	  	                }
+    	  	                return value;
+    	  	            }},
+    	  	          {display: '办理日期', name : 'stamp', width : 120, sortable : false}
+    		        ],
+    		       
+    		        searchitems :[
+    		  		            {display:'开始日期',html:'<span class="ltext"><input type="text" name="startDate" class="form-control form_datetime"/></span>'},
+    		  			      	{display:'结束日期',html:'<span class="ltext"><input type="text" name="endDate" class="form-control form_datetime" /></span>'},
+    		  			      	{display:'投保公司',html:'<span class="ltext"><select name="company" class="form-control"><option value="" selected>请选择</option><option value="1" >太平洋保险</option><option value="2">深圳平安保险</option></select></span>'}
+    		    		        ],
+    		    		        exporturl:'../../policy/exportExcelPolicysNew'
+    		      		     
+    		    };
+    		    $('#monitoring').sgDatagrid(defaults);
+   		   //复制一个导出->打印,再把它插入到原来导出的后面
+		  $("#monitoring .sDiv>.pGroup:first").clone().insertAfter($("#monitoring .sDiv>.pGroup:last"));
+		  $("#monitoring .sDiv>.pGroup:last a.button").attr('id','aprint');
+		  $("#monitoring .sDiv>.pGroup:last span.button_span span").html('打印'); 
+		  
+		  //打印
+			 $('#aprint').on('click',function(){
+				 //$('#ifm_print').attr('src','web/whs/stock_print2.html');
+				 window.open('../print/print.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+					//新增遮罩层
+					var mask=$('<div id="print_mask"></div>');
+					mask.addClass('window-mask');
+					mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+			        var span=$('<span></span');
+			        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+			        span.text('正在打印中...');
+			        mask.append(span);
+				    $(document.body).append(mask);  
+			 });
+    })(jQuery);
+    
+    
+    
+    //打印页面元素设置
+      var callback=function(subWinBody,subWin){
+     	         //查询数据
+     	        var params={};
+     		    params.startDate=$('#monitoring input[name=startDate]').val();
+     		    params.endDate=$('#monitoring input[name=endDate]').val();
+     		    params.company=$('#monitoring select[name=company]').val();
+     		    
+     	 		var resultData=null;//查询结果数据
+     	 		 $.ajax({
+     	 	            type: "POST",
+     	 	            async:false,
+     	 	            contentType : 'application/json',
+     	 	            dataType : 'json',
+     	 	            url: '../../policy/policyforPrint',
+     	 	       		 data:JSON.stringify(params),
+     	 	            success: function(data){
+     	 	            	resultData=data;
+     	 	            } ,     
+     	 	  		  error : function(res,error) { 
+     	 	 		  }  
+     	 	        });
+     	 
+     	$.ajax( {
+     		  type : 'post', 
+     		  async: false,   
+     		  contentType : 'application/json',     
+     		  dataType : 'json',     
+     		  url : '../../getCurrentCompany',   
+     		  data:JSON.stringify({}),
+     		  success : function(data) {
+     			  if(data){
+     				  var total = 0;
+     				  //公司中文名字
+     				  $("#cname",subWinBody).empty();
+     				  $("#cname",subWinBody).append(data.cnfullname);
+     				  //公司英文名字
+     				  $("#ename",subWinBody).empty();
+     				  $("#ename",subWinBody).append(data.enfullname);
+     				  //表单名字
+     				  $("#orderTitle",subWinBody).empty();
+     				  $("#orderTitle",subWinBody).append("保险清单汇总报表");
+     				  //表单日期
+     				  $("#orderDate",subWinBody).empty();
+     				  $("#orderDate",subWinBody).append(new Date().format('yyyy-MM-dd'));
+     				  //表单单号
+     				  $("#orderNo",subWinBody).empty();
+     				  $("#orderNo",subWinBody).append('&nbsp;');
+     				  
+     				 /*  //表前输入单
+     				  var outWhs ='<span style="width:10%;">日期：</span>';
+     				  outWhs=outWhs+'<div style="width:20%;">'+new Date().format('yyyy-MM-dd')+'</div>';
+     				 
+     				  $("#headInput",subWinBody).append(outWhs); */
+     				  //表头
+     				  $("#tbHead",subWinBody).append('<td style="width: 5%;" axis="rownumbers">序号</td>'+
+     														  '<td style="width: 20%;" axis="policyno">保单号</td>'+
+     														  '<td style="width: 10%;" axis="loginname">入网名</td>'+
+     														  '<td style="width: 20%;" axis="carNum">车牌号</td>'+
+     														  '<td style="width: 10%;" axis="sales_person">销售员</td>'+
+     														  '<td style="width: 15%;" axis="company_name">投保公司</td>' +
+     														  '<td style="width: 20%;" axis="stamp">办理日期</td>'
+     														 );
+     				  if(resultData){
+     					//列头
+     					
+     		           		var colModel=[];
+     		           		colModel.push({name:'rownumbers'});
+     		          	 	colModel.push({name:'policy_no'});
+     		           		colModel.push({name:'loginname'});
+     		           		colModel.push({name:'carNum'});
+     		          		colModel.push({name:'sales_person'});
+     		           		colModel.push({name:'company_name'});
+     		           		colModel.push({name:'stamp'});
+     		           	   var tr=null;
+     		    	       var td=null;
+     		    	       var stockNum=0;//合计库存数量
+     		    	        $.each(resultData,function(i,row){
+     		    	            tr = '<tr>';
+     		                	$.each(colModel,function(k,v){
+     		                		td ='<td>';
+     		    	                var tdx = v.name;
+
+     		    	            	if(tdx=='rownumbers'){
+     		    	                 	var num = i+1;
+     		    	                 	td=td+num+'</td>';              	
+     		    	                 }else{
+     		    	                	 if(row[tdx]=='null' || row[tdx]==null){
+     		    	                		 row[tdx]='';
+     		    	                	 }
+     		    	                	 td=td+row[tdx];
+     		    	                	 td=td+'</td>';
+     		    	                	 
+     		    	                	 if(tdx=='num'){
+     		    	                		 stockNum=Number(stockNum)+Number(row[tdx]);
+     		    	                	 }
+     		    	                 }
+     		    	           
+     		    	            	tr=tr+td;
+     		                	});
+     		                	tr=tr+'</tr>';
+     		                	$("#tbBody",subWinBody).append(tr);
+     		    	        });
+     		    	      
+     		    	       /*  if(resultData.length>0){
+     							  //表合计
+     							  var tbfoot = '<tr>';
+     							  tbfoot=tbfoot+'<td colspan="4"><div style="text-align:right">小计:</div></td>';
+     							  tbfoot=tbfoot+'<td colspan="1">'+stockNum+'</td>';
+     							   if(lastColumn){
+     							  	tbfoot=tbfoot+'<td colspan="1"></td>';
+     							  } 
+     							  tbfoot=tbfoot+'</tr>';
+     							  $("#tbBody",subWinBody).append(tbfoot);
+     						  } */
+     				  }
+     				 
+     				/*   //表尾输入单
+     				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+     													  '<span>复核人：</span><div>&nbsp;</div>'+
+     													  '<span>仓管员：</span><div>&nbsp;</div>'+
+     													  '<span>制单：</span><div>&nbsp;</div>'); */
+     				  
+     			  }else{
+     				  $(document).sgPup({message:'message_info',text: data});
+     			  }
+     		  } ,     
+     		  error : function(res,error) { 
+     		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+     		  }    
+     		});
+     	
+         if (navigator.appName == 'Microsoft Internet Explorer'){
+         	subWin.print();  
+         }else{ 
+         	subWin.focus();
+         	subWin.print();  
+         }
+     }
+
+    function GetDateStr(AddDayCount) {
+	    var dd = new Date();
+	    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+	    return dd.format('yyyy-MM-dd');
+	}
+</script>
+<script type="text/javascript">
+$.fn.datetimepicker.dates['zh'] = {
+    days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+    daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+    daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+    months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+    monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+    meridiem : [ "上午", "下午" ],
+    today : "今天"
+};
+$(document).ready(function(){
+    $(".form_datetime").datetimepicker({
+        language : "zh",
+        autoclose: true,
+        minView: "month",
+        format : 'yyyy-mm-dd'
+    });
+});
+</script>
+</html>

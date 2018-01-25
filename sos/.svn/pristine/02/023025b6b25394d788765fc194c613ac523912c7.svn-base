@@ -1,0 +1,589 @@
+<div class="container-fluid">
+    <div class="row">
+        <div id="news_list" class="datagrid" >
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+(function($){
+	
+    function GetDateStr(AddDayCount) {
+        var dd = new Date();
+        dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+        return dd.format('yyyy-MM-dd');
+    }
+    var winClose = function() {
+        $(document).sgWindow('close', {
+            id : 'add_unitType'
+        });
+    }
+    var winClose3 = function() {
+        $(document).sgWindow('close', {
+            id : 'news_view'
+        });
+    }
+  
+    var winCloseAdd = function(){
+    	 $(document).sgWindow('close', {
+            id : 'news_add'
+        });
+        $('span.select2-hidden-accessible').remove();
+    }
+    var winClose_edit = function() {
+        $(document).sgWindow('close', {
+            id : 'news_edit'
+        });
+    }
+   
+   
+    
+  //新增资讯
+    var addNew = function(){
+    	    //验证必填项
+    	   
+        	var title = $('#zx_title').val();
+    	    var myeditor = UM.getEditor('myEditor');
+    	    var id = '';
+    	    if($('#new_update_id')){
+    	    	id = $('#new_update_id').val();
+    	    	
+    	    }
+        	var content = myeditor.getContent();
+        	
+        	//var istop = $("input[name='is_top']:checked").val();
+        	
+        	var isTop = 0;
+        	var n = $("#zx_isTop:checked" ).length;//判断置顶是否选中
+        	//alert($("#zx_isTop:checked" ).val());
+        	if(n==1){
+        		isTop = 1;
+        	}
+        	
+        	var startTime = $("#start_time").val();
+        	var endTime = $("#end_time").val();
+        	var range = $('#zd_filter_org_select').val();
+        	var rangeVehicle = $('#zd_filter_vehicle_select').val();
+        	var rangeCarType = $('#zd_filter_cartype_select').val();//指定车型
+        	var rangeArea = $('#province').val()+","+$('#city').val()+","+$('#district').val();
+        	var vehicle_startTime = $('#vehicle_startTime').val();//车辆生产日期，开始时间
+        	var vehicle_endTime = $('#vehicle_endTime').val();//车辆生产日期，结束时间
+        	var imgLarge ="";
+        	if(content!=null && content!=''){
+        	/* 	 $('#new_add_alwaysShow img').each(function(i,data){ 
+        			 if(i==0){
+        				 imgLarge = this.src;
+        			 }
+        		 }); */
+        		 var imgs =  $('#new_add_alwaysShow img');
+        		 if(imgs && imgs.length>0){
+        			 imgLarge = imgs[0].src;
+        		 }
+        		
+        	}
+       		
+        	var summary = $("#zx_summary").val();
+        	if(title=='' || title == null){
+        		$(document).sgPup({message:'message_alert',text: "请输入资讯标题!"});
+        		return false;
+        	}
+        	
+        	if(content==''){
+        		$(document).sgPup({message:'message_alert',text: "请输入资讯内容!"});
+        		return false;
+        	}
+        	
+        	
+        	$.ajax({
+    			type : 'post',
+    			async : false,
+    			contentType : 'application/json',
+    			dataType : 'json',
+    			url : '../../../news/news/add',
+    			data : JSON.stringify({
+    				id:id,
+    				title : title,
+    				summary : summary,
+    				isTop : isTop,
+    				content : content,
+    				startTime : startTime,
+    				endTime : endTime,
+    				produceStartTime:vehicle_startTime,
+    				produceEndTime:vehicle_endTime,
+    				imgLarge:imgLarge,
+    				rangeVehicle:rangeVehicle,
+    				range:range,
+    				rangeCarType:rangeCarType,
+    				rangeArea:rangeArea
+    			}),
+    			success : function(data) {
+    				if (data) {
+    					if(data.success){
+    						
+    						$(document).sgPup({message:'message_alert',text: data.msg});
+    						$(document).sgWindow('close', {
+    				            id : 'news_add'
+    				        });
+    						$('#news_list').sgDatagrid('reload','sgDatagrid');
+    					}else{
+    						
+    						$(document).sgPup({message:'message_alert',text: data.msg});
+    					}
+    				}
+    			},
+    			error : function(res, error) {
+    				$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+    					+ ";error=" + error});
+    			}
+    		});
+       
+    }
+    
+    var viewItem = function() {
+        var obj = $('#news_list');
+        var bDiv = $('.bDiv',obj);
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            $(document).sgPup({message:'message_info',text: "只能选择一条记录！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+                if($(this).attr("checked")){
+                    editId=this.value;
+                    editObj=$(this).data('data');
+                    var defaults = {
+                        title : '资讯查看',
+                        id : 'news_view',
+                        url : '../../../news/news/showNew/'+ editObj.id,						
+                        width : 900,
+                        height : 400,
+                        buttons : [ {
+                            name : '关闭',
+                            onpress : winClose3
+                        } ]
+                    };
+                    $(document).sgWindow(defaults);
+                }
+            });
+        }else{
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }
+    }
+    var addItem = function(){  
+    	  $.ajax( {
+              type : 'post',
+              async: true,
+              dataType : 'json',
+              url : '../../../news/news/isseg',
+              success : function(data) {
+                  if(data){
+                	  
+                      if(data.success){
+                    	var url = '';
+                    	var type = data.type;
+                    	if(type==5){//海马车厂
+                    		url = 'news_add_chechang.html';
+                    	}
+                    	else if(type==6){//海马4S
+                    		url = 'news_add_sis.html';
+                    	}
+                    	else{
+                    		url = 'news_add_saige.html';
+                    	}
+                    	
+                      	var defaults = {
+    		    				title : '资讯新增',
+    		    				id : 'news_add',
+    		    				url : url,
+    		    				width : 900,
+    		    				height : 400,
+    		    				buttons : [ {
+									name : '保存',
+									type : 'submit',
+									onpress : addNew
+								},
+								{
+									name : '预览',
+									type : 'submit',
+									onpress : newAddView
+								},
+								{
+									name : '关闭',
+									onpress : winCloseAdd
+								}]
+    		    			};
+    		    			$(document).sgWindow(defaults);
+                      	
+                      }
+                      else{
+                    	  alert('机构信息验证出错!');
+                      }
+                  }
+              } ,
+              error : function(res,error) {
+                  if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}
+              }
+          });
+    	
+    }
+    //提交审核
+    var checkItem = function(){
+        var obj = $('#news_list');
+        var bDiv = $('.bDiv',obj);
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+            $(document).sgConfirm({text: '确定提交审核吗?',cfn:function(r){
+                if(r){
+                    var flag = false;
+                    $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+                        if($(this).attr("checked")){
+                            editId=this.value;
+                            editobj = $(this).data('data');
+                            if(editobj.isSubmit==true){
+                                alert("已提交审核的资讯不能再次提交!");
+                                return false;
+                            }
+                            var pids=[];
+                            pids.push(editobj.id);
+                            //打开窗口
+                            $.ajax( {
+                                type : 'post',
+                                async: false,
+                                dataType : 'json',
+                                url : '../../../news/news/newsSubmit',
+                                data:{ids:pids,type:1},
+                                success : function(data) {
+                                    if(data){
+                                        if(data.success){
+                                            $(document).sgPup({message:'message_info',text: "操作成功！"});
+                                        }else{
+                                            $(document).sgPup({message:'message_info',text: "操作失败！"});
+                                        }
+                                    }
+                                } ,
+                                error : function(res,error) {
+                                    if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}
+                                }
+                            });
+                        }
+                    });
+                    $('#news_list').sgDatagrid('reload','sgDatagrid');
+                }
+            }});
+        }
+    }
+    //下架
+    var banItem = function(){
+        var obj = $('#news_list');
+        var bDiv = $('.bDiv',obj);
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+            $(document).sgConfirm({text: '确定资讯下架吗?',cfn:function(r){
+                if(r){
+                    var flag = false;
+                    $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+                        if($(this).attr("checked")){
+                            editId=this.value;
+                            editobj = $(this).data('data');
+                            if(editobj.isOnline==false){
+                                alert("未上线的资讯不能进行下架操作!");
+                                return false;
+                            }
+                            var pids=[];
+                            pids.push(editobj.id);
+                            //打开窗口
+                            $.ajax( {
+                                type : 'post',
+                                async: false,
+                                dataType : 'json',
+                                url : '../../../news/news/newsban',
+                                data:{ids:pids,type:0},
+                                success : function(data) {
+                                    if(data){
+                                        if(data.success){
+                                            $(document).sgPup({message:'message_info',text: "操作成功！"});
+                                        }else{
+                                            $(document).sgPup({message:'message_info',text: "操作失败！"});
+                                        }
+                                    }
+                                } ,
+                                error : function(res,error) {
+                                    if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}
+                                }
+                            });
+                        }
+                    });
+                    $('#news_list').sgDatagrid('reload','sgDatagrid');
+                }
+            }});
+        }
+    }
+    
+    var editItem = function() {
+        var obj = $('#news_list');
+        var bDiv = $('.bDiv',obj);
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            $(document).sgPup({message:'message_info',text: "只能选择一条记录！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+                if($(this).attr("checked")){
+                    editId=this.value;
+                    editObj=$(this).data('data');
+                    var be_delete = true;
+                    var de_message ='';
+                    //已经在线的不能编辑
+                    if(editObj.checkState==1){
+                    	be_delete = false;
+                    	de_message = '该资讯已经上线,不能被编辑!';
+                    }
+                    //已提交审核，并且审核状态为未审核的不能编辑
+                    if(editObj.isSubmit){
+                    	if(editObj.checkState==0){
+                    		be_delete = false;
+                    		de_message = '该资讯正在审核中,不能被编辑!';
+                    	}
+                    }
+                    if(!be_delete){
+                    	$(document).sgPup({message:'message_info',text: de_message});
+                    	return false;
+                    }
+                    $.ajax( {
+                        type : 'post',
+                        async: true,
+                        dataType : 'json',
+                        url : '../../../news/news/isseg',
+                        success : function(data) {
+                         if(data){                            	
+                              
+                            var url = '';
+                           	var type = data.type;
+                           	if(type==5){//海马车厂
+                           		url = 'news_edit_chechang.html';
+                           	}
+                           	else if(type==6){//海马4S
+                           		url = 'news_edit_sis.html';
+                           	}
+                           	else{
+                           		url = 'news_edit_saige.html';
+                           	}
+                           	
+                            var defaults = {
+           		    				title : '资讯修改',
+           		    				id : 'news_edit',
+           		    				url : url,
+           		    				width : 900,
+           		    				height : 400,
+           		    				buttons : [ {
+       									name : '保存',
+       									type : 'submit',
+       									onpress : addNew
+       								},
+       								{
+       									name : '预览',
+       									type : 'submit',
+       									onpress : newAddView
+       								},
+       								{
+       									name : '关闭',
+       									onpress : winClose_edit
+       								}]
+           		    			};
+           		    			$(document).sgWindow(defaults);
+                            }
+                        } ,
+                        error : function(res,error) {
+                            if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}
+                        }
+                    });
+                  
+                }
+            });
+            
+        }else{
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }
+    }
+    var deleteItem = function(){
+        var obj = $('#news_list');
+        var bDiv = $('.bDiv',obj);
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else{
+            $(document).sgConfirm({text: '确定删除吗?',cfn:function(r){
+                if(r){
+                    var flag = false;
+                    $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+                        if($(this).attr("checked")){
+                            editId=this.value;
+                            editobj = $(this).data('data');
+                            var be_delete = true;
+                            var de_message ='';
+                            //已经在线的不能删除
+                            if(editobj.isOnline){
+                            	be_delete = false;
+                            	de_message = '该资讯已经上线,不能被删除!';
+                            }
+                            //已提交审核，并且审核状态为未审核的不能删除
+                            if(editobj.isSubmit){
+                            	if(editobj.checkState==0){
+                            		be_delete = false;
+                            		de_message = '该资讯正在审核中,不能被删除!';
+                            	}
+                            }
+                            if(!be_delete){
+                            	$(document).sgPup({message:'message_info',text: de_message});
+                            	return false;
+                            }
+                            
+                            var ids=[];
+                            ids.push(editId);
+                            //打开窗口
+                            $.ajax( {
+                                type : 'post',
+                                async: false,
+                                contentType : 'application/json',
+                                dataType : 'json',
+                                url : '../../../news/news/delete',
+                                data:JSON.stringify(ids),
+                                success : function(data) {
+                                    if(data){
+                                        if(data.success){
+                                            flag = true;
+                                        }else{
+                                            flag = false;
+                                        }
+                                    }
+                                } ,
+                                error : function(res,error) {
+                                    if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}
+                                }
+                            });
+                        }
+                    });
+                    if(flag){
+                        $(document).sgPup({message:'message_info',text: "删除成功！"});
+                    }else{
+                        //$(document).sgPup({message:'message_info',text: "删除不成功！"});
+                    }
+                    $('#news_list').sgDatagrid('reload','sgDatagrid');
+                }
+            }});
+        }
+    }
+
+    //新增资讯预览
+    var newAddView = function(){
+        var title = $('#zx_title').val();
+        var myeditor = UM.getEditor('myEditor');
+        var content = myeditor.getContent();
+
+        if(title=='')
+            title = '标题为空';
+        $('#seeModal_h4')[0].innerHTML= title;//标题
+        $('#seeModal_small')[0].innerHTML= new Date().format('yyyy-MM-dd');//时间
+        $('#new_view_context').empty();//先清空子元素
+        $('#new_view_context').append(content);//再追加展示内容
+        $('#seeModal').modal();
+    }
+    
+    var today = new Date().format('yyyy-MM-dd');
+    var twoDayBefore = GetDateStr(-2);
+    var defaults = {
+        title: "资讯管理",
+        width:  '100%',
+        height: 395,
+        url: '../../../news/news/findNewsByPage',
+        datatype:"json",
+        usepager: true,
+        rownumbers:true,
+        useRp: true,
+        colid:'id',  //主键
+        colModel : [
+            {display: '资讯标题', name : 'title', width : 130, formatter:function(value,row){
+                if(value.length >16){
+                    value = value.substr(0,10)+"...";
+                }else{
+                    value = value;
+                }
+                return value;
+            }},
+            {display: '是否置顶', name : 'isTop', width : 60, formatter:function(value,row){
+                if(value==true){
+                    value = "是";
+                }else{
+                    value = "否";
+                }
+                return value;
+            }},
+            {display: '提交状态', name : 'isSubmit', width : 100,formatter:function(value,row){
+                if(value== true){
+                    value = "已提交";
+                }else{
+                    value = "未提交";
+                }
+                return value;
+            }},
+            {display: '审核状态', name : 'checkState', width : 100,formatter:function(value,row){
+                if(value==1){
+                    value = "审核通过";
+                }else if(value==2){
+                    value = "审核未通过";
+                }else{
+                    value = "未审核";
+                }
+                return value;
+            }},
+            {display: '发布状态', name : 'isOnline', width : 100,formatter:function(value,row){
+                if(value== true){
+                    value = "已发布";
+                }else{
+                    value = "未发布";
+                }
+                return value;
+            }},
+            {display: '录入人', name : 'opName', width : 80},
+            {display: '录入时间', name : 'addTime', width : 120},
+            {display: '提交时间', name : 'submitTime', width : 120},
+            {display: '审核时间', name : 'checkTime', width : 120},
+            {display: '审核意见', name : 'checkInfo', width : 120}
+        ],
+        
+        buttons : [
+            {name:'新增', bclass:'glyphicon glyphicon-plus-sign', onpress:addItem},
+            {separator: true},
+            {name: '查看', bclass: 'glyphicon glyphicon-open', onpress : viewItem},
+            {separator: true},
+            {name: '编辑', bclass: 'glyphicon glyphicon-edit', onpress : editItem},
+            {separator: true},
+            {name: '提交审核', bclass: 'glyphicon glyphicon-pencil', onpress : checkItem},
+            {separator: true},
+            {name: '下架', bclass: 'glyphicon glyphicon-pencil', onpress : banItem},
+            {separator: true},
+            {name: '删除', bclass: 'glyphicon glyphicon-trash', onpress : deleteItem},
+            {separator: true}
+            
+        ],
+        searchitems :[
+            {display:'资讯标题',name:'title',type:'text',width:'120'},
+            {display:'资讯提交状态',name:'isSubmit',html:'<select style="width:120px"  name="isSubmit"><option value="" selected>请选择...</option><option value="1">已提交</option><option value="0">未提交</option></select>'},
+            {display:'资讯审核状态',name:'checkState',html:'<select style="width:120px"  name="checkState"><option value="" selected>请选择...</option><option value="0">未审核</option><option value="1">审核通过</option><option value="1">审核未通过</option></select>'},
+            {display:'开始时间',name:'startDate',type:'date',width:'120px',value:twoDayBefore},
+            {display:'结束时间',name:'endDate',type:'date',width:'140px',value:today}
+        ],
+        sortname: "id",
+        sortorder: "desc"
+    };
+    $('#news_list').sgDatagrid(defaults);
+
+
+})(jQuery);
+</script>

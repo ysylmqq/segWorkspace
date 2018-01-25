@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>订单编辑</title>
+</head>
+<body>
+	<form id='order_edit_form' method='post' class="form" style="width:860px;">
+		
+
+		<div class='title'>订单信息></div>
+		<fieldset style="width:840px;">
+            <div class="panel">
+                <span>订单号:</span>
+                <input type='text' id="orderNo" name='orderNo' disabled="disabled" style="width:290px;"/>
+                <input type='hidden' id="orderId" name='orderId'/>
+                <span>订单接收人:</span>
+                <input type='text' id="receiptName" name='receiptName' disabled="disabled" style="width:290px;"/>
+            </div>
+                
+            <div class="panel">    
+                <span>总金额(元):</span>
+                <input type='text' id="totalPrice" name='totalPrice' placeholder="请输入入库单号"  style="width:290px;" disabled="disabled"/>
+                
+                <span>订单日期:</span>
+                <input type='text' id="stamp" name='stamp' disabled="disabled" style="width:290px;" />
+            </div>
+            <div class="panel">    
+                <span style="vertical-align:top;">备注:</span>
+                <textarea id="remark" name='remark' style="width:685px;" disabled="disabled" ></textarea>
+            </div>
+        </fieldset>
+        
+        <div class="title">订单商品明细列表></div>
+		<fieldset class='fieldset' style="width:840px;">
+            <div id="order_detail_grid" class="datagird"></div>
+        </fieldset>
+
+        <div class="title">收货人列表></div>
+		<fieldset class='fieldset' style="width:840px;">
+            <div id="order_customer_grid" class="datagird"></div>
+        </fieldset>
+<!-- 
+        <fieldset style="width:840px;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="order_detail_close" type="button" >关闭</button>
+	        </div>
+        </fieldset>
+ -->
+	</form>
+</body>
+<script type="text/javascript">
+	(function($){
+		
+	})(jQuery)
+</script>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div id="whs_query" class="datagird"></div>
+
+</body>
+<script type="text/javascript">
+(function($){
+	var editId=null;//编辑时选中行ID
+	var editObj = null; //编辑时选中的对象
+    var loadSuccess = function(){
+	   //$("#username",$("#taskform")).val(editId);
+	   //alert(editObj.whsId);
+	   $.ajax( {
+    		  type : 'post', 
+    		  //async: false,   
+    		  contentType : 'application/json',     
+    		  dataType : 'json',     
+    		  url : '../../stock/findAllProduct', 
+    		  data:JSON.stringify({whsId:editObj.whsId,isContainsOrg:false}),
+    		  success : function(data) {
+    			  if(data){
+    				  var product=$("#product");
+    				  if(product){
+    					  $.each(data,function(k,v){
+    						  if(v.productId==editObj.productId)
+    						  	product.append("<option value='" +v.productId+"' selected=true>" + v.productName+"</option>");
+    						  else
+    							  product.append("<option value='" +v.productId+"'>" + v.productName+"</option>");
+        				  }); 
+    				  }
+    				 
+    			  }else{
+    				  $(document).sgPup({message:'message_info',text: data});
+    			  }
+    		  } ,     
+    		  error : function(res,error) { 
+    		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+    		  }    
+    		});
+	   
+	   $.ajax( {
+    		  type : 'post', 
+    		  //async: false,   
+    		  contentType : 'application/json',     
+    		  dataType : 'json',     
+    		  url : '../../stock/findOtherOrgWareHouses',   
+    		  data:JSON.stringify({'type':0}),
+    		  success : function(data) {
+    			  if(data){
+    				  //alert(JSON.stringify(data));
+    				  var outWhsId=$("#outWhsId");
+    				  if(outWhsId){
+    					  $.each(data,function(k,v){
+    						  if(v.id==editObj.whsId)
+    						  	  outWhsId.append("<option value='" +v.id+"' selected='true'>" + v.name+"</option>");
+    						  else
+    							  outWhsId.append("<option value='" +v.id+"'>" + v.name+"</option>");
+        				  }); 
+    				  }
+    				 
+    			  }else{
+    				  $(document).sgPup({message:'message_info',text: data});
+    			  }
+    		  } ,     
+    		  error : function(res,error) { 
+    		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+    		  }    
+    		});
+	   
+	   $.ajax( {
+ 		  type : 'post', 
+ 		  //async: false,   
+ 		  contentType : 'application/json',     
+ 		  dataType : 'json',     
+ 		  url : '../../stock/findWareHouses',   
+ 		  data:JSON.stringify({'type':0}),
+ 		  success : function(data) {
+ 			  if(data){
+ 				  //alert(JSON.stringify(data));
+ 				  var inWhsId=$("#inWhsId");
+ 				  if(inWhsId){
+ 					  $.each(data,function(k,v){
+ 						  inWhsId.append("<option value='" +v.id+"'>" + v.name+"</option>");
+     				  }); 
+ 				  }
+ 				 
+ 			  }else{
+ 				  $(document).sgPup({message:'message_info',text: data});
+ 			  }
+ 		  } ,     
+ 		  error : function(res,error) { 
+ 		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+ 		  }    
+ 		});
+	   editId=null;
+    }
+	
+    var tosubmit = function(){		   
+		   $("#whs_allocated_form").on('submit',function(e){
+			         
+	        		//做表单提交
+	                    var params = {};
+	        		    params.name = $('#name','#whs_allocated_form').val();
+	        		    
+	                    params.outWhsId = $('#outWhsId','#whs_allocated_form').val();
+	                    //alert(params.outWhsId);
+	                    params.inWhsId = $('#inWhsId','#whs_allocated_form').val();
+	                    //alert(params.inWhsId);
+	                    var productIds = $('input[name=productId]','#whs_allocated_form');
+	                    //alert(productIds.length);
+	                    var productNames=$('input[name=productName]','#whs_allocated_form');
+	                    //alert(productNames.length);
+	                    var productNums= $('input[name=num]','#whs_allocated_form');
+	                    //alert(productNames.length);
+	                    var details = new Array();
+	                    $.each(productIds,function(k,v){
+	                    	var obj = {};
+	                    	obj.productId = v.value;
+	                    	obj.productName = productNames[k].value;
+	                    	obj.num = productNums[k].value;
+	                    	details.push(obj);
+	                    })
+	                    params.allocatedDetails = details;
+
+	                    //alert(JSON.stringify(params))
+	                    $.ajax( {
+	            		  type : 'post', 
+	            		  async: false,   
+	            		  contentType : 'application/json',     
+	            		  dataType : 'json',     
+	            		  url : '../../stock/addAllocated',   
+	            		  data:JSON.stringify(params),
+	            		  success : function(data) {
+	            			  if(data){
+	            				  if(data.success){
+	            					  alert("调拨成功！")
+	            				  }else{
+	            					  alert("调拨失败！")
+	            				  }
+	            				 
+	            			  }else{
+	            				  $(document).sgPup({message:'message_info',text: data});
+	            			  }
+	            		  } ,     
+	            		  error : function(res,error) { 
+	            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	            		  }    
+	            		}); 
+	        		$(document).sgWindow('close',{id:'whs_allocated_window'}); 
+		 		    $('#taskgrid').sgDatagrid('reload','sgDatagrid');
+		 		   //$('#taskform').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+		 		   //e.stopPropagation();
+	        	return false;
+	        });
+
+	   };
+	var addItem = function(){
+		var obj = $('#whs_query');
+        var bDiv = $('.bDiv',obj);
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+                if($(this).attr("checked")){    
+                	editId=this.value;
+                	//alert(JSON.stringify($(this).data('data')))
+                	editObj = $(this).data('data');
+                	//打开窗口
+	                var defaults = {
+	    	                title:'调拨单',
+	    	                id:'whs_allocated_window',
+	    	                form:'whs_allocated_form',
+	    	                url:'allocated_form.html',
+	    	                success: loadSuccess,
+	    	                width: 640,
+	    	                height: 480,
+	    	                buttons : [
+	    	                           {name: '确定', type: 'submit', onpress : tosubmit},
+	    	                           {name: '重置', type: 'reset', onpress : null}
+	    	                       ]
+	    	            };
+	    	        $(document).sgWindow(defaults);
+                }
+            });
+        }else{
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }      
+        
+    }
+		//初始化表格
+   	 var defaults = {
+   		        width:  950,
+   		        height: 400,
+   		        url: '../../stock/findStocksNum',
+   		        rownumbers:true,//序号
+   		     	colid:'id',  //主键
+   		        colModel : [
+   		            {display: '仓库名称', name : 'whsName', width : 300, sortable : false},
+   		            {display: '商品名称', name : 'productName', width : 300, sortable : true},   		            
+   		            {display: '数量', name : 'num', width : 120, sortable : false}
+   		        ],
+   		        buttons : [
+   		  	            {name: '调拨', bclass: 'add', onpress : addItem}
+   			        ],
+   		        searchitems :[
+   		            {display:'商品名称',name:'productName',type:'text'}
+   		        ],
+   		        sortname: "productName",
+   		        sortorder: "asc"
+   		    };
+   		    $('#whs_query').sgDatagrid(defaults); 
+})(jQuery)
+</script>
+</html>

@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>挂账初始化</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css"><link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+    <style type="text/css">
+.hDiv table th,td {
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #fff;
+	overflow: hidden;
+	vertical-align: top !important;
+	padding-left: 4px;
+	padding-right: 4px;
+	line-height: 28px;
+	word-break:break-all;
+}
+
+.hDiv table thead th[rowspan],.hDiv th[colspan] {
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #fff;
+	overflow: hidden;
+	vertical-align: middle !important;
+	text-align: center !important;
+	line-height: 28px;
+}
+
+/* 表格主体 */
+.hDiv table tbody {
+	border: 1px solid #cbcbd5;
+	border-top: 0px;
+	overflow-y: scroll;
+	border-bottom: 1px solid #ccc;
+	background-color: #fff;
+}
+
+.hDiv table tbody tr.normalRow {
+	background-color: #dfe6ef;
+}
+
+.hDiv table tbody tr:hover {
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4791d2),
+		to(#4791d2), color-stop(.6, #4791d2));
+	background: -moz-linear-gradient(0% 65% 90deg, #4791d2, #4791d2, #4791d2 100%);
+	color: #fff;
+}
+.ui-icon-ellipsis{
+    background:url(../../images/icon-select.gif) no-repeat scroll 55% 55% transparent;
+    right: 0;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+	cursor: pointer;
+    overflow: hidden;
+    position: absolute;
+}
+
+</style>
+</head>
+
+<body>
+	<div id="dgd_borrow_init" class="datagrid" style="">
+		<div class="mDiv">挂账初始化</div>
+		<div class="sDiv">
+			<form>
+			   <div class="pGroup">
+				  <span class="label">营业处仓库:</span>
+				  <select size="1" name="whsId2" id="whsId2" style="width:138px">
+				    <option value="">--请选择--</option> 
+				  </select>
+				</div>
+				<div class="pGroup">
+					<span class="label">开始日期:</span><input type="date" name="startDate"
+						style="width: 150px;">
+				</div>
+				<div class="pGroup">
+					<span class="label">结束日期:</span><input type="date" name="endDate"
+						style="width: 150px;">
+				</div>
+				<div class="pGroup">
+					<span class="label">借用人:</span><input type="text"
+						name="borrowerName2" id="borrowerName2" style="width: 161px;"
+						list="userDataList"><input type="hidden" name="borrowerId2"
+						id="borrowerId2" >
+				</div>
+				<div class="pGroup">
+					<span class="label" style="width:52px;">代理商:</span><input type="text"
+						name="channelName2" id="channelName2" list="channeDataList"><input
+						type="hidden" name="channelId2" id="channelId2" value="">
+				</div>
+				<div class="pGroup">
+					<span class="label">商品名称:</span><input type="text"
+						name="productName2" id="productName2" style="width: 150px;" list="productDataList">
+						<input type="hidden" id="productId" name="productId" />
+				</div>
+			</form>
+			<div class="pGroup">
+				<a type="button" class="button" id="aquery"><span class="button_span"><span
+						class="pSearch">查询</span></span></a>
+			</div>
+			<div class="pGroup">
+				<a type="button" class="button" id="aexport"><span class="button_span"><span>导出Excel</span></span></a>
+			</div>
+		</div>
+		<div class="tDiv">
+			<div class="fbutton" id="div_add">
+				<span class="add">增加</span>
+			</div>
+			<div class="btnseparator"></div>
+			<div class="fbutton" id="div_edit">
+				<span class="edit">编辑</span>
+			</div>
+			<div class="btnseparator"></div>
+			<div class="fbutton" id="div_delete">
+				<span class="delete">删除</span>
+			</div>
+			<div class="btnseparator"></div>
+		</div>
+		<div class="hDiv" style="min-height:452px;max-height:452px;overflow: auto;">
+		   <form class="form" id="form_borrow">
+			<table  style="width: 1856px;">
+				<thead>
+					<tr>
+						<th axis="checkbox"><input type="checkbox" name="checkall"
+							style="margin-top: 8px;"></th>
+						<th axis="rownumbers" style="width: 38px;">序号</th>
+						<th axis="whsId" style="width: 140px;" isSelected="true"><div>营业处仓库</div></th>
+						<th axis="type" style="width: 100px;" isSelected="true"><div>挂账类型</div></th>
+						<th axis="borrowerName" style="width: 90px;" editable="true" isrequest="true"><div>借用人</div></th>
+						<th axis="channelName" style="width: 250px;" editable="true"><div>代理商</div></th>
+						<th axis="customerName" style="width: 120px;" editable="true"><div>最终客户</div></th>
+						<th axis="productName" style="width: 180px;" editable="true" isrequest="true"><div>商品名称</div></th>
+						<th axis="productCode" style="width: 100px;" disabled="true" ><div>商品编码</div></th>
+						<th axis="norm" style="width: 140px;" disabled="true" ><div>商品规格</div></th>
+						<th axis="contractName" style="width: 120px;" editable="true" ><div>合同名称</div></th>
+						<th axis="price" style="width: 50px;" editable="true" isFloat="true" ><div>单价</div></th>
+						<th axis="borrowNum" style="width: 60px;" editable="true" isnum="true" isrequest="true"><div>借用数量</div></th>
+						<th axis="returnNum" style="width: 60px;" editable="true" isnum="true" isrequest="true"><div>已还库数量</div></th>
+						<th axis="writeoffsNum" style="width: 70px;" editable="true" isnum="true" isrequest="true"><div>已销账数量</div></th>
+						<th axis="writeoffsNum2" style="width: 70px;" editable="true" isnum="true" isrequest="true"><div>已核销数量</div></th>
+						<th axis="num" style="width: 80px;"><div>未还库数量</div></th>
+						<th axis="stamp" style="width: 170px;" editable="true" isDate="true" isrequest="true"><div>日期</div></th>
+						<th axis="remark" style="width: 120px;" editable="true" ><div>备注</div></th>
+						<th axis="saveOperate" style="width: 200px;"><div>操作</div></th>
+					</tr>
+				</thead>
+			</table>
+			</form>
+		</div>
+	</div>
+	<datalist id="channeDataList">
+        </datalist>
+         <datalist id="userDataList"></datalist>
+         <datalist id="productDataList"></datalist>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+    (function($){
+    	var productDataList=[];//商品数组 key:商品名称,value:productId
+    	var channeDataList={};//代理商 key:名称,value:id
+    	var userDataList = {};//销售经理 key:name,value:id
+       var editId=null;//编辑时选中行ID
+       var editObj=null;//编辑时选中行对象
+       var editIds=null;//批量修改挂账初始化的ID
+       var lastMonthDay=new Date();//上个月的今天
+   	//lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+	   lastMonthDay.setDate(1);
+       lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+	   var today=new Date().format('yyyy-MM-dd');
+	   
+	   $('input[name=startDate]').val(lastMonthDay);
+	   $('input[name=endDate]').val(today);
+	   
+	 //列头
+  		var colModel=[];
+  		colModel.push({name:'checkbox'});
+  		colModel.push({name:'rownumbers'});
+  		colModel.push({name:'whsId'});
+  		colModel.push({name:'type'});//挂账类型
+  		colModel.push({name:'borrowerName'});
+  		colModel.push({name:'channelName'});
+  		colModel.push({name:'customerName'});
+  		colModel.push({name:'productName'});
+  		colModel.push({name:'productCode'});
+  		colModel.push({name:'norm'});
+  		colModel.push({name:'contractName'});//合同名称
+  		colModel.push({name:'price'});
+  		colModel.push({name:'borrowNum'});
+  		colModel.push({name:'returnNum'});
+  		colModel.push({name:'writeoffsNum'});
+  		colModel.push({name:'writeoffsNum2'});
+  		colModel.push({name:'num'});
+  		colModel.push({name:'stamp'});
+  		colModel.push({name:'remark'});
+  		colModel.push({name:'saveOperate'});
+	   
+	   //自动查询经办人
+		var checkUser = function(){
+			/* var text=this.value;
+			text = text.replace(/\s/g,''); //去除空格
+			if(text!=this.value){//有空格
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			} */
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.opname = this.value;
+			params.filter.isCompany = true;//查询机构下的的所有操作人
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getOrgOperators',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#borrowerName2","#dgd_borrow_init");
+						  						  
+						  if(manager){
+							  if(data.items.length>0){
+						  		  userDataList = {};
+								  $("#userDataList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.opname);
+								  $("#userDataList").append(op);
+								  
+								  userDataList[v.opname] = v.opid;
+		 				  	 }); 
+							}
+					  }else{
+					  	$(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		}
+		
+	  //填充经办人
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getOrgOperators',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#borrowerName2","#dgd_borrow_init");
+				  if(manager){
+					  if(data.items.length>0){
+				 		  userDataList = {};
+						  $("#userDataList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userDataList").append(op);
+						  
+						  userDataList[v.opname] = v.opid;
+					  	 }); 
+					  manager.on('keyup',checkUser);
+					  manager.on('change',function(){
+						  	var strs = this.value.split(" ");
+							 if(userDataList[strs[strs.length-1]]){
+									$(this).val(strs[strs.length-1]);
+									$("#borrowerId2","#dgd_borrow_init").val(userDataList[strs[strs.length-1]]);
+									if($("#borrowerId2","#dgd_borrow_init").val().length==0){
+										$("#borrowerName2","#dgd_borrow_init").val("");
+									}
+							    }else{
+							    	$(this).val('');
+							    	$("#borrowerId2","#dgd_borrow_init").val("");
+							    }
+							
+						});
+
+					};
+			  }else{
+			  	$(document).sgPup({message:'message_info',text: data});
+			  }
+		  },     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+		
+	  //自动查询代理商
+		 	var checkChannel = function(){
+		 		/* var text=this.value;
+		 		text = text.replace(/\s/g,''); //去除空格
+		 		if(text!=this.value){//有空格
+		 			this.value=text;
+		 			//$(this).trigger('change');
+		 			return false;
+		 		} */
+		 		var params = {};
+		 		params.pageNo = 1;
+		 		params.pageSize = 10;
+		 		params.filter = {};
+		 		params.filter.name = this.value;
+		 		params.filter.exceptDicId='5';
+		 		var obj = $(this);
+		 		$.ajax({
+		 			  type : 'post', 
+		 			  async: false,   
+		 			  contentType : 'application/json',     
+		 			  dataType : 'json',     
+		 			  url : '../../sell/findChannels',   
+		 			  data:JSON.stringify(params),
+		 			  success : function(data) {
+		 				  if(data){
+		 					 var channels = data.items;
+		 					 if(channels.length>0){
+		 					     $("#channeDataList").empty();
+		 					     channeDataList = {};
+		 					  }
+		 					  $.each( channels, function(key,value){
+		 						  var op = $("<option></option>");
+		 						  op.val(obj.val()+" "+value.name);
+		 						  $("#channeDataList").append(op);
+		 						  
+		 						  channeDataList[value.name]=value;
+		 						}); 
+		 						
+		 				  }else{
+		 					  $(document).sgPup({message:'message_info',text: data});
+		 				  }
+		 			  } ,     
+		 			  error : function(res,error) { 
+		 			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		 			  }    
+		 			});
+		 	};
+		   	   
+		 	//填充代理商
+			$.ajax({
+				  type : 'post', 
+				  async: false,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../sell/findChannels',   
+				  data:JSON.stringify({pageNo:1,pageSize:10,filter:{exceptDicId:'5'}}),
+				  success : function(data) {
+					  if(data){
+						  var channels = data.items;
+						   $("#channeDataList").empty();
+						  channeDataList = {};
+						  $.each( channels, function(key,value){
+							  var op = $("<option></option>");
+							  op.val(value.name);
+							  $("#channeDataList").append(op);
+							  channeDataList[value.name]=value;
+							});
+						  $("#channelName2","#dgd_borrow_init").on('keyup',checkChannel);
+						  $("#channelName2","#dgd_borrow_init").on('change',function(){
+							    var strs = this.value.split(" ");
+							    if(channeDataList[strs[strs.length-1]]){
+  								$(this).val(strs[strs.length-1]);
+  								$("#channelId2","#dgd_borrow_init").val(channeDataList[strs[strs.length-1]].id);
+  								
+  								if($("#channelId2","#dgd_borrow_init").val().length==0){
+  									$("#channelName2","#dgd_borrow_init").val("");
+  								}
+							    }else{
+							    	$(this).val('');
+							    	$("#channelId2","#dgd_borrow_init").val("");
+							    }
+							});
+						  
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		 	
+			//自动查询商品
+			var checkProduct = function(){
+				/* var text=this.value;
+				text = text.replace(/\s/g,''); //去除空格
+				if(text!=this.value){//有空格
+					this.value=text;
+					$(this).trigger('change');
+					return false;
+				} */
+				var params = {};
+				params.pageNo = 1;
+				params.pageSize = 15;
+				params.filter = {};
+				params.filter.nameOrCode = this.value;
+				var obj = $(this);
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../product/findProducts',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  var products = data.items;
+							  if(products.length>0){
+								  $("#productDataList").empty();
+							  	productDataList=[];
+							  }
+							  var key=null;
+							  $.each( products, function(key,value){
+								  var op = $("<option></option>");
+								  key=value.code;
+								  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+									 
+								  $("#productDataList").append(op);
+								  productDataList[key]=value.id;
+							 });
+						  }else{
+							  $(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					});
+			};
+			
+			//填充商品
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../product/findProducts',   
+				  data:JSON.stringify({pageNo:1,pageSize:15,filter:{type:0}}),
+				  success : function(data) {
+					  if(data){
+						  var products = data.items;
+						  $("#productDataList").empty();
+						  var key=null;
+						  productDataList=[];
+						  $.each( products, function(key,value){
+							  var op = $("<option></option>");
+							  key=value.code;
+							  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+							  
+							  $("#productDataList").append(op);
+							  productDataList[key]=value.id;
+						 });
+						  
+							var productNameCondn=$('input[name=productName2]',$('#dgd_borrow_init'));
+	   						productNameCondn.on('keyup',checkProduct);
+	   						
+	   						productNameCondn.on('change',function(){
+	   							var strs = this.value.split(" ");
+	   							$(this).val(strs[strs.length-3]);
+	   							if($(this).val()){
+									$("#productId",$('#dgd_borrow_init')).val(productDataList[strs[strs.length-2]]);
+									if($("#productId",$('#dgd_borrow_init')).val().length==0){
+										$("#productName2",$('#dgd_borrow_init')).val("");
+									}
+							    }else{
+							    	$(this).val('');
+							    	$("#productId",$('#dgd_borrow_init')).val("");
+							    }
+							
+								});
+
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+			
+			//填充营业处仓库
+		    $.ajax( {
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : './../../stock/findWarehouses',   
+			  data:JSON.stringify({}),
+			  success : function(data) {
+				  if(data){
+					  var whsId=$("#whsId2",$('#dgd_borrow_init'));
+					  if(whsId.get(0)){
+						  $.each(data,function(k,v){
+							  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+						  }); 
+					  }
+					 
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});	
+			//添加
+			$('#div_add').on('click',function(){
+				editId=null;
+	 			editIds=[];
+	 	       	editObj=null;
+		 	   	var rowDatas=[];
+		     	rowDatas.push({checkbox:'',rownumbers:'',whsId:'',type:0,borrowerName:'',channelName:'',customerName:'',productName:'',norm:'',contractId:'',price:'',borrowNum:'1',returnNum:'0',writeoffsNum:'0',writeoffsNum2:'0',num:'1',stamp:today,remark:'',saveOperate:''});
+		     	var obj=$('#dgd_borrow_init');
+	       	  	appendData(rowDatas,obj,colModel);
+			});
+			//编辑
+			$('#div_edit').on('click',function(){
+				var bDiv = $('#dgd_borrow_init .hDiv table tr:gt(0)');
+				  if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+		 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+		 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+		 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+			    	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+			    		    //输入框变成可输入状态  
+			    		    $('input',$(this).parent().parent()).attr('readonly',false);
+			          	    $('input',$(this).parent().parent()).css('border','2px inset');
+			          	    $('input',$(this).parent().parent()).css('background','white');
+			          	    $('select',$(this).parent().parent()).attr('readonly',false);
+			          	   $('#dgd_borrow_init .hDiv table select').attr('disabled',false);
+			          	    $('select',$(this).parent().parent()).css('border','2px inset');
+			          	    $('select',$(this).parent().parent()).css('background','white');
+			          	    $('span',$(this).parent().parent()).show();
+			          		//显示保存按钮
+			            	$('td:last div',$(this).parent().parent()).show();
+			          });
+			      }
+			});
+			//删除
+			$('#div_delete').on('click',function(){
+				var bDiv = $('#dgd_borrow_init .hDiv table tr:gt(0)');
+			      if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+			          $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+			      }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+			    	      var ids=[];
+			    	      $(document).sgConfirm({text: '删除后不可恢复，确定删除?',cfn:function(r){ 
+		    		     	if(r){
+		 	        	 
+		 	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		 	        			if(this.value){
+		 	        				if(this.value=='on'){
+		 	        					ids.push('-1');
+		 	        				}else{
+		 	 	        				ids.push(this.value);
+		 	        				}
+		 	        			}
+		 	 	            });
+		 	        		 $.ajax( {
+			            		  type : 'post', 
+			            		  async: false,   
+			            		  contentType : 'application/json',     
+			            		  dataType : 'json',     
+			            		  url : '../../stock/deleteBorrows',   
+			            		  data:JSON.stringify(ids),
+			            		  success : function(data) {
+			            			  if(data){
+			            				 if(data.success){
+			    	          		 		 //$('#dgd_setup').sgDatagrid('reload','sgDatagrid');
+			    	          		 		 $('#aquery').trigger('click');
+			            				 }
+			            				$(document).sgPup({message:'message_info',text: data.msg});
+			            			  }
+			            		  } ,     
+			            		  error : function(res,error) { 
+			            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			            		  }    
+			            		}); 
+		 	        	}
+		 	        }});
+			      }else{
+			          $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+			      }  
+			});
+			//查询
+			$('#aquery').on('click',function(){
+				var param={};
+				param.remark='1';
+				param.whsId=$("#whsId2").val();
+				param.channelId=$("#channelId2").val();
+				param.borrowerId=$("#borrowerId2").val();
+				param.productId=$("#productId").val();
+				param.startDate=$("input[name=startDate]").val();
+				param.endDate=$("input[name=endDate]").val();
+				 $.ajax({
+			            type: "POST",
+			            async:false,
+			            contentType : 'application/json',
+			            url: '../../stock/findBorrows',
+			            data: JSON.stringify(param),
+			            dataType : 'json',
+			            success: function(data){
+			            	if(data){
+			            	   var obj=$('#dgd_borrow_init');
+			            	   addData(data,obj,colModel);
+			            	   //设置可编辑的外框border 为0
+			            	   $('#dgd_borrow_init .hDiv table input').attr('readonly',true);
+			            	   $('#dgd_borrow_init .hDiv table input').css('border','0px');
+			            	   $('#dgd_borrow_init .hDiv table input').css('background','transparent');
+			            	   $('#dgd_borrow_init .hDiv table select').attr('readonly',true);
+			            	   $('#dgd_borrow_init .hDiv table select').attr('disabled',true);
+			            	   $('#dgd_borrow_init .hDiv table select').css('border','0px');
+			            	   $('#dgd_borrow_init .hDiv table select').css('background','transparent');
+			            	
+			            	   //最终客户查询span隐藏
+			            	   $('#dgd_borrow_init .hDiv table span').hide();
+			            	   //隐藏保存按钮
+			            	   $('td:last div','#dgd_borrow_init .hDiv table tr').hide();
+			            	}else{
+			            		$('#dgd_borrow_init .hDiv table tbody').empty();
+			            	}
+			            } ,     
+			  		  error : function(res,error) { 
+			 		  	 //    if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}  
+			 		  	$('#dgd_borrow_init .hDiv table tbody').empty();
+			 		  }  
+			        });
+			}); 
+			
+			//导出
+			$('#aexport').on('click',function(){
+				var url="../../stock/exportExcel4BorrowDetailsInit?remark=1&channelId="
+						+$("#channelId2").val()+"&borrowerId="+$("#borrowerId2").val()
+						+"&whsId="+$("#whsId2").val()
+						+"&productId="+$("#productId").val()
+						+"&startDate="+$("input[name=startDate]").val()
+						+"&endDate="+$("input[name=endDate]").val();
+		        window.location.href=url;
+			}); 
+			//添加数据
+			var addData=function(json,obj,colModel){
+		        $('tbody',tbl).remove();
+		        var tby = $('<tbody></tbody>') ;
+		        var hdv = $('.hDiv',obj);
+		        var tbl = $("#"+obj.attr("id")+" table");
+		        $.each(json,function(i,row){
+		            var tr = $('<tr></tr>');
+	            	$.each(colModel,function(k,v){
+	            		var td = $('<td></td>');
+	            		var th_this= $('thead th[axis='+v.name+']', hdv);
+		                var editable = $(th_this).attr('editable');
+		                var isSelected = $(th_this).attr('isSelected');
+		                var disabled = $(th_this).attr('disabled');
+		                var isnum = $(th_this).attr('isnum');
+		                var isDate = $(th_this).attr('isDate');
+		                var isDateTime = $(th_this).attr('isDateTime');
+		                var isFloat= $(th_this).attr('isFloat');
+		                var isrequest = $(th_this).attr('isrequest');
+		                var formatter = $(th_this).attr('formatter');
+		                var tdx = v.name;
+
+		                if(tdx=='checkbox'){
+		                    var check = $('<input type="checkbox" style="margin-top:8px;" />');
+		                     check.attr('axis','id');
+		                     check.attr('name',obj.attr("id")+"_chx");
+		                     check.attr('value',row['id']);                    
+		                     check.data('data',row);                   
+		                     td.append(check);
+		                     // 此处添加onchange事件代码
+		                     check.change(function(){
+		                         if (!check.attr("checked")) {
+		                             check.attr("checked","checked");
+		                         }else if(check.attr("checked")){
+		                             check.removeAttr("checked");
+		                         }; 
+		                     });
+		                 }else if(tdx=='rownumbers'){
+		                 	var tdwidth = $(th_this).css('width');
+		                     td.css('width',tdwidth);
+		                     //var num =$('tr', tbl).length+1;
+		                 	 var num = i+1;
+		                 	 var dv = $('<div></div>');
+			                 dv.css('width',tdwidth);
+			                 dv.css('padding-top','5px');
+			                 dv.css('line-height','16px');
+			                 dv.append(num);
+		                 	td.append(dv);              	
+		                 }else if(tdx=='saveOperate'){//操作，保存按钮
+			                 	var tdwidth = $(th_this).css('width');
+			                     td.css('width',tdwidth);
+			                     //var num =$('tr', tbl).length+1;
+			                 	 var num = i+1;
+			                 	 var dv = $('<div class="submit"></div>');
+				                 dv.css('width',tdwidth);
+				                 dv.css('padding-top','5px');
+				                 dv.css('line-height','16px');
+				                 var btn=$('<button type="submit" style="width:60px;">保存</button>');
+				                 dv.append(btn);
+				                 btn.on('click',function(){
+				                		 $('#form_borrow').unbind('submit');
+				                		 var trSave= $(this).parents('tr');
+				                		 $('#form_borrow').on('submit',function(){
+				                		 	$(document).sgConfirm({text: '确定保存吗?',cfn:function(r){ 
+		    		     						if(r){
+				                			 
+						                		var id=$('input[type=checkbox]:first',trSave).attr('value');
+						                		var whsId=$('select[name=whsId]',trSave).val();
+					                			var whsName=$('select[name=whsId]',trSave).find('option:selected').text();
+					                			var type=$('select[name=type]',trSave).val();
+					                			var borrowerId=$('input[name=borrowerId]',trSave).val();
+						                		var borrowerName=$('input[name=borrowerName]',trSave).val();
+						                		var channelId=$('input[name=channelId]',trSave).val();
+						                		var customerId=null;
+						                		if($('input[name=customerName]',trSave).val()){
+						                			customerId=$('input[name=customerId]',trSave).val();
+						                		}
+						                		var productId=$('input[name=productId]',trSave).val();
+						                		var borrowNum=$('input[name=borrowNum]',trSave).val();//num
+						                		var contractId=$('input[name=contractId]',trSave).val();
+						                		var price=$('input[name=price]',trSave).val();
+						                		var writeoffsNum=$('input[name=writeoffsNum]',trSave).val();
+						                		var writeoffsNum2=$('input[name=writeoffsNum2]',trSave).val();
+						                		var returnNum=$('input[name=returnNum]',trSave).val();
+						                		var remark=$('input[name=remark]',trSave).val();
+						                		var stamp=$('input[name=stamp]',trSave).val();
+						                		var param={
+						                				id:id,
+						                				whsId:whsId,
+						                				whsName:whsName,
+						                				type:type,
+						                				borrowerId:borrowerId,
+						                				borrowerName:borrowerName,
+						                				channelId:channelId,
+						                				customerId:customerId,
+						                				productId:productId,
+						                				num:borrowNum,
+						                				contractId:contractId,
+						                				price:price,
+						                				writeoffsNum:writeoffsNum,
+						                				writeoffsNum2:writeoffsNum2,
+						                				returnNum:returnNum,
+						                				stamp:stamp,
+						                				remark:remark
+						                		};
+						                		//$(document).sgPup({message:'message_info',text: JSON.stringify(param));
+						                		 $.ajax({
+								            		  type : 'post', 
+								            		  async: false,   
+								            		  contentType : 'application/json',     
+								            		  dataType : 'json',     
+								            		  url : '../../stock/saveBorrows',   
+								            		  data:JSON.stringify(param),
+								            		  success : function(data) {
+								            			  if(data){
+								            				 if(data.success){
+								    	          		 		 $('#aquery').trigger('click');
+								            				 }
+								            				$(document).sgPup({message:'message_info',text: data.msg});
+								            			  }
+								            		  } ,     
+								            		  error : function(res,error) { 
+								            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+								            		  }    
+								            		}); 
+				                			 }
+				                			}});
+				                			 return false;
+				                		 });
+				                		
+				                 });
+				                 
+				                 //取消
+				                 var btn2=$('<button type="button" style="width:60px;">取消</button>');
+				                 dv.append(btn2);
+				                 btn2.on('click',function(){
+				                	 	var trSave= $(this).parents('tr');
+				                		var id=$('input[type=checkbox]:first',trSave).attr('value');
+				                		if(id){//编辑
+				                			   //设置可编辑的外框border 为0
+							            	   $('input',trSave).attr('readonly',true);
+							            	   $('input',trSave).css('border','0px');
+							            	   $('input',trSave).css('background','transparent');
+							            	   $('select',trSave).attr('readonly',true);
+							            	   $('select',trSave).attr('disabled',true);
+							            	   $('select',trSave).css('border','0px');
+							            	   $('select',trSave).css('background','transparent');
+							            	
+							            	   //隐藏保存按钮
+							            	   $('td:last div',trSave).hide();
+							      
+				                		}else{
+				                			$(this).parents('tr').remove();
+				                		}
+				                 });
+			                 	 td.append(dv);              	
+			              }else{
+		                	 var tdwidth = $(th_this).css('width');
+		                     td.css('width',tdwidth);
+		                     var dv = $('<div></div>');
+		                     dv.css('width',tdwidth);
+		                     //padding-top: 5px; line-height: 16px;
+		                     dv.css('padding-top','5px');
+		                     dv.css('line-height','16px');
+		                     dv.css('width',tdwidth);
+		                     dv.css('word-break','break-all');
+		                	 if(editable){
+		                		 td.css('margin',0);
+		                		 td.css('padding',2);
+		                     	 var editinput = $("<input type='text' />");
+		                     	 editinput.attr('name',tdx);
+		                     	 editinput.width(tdwidth);
+		                     	 editinput.css('margin',0);
+		                    	 editinput.css('padding',0);
+		     
+		                     	 if(disabled){
+		                     		 editinput.attr('disabled','disabled');
+		                     	 }
+		                     	 if(isnum){
+		                     		editinput.attr('type','number');
+		                     	 }
+		                     	 if(isDate){
+			                     		editinput.attr('type','date');
+			                     	 }
+		                     	 if(isDateTime){
+			                     	//editinput.attr('type','datetime');
+		                           	editinput.attr('pattern','^((((1[6-9]|[2-9]\\d)\\d{2})-(0?[13578]|1[02])-(0?[1-9]|[12]\\d|3[01]))|(((1[6-9]|[2-9]\\d)\\d{2})-(0?[13456789]|1[012])-(0?[1-9]|[12]\\d|30))|(((1[6-9]|[2-9]\\d)\\d{2})-0?2-(0?[1-9]|1\\d|2[0-8]))|(((1[6-9]|[2-9]\\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))-0?2-29-))(\\s(([01]\\d{1})|(2[0123])):([0-5]\\d):([0-5]\\d))?$');
+			                     } 
+		                     	 if(isFloat){
+			                        editinput.attr('pattern','^(-?\\d+)(\\.\\d+)?$');
+				                 }
+		                     	 if(isrequest){
+		                     		editinput.attr('required',true);
+		                     	 }
+		                     	 editinput.val(row[tdx]);
+		                     	 dv.append(editinput);
+		                     	 //借用人、代理商、商品名称，需要加上id,自动搜索
+		                     	 if(tdx=='borrowerName'){//借用人
+		                     		var hiddenId=$("<input type='hidden' name='borrowerId'/>");
+		                     		hiddenId.val(row['borrowerId']);
+		                     		dv.append(hiddenId);
+		                     		//加上事件自动搜索的事件
+		                     		editinput.attr('list','userDataList');
+                     				editinput.on('keyup',checkUser);
+                     				editinput.on('change',function(){
+	      						  	    var strs = this.value.split(" ");
+	      							    if(userDataList[strs[strs.length-1]]){
+	      									$(this).val(strs[strs.length-1]);
+	      									hiddenId.val(userDataList[strs[strs.length-1]]);
+	      									if(hiddenId.val().length==0){
+	      										hiddenId.val("");
+	      									}
+	      							    }else{
+	      							    	$(this).val('');
+	      							    	hiddenId.val("");
+	      							    }
+		                     	   });
+		                     	 }else if(tdx=='channelName'){//代理商
+			                     		var hiddenId=$("<input type='hidden' name='channelId'/>");
+			                     		hiddenId.val(row['channelId']);		
+		                     			dv.append(hiddenId);
+			                     		//加上事件自动搜索的事件
+			                     		editinput.attr('list','channeDataList');
+			                     		editinput.on('keyup',checkChannel);
+			                     		editinput.on('change',function(){
+			   							    var strs = this.value.split(" ");
+			   							    if(channeDataList[strs[strs.length-1]]){
+			     								$(this).val(strs[strs.length-1]);
+			     								hiddenId.val(channeDataList[strs[strs.length-1]].id);
+			     								//商品div
+			                     				var div_product=$(this).parents('td').nextAll('td:eq(1)').find('div');
+			                     				//合同div
+	                   							var div_contract=$(this).parents('td').nextAll('td:eq(3)').find('div');
+	                   							//价格div
+	                   							var div_price=$(this).parents('td').nextAll('td:eq(4)').find('div');
+			     								if($("input[name=productId]",div_product).val()){
+	                   							  //设置合同、价格
+				                   				   $.ajax({
+				                   					  type : 'post', 
+				                   					  async: false,   
+				                   					  dataType : 'json',     
+				                   					  url : '../../sell/getSalePriceByProductId',   
+				                   					  data:{productId:$("input[name=productId]",div_product).val(),channelId:hiddenId.val()},
+				                   					  success : function(data) {
+				                   						  if(data){
+				                   							//设置商品价格、合同
+				                   							$('input[name=contractId]',div_contract).val(data.contractId);
+				                   							$('input[name=contractName]',div_contract).val(data.contractName);
+				                   							$('input[name=price]',div_price).val(data.price);
+				                   						  }else{
+				                   							  $(document).sgPup({message:'message_info',text: data});
+				                   						  }
+				                   					  } ,     
+				                   					  error : function(res,error) { 
+				                   					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				                   					  }    
+				                   					}); 
+			     								 }
+			     								if(hiddenId.val().length==0){
+			     									editinput.val("");
+			     								}
+			   							    }else{
+			   							    	$(this).val('');
+			   							    	hiddenId.val("");
+			   							    }
+			   							});
+			                     	 }else if(tdx=='customerName'){//最终客户
+				                     		var hiddenId=$("<input type='hidden' name='customerId'/>");
+				                     		hiddenId.val(row['customerId']);		
+			                     			dv.append(hiddenId);
+			                     			
+			                     			var spanSearch=$("<span class='ui-icon-ellipsis' style='width:16px;'/>");
+			                     			dv.append(spanSearch);
+			                     			dv.css('position','relative');
+				                     		//加上事件自动搜索的事件
+				                     		spanSearch.on('click',function(){
+				                     			var isSure=false;
+				                     	    	var getCusomer=function(){
+				                     	    		var obj = $('#dgd_customer','#win_customer');
+				                     		        var bDiv = $('.bDiv',obj);
+				                     	 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+				                     	 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+				                     	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+				                     	 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+				                     	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+				                     	 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+				                     	 	 	                if($(this).attr("checked")){
+				                     	 	 	                	isSure=true;
+				                     	 	 	                	$(document).sgWindow('close',{id:'win_customer',beforeClose:winBefClose});
+				                     	 	 	                }
+				                     	 	        	  });
+				                     	 	        }
+				                     		   };
+				                     	    	 var winBefClose=function(){
+				                     	    	    	//重新查询所属集团
+				                     	    	    	//$("#groupName").trigger('keyup');
+				                     	    	    	var isClose=true;
+				                     	    	    	if(isSure){
+				                     	    	    		var obj = $('#dgd_customer','#win_customer');
+				                     	    		        var bDiv = $('.bDiv',obj);
+				                     	    	 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+				                     	    	 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+				                     	    	 	            isClose=false;
+				                     	    	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+				                     	    	 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+				                     	    	 	            isClose=false;
+				                     	    	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+				                     	    	 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+				                     	    	 	 	                if($(this).attr("checked")){ 
+				                     	    	 	 	                   var rowData=$(this).data('data');
+				                     	    	 	 	                    editinput.val(rowData.customer_name);
+				                     	    	 	 	                	hiddenId.val(rowData.id);
+				                     	    	 	 	                }
+				                     	    	 	        	  });
+				                     	    	 	        }
+				                     	    	    	}
+				                     	    	    	return isClose;
+				                     	    	  };
+				                     	    	  var winClose = function (){
+				                     	              $(document).sgWindow('close',{id:'win_customer'});
+				                     	           }
+				                     	           
+				                     	    	 var defaults = {
+				                     		                title:'客户信息',
+				                     		                id:'win_customer',
+				                     		                form:'win_customer',
+				                     		                url:'customer_form.html',
+				                     		                width: 788,
+				                     		                height: 452,
+				                     	           	    	beforeClose:winBefClose,
+				                     	           	    	buttons : [
+				                     		                           {name: '确定', type: 'button', onpress : getCusomer},
+				                     		                           {name: '关闭', onpress : winClose}
+				                     		                       ]
+				                     		            };
+				                     		        $(document).sgWindow(defaults);
+				   							}); 
+				                     }else if(tdx=='contractName'){//销售合同名称
+				                     		var hiddenId=$("<input type='hidden' name='contractId'/>");
+				                     		hiddenId.val(row['contractId']);		
+			                     			dv.append(hiddenId);
+			                     			
+			                     			var spanSearch=$("<span class='ui-icon-ellipsis' style='width:16px;'/>");
+			                     			dv.append(spanSearch);
+			                     			dv.css('position','relative');
+				                     		//加上事件自动搜索的事件
+				                     		spanSearch.on('click',function(){
+				                     			  var ptd=editinput.parents('td');
+				                     			 var productId=ptd.prevAll('td:eq(2)').find('input[name=productId]').val();
+			                     	        	  var channelId=ptd.prevAll('td:eq(4)').find('input[name=channelId]').val();
+			                     	        	  if(!productId || !channelId){
+			                     	        		  $(document).sgPup({message:'message_info',text: '请先选择商品和代理商!'});
+			                     	        	  }else{
+						                     			var isSure=false;
+						                     	    	var getContract=function(){
+						                     	    		var obj = $('#dlg_salecontract','#win_contract');
+						                     		        var bDiv = $('.bDiv',obj);
+						                     	 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+						                     	 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+						                     	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+						                     	 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+						                     	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+						                     	 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+						                     	 	 	                if($(this).attr("checked")){
+						                     	 	 	                	isSure=true;
+						                     	 	 	                	$(document).sgWindow('close',{id:'win_contract',beforeClose:winBefClose});
+						                     	 	 	                }
+						                     	 	        	  });
+					                     	 	        }
+				                     	    	}
+				                     	    	 var winBefClose=function(){
+				                     	    	    	//重新查询所属集团
+				                     	    	    	//$("#groupName").trigger('keyup');
+				                     	    	    	var isClose=true;
+				                     	    	    	if(isSure){
+				                     	    	    		var obj = $('#dlg_salecontract','#win_contract');
+				                     	    		        var bDiv = $('.bDiv',obj);
+				                     	    	 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+				                     	    	 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+				                     	    	 	            isClose=false;
+				                     	    	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+				                     	    	 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+				                     	    	 	            isClose=false;
+				                     	    	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+				                     	    	 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+				                     	    	 	 	                if($(this).attr("checked")){ 
+				                     	    	 	 	                   var rowData=$(this).data('data');
+				                     	    	 	 	                    editinput.val(rowData.name);
+				                     	    	 	 	                	hiddenId.val(rowData.id);
+				                     	    	 	 	                	//价格
+				                     	    	 	 	                	ptd.nextAll('td:eq(0)').find('input[name=price]').val(rowData.price);
+				                     	    	 	 	                }
+				                     	    	 	        	  });
+				                     	    	 	        }
+				                     	    	    	}
+				                     	    	    	return isClose;
+				                     	    	  };
+				                     	    	  var winClose = function (){
+				                     	              $(document).sgWindow('close',{id:'win_contract'});
+				                     	           }
+				                     	    	  
+				                     	          var contractWinLoad=function(){
+				                     	        	  if(!productId || !channelId){
+				                     	        		  $(document).sgPup({message:'message_info',text: '请先选择商品和代理商!'});
+				                     	        	  }else{
+				                     	        		var now=new Date().format('yyyy-MM-dd');
+				                     	        	    $('#dlg_salecontract','#win_contract').sgDatagrid('reload',{url:'../../sell/findSalesContractProducts',query:{status:1,startDate:now,endDate:now,productId:productId,channelId:channelId}}); 
+				                     	        	  }
+				                     	          };
+				                     	    	 var defaults = {
+				                     		                title:'销售合同信息',
+				                     		                id:'win_contract',
+				                     		                form:'dlg_salecontract',
+				                     		                url:'salescontract_query.html',
+				                     		                width: 788,
+				                     		                height: 452,
+				                     		                success: contractWinLoad,
+				                     	           	    	beforeClose:winBefClose,
+				                     	           	    	buttons : [
+				                     		                           {name: '确定', type: 'button', onpress : getContract},
+				                     		                           {name: '关闭', onpress : winClose}
+				                     		                       ]
+				                     		            };
+				                     		        $(document).sgWindow(defaults);
+				                     		        
+			                     	        	  };
+				   							}); 
+				                     }else if(tdx=='productName'){//商品名称
+			                     		var hiddenId=$("<input type='hidden' name='productId'/>");
+			                     		hiddenId.val(row['productId']);	
+			                     	   dv.append(hiddenId);
+			                     		//加上事件自动搜索的事件
+			                     		editinput.attr('list','productDataList');
+			                     		editinput.on('keyup',checkProduct);
+			                     		editinput.on('change',function(){
+			                     			var strs = this.value.split(" ");
+			                     			$(this).val(strs[strs.length-3]);
+			                     			if($(this).val()){
+			                     				//设置productId
+			                     				hiddenId.val(productDataList[strs[strs.length-2]]);
+			                     				var ptd=$(this).parents('td');
+			                     				//设置商品编码、规格
+			                     	        	ptd.nextAll('td:eq(0)').find('div').html(strs[strs.length-2]);
+			                     	        	ptd.nextAll('td:eq(1)').find('div').html(strs[strs.length-1]);
+
+			                     				//代理商div
+			                     				var div_channel=ptd.prevAll('td:eq(1)').find('div');
+			                     				//合同div
+	                   							var div_contract=ptd.nextAll('td:eq(2)').find('div');
+	                   							//价格div
+	                   							var div_price=ptd.nextAll('td:eq(3)').find('div');
+			                     	        	//设置合同、价格
+			                     	        	if($("input[name=channelId]",div_channel).val()){
+				                   				   $.ajax({
+				                   					  type : 'post', 
+				                   					  async: false,   
+				                   					  dataType : 'json',     
+				                   					  url : '../../sell/getSalePriceByProductId',   
+				                   					  data:{productId:hiddenId.val(),channelId:$("input[name=channelId]",div_channel).val()},
+				                   					  success : function(data) {
+				                   						  if(data){
+				                   							//设置商品价格、合同
+				                   							$('input[name=contractId]',div_contract).val(data.contractId);
+				                   							$('input[name=contractName]',div_contract).val(data.contractName);
+				                   							$('input[name=price]',div_price).val(data.price);
+				                   						  }else{
+				                   							  $(document).sgPup({message:'message_info',text: data});
+				                   						  }
+				                   					  } ,     
+				                   					  error : function(res,error) { 
+				                   					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				                   					  }    
+				                   					}); 
+			                     	        	}
+			                     			}else{
+			                     				//设置productId
+			                     				hiddenId.val('');
+			                     				//设置商品编码
+			                     	        	ptd.nextAll('td:eq(0)').find('div').html('');
+			                     				//设置商品规格
+			                     	        	ptd.nextAll('td:eq(1)').find('div').html('');
+			                     			}
+			   							});
+			                     		//借用数量、已还库数量、已销账数量、已核销数量修改，未还库数量自动修改
+			                     	 }else if(tdx=='borrowNum'){//借用数量
+			                     		editinput.on('change',function(){
+			                     			var returnNum=$(this).parents('td').nextAll('td:eq(0)').find('input[name=returnNum]').val();//已还库数量
+			                     			var writeoffsNum=$(this).parents('td').nextAll('td:eq(1)').find('input[name=writeoffsNum]').val();//已销账数量
+			                     			var writeoffsNum2=$(this).parents('td').nextAll('td:eq(2)').find('input[name=writeoffsNum2]').val();//已核销数量
+				                     		
+			                     			if(!returnNum){
+			                     				returnNum=0;
+			                     			}
+			                     			if(!writeoffsNum){
+			                     				writeoffsNum=0;
+			                     			}
+			                     			if(!writeoffsNum2){
+			                     				writeoffsNum2=0;
+			                     			}
+			                     			$(this).parents('td').nextAll('td:eq(3)').find('div').html(Number(this.value)-Number(returnNum)-Number(writeoffsNum)-Number(writeoffsNum2));
+			                     		});
+		                     	   }else if(tdx=='returnNum'){//归还数量
+			                     		editinput.on('change',function(){
+			                     			var borrowNum=$(this).parents('td').prev('td:eq(0)').find('input[name=borrowNum]').val();
+			                     			var writeoffsNum=$(this).parents('td').nextAll('td:eq(0)').find('input[name=writeoffsNum]').val();//已销数量
+			                     			var writeoffsNum2=$(this).parents('td').nextAll('td:eq(1)').find('input[name=writeoffsNum2]').val();//已销数量
+			                     			if(!borrowNum){
+			                     				borrowNum=0;
+			                     			}
+			                     			if(!writeoffsNum){
+			                     				writeoffsNum=0;
+			                     			}
+			                     			if(!writeoffsNum2){
+			                     				writeoffsNum2=0;
+			                     			}
+			                     			$(this).parents('td').nextAll('td:eq(2)').find('div').html(Number(borrowNum)-Number(this.value)-Number(writeoffsNum)-Number(writeoffsNum2));
+			                     		});
+		                     	   }else if(tdx=='writeoffsNum'){//销账数量
+			                     		editinput.on('change',function(){
+			                     			var borrowNum=$(this).parents('td').prevAll('td:eq(1)').find('input[name=borrowNum]').val();
+			                     			var writeoffsNum2=$(this).parents('td').nextAll('td:eq(0)').find('input[name=writeoffsNum2]').val();//已核销数量
+			                     			var returnNum=$(this).parents('td').prevAll('td:eq(0)').find('input[name=returnNum]').val();//已还库数量
+				                     		if(!borrowNum){
+			                     				borrowNum=0;
+			                     			}
+			                     			if(!returnNum){
+			                     				returnNum=0;
+			                     			}
+			                     			if(!writeoffsNum2){
+			                     				writeoffsNum2=0;
+			                     			}
+			                     			$(this).parents('td').nextAll('td:eq(1)').find('div').html(Number(borrowNum)-Number(returnNum)-Number(writeoffsNum2)-Number(this.value));
+			                     		});
+		                     	   }else if(tdx=='writeoffsNum2'){//核销数量
+			                     		editinput.on('change',function(){
+			                     			var borrowNum=$(this).parents('td').prevAll('td:eq(2)').find('input[name=borrowNum]').val();
+			                     			var writeoffsNum=$(this).parents('td').prevAll('td:eq(0)').find('input[name=writeoffsNum]').val();//已销账数量
+			                     			var returnNum=$(this).parents('td').prevAll('td:eq(1)').find('input[name=returnNum]').val();//已还库数量
+				                     		if(!borrowNum){
+			                     				borrowNum=0;
+			                     			}
+			                     			if(!returnNum){
+			                     				returnNum=0;
+			                     			}
+			                     			if(!writeoffsNum){
+			                     				writeoffsNum=0;
+			                     			}
+			                     			$(this).parents('td').nextAll('td:eq(0)').find('div').html(Number(borrowNum)-Number(returnNum)-Number(writeoffsNum)-Number(this.value));
+			                     		});
+		                     	   }
+		                     }else if(isSelected){
+		                		 td.css('margin',0);
+		                		 td.css('padding',2);
+		                     	 var editinput = $("<select />");
+		                     	 editinput.attr('name',tdx);
+		                     	 editinput.width(tdwidth);
+		                     	 editinput.css('margin',0);
+		                    	 editinput.css('padding',0);
+		                    	
+		                     	if(tdx=='whsId'){//仓库id
+		                     		//填充营业处仓库
+		                		    $.ajax( {
+		                			  type : 'post', 
+		                			  async: false,   
+		                			  contentType : 'application/json',     
+		                			  dataType : 'json',     
+		                			  url : './../../stock/findWarehouses',   
+		                			  data:JSON.stringify({}),
+		                			  success : function(data) {
+		                				  if(data){
+		                					  var whsId=editinput;
+		                					  whsId.empty();
+		                					  if(whsId.get(0)){
+		                						  $.each(data,function(k,v){
+		                							  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+		                						  }); 
+		                					  }
+		                					 
+		                				  }else{
+		                					  $(document).sgPup({message:'message_info',text: data});
+		                				  }
+		                			  } ,     
+		                			  error : function(res,error) { 
+		                			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		                			  }    
+		                			});	
+		                     	}else if(tdx=='type'){//类型
+		                     		editinput.append('<option value="0">代理销售</option><option value="1">直销</option><option value="2">升级</option><option value="3">借用</option><option value="5">其他</option>');
+		                     	}
+		                     	 editinput.val(row[tdx]);
+		                     	 dv.append(editinput);
+		                     	 
+	                     }else{                         
+								if(formatter){
+									 dv.html((formatter)(row[tdx],row));
+								}else{
+									 dv.html(row[tdx]);
+								}
+		                     }
+		                	 td.append(dv);
+		                     
+		                 }
+		           
+		                tr.append(td);
+		                td = null;
+	            	});
+		            tby.append(tr);
+		        });
+		        //var tbl_id =  "#"+obj.attr("id")+"_tbl";
+		        $('tr', tbl).unbind();
+		        //$(tbl).empty();
+		        $('tbody',tbl).empty();
+		        tbl.append(tby);
+		        $('tbody tr:odd',tbl).addClass('normalRow');
+
+		        tby = null;
+		        hdv = null;
+		        tbl = null;
+		        tbl_id = null;
+		        json = null;
+			}; 	
+			
+			//追加数据
+			var appendData=function(json,obj,colModel){
+		        var tbl = $("#"+obj.attr("id")+" table");
+		        $('tr', tbl).unbind();
+		        
+		        var tby = $('tbody',tbl);
+		        if(!tby.get(0)){
+		        	tby=$('<tbody></tbody>') ;
+		        	tbl.append(tby);
+		        };
+		        var hdv = $('.hDiv',obj);
+		        $.each(json,function(i,row){
+		            var tr = $('<tr></tr>');
+	            	$.each(colModel,function(k,v){
+	            		var td = $('<td></td>');
+	            		var th_this= $('thead th[axis='+v.name+']', hdv);
+		                var editable = $(th_this).attr('editable');
+		                var isSelected = $(th_this).attr('isSelected');
+		                var disabled = $(th_this).attr('disabled');
+		                var isnum = $(th_this).attr('isnum');
+		                var isDate= $(th_this).attr('isDate');
+		                var isDateTime = $(th_this).attr('isDateTime');
+		                var isFloat= $(th_this).attr('isFloat');
+		                var isrequest = $(th_this).attr('isrequest');
+		                var formatter = $(th_this).attr('formatter');
+		                var tdx = v.name;
+
+		                if(tdx=='checkbox'){
+		                    var check = $('<input type="checkbox" style="margin-top:8px;" />');
+		                     check.attr('axis','id');
+		                     check.attr('name',obj.attr("id")+"_chx");
+		                     check.attr('value',row['id']);                    
+		                     check.data('data',row);                   
+		                     td.append(check);
+		                     // 此处添加onchange事件代码
+		                     check.change(function(){
+		                         if (!check.attr("checked")) {
+		                             check.attr("checked","checked");
+		                         }else if(check.attr("checked")){
+		                             check.removeAttr("checked");
+		                         }; 
+		                     });
+		                 }else if(tdx=='rownumbers'){
+		                 	var tdwidth = $(th_this).css('width');
+		                     td.css('width',tdwidth);
+		                     var num =$('tr', tbl).length;
+		                 	 //var num = i+1;
+		                 	 var dv = $('<div></div>');
+			                 dv.css('width',tdwidth);
+			                 dv.css('padding-top','5px');
+			                 dv.css('line-height','16px');
+			                 dv.append(num);
+		                 	td.append(dv);              	
+		                 }else if(tdx=='saveOperate'){//操作，保存按钮
+			                 	var tdwidth = $(th_this).css('width');
+			                     td.css('width',tdwidth);
+			                     //var num =$('tr', tbl).length+1;
+			                 	 var num = i+1;
+			                 	 var dv = $('<div class="submit"></div>');
+				                 dv.css('width',tdwidth);
+				                 dv.css('padding-top','5px');
+				                 dv.css('line-height','16px');
+				                 var btn=$('<button type="submit" style="width:60px;">保存</button>');
+				                 dv.append(btn);
+				                 btn.on('click',function(){
+				                		 $('#form_borrow').unbind('submit');
+				                		 var trSave= $(this).parents('tr');
+				                		 $('#form_borrow').on('submit',function(){
+				                		 	$(document).sgConfirm({text: '确定保存吗?',cfn:function(r){ 
+		    		     						if(r){
+				                			
+						                		var id=$('input[type=checkbox]:first',trSave).attr('value');
+						                		var whsId=$('select[name=whsId]',trSave).val();
+					                			var whsName=$('select[name=whsId]',trSave).find('option:selected').text();
+					                			var type=$('select[name=type]',trSave).val();
+					                			var borrowerId=$('input[name=borrowerId]',trSave).val();
+						                		var borrowerName=$('input[name=borrowerName]',trSave).val();
+						                		var channelId=$('input[name=channelId]',trSave).val();
+						                		var customerId=null;
+						                		if($('input[name=customerName]',trSave).val()){
+						                			customerId=$('input[name=customerId]',trSave).val();
+						                		}
+						                		var productId=$('input[name=productId]',trSave).val();
+						                		var borrowNum=$('input[name=borrowNum]',trSave).val();//num
+						                		var contractId=$('input[name=contractId]',trSave).val();
+						                		var price=$('input[name=price]',trSave).val();
+						                		var writeoffsNum=$('input[name=writeoffsNum]',trSave).val();
+						                		var writeoffsNum2=$('input[name=writeoffsNum2]',trSave).val();
+						                		var returnNum=$('input[name=returnNum]',trSave).val();
+						                		var remark=$('input[name=remark]',trSave).val();
+						                		var stamp=$('input[name=stamp]',trSave).val();
+						                		var param={
+						                				id:id,
+						                				whsId:whsId,
+						                				whsName:whsName,
+						                				type:type,
+						                				borrowerId:borrowerId,
+						                				borrowerName:borrowerName,
+						                				channelId:channelId,
+						                				customerId:customerId,
+						                				productId:productId,
+						                				num:borrowNum,
+						                				contractId:contractId,
+						                				price:price,
+						                				writeoffsNum:writeoffsNum,
+						                				writeoffsNum2:writeoffsNum2,
+						                				returnNum:returnNum,
+						                				stamp:stamp,
+						                				remark:remark
+						                		};
+						                		//$(document).sgPup({message:'message_info',text: JSON.stringify(param)});
+						                		 $.ajax({
+								            		  type : 'post', 
+								            		  async: false,   
+								            		  contentType : 'application/json',     
+								            		  dataType : 'json',     
+								            		  url : '../../stock/saveBorrows',   
+								            		  data:JSON.stringify(param),
+								            		  success : function(data) {
+								            			  if(data){
+								            				 if(data.success){
+								    	          		 		 $('#aquery').trigger('click');
+								            				 }
+								            				$(document).sgPup({message:'message_info',text: data.msg});
+								            			  }
+								            		  } ,     
+								            		  error : function(res,error) { 
+								            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+								            		  }    
+								            		}); 
+				                			 }
+				                			}});
+				                			 return false;
+				                		 });
+				                		
+				                 });
+				                 
+				                 //取消
+				                 var btn2=$('<button type="button" style="width:60px;">取消</button>');
+				                 dv.append(btn2);
+				                 btn2.on('click',function(){
+				                	 	var trSave= $(this).parents('tr');
+				                		var id=$('input[type=checkbox]:first',trSave).attr('value');
+				                		if(id){//编辑
+				                			   //设置可编辑的外框border 为0
+							            	   $('input',trSave).attr('readonly',true);
+							            	   $('input',trSave).css('border','0px');
+							            	   $('input',trSave).css('background','transparent');
+							            	   $('select',trSave).attr('readonly',true);
+							            	   $('select',trSave).attr('disabled',true);
+							            	   $('select',trSave).css('border','0px');
+							            	   $('select',trSave).css('background','transparent');
+							            	
+							            	   //隐藏保存按钮
+							            	   $('td:last div',trSave).hide();
+							      
+				                		}else{
+				                			$(this).parents('tr').remove();
+				                		}
+				                 });
+			                 	 td.append(dv);              	
+			              }else{
+		                	 var tdwidth = $(th_this).css('width');
+		                     td.css('width',tdwidth);
+		                     var dv = $('<div></div>');
+		                     dv.css('width',tdwidth);
+		                     //padding-top: 5px; line-height: 16px;
+		                     dv.css('padding-top','5px');
+		                     dv.css('line-height','16px');
+		                	 if(editable){
+		                		 td.css('margin',0);
+		                		 td.css('padding',2);
+		                     	 var editinput = $("<input type='text' />");
+		                     	 editinput.attr('name',tdx);
+		                     	 editinput.width(tdwidth);
+		                     	 editinput.css('margin',0);
+		                    	 editinput.css('padding',0);
+		     
+		                     	 if(disabled){
+		                     		 editinput.attr('disabled','disabled');
+		                     	 }
+		                     	 if(isnum){
+		                     		editinput.attr('type','number');
+		                     	 }
+		                     	if(isDate){
+		                     		editinput.attr('type','date');
+		                     	 }
+		                     	 if(isDateTime){
+			                     	//editinput.attr('type','datetime');
+			                     	editinput.attr('pattern','^((((1[6-9]|[2-9]\\d)\\d{2})-(0?[13578]|1[02])-(0?[1-9]|[12]\\d|3[01]))|(((1[6-9]|[2-9]\\d)\\d{2})-(0?[13456789]|1[012])-(0?[1-9]|[12]\\d|30))|(((1[6-9]|[2-9]\\d)\\d{2})-0?2-(0?[1-9]|1\\d|2[0-8]))|(((1[6-9]|[2-9]\\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))-0?2-29-))(\\s(([01]\\d{1})|(2[0123])):([0-5]\\d):([0-5]\\d))?$');
+			                     }
+		                     	 if(isFloat){
+			                        editinput.attr('pattern','^(-?\\d+)(\\.\\d+)?$');
+				                 }
+		                     	 if(isrequest){
+		                     		editinput.attr('required',true);
+		                     	 }
+		                     	 editinput.val(row[tdx]);
+		                     	 dv.append(editinput);
+		                     	 //借用人、代理商、商品名称，需要加上id,自动搜索
+		                     	 if(tdx=='borrowerName'){//借用人
+		                     		var hiddenId=$("<input type='hidden' name='borrowerId'/>");
+		                     		hiddenId.val(row['borrowerId']);
+		                     		dv.append(hiddenId);
+		                     		//加上事件自动搜索的事件
+		                     		editinput.attr('list','userDataList');
+                     				editinput.on('keyup',checkUser);
+                     				editinput.on('change',function(){
+	      						  	    var strs = this.value.split(" ");
+	      							    if(userDataList[strs[strs.length-1]]){
+	      									$(this).val(strs[strs.length-1]);
+	      									hiddenId.val(userDataList[strs[strs.length-1]]);
+	      									if(hiddenId.val().length==0){
+	      										hiddenId.val("");
+	      									}
+	      							    }else{
+	      							    	$(this).val('');
+	      							    	hiddenId.val("");
+	      							    }
+		                     	   });
+		                     	 }else if(tdx=='channelName'){//代理商
+			                     		var hiddenId=$("<input type='hidden' name='channelId'/>");
+			                     		hiddenId.val(row['channelId']);		
+		                     			dv.append(hiddenId);
+			                     		//加上事件自动搜索的事件
+			                     		editinput.attr('list','channeDataList');
+			                     		editinput.on('keyup',checkChannel);
+			                     		editinput.on('change',function(){
+			   							    var strs = this.value.split(" ");
+			   							    if(channeDataList[strs[strs.length-1]]){
+			     								$(this).val(strs[strs.length-1]);
+			     								hiddenId.val(channeDataList[strs[strs.length-1]].id);
+			     								//商品div
+			                     				var div_product=$(this).parents('td').nextAll('td:eq(1)').find('div');
+			                     				//合同div
+	                   							var div_contract=$(this).parents('td').nextAll('td:eq(3)').find('div');
+	                   							//价格div
+	                   							var div_price=$(this).parents('td').nextAll('td:eq(4)').find('div');
+			     								if($("input[name=productId]",div_product).val()){
+	                   							  //设置合同、价格
+				                   				   $.ajax({
+				                   					  type : 'post', 
+				                   					  async: false,   
+				                   					  dataType : 'json',     
+				                   					  url : '../../sell/getSalePriceByProductId',   
+				                   					  data:{productId:$("input[name=productId]",div_product).val(),channelId:hiddenId.val()},
+				                   					  success : function(data) {
+				                   						  if(data){
+				                   							//设置商品价格、合同
+				                   							$('input[name=contractId]',div_contract).val(data.contractId);
+				                   							$('input[name=contractName]',div_contract).val(data.contractName);
+				                   							$('input[name=price]',div_price).val(data.price);
+				                   						  }else{
+				                   							  $(document).sgPup({message:'message_info',text: data});
+				                   						  }
+				                   					  } ,     
+				                   					  error : function(res,error) { 
+				                   					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				                   					  }    
+				                   					}); 
+			     								 }
+			     								if(hiddenId.val().length==0){
+			     									editinput.val("");
+			     								}
+			   							    }else{
+			   							    	$(this).val('');
+			   							    	hiddenId.val("");
+			   							    }
+			   							});
+			                     	 }else if(tdx=='customerName'){//最终客户
+				                     		var hiddenId=$("<input type='hidden' name='customerId'/>");
+				                     		hiddenId.val(row['customerId']);		
+			                     			dv.append(hiddenId);
+			                     			
+			                     			var spanSearch=$("<span class='ui-icon-ellipsis' style='width:16px;'/>");
+			                     			dv.append(spanSearch);
+			                     			dv.css('position','relative');
+				                     		//加上事件自动搜索的事件
+				                     		spanSearch.on('click',function(){
+				                     			var isSure=false;
+				                     	    	var getCusomer=function(){
+				                     	    		var obj = $('#dgd_customer','#win_customer');
+				                     		        var bDiv = $('.bDiv',obj);
+				                     	 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+				                     	 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+				                     	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+				                     	 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+				                     	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+				                     	 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+				                     	 	 	                if($(this).attr("checked")){
+				                     	 	 	                	isSure=true;
+				                     	 	 	                	$(document).sgWindow('close',{id:'win_customer',beforeClose:winBefClose});
+				                     	 	 	                }
+				                     	 	        	  });
+				                     	 	        }
+				                     		   };
+				                     	    	 var winBefClose=function(){
+				                     	    	    	//重新查询所属集团
+				                     	    	    	//$("#groupName").trigger('keyup');
+				                     	    	    	var isClose=true;
+				                     	    	    	if(isSure){
+				                     	    	    		var obj = $('#dgd_customer','#win_customer');
+				                     	    		        var bDiv = $('.bDiv',obj);
+				                     	    	 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+				                     	    	 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+				                     	    	 	            isClose=false;
+				                     	    	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+				                     	    	 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+				                     	    	 	            isClose=false;
+				                     	    	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+				                     	    	 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+				                     	    	 	 	                if($(this).attr("checked")){ 
+				                     	    	 	 	                   var rowData=$(this).data('data');
+				                     	    	 	 	                    editinput.val(rowData.customer_name);
+				                     	    	 	 	                	hiddenId.val(rowData.id);
+				                     	    	 	 	                }
+				                     	    	 	        	  });
+				                     	    	 	        }
+				                     	    	    	}
+				                     	    	    	return isClose;
+				                     	    	  };
+				                     	    	  var winClose = function (){
+				                     	              $(document).sgWindow('close',{id:'win_customer'});
+				                     	           }
+				                     	           
+				                     	    	 var defaults = {
+				                     		                title:'客户信息',
+				                     		                id:'win_customer',
+				                     		                form:'win_customer',
+				                     		                url:'customer_form.html',
+				                     		                width: 788,
+				                     		                height: 452,
+				                     	           	    	beforeClose:winBefClose,
+				                     	           	    	buttons : [
+				                     		                           {name: '确定', type: 'button', onpress : getCusomer},
+				                     		                           {name: '关闭', onpress : winClose}
+				                     		                       ]
+				                     		            };
+				                     		        $(document).sgWindow(defaults);
+				   							}); 
+				                     }else if(tdx=='contractName'){//销售合同名称
+				                     		var hiddenId=$("<input type='hidden' name='contractId'/>");
+				                     		hiddenId.val(row['contractId']);		
+			                     			dv.append(hiddenId);
+			                     			
+			                     			var spanSearch=$("<span class='ui-icon-ellipsis' style='width:16px;'/>");
+			                     			dv.append(spanSearch);
+			                     			dv.css('position','relative');
+				                     		//加上事件自动搜索的事件
+				                     		spanSearch.on('click',function(){
+				                     			  var ptd=editinput.parents('td');
+				                     			 var productId=ptd.prevAll('td:eq(2)').find('input[name=productId]').val();
+			                     	        	  var channelId=ptd.prevAll('td:eq(4)').find('input[name=channelId]').val();
+			                     	        	  if(!productId || !channelId){
+			                     	        		  $(document).sgPup({message:'message_info',text: '请先选择商品和代理商!'});
+			                     	        	  }else{
+						                     			var isSure=false;
+						                     	    	var getContract=function(){
+						                     	    		var obj = $('#dlg_salecontract','#win_contract');
+						                     		        var bDiv = $('.bDiv',obj);
+						                     	 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+						                     	 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+						                     	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+						                     	 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+						                     	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+						                     	 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+						                     	 	 	                if($(this).attr("checked")){
+						                     	 	 	                	isSure=true;
+						                     	 	 	                	$(document).sgWindow('close',{id:'win_contract',beforeClose:winBefClose});
+						                     	 	 	                }
+						                     	 	        	  });
+					                     	 	        }
+				                     	    	}
+				                     	    	 var winBefClose=function(){
+				                     	    	    	//重新查询所属集团
+				                     	    	    	//$("#groupName").trigger('keyup');
+				                     	    	    	var isClose=true;
+				                     	    	    	if(isSure){
+				                     	    	    		var obj = $('#dlg_salecontract','#win_contract');
+				                     	    		        var bDiv = $('.bDiv',obj);
+				                     	    	 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+				                     	    	 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+				                     	    	 	            isClose=false;
+				                     	    	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+				                     	    	 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+				                     	    	 	            isClose=false;
+				                     	    	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+				                     	    	 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+				                     	    	 	 	                if($(this).attr("checked")){ 
+				                     	    	 	 	                   var rowData=$(this).data('data');
+				                     	    	 	 	                    editinput.val(rowData.name);
+				                     	    	 	 	                	hiddenId.val(rowData.id);
+				                     	    	 	 	                	//价格
+				                     	    	 	 	                	ptd.nextAll('td:eq(0)').find('input[name=price]').val(rowData.price);
+				                     	    	 	 	                }
+				                     	    	 	        	  });
+				                     	    	 	        }
+				                     	    	    	}
+				                     	    	    	return isClose;
+				                     	    	  };
+				                     	    	  var winClose = function (){
+				                     	              $(document).sgWindow('close',{id:'win_contract'});
+				                     	           }
+				                     	    	  
+				                     	          var contractWinLoad=function(){
+				                     	        	  if(!productId || !channelId){
+				                     	        		  $(document).sgPup({message:'message_info',text: '请先选择商品和代理商!'});
+				                     	        	  }else{
+				                     	        		var now=new Date().format('yyyy-MM-dd');
+				                     	        	    $('#dlg_salecontract','#win_contract').sgDatagrid('reload',{url:'../../sell/findSalesContractProducts',query:{status:1,startDate:now,endDate:now,productId:productId,channelId:channelId}}); 
+				                     	        	  }
+				                     	          };
+				                     	    	 var defaults = {
+				                     		                title:'销售合同信息',
+				                     		                id:'win_contract',
+				                     		                form:'dlg_salecontract',
+				                     		                url:'salescontract_query.html',
+				                     		                width: 788,
+				                     		                height: 452,
+				                     		                success: contractWinLoad,
+				                     	           	    	beforeClose:winBefClose,
+				                     	           	    	buttons : [
+				                     		                           {name: '确定', type: 'button', onpress : getContract},
+				                     		                           {name: '关闭', onpress : winClose}
+				                     		                       ]
+				                     		            };
+				                     		        $(document).sgWindow(defaults);
+				                     		        
+			                     	        	  };
+				   							}); 
+				                     }else if(tdx=='productName'){//商品名称
+			                     		var hiddenId=$("<input type='hidden' name='productId'/>");
+			                     		hiddenId.val(row['productId']);	
+			                     	   dv.append(hiddenId);
+			                     		//加上事件自动搜索的事件
+			                     		editinput.attr('list','productDataList');
+			                     		editinput.on('keyup',checkProduct);
+			                     		editinput.on('change',function(){
+			                     			var strs = this.value.split(" ");
+			                     			$(this).val(strs[strs.length-3]);
+			                     			if($(this).val()){
+			                     				//设置productId
+			                     				hiddenId.val(productDataList[strs[strs.length-2]]);
+			                     				var ptd=$(this).parents('td');
+			                     				//设置商品编码、规格
+			                     	        	ptd.nextAll('td:eq(0)').find('div').html(strs[strs.length-2]);
+			                     	        	ptd.nextAll('td:eq(1)').find('div').html(strs[strs.length-1]);
+
+			                     				//代理商div
+			                     				var div_channel=ptd.prevAll('td:eq(1)').find('div');
+			                     				//合同div
+	                   							var div_contract=ptd.nextAll('td:eq(2)').find('div');
+	                   							//价格div
+	                   							var div_price=ptd.nextAll('td:eq(3)').find('div');
+			                     	        	//设置合同、价格
+			                     	        	if($("input[name=channelId]",div_channel).val()){
+				                   				   $.ajax({
+				                   					  type : 'post', 
+				                   					  async: false,   
+				                   					  dataType : 'json',     
+				                   					  url : '../../sell/getSalePriceByProductId',   
+				                   					  data:{productId:hiddenId.val(),channelId:$("input[name=channelId]",div_channel).val()},
+				                   					  success : function(data) {
+				                   						  if(data){
+				                   							//设置商品价格、合同
+				                   							$('input[name=contractId]',div_contract).val(data.contractId);
+				                   							$('input[name=contractName]',div_contract).val(data.contractName);
+				                   							$('input[name=price]',div_price).val(data.price);
+				                   						  }else{
+				                   							  $(document).sgPup({message:'message_info',text: data});
+				                   						  }
+				                   					  } ,     
+				                   					  error : function(res,error) { 
+				                   					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				                   					  }    
+				                   					}); 
+			                     	        	}
+			                     			}else{
+			                     				//设置productId
+			                     				hiddenId.val('');
+			                     				//设置商品编码
+			                     	        	ptd.nextAll('td:eq(0)').find('div').html('');
+			                     				//设置商品规格
+			                     	        	ptd.nextAll('td:eq(1)').find('div').html('');
+			                     			}
+			   							});
+			                     		//借用数量、已还库数量、已销账数量、已核销数量修改，未还库数量自动修改
+			                     	 }else if(tdx=='borrowNum'){//借用数量
+			                     		editinput.on('change',function(){
+			                     			var returnNum=$(this).parents('td').nextAll('td:eq(0)').find('input[name=returnNum]').val();//已还库数量
+			                     			var writeoffsNum=$(this).parents('td').nextAll('td:eq(1)').find('input[name=writeoffsNum]').val();//已销账数量
+			                     			var writeoffsNum2=$(this).parents('td').nextAll('td:eq(2)').find('input[name=writeoffsNum2]').val();//已核销数量
+				                     		
+			                     			if(!returnNum){
+			                     				returnNum=0;
+			                     			}
+			                     			if(!writeoffsNum){
+			                     				writeoffsNum=0;
+			                     			}
+			                     			if(!writeoffsNum2){
+			                     				writeoffsNum2=0;
+			                     			}
+			                     			$(this).parents('td').nextAll('td:eq(3)').find('div').html(Number(this.value)-Number(returnNum)-Number(writeoffsNum)-Number(writeoffsNum2));
+			                     		});
+		                     	   }else if(tdx=='returnNum'){//归还数量
+			                     		editinput.on('change',function(){
+			                     			var borrowNum=$(this).parents('td').prev('td:eq(0)').find('input[name=borrowNum]').val();
+			                     			var writeoffsNum=$(this).parents('td').nextAll('td:eq(0)').find('input[name=writeoffsNum]').val();//已销数量
+			                     			var writeoffsNum2=$(this).parents('td').nextAll('td:eq(1)').find('input[name=writeoffsNum2]').val();//已销数量
+			                     			if(!borrowNum){
+			                     				borrowNum=0;
+			                     			}
+			                     			if(!writeoffsNum){
+			                     				writeoffsNum=0;
+			                     			}
+			                     			if(!writeoffsNum2){
+			                     				writeoffsNum2=0;
+			                     			}
+			                     			$(this).parents('td').nextAll('td:eq(2)').find('div').html(Number(borrowNum)-Number(this.value)-Number(writeoffsNum)-Number(writeoffsNum2));
+			                     		});
+		                     	   }else if(tdx=='writeoffsNum'){//销账数量
+			                     		editinput.on('change',function(){
+			                     			var borrowNum=$(this).parents('td').prevAll('td:eq(1)').find('input[name=borrowNum]').val();
+			                     			var writeoffsNum2=$(this).parents('td').nextAll('td:eq(0)').find('input[name=writeoffsNum2]').val();//已核销数量
+			                     			var returnNum=$(this).parents('td').prevAll('td:eq(0)').find('input[name=returnNum]').val();//已还库数量
+				                     		if(!borrowNum){
+			                     				borrowNum=0;
+			                     			}
+			                     			if(!returnNum){
+			                     				returnNum=0;
+			                     			}
+			                     			if(!writeoffsNum2){
+			                     				writeoffsNum2=0;
+			                     			}
+			                     			$(this).parents('td').nextAll('td:eq(1)').find('div').html(Number(borrowNum)-Number(returnNum)-Number(writeoffsNum2)-Number(this.value));
+			                     		});
+		                     	   }else if(tdx=='writeoffsNum2'){//核销数量
+			                     		editinput.on('change',function(){
+			                     			var borrowNum=$(this).parents('td').prevAll('td:eq(2)').find('input[name=borrowNum]').val();
+			                     			var writeoffsNum=$(this).parents('td').prevAll('td:eq(0)').find('input[name=writeoffsNum]').val();//已销账数量
+			                     			var returnNum=$(this).parents('td').prevAll('td:eq(1)').find('input[name=returnNum]').val();//已还库数量
+				                     		if(!borrowNum){
+			                     				borrowNum=0;
+			                     			}
+			                     			if(!returnNum){
+			                     				returnNum=0;
+			                     			}
+			                     			if(!writeoffsNum){
+			                     				writeoffsNum=0;
+			                     			}
+			                     			$(this).parents('td').nextAll('td:eq(0)').find('div').html(Number(borrowNum)-Number(returnNum)-Number(writeoffsNum)-Number(this.value));
+			                     		});
+		                     	   }
+		                     }else if(isSelected){
+		                		 td.css('margin',0);
+		                		 td.css('padding',2);
+		                     	 var editinput = $("<select />");
+		                     	 editinput.attr('name',tdx);
+		                     	 editinput.width(tdwidth);
+		                     	 editinput.css('margin',0);
+		                    	 editinput.css('padding',0);
+		                     	 
+		                     	if(tdx=='whsId'){//仓库id
+		                     		//填充营业处仓库
+		                		    $.ajax( {
+		                			  type : 'post', 
+		                			  async: false,   
+		                			  contentType : 'application/json',     
+		                			  dataType : 'json',     
+		                			  url : './../../stock/findWarehouses',   
+		                			  data:JSON.stringify({}),
+		                			  success : function(data) {
+		                				  if(data){
+		                					  var whsId=editinput;
+		                					  whsId.empty();
+		                					  if(whsId.get(0)){
+		                						  $.each(data,function(k,v){
+		                							  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+		                						  }); 
+		                					  }
+		                					 
+		                				  }else{
+		                					  $(document).sgPup({message:'message_info',text: data});
+		                				  }
+		                			  } ,     
+		                			  error : function(res,error) { 
+		                			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		                			  }    
+		                			});	
+		                     	}else if(tdx=='type'){//类型
+		                     		editinput.append('<option value="0">代理销售</option><option value="1">直销</option><option value="2">升级</option><option value="3">借用</option><option value="5">其他</option>');
+		                     	}
+		                     	
+		                     	 editinput.val(row[tdx]);
+		                     	 dv.append(editinput);
+	     
+	                     }else{                         
+								if(formatter){
+									 dv.html((formatter)(row[tdx],row));
+								}else{
+									 dv.html(row[tdx]);
+								}
+		                     }
+		                	 td.append(dv);
+		                     
+		                 }
+		           
+		                tr.append(td);
+		                td = null;
+	            	});
+		            tby.append(tr);
+		        });
+		        $('tbody tr:odd',tbl).addClass('normalRow');
+
+		        tby = null;
+		        hdv = null;
+		        tbl = null;
+		        tbl_id = null;
+		        json = null;
+			}; 	
+    	
+    })(jQuery)
+</script>
+</html>

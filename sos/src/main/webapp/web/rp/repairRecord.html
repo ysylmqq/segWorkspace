@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>营业处维护登记表</title>
+</head>
+<body>
+<div style="overflow-x:scroll;height: 100%;">
+	<div id="repairRecord" class="datagrid">
+	</div>
+</div>
+</body>
+<script type="text/javascript">
+    (function($) {
+    	var today=new Date().format('yyyy-MM');
+    	var height = 467;
+    	//初始化表格
+    	var defaults = {
+    		        title: "营业处维护登记表",
+    		        width:  '1950',
+    		        height: height,
+    		        rownumbers:true,
+    		        url:'',
+    		        isNotCheckall:true,
+    		        colModel : [
+						{display: '维护单号', name : 'billno', width : 70},
+						{display: '安装日期', name : 'stamp', width : 70},
+						{display: '保修期内/外', name : 'productCode', width : 70},
+    		            {display: '升级日期', name : 'productName', width : 70},
+    		            {display: '维护日期', name : 'norm', width : 70},
+    		            {display: '入单日期', name : 'unit', width : 70},
+    		            {display: '车牌号', name : 'inNum', width : 70},
+    		            {display: '车型', name : 'price', width : 70},
+    		            {display: '产品型号', name : 'code', width : 70},
+    		            {display: '车载电话', name : 'whsName', width : 70},
+    		            {display: '用户名', name : 'billno', width : 70},
+    		            {display: '故障现象', name : 'location', width : 200},
+    		            {display: '故障排除', name : 'location', width : 200},
+    		            {display: '维护电工', name : 'location', width : 70},
+    		            {display: '维护地点', name : 'location', width : 100},
+    		            {display: '接待员', name : 'location', width : 70},
+    		            {display: '客户满意度', name : 'location', width : 70},
+    		            {display: '配件金额', name : 'location', width : 70},
+    		            {display: '升级费', name : 'location', width : 70},
+    		            {display: '备注', name : 'remark', width : 70}
+    		        ],
+    		        searchitems :[
+				      	{display:'年月',name:'month',type:'month',width:150,value:today}
+    		        ],
+    		        query:{startDate:today,endDate:today},
+    		        exporturl:'./stock/exportExcel4StockIn'//导出excel
+    		    };
+    		    $('#repairRecord').sgDatagrid(defaults);
+   		  //复制一个导出->打印,再把它插入到原来导出的后面
+		  $("#repairRecord .sDiv>.pGroup:first").clone().insertAfter($("#repairRecord .sDiv>.pGroup:last"));
+		  $("#repairRecord .sDiv>.pGroup:last a.button").attr('id','aprint');
+		  $("#repairRecord .sDiv>.pGroup:last span.button_span span").html('打印');
+    })(jQuery);
+</script>
+</html>

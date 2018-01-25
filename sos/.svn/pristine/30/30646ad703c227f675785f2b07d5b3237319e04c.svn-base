@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>修改账号信息</title>
+</head>
+
+<body>
+	<form id='account_content' name='account_content' method='post' class="form">
+		<div class='title' style='width: 380px;'>账号信息</div>
+		<fieldset style="width: 365px;">
+			<div class="panel">
+				<div class="row">
+					<span class="col-xs-2">姓名:</span>
+					<span class="col-xs-10">
+						<input type='text' id="opname" name='opname' required="true" class="form-control" />
+					</span>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<span class="col-xs-2">登录名:</span>
+					<span class="col-xs-10">
+						<input type='text' id="loginname" name='loginname' required="true" class="form-control" />
+					</span>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<span class="col-xs-2">联系电话:</span>
+					<span class="col-xs-10">
+						<input type='text' id="mobile" name='mobile' class="form-control" />
+					</span>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<span class="col-xs-2">车牌号码:</span>
+					<span class="col-xs-10">
+						<input type='text' id="numberplate" name='numberplate' class="form-control" />
+					</span>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<span class="col-xs-2">邮箱:</span>
+					<span class="col-xs-10">
+						<input type='text' id="mail" name='mail' class="form-control" />
+					</span>
+				</div>
+			</div>
+		</fieldset>
+
+	</form>
+</body>
+</html>

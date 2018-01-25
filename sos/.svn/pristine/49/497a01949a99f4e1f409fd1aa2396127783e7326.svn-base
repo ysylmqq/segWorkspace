@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <div id="policeList_grid" class="datagrid"></div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/index.js"></script>
+<script type="text/javascript" src="../../jscript/accordion.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/tab.js"></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/tree.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+(function($){
+    var endItem = function(){
+        var obj = $('#policeList_grid');
+        var bDiv = $('.bDiv',obj);
+
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+       	 $(document).sgConfirm({text: '确定办停该保单吗?',cfn:function(r){ 
+		    if(r){
+     	//if(window.confirm('确定结束该工作单吗?')){
+     		var flag = false;
+     		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){    
+	                	editId=this.value;
+	                	editobj = $(this).data('data');
+	                	if(editobj.pid==null){
+	                		$(document).sgPup({message:'message_info',text: "客户("+editobj.name+")未办理保险！"});
+	                	}else{
+	                		var pids=[];
+	                		pids.push(editobj.pid);
+		                	//打开窗口
+		                	$.ajax( {
+           					  type : 'post', 
+			            		  async: false,   
+			            		  dataType : 'json',     
+			            		  url : '/sos/policy/operatePolicy',   
+			            		  data:{ids:pids,type:0},
+			            		  success : function(data) {
+			            			  if(data){
+			            				 if(data.success){
+			            					 $(document).sgPup({message:'message_info',text: "操作成功！"});
+			            				 }else{
+			            					 $(document).sgPup({message:'message_info',text: "操作失败！"});
+			            				 }
+			            			  }
+			            		  } ,     
+			            		  error : function(res,error) { 
+			            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			            		  }    
+			            		}); 
+	                	}
+	                }
+	            });
+     		$('#policeList_grid').sgDatagrid('reload','sgDatagrid');
+     	}	
+     	 }});
+       	 
+        }
+    }
+        
+
+	function GetDateStr(AddDayCount) {
+	    var dd = new Date();
+	    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+	    return dd.format('yyyy-MM-dd');
+	}
+ 
+        
+        
+    var checkItem = function(){
+        var obj = $('#policeList_grid');
+        var bDiv = $('.bDiv',obj);
+
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+       	 $(document).sgConfirm({text: '确定该保单审核通过吗?',cfn:function(r){ 
+		    if(r){
+     	//if(window.confirm('确定结束该工作单吗?')){
+     		var flag = false;
+     		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){    
+	                	editId=this.value;
+	                	editobj = $(this).data('data');
+	                	if(editobj.pid==null){
+	                		$(document).sgPup({message:'message_info',text: "客户("+editobj.name+")未办理保险！"});
+	                	}else if(editobj.pid!=null && editobj.pstatus == 2){
+	                		$(document).sgPup({message:'message_info',text: "已审核！"});
+	                	}else if(editobj.pid!=null && editobj.pstatus == 0){
+	                		$(document).sgPup({message:'message_info',text: "已停办，不能进行审操作！"});
+	                	}else{
+	                		var pids=[];
+	                		pids.push(editobj.pid);
+		                	//打开窗口
+		                	$.ajax( {
+           					  type : 'post', 
+			            		  async: false,   
+			            		  dataType : 'json',     
+			            		  url : '/sos/policy/operatePolicy',   
+			            		  data:{ids:pids,type:2},
+			            		  success : function(data) {
+			            			  if(data){
+			            				 if(data.success){
+			            					 $(document).sgPup({message:'message_info',text: "操作成功！"});
+			            				 }else{
+			            					 $(document).sgPup({message:'message_info',text: "操作失败！"});
+			            				 }
+			            			  }
+			            		  } ,     
+			            		  error : function(res,error) { 
+			            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			            		  }    
+			            		}); 
+	                	}
+	                }
+	            });
+     		$('#policeList_grid').sgDatagrid('reload','sgDatagrid');
+     	}	
+     	 }});
+       	 
+        }
+    }
+        
+        
+    var openItem = function(){
+        var obj = $('#policeList_grid');
+        var bDiv = $('.bDiv',obj);
+
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+       	 $(document).sgConfirm({text: '确定重新开启该保单吗?',cfn:function(r){ 
+		    if(r){
+     		var flag = false;
+     		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){    
+	                	editId=this.value;
+	                	editobj = $(this).data('data');
+	                	if(editobj.pid==null){
+	                		$(document).sgPup({message:'message_info',text: "客户("+editobj.name+")未办理保险！"});
+	                	}else if(editobj.pid!=null && editobj.pstatus != 0){
+	                		$(document).sgPup({message:'message_info',text: "该保单处于正常 状态，不需要重新开启！"});
+	                	}else{
+	                		var pids=[];
+	                		pids.push(editobj.pid);
+		                	//打开窗口
+		                	$.ajax( {
+           					  type : 'post', 
+			            		  async: false,   
+			            		  dataType : 'json',     
+			            		  url : '/sos/policy/operatePolicy',   
+			            		  data:{ids:pids,type:1},
+			            		  success : function(data) {
+			            			  if(data){
+			            				 if(data.success){
+			            					 $(document).sgPup({message:'message_info',text: "操作成功！"});
+			            				 }else{
+			            					 $(document).sgPup({message:'message_info',text: "操作失败！"});
+			            				 }
+			            			  }
+			            		  } ,     
+			            		  error : function(res,error) { 
+			            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			            		  }    
+			            		}); 
+	                	}
+	                }
+	            });
+     		$('#policeList_grid').sgDatagrid('reload','sgDatagrid');
+     	}	
+     	 }});
+       	 
+        }
+    }
+        
+        
+   function formatDateStr(str)
+   {
+   	var result='';
+   	if(str != null && str.length > 9){
+   		for(var i = 0; i < 10; i++){
+   		      result = result + str.charAt(i)
+   		}
+   	   return result;
+   	 }else{
+   		return "";
+   	 }
+   }
+   
+   
+   function formatStr(str)
+   {
+	   	var result='';
+	   	if(str == null){
+	   		return "";
+	   	}else{
+	   		for(var i = 0; i < str.length; i++){
+	   		      if (i % 4 == 0 && i != 0){
+	   		      	result = result + " " + str.charAt(i)
+	   		      }
+	   		      else{
+	   		      	result = result + str.charAt(i)
+	   		     }
+	   		}
+	   	return result;
+	   }
+   }
+   
+   
+   function removeStr(str)
+   {
+	   	if(str == null || str.length ==0){
+	   		return "";
+	   	}else{
+	   		return str.replace(/[ ]/g,"");
+	   	}
+   }
+   
+   
+   function getCusinfoAge(str)
+   {
+	   if(str!= null && str.length >=4 ){
+		   var m = str.substr(0,4);
+		   var Y = new Date().getFullYear();   
+	       var age = Y-m;
+	       if(age >= 65){
+	      	 return true;   
+	       }
+	        return false; 
+	   }
+	   return false; 
+   }
+        
+   var loadSuccessEdit11 = function(){
+		//填充编辑前的值
+		debugger;
+		   if(editId && editObj){
+			   
+			   
+			 	  $("#name","#police_transferl").val(formatStr(editObj.name));
+				  $("#old_person","#police_transferl").val(editObj.policyholder);
+				  $("#old_car_num","#police_transferl").val(editObj.carNum);
+		  
+			   
+				  $("#idcard","#police_transferl").val(formatStr(editObj.tidcard));
+				  $("#carNum","#police_transferl").val(editObj.car_num);
+				  $("#vCode","#police_transferl").val(editObj.vCode);
+				  $("#money","#police_transferl").val(editObj.vmoney);
+				  $("#vehicle_id","#police_transferl").val(editObj.vid);
+				  $("#ennum","#police_transferl").val(editObj.ennum);
+				  $("#chassnum","#police_transferl").val(formatStr(editObj.chassnum));
+				  $("#registerTime","#police_transferl").val(formatDateStr(editObj.registerTime));
+				  $("#status","#police_transferl").val(editObj.pstatus);
+				  $("#customer_name","#police_transferl").val(editObj.customer_name);
+				  $("#customer_id","#police_transferl").val(editObj.customer_id);
+				  	 $("#loginname","#police_transferl").val(editObj.customer_name); 
+					 $("#ucall","#police_transferl").val(formatStr(editObj.ucall));
+					 $("#ucall2","#police_transferl").val(editObj.ucall);
+					  
+					  $("#code","#police_transferl").val(editObj.prCode);
+					  $("#uTime","#police_transferl").val(formatDateStr(formatDateStr(editObj.fix_time)));
+				  
+					  debugger;
+				  
+				      if(editObj.insurance_id){
+				    	 // $("#phone","#police_transferl").val(editObj.pphone);
+				    	  $("#transferl_id","#police_transferl").val(editObj.insurance_id);
+						  $("#policyno","#police_transferl").val(editObj.policyno);
+						  $("#company","#police_transferl").val(editObj.company);
+						 // $("#person","#police_transferl").val(editObj.person);
+						//  $("#ywidcard","#police_transferl").val(formatStr(editObj.idcard));
+						//  $("#ywidcard1","#police_transferl").val(editObj.idcard);
+						//  $("#birthday","#police_transferl").val(formatDateStr(editObj.birthday));
+						//$("#mobile","#police_transferl").val(editObj.phone);
+						  $("#start_time","#police_transferl").val(formatDateStr(editObj.start_time));
+						  $("#end_time","#police_transferl").val(formatDateStr(editObj.end_time));
+						  $("#policyMoney","#police_transferl").val(editObj.amount);
+						  $("#address","#police_transferl").val(editObj.address);
+						  $("#sales_person","#police_transferl").val(editObj.sales);
+						  $("#policyFee","#police_transferl").val(editObj.fee);
+						  $("#status","#police_transferl").val(editObj.pstatus);
+						  $("#subco_no","#police_transferl").val(editObj.subco_no);
+						  $("#company","#police_transferl").val(editObj.company);
+						  
+						  
+						  
+						  
+						  if(editObj.payment == '1'){
+						  	$("#payment2","#police_transferl").attr('checked', 'checked'); 
+						  }
+						  if(editObj.is_buypilfer == '1'){
+							  	$("#is_buypilfer2","#police_transferl").attr('checked', 'checked'); 
+							  }
+						  if(editObj.is_contain == '1'){
+							  	$("#is_contain2","#police_transferl").attr('checked', 'checked'); 
+							  }
+						  
+				      }else{
+						  
+						  $.ajax( {
+							  type : 'POST', 
+							  async: false,   
+							  url : "/sos/policy/getPolicyNo",   
+							  data:{},
+							  success : function(data) {
+								  if(data){
+									  $("#policyno","#police_transferl").val(data);
+								  }
+							  } 
+						});
+				      
+				      
+
+				      
+				      }
+				      
+				  
+		   }
+		  editId=null;
+		 editObj=null; 
+		  
+	   }
+ 
+    
+    var overItem = function(){
+        var obj = $('#policeList_grid');
+        var bDiv = $('.bDiv',obj);
+        var title;
+        //alert($('input[type=checkbox][checked=checked]',bDiv).length) ;
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            alert("选择多于一个选项！");
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            alert("请选择一个选项！");
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+            	title ="工单结束";
+            	editId=this.value;
+            	editObj=$(this).data('data');
+            });
+            var defaults = {
+       			title : title,
+       			id : 'follow',
+       			form : 'follow_form',
+       			url : 'web/bsp/over_bill.html',
+       			success: loadSuccessfollow,
+       			width : 390,
+       			height : 300,
+       			buttons : [ {
+       				name : '确认',
+       				type : 'submit',
+       				onpress : saveFollow
+       			}, {
+       				name : '取消',
+       				onpress : winClose1
+       			} ]
+       		};
+       		$(document).sgWindow(defaults);
+        }else{
+            alert("请选择一个选项！");
+        }
+    }
+    
+    
+   
+    var winClose = function() {
+		$(document).sgWindow('close', {
+			id : 'dispathch'
+		});
+	}
+    
+    var winClose1 = function() {
+		$(document).sgWindow('close', {
+			id : 'follow'
+		});
+	}
+    
+    var winCloseEdit = function() {
+		$(document).sgWindow('close', {
+			id : 'policy_edit'
+		});
+	}
+
+    
+    
+    var winCloseAdd = function() {
+		$(document).sgWindow('close', {
+			id : 'add_police'
+		});
+	}
+    
+    var winCloseTest = function() {
+		$(document).sgWindow('close', {
+			id : 'test'
+		});
+	}
+    
+    var addItem = function(){
+    	var defaults = {
+   			title : '保险办理',
+   			id : 'add_police',
+   			form : 'task_form',
+   			url : 'police_add.html',
+   			//success: defaultAdd,
+   			width : 850,
+   			height : 500,
+   			buttons : [ {
+   				name : '保存',
+   				type : 'submit',
+   			    onpress : savepolicy
+   			}, {
+   				name : '发送短信',
+   				onpress : winClose1
+   			}, {
+   				name : '打印',
+   				onpress : printBill
+   			} ]
+   		};
+   		$(document).sgWindow(defaults);
+    }
+    
+    
+    
+
+	    var printBill = function(){
+	    	
+	    	 var defaultsType = {
+ 	                title:'打印选择',
+ 	                id:'test',
+ 	                form:'policy_edit_form',
+ 	                url:'police_transferl.html',
+ 	                success: loadSuccessEdit11,
+ 	                width: 200,
+ 	                height: 25,
+ 	                buttons : [
+ 	                           {name: 'A款', onpress : printA},
+ 	                           {name: 'B款', onpress : printB}
+ 	                       ]
+ 	            };
+ 	          $(document).sgWindow(defaultsType);	
+	    	
+	   
+			// $('#ifm_print').attr('src','web/whs/stock_print2.html');
+			/* window.open('web/bsp/print_policy.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+			$("#task",subWinBody).show();
+			//新增遮罩层
+			var mask=$('<div id="print_mask"></div>');
+			mask.addClass('window-mask');
+			mask.css('z-index',$('div.window').css('z-index')+1);//如果有弹出窗口，则将遮罩层置为最上层
+	       var span=$('<span></span');
+	       var span=$('<span></span');
+	       span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+	       span.text('正在打印中...');
+	       mask.append(span);
+		    $(document.body).append(mask);
+		    $('#police_transferl').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	        $(document).sgWindow('close', {id : 'policy_edit'});
+	    	return false;  */
+		    
+		 }; 
+		 
+		 
+		 
+		 
+		    var printA = function(){
+		    	if($('#company','#police_transferl').val() == 1){
+		    		window.open('../print/print_policy1A.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+		    	}else{
+		    		window.open('../print/print_policy2A.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+		    	}
+		    	
+				$("#task",subWinBody).show();
+				//新增遮罩层
+				var mask=$('<div id="print_mask"></div>');
+				mask.addClass('window-mask');
+				mask.css('z-index',$('div.window').css('z-index')+1);//如果有弹出窗口，则将遮罩层置为最上层
+		       var span=$('<span></span');
+		       var span=$('<span></span');
+		       span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+		       span.text('正在打印中...');
+		       mask.append(span);
+			   $(document.body).append(mask);
+		    	
+			   $(document).sgWindow('close', {
+					id : 'test'
+				});
+	 		 }; 
+	 		 
+	 		 
+	 		 
+	 		  var printB = function(){
+	 			  
+	 			 	if($('#company','#police_transferl').val() == 1){
+			    		window.open('../print/print_policy1B.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+			    	}else{
+			    		window.open('../print/print_policy2B.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+			    	}
+			    	
+					$("#task",subWinBody).show();
+					//新增遮罩层
+					var mask=$('<div id="print_mask"></div>');
+					mask.addClass('window-mask');
+					mask.css('z-index',$('div.window').css('z-index')+1);//如果有弹出窗口，则将遮罩层置为最上层
+			       var span=$('<span></span');
+			       var span=$('<span></span');
+			       span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+			       span.text('正在打印中...');
+			       mask.append(span);
+				   $(document.body).append(mask);
+			    	
+				   $(document).sgWindow('close', {
+						id : 'test'
+					}); 
+	 			  
+	 		 
+		 	 }; 
+	 	    
+		 
+		 
+		 
+		 
+		 
+		 
+
+	 	    var savepolicy = function(){
+			    var params = {};
+			    var url='/sos/policy/add';
+			    if($('#id','#police_add').val()){
+			    	url='/sos/policy/update';
+			    	params.id = $('#id','#police_add').val();
+			    }
+				params.is_buypilfer=$("input[name='is_buypilfer']:checked").val();
+				params.payment=$("input[name='payment']:checked").val();
+				params.is_contain=$("input[name='is_contain']:checked").val();
+				
+				params.loginname = $("#loginname","#police_add").val();
+		       
+			 	params.policyno=$('#policyno','#police_add').val();
+			 	params.vehicle_id=$('#vehicle_id','#police_add').val();
+				params.company=$('#company','#police_add').val();
+				params.money=$('#policyMoney','#police_add').val();
+				params.fee=$('#policyFee','#police_add').val();
+				params.person=$('#person','#police_add').val();
+				params.idcard=$('#ywidcard','#police_add').val();
+				params.birthday=$('#birthday','#police_add').val();
+				params.phone=$('#mobile','#police_add').val();
+				params.start_time=$('#start_time','#police_add').val();
+				params.end_time=$('#end_time','#police_add').val();
+				params.address=$('#address','#police_add').val();
+				params.sales_person=$('#sales_person','#police_add').val();
+			 	alert(JSON.stringify(params));
+			 	//if(window.confirm('确定保存接单吗?')){
+			 	  $(document).sgConfirm({text: '确定保存保险单吗?',cfn:function(r){ 
+				  if(r){ 
+				          $.ajax( {
+				      		  type : 'post', 
+				      		  async: false,   
+				      		  contentType : 'application/json',     
+				      		  dataType : 'json',     
+				      		  url : url,   
+				      		  data:JSON.stringify(params),
+				      		  success : function(data) {
+				      			  if(data){
+				      				 if(data.success){
+				      					// $(document).sgWindow('close',{id:'win_managers'}); 
+					          		 		$('#policeList_grid').sgDatagrid('reload','sgDatagrid');
+				      				 }
+				      				$(document).sgPup({message:'message_alert',text: data.msg});
+				      				 
+				      			  }
+				      		  } ,     
+				      		  error : function(res,error) { 
+				      		  	 alert(res.responseText);     
+				      		  }   
+				          });
+				      		  
+				  } 	  
+				          }}); 
+				  
+		  			 $('#police_add').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	 		        $(document).sgWindow('close', {id : 'add_police'});
+	 		    	return false;
+	 		 }; 
+	 	    
+	 		 
+	 		 
+	 	    var saveEditpolicy = function(){
+			    var params = {};
+			    var url='/sos/policy/transferl';
+			    params.transferl_id = $('#transferl_id','#police_transferl').val();
+				params.is_buy_tp=$("input[name='is_buypilfer']:checked").val();
+				params.payment=$("input[name='payment']:checked").val();
+				params.is_contain=$("input[name='is_contain']:checked").val();
+				params.customer_name = $("#loginname","#police_transferl").val();
+				params.customer_id = $("#customer_id","#police_transferl").val();
+				params.plate_no = $("#carNum","#police_transferl").val();
+				
+				
+			 	params.policy_no=$('#policyno','#police_transferl').val();
+			 	params.vehicle_id=$('#vehicle_id','#police_transferl').val();
+				params.ic_no=$('#company','#police_transferl').val();
+				params.vehicle_price=$('#money','#police_transferl').val();
+				params.fee=$('#policyFee','#police_transferl').val();
+				params.amount=$('#policyMoney','#police_transferl').val();
+				
+				
+				params.policyholder=$('#person','#police_transferl').val();
+				
+				var ph_id_no=$('#ywidcard','#police_transferl').val();
+				params.ph_id_no=removeStr(ph_id_no);
+				
+				params.birthday=$('#birthday','#police_transferl').val();
+				params.phone=$('#phone','#police_transferl').val();
+				params.tel=$('#mobile','#police_transferl').val();
+				params.is_bdate=$('#start_time','#police_transferl').val();
+				params.is_edate=$('#end_time','#police_transferl').val();
+				params.address=$('#address','#police_transferl').val();
+				params.sales=$('#sales_person','#police_transferl').val();
+				var cust_id_no=$('#idcard','#police_transferl').val();
+				params.cust_id_no=removeStr(cust_id_no);
+				params.status= $("#status","#police_transferl").val();
+				params.subco_no= $("#subco_no","#police_transferl").val();
+				
+			 	alert(JSON.stringify(params));
+			 	
+			 	 if(!params.policyholder){
+	  	         	$(document).sgPup({message:'message_info',text: "请输入意外投保人！"});
+	  	         	   return false;
+	  	         }
+	       		 	 
+	       		 if(!params.is_bdate){
+	   	         	$(document).sgPup({message:'message_info',text: "请选择服务开始时间！"});
+	   	         	   return false;
+	   	          }
+	       		 
+	       		 if(!params.is_edate){
+	   	         	$(document).sgPup({message:'message_info',text: "请选服务结束时间！"});
+	   	         	   return false;
+	   	         } 
+	       		if(!params.fee){
+	   	         	$(document).sgPup({message:'message_info',text: "请输入保险费用！"});
+	   	         	   return false;
+	   	         } 
+	       		if(!params.address){
+	   	         	$(document).sgPup({message:'message_info',text: "请输入联系地址！"});
+	   	         	   return false;
+	   	         } 
+	       		
+	       		if(params.status == 21){
+	       			$(document).sgPup({message:'message_info',text: "保单已审核，不能编辑！"});
+	   	         	   return false;
+	   	        } 
+	       		
+			 	
+			 	
+			 	//if(window.confirm('确定保存接单吗?')){
+			 	  $(document).sgConfirm({text: '确定保存保险单吗?',cfn:function(r){ 
+				  if(r){ 
+					  
+					  if(params.status==2){
+		            	   $(document).sgPup({message:'message_info',text: "保单已审核，不能再编辑!"});
+		            	   return false;
+		               }else{
+				          $.ajax( {
+				      		  type : 'post', 
+				      		  async: false,   
+				      		  contentType : 'application/json',     
+				      		  dataType : 'json',     
+				      		  url : url,   
+				      		  data:JSON.stringify(params),
+				      		  success : function(data) {
+				      			  if(data){
+				      				 if(data.success){
+				      					// $(document).sgWindow('close',{id:'win_managers'}); 
+					          		 		$('#policeList_grid').sgDatagrid('reload','sgDatagrid');
+				      				 }
+				      				$(document).sgPup({message:'message_alert',text: data.msg});
+				      				 
+				      			  }
+				      		  } ,     
+				      		  error : function(res,error) { 
+				      		  	 alert(res.responseText);     
+				      		  }   
+				          });
+		               }
+				  } 	  
+				          }}); 
+				  
+		  			 $('#police_transferl').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	 		        $(document).sgWindow('close', {id : 'policy_transferl'});
+	 		    	return false;
+	 		 }; 
+	 	    
+	 		 
+
+			 var editItem = function(){
+				 	var obj = $('#policeList_grid');
+			        var bDiv = $('.bDiv',obj);
+			        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+			            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+			        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+			            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+			        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+			            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+			                if($(this).attr("checked")){    
+			                	editId=this.value;
+			                	editObj=$(this).data('data');
+				                	//打开窗口
+					                var defaults = {
+					    	                title:'保单办理',
+					    	                id:'policy_transferl',
+					    	                url:'transferl.html',
+					    	                success: loadSuccessEdit11,
+					    	                width: 850,
+					    	                height: 500,
+					    	                buttons : [
+					    	                           {name: '保存', type: 'submit', onpress : saveEditpolicy},
+					    	                           {name : '发送短信',onpress : winCloseAdd}, 
+					    	                           {name : '打印',onpress : printBill} 
+					    	                       ]
+					    	            };
+					    	          $(document).sgWindow(defaults);
+					    	          
+					    	          
+			                }
+			            });
+			        }
+			    }
+		 
+		 
+	    
+    
+
+  
+
+    var viewItem = function() {
+    	 	var obj = $('#policeList_grid');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "只能选择一条记录！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	        	 $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){  
+		                	editId=this.value;
+		                	editObj=$(this).data('data');
+			    			var defaults = {
+			    				title : '工单明细',
+			    				id : 'task_view2',
+			    				form : 'bill_view2_form',
+			    				url : 'bill_view2.html',
+			    				success: loadSuccess,
+			    				width : 710,
+			    				height : 430,
+			    				buttons : [ {
+			    					name : '关闭',
+			    					onpress : winClose3
+			    				} ]
+			    			};
+			    			$(document).sgWindow(defaults);
+		                }
+		            });
+	   }else{
+		   $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	    }
+    	
+	}
+	 
+	 var deleteItem = function(){
+	        var obj = $('#policeList_grid');
+	        var bDiv = $('.bDiv',obj);
+
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else{
+	        	 $(document).sgConfirm({text: '确定该工单作废吗?',cfn:function(r){ 
+	    		   if(r){
+	        	//if(window.confirm('确定该工单作废吗?')){
+	        		var flag = false;
+	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){    
+		                	editId=this.value;
+		                	editobj = $(this).data('data');
+		                		var ids=[];
+		                		ids.push(editId);
+			                	//打开窗口
+			                	$.ajax( {
+				            		  type : 'post', 
+				            		  async: false,   
+				            		  contentType : 'application/json',     
+				            		  dataType : 'json',     
+				            		  url : '/sos/task/deleteTasks',   
+				            		  data:JSON.stringify(ids),
+				            		  success : function(data) {
+				            			  if(data){
+				            				 if(data.success){
+				    	          		 		flag = true; 
+				            				 }else{
+				            					flag = false; 
+				            				 }
+				            			  }
+				            		  } ,     
+				            		  error : function(res,error) { 
+				            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				            		  }    
+				            		}); 
+		                	
+		                }
+		            });
+	        		if(flag){
+	        			$(document).sgPup({message:'message_info',text: "删除成功！"});
+	        		}else{
+	        			//$(document).sgPup({message:'message_info',text: "删除不成功！"});
+	        		}
+	        		$('#policeList_grid').sgDatagrid('reload','sgDatagrid');
+	        	}	
+	        	
+	        }});
+	        }
+	    }
+	 
+
+	   
+	 	   
+    var today = new Date().format('yyyy-MM-dd');
+    var twoDayBefore = GetDateStr(-2);
+
+    var defaults = {
+        title: "保单管理",
+        width:  720,
+        height: 395,
+        url: '/sos/vehicle/findVehicleInfoPage',
+        datatype:"json",
+        usepager: true,
+	    rownumbers:true,
+        useRp: true,
+        colid:'id',  //主键
+        colModel : [
+            {display: '客户', name : 'customer_name', width : 80, sortable : false},
+            {display: '车牌号', name : 'car_num', width : 100, sortable : false},
+            {display: '车辆颜色', name : 'color', width : 50, sortable : false},
+            {display: '车辆识别号码', name : 'vin', width : 80, sortable : false},
+            {display: '车型', name : 'model_name', width : 80, sortable : false},
+            {display: '是否过户', name : 'is_transfer', width : 60, sortable : true,formatter:function(value,row){
+                if(value==0 || value == null){
+                    value = '否';
+                }else if(value==1){
+                    value = '是';
+                }
+                return value;
+            }}, 
+            {display: '办理日期', name : 'stamp', width : 120, sortable : false}
+        ],
+        
+        buttons : [
+			{name: '过户', bclass: 'add', onpress : editItem}
+        ],
+        
+        searchitems :[
+            {display:'客户姓名',name:'customerName',type:'text',width:'140'},
+            {display:'车牌号码',name:'car_num',type:'text',width:'140'},
+            {display:'是否过户',name:'vstatus',html:'<select  style="width:140px" name="is_transfer"><option value="" selected>请选择...</option><option value="1">是</option><option value="0">否</option></select>'},
+            {display:'开始时间',name:'startDate',type:'date',width:'140px',value:twoDayBefore},
+	      	{display:'结束时间',name:'endDate',type:'date',width:'140px',value:today}
+            
+        ],
+        sortname: "id",
+        sortorder: "desc"
+    };
+    $('#policeList_grid').sgDatagrid(defaults);
+    
+    
+    
+  /*   
+    function getYMD(str){
+ 	   debugger;
+ 	   if(str != null && str.length > 9){
+ 		   var year = str.substr(0,4);
+ 		   var month = str.substr(5,2);
+ 		   var day = str.substr(8,2);
+ 		   return "<em style='padding-right:20px;'>" +(year+"</em><em style='padding-right:20px;'>"+month+"</em><em style='padding-right:20px;'>"+day); 
+ 	   }else{
+ 		   return "";
+ 	   }
+    
+    } */
+    
+})(jQuery);
+
+
+
+
+//打印页面元素设置
+   var callback=function(subWinBody,subWin){
+  	$.ajax( {
+  		  type : 'post', 
+  		  async: false,   
+  		  contentType : 'application/json',     
+  		  dataType : 'json',     
+  		  url : '/sos/getCurrentCompany',   
+  		  data:JSON.stringify({}),
+  		  success : function(data)  {
+  			  if(data){
+
+  				 var customer_name = '<div >'+$('#customer_name','#police_transferl').val()+'</div>';
+  				 $("#headInput",subWinBody).append(customer_name);
+  				 
+  				 var date=new Date;
+  				 var year=date.getFullYear();
+  				 var month=date.getMonth()+1;
+  				 month =(month<10 ? "0"+month:month);
+  				 var day = date.getDate(); 
+  				 
+  				// var mydate = (year.toString()+"&nbsp;&nbsp;&nbsp;"+month.toString()+"&nbsp;&nbsp;"+day.toString()); 
+  				 
+  				 var mydate = "<em style='padding-right:20px;'>" +(year.toString()+"</em><em style='padding-right:20px;'>"+month.toString()+"</em><em style='padding-right:20px;'>"+day.toString()); 
+  				 
+  				
+  				  $("#headInput2",subWinBody).append(mydate); 
+  				  
+  				  $("#headInput3",subWinBody).append(mydate); 
+  				  
+  				  
+  				 $("#loginname",subWinBody).append($("#loginname","#police_transferl").val()); 
+  				 
+  				 $("#ywloginname",subWinBody).append($("#loginname","#police_transferl").val()); 
+  				 
+  				   var idcard=$('#idcard','#police_transferl').val();
+  				 	idcard = idcard.replace(/[ ]/g,"");
+  				   var idcardStr = '';
+  				  if(idcard != null && idcard.length>0){
+  					for(var i = 0; i < idcard.length; i++){
+  					    var card = '';
+  					if(i ==0 ){
+  						card = idcard.charAt(i)+'<em style="padding-right:4px;"></em>';
+  					}else{
+  						card = '<em style="padding-right:4px;">'+idcard.charAt(i)+'</em>';
+  					}
+  						idcardStr = idcardStr + card;
+  					}
+  				  } 
+  				 
+  				 $("#card",subWinBody).append(idcardStr); 
+  				  
+  				 
+  				 $("#phone",subWinBody).append($("#phone","#police_transferl").val());  
+  				 
+  				 var ywidcard=$('#ywidcard1','#police_transferl').val();
+  					ywidcard = ywidcard.replace(/[ ]/g,"");
+				   var ywidcardStr = '';
+				  if(ywidcard != null && ywidcard.length>0){
+					for(var i = 0; i < ywidcard.length; i++){
+					    var card2 = '';
+					if(i ==0 ){
+						card2 = ywidcard.charAt(i)+'<em style="padding-right:4px;"></em>';
+					}else{
+						card2 = '<em style="padding-right:4px;">'+ywidcard.charAt(i)+'</em>';
+					}
+					ywidcardStr = ywidcardStr + card2;
+					}
+				  } 
+				 
+				 $("#icard",subWinBody).append(ywidcardStr);
+  				 
+				 
+				 
+				 var birthday = $("#birthday","#police_transferl").val();
+  				 var str = birthday.toString();
+  				   var year2 = str.substr(0,4);
+  		 		   var month2 = str.substr(5,2);
+  		 		   var day2 = str.substr(8,2);
+  				 
+  				 $("#birthday",subWinBody).append("<em style='padding-right:20px;'>" +(year2+"</em><em style='padding-right:20px;'>"+month2+"</em><em style='padding-right:20px;'>"+day) );
+				 
+  				// $("#birthday",subWinBody).append($("#birthday","#police_transferl").val());  
+  				 $("#mobile",subWinBody).append($("#mobile","#police_transferl").val());  
+  				  
+  				 
+  				 
+  				 
+  				 var is_buypilfer = $("input[name='is_buypilfer']:checked").val();
+  				 var is_buy='';
+  				 if(is_buypilfer == 0){
+  					is_buy = "<em style='padding-left:17px'>√</em>";
+  				 }else if(is_buypilfer == 1){
+  					is_buy = "<em style='padding-left:61px'>√</em>";
+  				 }
+  				 $("#is_buypilfer",subWinBody).append(is_buy);  
+  				 
+  				 
+  				 
+  				 $("#car_num",subWinBody).append($("#carNum","#police_transferl").val());  
+  				
+  				 $("#ucode",subWinBody).append($("#vCode","#police_transferl").val());  
+  				 $("#money",subWinBody).append($("#money","#police_transferl").val());  
+  				  
+  				 $("#engine_no",subWinBody).append($("#ennum","#police_transferl").val());  
+  				  
+  				 $("#chassis_nos",subWinBody).append($("#chassnum","#police_transferl").val());
+  				 
+  				 var regTime = $("#registerTime","#police_transferl").val();
+  				 var str = regTime.toString();
+  				   var year = str.substr(0,4);
+  		 		   var month = str.substr(5,2);
+  		 		   var day = str.substr(8,2);
+  				 
+  				 $("#register_time",subWinBody).append("<em style='padding-right:20px;'>" +(year+"</em><em style='padding-right:20px;'>"+month+"</em><em style='padding-right:20px;'>"+day) );
+  				  
+  				 $("#call_letter",subWinBody).append($("#ucall2","#police_transferl").val());  
+  				 $("#code",subWinBody).append($("#code","#police_transferl").val());
+  				 
+  				   var fix_time = $("#uTime","#police_transferl").val();
+  				   var str = fix_time.toString();
+  				   var year = str.substr(0,4);
+  		 		   var month = str.substr(5,2);
+  		 		   var day = str.substr(8,2);
+  				 $("#time",subWinBody).append("<em style='padding-right:20px;'>" +(year+"</em><em style='padding-right:20px;'>"+month+"</em><em style='padding-right:20px;'>"+day));
+  				 
+  				 $("#address",subWinBody).append($("#address","#police_transferl").val());
+  				  
+  				 $("#sales_person",subWinBody).append($("#sales_person","#police_transferl").val());
+  				 
+  				 
+  			   var start_time = $("#start_time","#police_transferl").val();
+				   var str = start_time.toString();
+				   var year = str.substr(0,4);
+		 		   var month = str.substr(5,2);
+		 		   var day = str.substr(8,2);
+  				var bigin = "<em style='padding-right:30px;'>" +(year+"</em><em style='padding-right:30px;'>"+month+"</em><em style='padding-right:30px;'>"+day+ "<em style='padding-right:55px;'></em>");
+  				 
+  				 
+   			   var end_time = $("#end_time","#police_transferl").val();
+ 				   var str1 = end_time.toString();
+ 				   var year1 = str1.substr(0,4);
+ 		 		   var month1 = str1.substr(5,2);
+ 		 		   var day1 = str1.substr(8,2);
+   				var end = "<em style='padding-right:30px;'>" +(year1+"</em><em style='padding-right:30px;'>"+month1+"</em><em style='padding-right:30px;'>"+day1);
+   				$("#headInput4",subWinBody).append(bigin + end); 
+   				
+   				var moneyplace ='';
+   				var money = $("#policyMoney","#police_transferl").val();
+   				if(money == 100000){
+   					moneyplace = "<em style='padding-left:45px;'>√</em>";
+   				}else if(money == 150000){
+   					moneyplace = "<em style='padding-left:90px;'>√</em>";
+   				}else if(money == 200000){
+   					moneyplace = "<em style='padding-left:135px;'>√</em>";
+   				}else if(money == 300000){
+   					moneyplace = "<em style='padding-left:180px;'>√</em>";
+   				}else if(money == 400000){
+   					moneyplace = "<em style='padding-left:225px;'>√</em>";
+   				}else if(money == 500000){
+   					moneyplace = "<em style='padding-left:270px;'>√</em>";
+   				}else if(money == 600000){
+   					moneyplace = "<em style='padding-left:315px;'>X</em>";
+   				}else if(money == 700000){
+   					moneyplace = "<em style='padding-left:360px;'>√</em>";
+   				}else if(money == 800000){
+   					moneyplace = "<em style='padding-left:405px;'>√</em>";
+   				}else if(money == 900000){
+   					moneyplace = "<em style='padding-left:450px;'>√</em>";
+   				}else if(money == 1000000){
+   					moneyplace = "<em style='padding-left:495px;'>√</em>";
+   				}
+   				
+   				$("#headInput5",subWinBody).append(moneyplace); 
+   				
+   				$("#headInput6",subWinBody).append(data.companyname); 
+   				
+   				$("#headInput7",subWinBody).append(data.address); 
+   				
+  				
+  				  
+  			  }else{
+  				  $(document).sgPup({message:'message_info',text: data});
+  			  }
+  		  } ,     
+  		  error : function(res,error) { 
+  		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+  		  }    
+  		});
+  	
+      if (navigator.appName == 'Microsoft Internet Explorer'){
+      	subWin.print();  
+      }else{ 
+      	subWin.focus();
+      	subWin.print();  
+      }
+      
+      
+  }
+
+</script>
+</html>

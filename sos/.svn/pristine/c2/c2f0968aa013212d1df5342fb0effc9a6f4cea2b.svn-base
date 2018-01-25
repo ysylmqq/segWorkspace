@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>缴费明细</title>
+<style>
+
+</style>
+</head>
+<body>
+ 		<div id="fee_detail" class="datagrid" style="width:780px;" ></div>
+</body>
+<script type="text/javascript">
+(function($){
+	//初始化表格
+	 	var defaults = {
+	 		    title: "",
+		        width:  '780px',
+		        //url : '../../payment/findfeeDetailPage',
+		        url:'',
+			    usepager: true,
+			    rownumbers:true,
+			    useRp: true,
+			    //query:{id:18901},
+		        colModel : [
+		            {display: '车牌号', name : 'plate_no', width : 100, sortable : false},
+		            {display: '缴费项', name : 'feetype_id', width : 60, sortable : true,formatter:function(value,row){
+	  	                if(value==1){
+	  	                    value = '服务费';
+	  	                }else if(value==2){
+	  	                    value = 'SIM卡';
+	  	                }else if(value==3){
+	  	                    value = '盗抢险';
+	  	                }else if(value==4){
+	  	                    value = '网上查车';
+	  	                }
+	  	                return value;
+	  	            }},
+	  	          {display: '应缴', name : 'ac_amount', width : 100, sortable : false},
+		          {display: '实缴', name : 'real_amount', width : 100, sortable : false},
+		          {display: '缴费月数', name : 's_months', width : 60, sortable : false},
+		          {display: '缴费天数', name : 's_days', width : 60, sortable : false},
+		          {display: '开始日期', name : 'starttime', width : 80, sortable : false},
+		          {display: '结束日期', name : 'endtime', width : 80, sortable : false}
+		        ]
+		    };
+		    $('#fee_detail').sgDatagrid(defaults);
+		    
+})(jQuery)
+
+</script>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+	<form id='police_add' method='post' class="form" style="width:100%" >
+		<fieldset style="width:850px;">
+			<div class='submit' style="text-align:left;">
+					 <input type='hidden' id="id" name='id'  />
+	            	<span style="width:100px;">车牌号:</span>
+	                <input type='text' id="carnumber" name='carnumber' style="width:155px;margin-right:20px;" />
+	                <button id="search"  type="button"  onclick="searchdocument();" style="width:80px;height:26px;" >查询</button>
+	        </div>
+		</fieldset>
+		
+		<fieldset style="width:850px;">
+			<div class="panel">
+	            	<span style="width:100px;">保单号:</span>
+	                <input type='text' id="policyno" name='policyno' disabled="disabled" style="width:155px;" />
+	                
+	                <span style="width:100px;">投保公司:</span>
+	                <select id="company" name="company" style="width:160px;">
+	                	<option value="1">太平洋保险</option>
+	                	<option value="2">深圳平安保险</option>
+	                </select>                
+	        </div>
+	        <hr>
+	        <div class="panel">
+	            	<span style="width:100px;">入网名:</span>
+	                <input type='text' id="loginname" name='loginname' required="true"  disabled="disabled" style="width:155px;" />
+	                
+	                <span style="width:100px;">身份证:</span>
+	                <input type='text' id="idcard" name='idcard' disabled="disabled"  style="width:155px;" />  
+	                
+	                <span style="width:100px;">移动电话:</span>
+	                <input type='text' id="phone" name="phone" disabled="disabled" style="width:155px;" />              
+	        </div>
+	        <div class="panel">
+	            	<span style="width:100px;">意外投保人:</span>
+	                <input type='text' id="person" name='persons' required="true" style="width:155px;" />
+	                
+	                <span style="width:100px;">身份证:</span>
+	                <input type='text' id="ywidcard" name='ywidcard' onkeyup="a(this)"  required="true" style="width:155px;" />
+	                
+	                <span style="width:100px;">出生日期:</span>
+	              <input type='date' id="birthday" name='birthday' style="width:155px;" />           
+	        </div>
+	        <div class="panel">
+	        		<span style="width:100px;">固定电话:</span>
+	                <input type='text' id="mobile" name='"mobile"' onkeyup="a(this)" style="width:155px;" /> 
+	                
+	            	<span style="width:100px;">已购盗抢险:</span>
+	                <input type="radio" name="is_buypilfer" checked="checked" id="is_buypilfer1" value="0" style="position: relative; top:5px;margin-right:5px;" />是
+            		&nbsp;
+            		<input type="radio" name="is_buypilfer" id="is_buypilfer2" value="1" style="position: relative; top:5px;margin-right:5px;" />否 
+              
+	        </div>
+	        <div class="panel">
+	            	<span style="width:100px;">车牌号码:</span>
+	                <input type='text' id="carNum" name='carNum' required="true" disabled="disabled" style="width:155px;" />
+	                
+	                <span style="width:100px;">车牌型号:</span>
+	                <input type='text' id="vCode" name='vCode'  disabled="disabled" style="width:155px;" /> 
+	                
+	                 <input type='hidden' id="vehicle_id" name='vehicle_id' style="width:155px;" />  
+	                
+	                <span style="width:100px;">新车价:</span>
+	                <input type='text' id="money" name='money' disabled="disabled" style="width:155px;" />              
+	        </div>
+	        <div class="panel">
+	            	<span style="width:100px;">发动机号:</span>
+	                <input type='text' id="ennum" name='ennum' disabled="disabled" style="width:155px;" />
+	                
+	                <span style="width:100px;">车架号:</span>
+	                <input type='text' id="chassnum" name='chassnum' disabled="disabled" style="width:155px;" />  
+	                
+	                <span style="width:100px;">车辆初次登记日:</span>
+	                <input type='date' id="registerTime" name='registerTime' disabled="disabled" style="width:155px;" />              
+	        </div>
+	        <div class="panel">
+	            	<span style="width:100px;">GPS型号:</span>
+	                <input type='text' id="ucall" name='ucall' disabled="disabled" style="width:155px;" />
+	                
+	                <span style="width:100px;">机身编号:</span>
+	                <input type='text' id="code" name='code' disabled="disabled" style="width:155px;" />  
+	                
+	                <span style="width:100px;">安装日期:</span>
+	                <input type='date' id="uTime" name='uTime' disabled="disabled" style="width:155px;" />              
+	        </div>	        
+	        <div class="panel">
+	            	<span style="width:100px;">服务开始日期:</span>
+	                <input type='date' id="start_time" name='start_time' required="true" style="width:155px;" />
+	                
+	                <span style="width:100px;">服务截止日期:</span>
+	                <input type='date' id="end_time" name='end_time' required="true" style="width:155px;" />  
+	                
+	                <span style="width:100px;">保险金额:</span>
+	               <input type='number' id="policyMoney" name='policyMoney' required="true" style="width:155px;" />              
+	        </div>
+	        <div class="panel">
+	            	<span style="width:100px;">联系地址:</span>
+	                <input type='text' id="address" name='address' required="true" style="width:432px;" />
+	                
+	                <span style="width:100px;">销售员:</span>
+	                <input type='text' id="sales_person" name='sales_person' style="width:155px;" />    
+	        </div>
+	        <div class="panel">
+	        		<span style="width:100px;">保险费用:</span>
+	                <input type='number' id="policyFee" name='policyFee' style="width:155px;" /> 
+	                
+	                <span style="width:100px;">缴费方式:</span>
+	                <input type="radio" name="payment" id="payment0"  value="0" checked="checked" style="position: relative; top:5px;margin-right:5px;" />年
+            		&nbsp;
+            		<input type="radio" name="payment" id="payment2" value="1" style="position: relative; top:5px;margin-right:5px;" />月
+	                
+	            	<span style="width:100px;margin-left:85px;">是否包含套餐内:</span>
+	                <input type="radio" name="is_contain" id="is_contain1" value="0" checked="checked"  style="position: relative; top:5px;margin-right:5px;" />是
+            		&nbsp;
+            		<input type="radio" name="is_contain" id="is_contain2" value="1" style="position: relative; top:5px;margin-right:5px;" />否 
+              
+	        </div>
+		</fieldset>
+	<!-- 	<fieldset style="width:850px;border-top:0px;">	
+	        <div class='submit' style="height:25px">
+	            <button id="order_detail_submit" type="button" >打印</button>
+	            <button id="mysave" type="submit" >保存</button> 
+	            <button id="mycancel" type="reset">重置</button>
+	        </div>
+        </fieldset> -->
+        <div class="title">当日保单列表</div>
+        <fieldset style="width:850px;">
+			<div id="dgd_work_detail" class="datagird"></div>
+		</fieldset>
+	</form>
+</body>
+<script type="text/javascript">
+
+
+function a(Xtext)
+{
+    var str=Xtext.value;
+        if(str.length%5==4)
+            Xtext.value=Xtext.value+" ";
+}
+
+function formatStr(str)
+{
+	var result='';
+	if(str == null){
+		return "";
+	}else{
+		for(var i = 0; i < str.length; i++)
+		  {
+		      if (i % 4 == 0 && i != 0)
+		      {
+		      	result = result + " " + str.charAt(i)
+		      }
+		      else
+		      {
+		      	result = result + str.charAt(i)
+		      }
+		  }
+		return result;
+	}
+}
+
+
+
+
+function searchdocument(){
+	var car_num = $("#carnumber").val();
+	if(car_num==''){
+		$(document).sgPup({message:'message_alert',text: "请选择查询条件!"});
+		return false;
+	}
+	$.ajax({
+		type : 'post',
+		async : false,
+		url : 'policy/getDetailMsgByCarNum',
+		 data:{carNum:car_num},
+		success : function(data) {
+			if (data) {
+				  $("#loginname","#police_add").val(data.loginname);
+				  $("#idcard","#police_add").val(formatStr(data.idcard));
+				  $("#phone","#police_add").val(data.phone);
+				  $("#carNum","#police_add").val(data.carNum);
+				  $("#vCode","#police_add").val(data.vCode);
+				  $("#money","#police_add").val(data.money);
+				  
+				  $("#vehicle_id","#police_add").val(data.vId);
+				  
+				  $("#ennum","#police_add").val(data.ennum);
+				  $("#chassnum","#police_add").val(formatStr(data.chassnum));
+				  $("#registerTime","#police_add").val(data.registerTime);
+				  $("#ucall","#police_add").val(formatStr(data.ucall));
+				  
+				  $("#code","#police_add").val(data.code);
+				  $("#uTime","#police_add").val(data.uTime);
+				  
+				  $("#id","#police_add").val(data.id);
+				  if(data.id){
+					  $("#policyno","#police_add").val(data.policyno);
+					  $("#company","#police_add").val(data.company);
+					  $("#person","#police_add").val(data.person);
+					  
+					  $("#ywidcard","#police_add").val(formatStr(data.ywidcard));
+					  $("#birthday","#police_add").val(data.birthday);
+					  $("#mobile","#police_add").val(formatStr(data.ywphone));
+					  
+					  
+					  $("#start_time","#police_add").val(data.start_time);
+					  $("#end_time","#police_add").val(data.end_time);
+					  $("#policyMoney","#police_add").val(data.ywmoney);
+					  $("#address","#police_add").val(data.address);
+					  $("#sales_person","#police_add").val(data.sales_person);
+					  $("#policyFee","#police_add").val(data.fee);
+					  
+					  
+					  if(data.payment == '1'){
+					  	$("#payment2","#police_add").attr('checked', 'checked'); 
+					  }
+					  if(data.is_buypilfer == '1'){
+						  	$("#is_buypilfer2","#police_add").attr('checked', 'checked'); 
+						  }
+					  if(data.is_contain == '1'){
+						  	$("#is_contain2","#police_add").attr('checked', 'checked'); 
+						  }
+					  
+				  }else{
+					  $("#company","#police_add").val("");
+					  $("#person","#police_add").val("");
+					  $("#ywidcard","#police_add").val("");
+					  $("#birthday","#police_add").val("");
+					  $("#mobile","#police_add").val("");
+					  
+					  
+					  $("#start_time","#police_add").val("");
+					  $("#end_time","#police_add").val("");
+					  $("#policyMoney","#police_add").val("");
+					  $("#address","#police_add").val("");
+					  $("#sales_person","#police_add").val("");
+					  $("#policyFee","#police_add").val("");
+					  
+					  $("#payment0","#police_add").attr("checked",true); 
+					  $("#payment2","#police_add").attr("checked",false); 
+					  $("#is_buypilfer1","#police_add").attr("checked",true); 
+					  $("#is_buypilfer2","#police_add").attr("checked",false); 
+					  $("#is_contain1","#police_add").attr("checked",true); 
+					  $("#is_contain2","#police_add").attr("checked",false); 
+					  
+					  
+					  
+					
+					  
+					  $.ajax( {
+						  type : 'POST', 
+						  async: false,   
+						  url : "policy/getPolicyNo",   
+						  data:{},
+						  success : function(data) {
+							  if(data){
+								  $("#policyno").val(data);
+							  }
+						  } 
+					});
+					  
+				  }
+				  
+			}
+		},
+		error : function(res, error) {
+			$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+				+ ";error=" + error});
+		}
+	});
+}
+
+
+
+(function($){
+	
+    
+    $.ajax( {
+		  type : 'POST', 
+		  async: false,   
+		  url : "policy/getPolicyNo",   
+		  data:{},
+		  success : function(data) {
+			  if(data){
+				  $("#policyno").val(data);
+			  }
+		  } 
+	});
+    
+
+ 
+    
+	var defaults = {
+	        width:  '100%',
+	        height: 90,
+	     	url:'policy/getTodayPolicy',
+	        rownumbers:true,//序号
+	        isNotCheckall:true,
+	     	colid:'id',  //主键
+	        colModel : [
+	            {display: '保单号', name : 'policyno', width : 200, sortable : false},
+	         	{display: '入网名', name : 'loginname', width : 120, sortable : false},
+	            {display: '车牌号', name : 'carNum', width : 120, sortable : false},
+	         	{display: '销售员', name : 'saler', width : 100, sortable : false},
+	         	{display: '日期时间', name : 'time', width : 120, sortable : false}
+	         	/* {display: '日期时间', name : 'time', width : 120, sortable : true,formatter:function(value,row){
+		                return setTime(value); 
+		            }} */
+	        ],
+	    };
+	$('#dgd_work_detail').sgDatagrid(defaults);
+})(jQuery)
+
+</script>
+</html>

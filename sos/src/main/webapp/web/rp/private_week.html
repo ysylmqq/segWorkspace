@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>私家车入离网汇总</title>
+	<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap-datetimepicker.css" /><!-- +++++ -->
+	<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/form.css">
+	<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+	<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+	<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+</head>
+<body>
+	<div id="monitoring">
+		<div id="dgd_private_joinoff" class="datagrid">
+		</div>
+	</div>
+	<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../bslib/js/bootstrap-datetimepicker.js"></script><!-- ++++ -->
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+	<script type="text/javascript">
+		var lastMonthDay=new Date();//上个月的今天
+		//lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+		lastMonthDay.setDate(1);
+		lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+		var today=new Date().format('yyyy-MM-dd');
+    
+		//修改表格的宽度
+		var height =$('#main_bd',window.parent.document).height()-288;
+		var startDateHTML = '<span class="ltext"><input type="text" name="startDate" class="form-control form_datetime" value='+lastMonthDay+' /></span>';//开始日期
+		var endDateHTML = '<span class="ltext"><input type="text" name="endDate" class="form-control form_datetime" value='+today+' /></span>';//结束日期
+		
+		//初始化表格
+		var defaults = {
+			title: "私家车入离网汇总 ",
+			width:  '100%',
+			fitColumn:  true,
+			height: height,
+			url:'',
+			usepager: true,
+			rownumbers:true,
+			useRp: true,
+			colid:'subco_name',  //主键
+			colModel : [
+				{display: '投资公司', name : 'subco_name', width : 120, sortable : false},
+				{display: '总数(在网/离网)', name : 'in_off', width : 120, sortable : false},
+				{display: '统计日期', name : 'date_str', width : 160, sortable : false},
+				{display: '上周数据', name : 'last', width : 120, sortable : false},
+				{display: '新增入网', name : 'newjoin', width : 120, sortable : false},
+				{display: '新增离网', name : 'nowoff', width : 120, sortable : false},
+				{display: '本周数据', name : 'innet', width : 120, sortable : false},
+				{display: '净增长', name : 'increase', width : 120, sortable : false}
+			],
+			buttons : [],
+			searchitems :[
+				{display:'开始日期',html:startDateHTML},
+				{display:'结束日期',html:endDateHTML}
+			],
+			query:{startDate:lastMonthDay,endDate:today},
+            exporturl:'../../rpt/exportPrivateWeek'//导出excel
+		};
+		$('#dgd_private_joinoff').sgDatagrid(defaults); 
+		
+		//重新赋值url
+		var settings =  $('#dgd_private_joinoff').data('sgDatagrid');
+		settings.url='../../rpt/privateWeekCount';
+		$('#dgd_private_joinoff').data('sgDatagrid',settings);
+	</script>
+</body>
+</html>

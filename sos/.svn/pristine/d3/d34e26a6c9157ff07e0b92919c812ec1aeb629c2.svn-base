@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>入网明细</title>
+<style>
+
+</style>
+</head>
+<body>
+ 		<div id="online_detail" class="datagrid"></div>
+</body>
+<script type="text/javascript">
+(function($){
+	//初始化表格
+	 	var defaults = {
+	 		    title: "",
+		        width:  '',
+		        //url : '../../payment/findfeeDetailPage',
+		        url:'',
+			    usepager: true,
+			    rownumbers:true,
+			    useRp: true,
+			    //query:{id:18901},
+		        colModel : [
+		          {display: '4S店名', name : 'companyName', width : 121, sortable : false},
+	  	          {display: '车牌号码', name : 'plate_no', width : 120, sortable : false},
+		          {display: '车载电话', name : 'call_letter', width : 120, sortable : false},
+		          {display: '车架号', name : 'vin', width : 140, sortable : false},
+		          {display: '入网日期', name : 'create_date', width : 121, sortable : false}
+		        ]
+		    };
+		    $('#online_detail').sgDatagrid(defaults);
+		    
+})(jQuery)
+
+</script>
+</html>

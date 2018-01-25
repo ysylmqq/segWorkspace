@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>入网未计费汇总</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap-datetimepicker.css" /><!-- +++++ -->
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+	<div class='datagrid' id="monitoring"></div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../bslib/js/bootstrap-datetimepicker.js"></script><!-- ++++ -->
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/index.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript">
+    (function($) {
+    	 var now =new Date().format('yyyy-MM-dd');
+    	var today=new Date().format('yyyy-MM');
+    	 var twoDayBefore = GetDateStr(-30);
+    	var height = 476;
+    	//初始化表格
+    	var defaults = {
+    		        title: "入网未计费",
+    		        width:  '100%',
+    		        height: height,
+    		        rownumbers:true,
+    		        usepager: true,
+    		        url:'../../vehicle/onlineNoFeeByPage',
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '客户名', name : 'customer_name', width : 110},
+						{display: '车牌号码', name : 'plate_no', width : 90},
+						{display: '车载号码', name : 'call_letter', width : 120},
+						{display: '销售经理', name : 'sales', width : 100},
+						{display: '安装日期', name : 'fix_time', width : 120},
+						{display: '入网日期', name : 'create_date', width : 120}
+    		        ],
+    		       
+    		        searchitems :[
+    		  		            {display:'开始日期',html:'<span class="ltext"><input type="text" name="start_date" class="form-control form_datetime" /></span>'},
+    		  			      	{display:'结束日期',html:'<span class="ltext"><input type="text" name="end_date" class="form-control form_datetime" /></span>'}
+    		    		        ],
+    		    		        exporturl:'../../vehicle/exportOnlineNoFeeList'
+    		      		     
+    		    };
+    		    $('#monitoring').sgDatagrid(defaults);
+   		   //复制一个导出->打印,再把它插入到原来导出的后面
+		
+    })(jQuery);
+    
+    function GetDateStr(AddDayCount) {
+	    var dd = new Date();
+	    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+	    return dd.format('yyyy-MM-dd');
+	}
+</script>
+<script type="text/javascript">
+$.fn.datetimepicker.dates['zh'] = {
+    days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+    daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+    daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+    months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+    monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+    meridiem : [ "上午", "下午" ],
+    today : "今天"
+};
+$(document).ready(function(){
+    $(".form_datetime").datetimepicker({
+        language : "zh",
+        autoclose: true,
+        minView: "month",
+        format : 'yyyy-mm-dd'
+    });
+});
+</script>
+</html>

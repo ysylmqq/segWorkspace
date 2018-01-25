@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+<form id="sim_import" method="post" class="form" name="sim_import"  action="../../../preload/importSim" target="import_imp" enctype="multipart/form-data">
+	<div class="form">
+		<fieldset style="width: 270px;">
+            <div class="panel">
+	            <div class="row">
+	            	<span class="col-xs-3">模板下载:</span>
+	            	<span class="col-xs-9" style="text-align:left;">
+		                <a href="../../../excelFile/HM_SIM.xls" id="sim0" >SIM卡模板</a>
+		                <a href="../../../excelFile/SIM.xls" id="sim1" style="display:none">SIM卡模板</a>
+		                <a href="../../../excelFile/SIM+TBOX.xls" id="sim2" style="display:none">SIM卡+TBOX模板</a>
+		                <a href="../../../excelFile/VEHICLE+TBOX.xls" id="sim3" style="display:none">车辆+TBOX模板</a>
+	                </span>
+	            </div>
+            </div>
+           <!--  <div class="panel" >
+                 <span >Excel类型:</span>
+                <select id="type" name="type" style="width:153px;" onchange="check(this.value)">
+                	<option value="1">SIM卡</option>
+                	<option value="2">SIM卡+TBOX</option>
+                	<option value="3">车辆+TBOX</option>
+                </select>
+            </div> -->
+            <div class="panel" id="telco_panel" >
+            	<div class="row">
+	                <span class="col-xs-3">运营商:</span>
+	                <span class="col-xs-9" style="text-align:left;">
+		                <select id="telco" name="telco" style="width:100%;" required="true">
+		               		<option value="">请选择</option>
+		                	<option value="3">中国电信</option>
+		                	<option value="1">中国移动</option>
+		                	<option value="2">中国联通</option>
+		                	<option value="4">其它</option>
+		                </select>
+		            </span>
+	            </div>
+            </div>
+			<div class="panel" >
+				<div class="row">
+					<input type="hidden" id="type" name="type" value="4"/>
+					<input type="hidden" id="isOverride" name="isOverride" value="false"/>
+	                <span class="col-xs-3">选择文件:</span>
+	                <span class="col-xs-9">
+	                	<input type='file' id='sim_file' name='sim_file' style="width:100%;" />
+	                </span>
+	            </div>
+           	</div>
+        </fieldset>
+	</div>
+</form>
+<iframe name='import_imp' id="import_imp" style="display:none;" ></iframe> 
+</body>
+<script type="text/javascript">
+
+
+
+function check(v)
+{
+	if(v == 1){
+		 $("#telco_panel").show();
+	}else{
+		 $("#telco_panel").hide();
+	}
+	
+	if(v == 1){
+		 $("#sim1").show();
+		 $("#sim2").hide();
+		 $("#sim3").hide();
+	}else if(v == 2){
+		 $("#sim1").hide();
+		 $("#sim2").show();
+		 $("#sim3").hide();
+	}else if(v == 3 ){
+		 $("#sim1").hide();
+		 $("#sim2").hide();
+		 $("#sim3").show();
+	}
+}
+
+
+function callback(msg,flag){   
+	if(msg.indexOf('覆盖')>0){
+		rm({text: msg,cfn:function(r){
+			if(r){
+				//再次提交	
+				$('#isOverride').val(true);
+				$('input[type=submit]','#import_sim').trigger('click');
+				$('#isOverride').val(false);
+			}else{//取消
+				//移除遮罩层
+				$('div#imp_mask',window.document.body).remove();
+			}
+		}});
+	}else{
+		$(document).sgPup({message:'message_info',text: msg});
+	}
+//	if(flag) {
+		 //移除遮罩层
+		 $('div#imp_mask',window.document.body).remove();
+		 $(document).sgWindow('close',{id:'import_sim'});
+		 $('#monitoring').sgDatagrid('reload','sgDatagrid');
+//	}
+}   
+</script>
+</html>

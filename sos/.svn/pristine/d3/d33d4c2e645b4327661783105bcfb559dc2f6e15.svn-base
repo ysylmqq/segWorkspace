@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>采购合同</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+
+<body>
+<div id="nw_document_all">
+ <div id="dgd_supply_contract" class="datagrid"></div>
+ <datalist id="companyDataList"></datalist>
+</div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script>
+	<script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+    (function($){
+    	var companyDataList = [];
+       var editId=null;//编辑时选中行ID
+       var isEdit=null;//是编辑还是查看
+       var editObj=null;//编辑时选中行对象
+ 	   var loadSuccess = function(){
+ 		  var form_=$("#form_supply_contract");
+ 		   $("#id",form_).val('');
+ 		//填充编辑前的值
+ 		   if(editId){
+ 			 
+ 			//查询所有分公司
+ 			 var companys=null;
+ 				$.ajax({
+ 					  type : 'post', 
+ 					  async: false,   
+ 					  url : '../../getAllCompanys',   
+ 					  contentType : 'application/json',     
+ 					  dataType : 'json',     
+ 					  data:JSON.stringify({}),
+ 					  success : function(data) {
+ 						  if(data){
+ 							 companys=data;
+ 						  }
+ 					  } ,     
+ 					  error : function(res,error) { 
+ 					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+ 					  }    
+ 				}); 
+ 			   
+ 		      $("#id",form_).val(editId);
+ 		      
+ 		      $("#isEdit",form_).val(isEdit);
+ 		     
+			  $.ajax( {
+	   		  type : 'post', 
+	   		  async: false,   
+	   		  contentType : 'application/json',     
+	   		  dataType : 'json',     
+	   		  url : '../../sell/getSupplyContract',   
+	   		  data:JSON.stringify({id:editId}),
+	   		  success : function(data) {
+	   			  if(data){
+	   				  $("#id",form_).val(editId);
+	   				  $("#id2",form_).val(editId);//防止导入提交时，浏览器自动清空id数据，用id2代替
+	   				  $("#code",form_).val(data.code);
+	   				  $("#name",form_).val(data.name);
+	   				  $("#type",form_).val(data.type);
+	   				  var validDate=data.validDate;
+	   				  if(validDate && validDate.length>10){
+	   					validDate=validDate.substring(0,10);
+	            	  }
+	   				  $("#validDate",form_).val(validDate);
+	   				  var matureDate=data.matureDate;
+	   				  if(matureDate && matureDate.length>10){
+	   					matureDate=matureDate.substring(0,10);
+	            	  }
+	   				  $("#matureDate",form_).val(matureDate);
+	   				  if(data.status==1){//生效
+	   					 $("#status",form_).prop("checked",true);
+	   					 $("#status",form_).attr("checked","checked");
+	   				  }else{
+	   					 $("#status",form_).prop("checked",null);
+	   					 $("#status",form_).removeAttr("checked");
+	   				  }
+	   				  $("#remark",form_).val(data.remark);
+	   				  
+	   				  
+	   				  //分公司明细 
+	   				  var supplyBranchsSelected=data.supplyBranchs;
+	   				  if(companys){
+	   				      var div_chk_companys =$('#div_chk_companys','#form_supply_contract').get(0);
+						  div_chk_companys.innerHTML = "";
+						  var ul = document.createElement("ul");
+						  if (companys.length > 0) {
+								$.each(companys, function(i, obj) {
+									// 加入复选框
+									var checkBox = document.createElement("input");
+									checkBox.setAttribute("type", "checkbox");
+									checkBox.setAttribute("id", "chk_"+obj.companyno);
+									checkBox.setAttribute("value",obj.companyname);
+									checkBox.setAttribute("name", "CkbCompanys");
+									checkBox.setAttribute("checked", "checked");
+									// checkBox.setAttribute("onclick", "getAlamryTypes()");
+									$(checkBox).on('click',function(){
+										doChkAll();
+									});
+									var li = document.createElement("li");
+									li.appendChild(checkBox);
+									// checkBox.checked = true;
+									checkBox.checked = false;
+									if(supplyBranchsSelected){//如果分公司已经设置
+										$.each(supplyBranchsSelected, function(i, obj2) {
+											if(obj.companyno==obj2.orgId){
+												checkBox.checked = true;
+												return false;
+											}
+										});
+									} 
+									var label = document.createElement('label');
+									label.setAttribute('for', "chk_"+obj.companyno);
+									label.innerHTML = obj.companyname;
+									li.appendChild(label);
+									ul.appendChild(li);
+								});
+							}
+							div_chk_companys.appendChild(ul);
+	   				  }
+	   				  
+	   				//控制全选按钮
+	   				var doChkAll=function(){
+	   					//设置全选
+	   					  var chkCompanySelLength=$("input[name='CkbCompanys']:checked",'#form_supply_contract').length;
+	   					  var chkCompanyLength=$("input[name='CkbCompanys']",'#form_supply_contract').length;
+	   					   var chk_isSelectAll=$("#chk_isSelectAll",'#form_supply_contract').get(0);
+	   					  if(chk_isSelectAll){
+	   					     if(chkCompanySelLength<chkCompanyLength){
+	   							chk_isSelectAll.checked=false;
+	   						  }else{
+	   							chk_isSelectAll.checked=true; 
+	   						  }
+	   					  }
+	   				}
+	   				
+	   				doChkAll();
+	   				
+	   				  //商品明细
+	   				  if(data.suppplyDetailsMap){
+	   					 var products = data.suppplyDetailsMap;
+						  //先删除原有的
+						  $('#div_supply_contract').prevAll('div[id^=div_supply_contract]').find('a').trigger('click');
+						  var divId=null;
+						  $.each(products, function(key,value){
+							 divId='#div_supply_contract';
+							if(key>0){
+								 $("#div_supply_contract a").trigger('click');
+								 key=key-1;
+								 divId=divId+key;
+							}
+							 $('input[name=productName]',divId).val(value.productName.replace(/\s/g,''));
+							 $('input[name=productCode]',divId).val(value.productCode.replace(/\s/g,''));
+							 $('input[name=productId]',divId).val(value.productId);
+							 $('input[name=norm]',divId).val(value.norm.replace(/\s/g,'-'));
+							 $('input[name=price]',divId).val(value.price);
+							 $('input[name=remark]',divId).val(value.remark);
+						 });
+	   				  }
+	   				   //查看明细，设置input标签卫disabled
+	   				 if(!isEdit){
+	   				  var inputs=$("input,textarea,select","#win_supply_contract");
+		   			  $.each(inputs, function(key,value){
+		   					$(this).attr('disabled',true);
+		   			  }); 
+		   			  //克隆等按钮禁用
+		   				//$('button.btnsubmit').attr('disabled',true);
+		   			  //$('#div_supply_contract',"#panel_supply_contract").prevAll().empty();
+		   			  $('button.btnsubmit').attr('disabled',true);
+		   			  //导出不禁用
+		   			  $('#btn_export').attr('disabled',false);
+		   			   //重置隐藏
+		   				$('button[type=reset]').hide();
+	   				 }
+	   			  }else{
+	   				  $(document).sgPup({message:'message_info',text: data});
+	   			  }
+	   		  } ,     
+	   		  error : function(res,error) { 
+	   		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	   		  }    
+	   		}); 
+ 		   
+ 		   }
+ 		  editId=null;
+ 		  
+ 	   }
+ 	  var loadSuccess4View = function(){
+ 		 var form_view=$("#form_supply_contract");
+		   $("#id",form_view).val('');
+		//填充编辑前的值
+		   if(editId){
+		      $("#id",form_view).val(editId);
+		      
+		      $("#isEdit",form_view).val(isEdit);
+		     
+			  $.ajax( {
+	   		  type : 'post', 
+	   		  async: false,   
+	   		  contentType : 'application/json',     
+	   		  dataType : 'json',     
+	   		  url : '../../sell/getSupplyContract',   
+	   		  data:JSON.stringify({id:editId}),
+	   		  success : function(data) {
+	   			  if(data){
+	   				  
+	   				  $("#id",form_view).val(editId);
+	   				  $("#id2",form_view).val(editId);//防止导入提交时，浏览器自动清空id数据，用id2代替
+	   				  $("#code",form_view).val(data.code);
+	   				  $("#name",form_view).val(data.name);
+	   				  $("#type",form_view).val(data.type);
+	   				  var validDate=data.validDate;
+	   				  if(validDate && validDate.length>10){
+	   					validDate=validDate.substring(0,10);
+	            	  }
+	   				  $("#validDate",form_view).val(validDate);
+	   				  var matureDate=data.matureDate;
+	   				  if(matureDate && matureDate.length>10){
+	   					matureDate=matureDate.substring(0,10);
+	            	  }
+	   				  $("#matureDate",form_view).val(matureDate);
+	   				  if(data.status==1){//生效
+	   					 $("#status",form_view).prop("checked",true);
+	   					 $("#status",form_view).attr("checked","checked");
+	   				  }else{
+	   					 $("#status",form_view).prop("checked",null);
+	   					 $("#status",form_view).removeAttr("checked");
+	   				  }
+	   				  $("#remark",form_view).val(data.remark);
+	   				  //禁用
+	   				  var inputs=$("input,textarea,select","#form_supply_contract");
+		   			  $.each(inputs, function(key,value){
+		   					$(this).attr('disabled',true);
+		   			  });
+		   			  //分公司明细
+		   			   var supplyBranchsSelected=data.supplyBranchs;
+		   			  if(supplyBranchsSelected){
+		   				  var orgNames=[];
+		   				  $.each(supplyBranchsSelected,function(i,obj){
+		   					orgNames.push(obj.orgName);
+		   				  });
+		   				  $('#div_chk_companys',form_view).html(orgNames.join('，'));
+		   			  }
+	   				  //添加商品明细数据
+	   				   if(data.suppplyDetailsMap){
+	   				 	 $("#dgd_details").sgDatagrid('appendData',data.suppplyDetailsMap);
+	   				   };
+	   			  }else{
+	   				  $(document).sgPup({message:'message_info',text: data});
+	   			  }
+	   		  } ,     
+	   		  error : function(res,error) { 
+	   		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	   		  }    
+	   		}); 
+		   
+		   }
+		  editId=null;
+		  
+	   }
+       var winClose = function (){
+          $(document).sgWindow('close',{id:'win_supply_contract'});
+       }
+ 	   var save = function(){
+	 	   $('#btn_supply_contract','#form_supply_contract').trigger('submit');
+ 	   };
+
+ 	   var addItem = function(){
+ 		    editId=null;
+ 	       	editObj=null;
+ 	        var defaults = {
+ 	                title:'总部供货合同管理',
+ 	                id:'win_supply_contract',
+ 	                form:'form_supply_contract',
+ 	                url:'supply_contract_form.html',
+ 	                success: loadSuccess,
+ 	                width: 850,
+	                height:450
+ 	               /*  buttons : [
+ 	                           {name: '确定', type: 'submit', onpress : save},
+ 	                           {name: '关闭', onpress : winClose},
+ 	                           {name: '重置', type: 'reset'}
+ 	                       ] */
+ 	            };
+ 	        $(document).sgWindow(defaults);
+ 	        
+ 	    }
+ 	    var editItem = function(){
+ 	    	var obj = $('#dgd_supply_contract');
+ 	        var bDiv = $('.bDiv',obj);
+ 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+ 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+ 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+ 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+ 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+ 	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	                if($(this).attr("checked")){ 
+ 	                	if($(this).data('data').status==0){
+	 	                	editId=this.value;
+	 	                	isEdit=true;
+	 	                	var defaults = {
+	 	        	                title:'总部供货合同明细',
+	 	        	                id:'win_supply_contract',
+	 	        	                form:'form_supply_contract',
+	 	        	                url:'supply_contract_edit_form.html',
+	 	        	                success: loadSuccess,
+	 	        	                width: 850,
+	 	      	                	height:450
+	 	        	            };
+	 	                	
+	 		    	        $(document).sgWindow(defaults);
+ 	                	}else{
+ 	                		$(document).sgPup({message:'message_info',text: "该合同已生效,不能编辑!"});
+ 	                	}
+ 	                }
+ 	            });
+ 	        }else{
+ 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+ 	        }
+ 	    	
+ 	    }
+ 	   var editItemStatus = function(){
+	    	var obj = $('#dgd_supply_contract');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){  
+	                	editId=this.value;
+	                	if($(this).data('data').status==0){
+	                		$(document).sgConfirm({text: '审核后合同生效，将不能更改和删除,确定审核通过?',cfn:function(r){ 
+		    		     	if(r){
+	                		
+		     	        		 $.ajax( {
+		    	            		  type : 'post', 
+		    	            		  async: false,   
+		    	            		  contentType : 'application/json',     
+		    	            		  dataType : 'json',     
+		    	            		  url : '../../sell/updateStatus',   
+		    	            		  data:JSON.stringify({id:editId,status:1}),
+		    	            		  success : function(data) {
+		    	            			  if(data){
+		    	            				 if(data.success){
+		    	    	          		 		 $('#dgd_supply_contract').sgDatagrid('reload','sgDatagrid');
+		    	            				 }
+		    	            				$(document).sgPup({message:'message_info',text: data.msg});
+		    	            			  }
+		    	            		  } ,     
+		    	            		  error : function(res,error) { 
+		    	            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		    	            		  }    
+		    	            		}); 
+		     	        	};
+		     	        }});
+	                	}else{
+	                		$(document).sgPup({message:'message_info',text: "该合同已生效!"});
+	                	}
+	                	
+	                }
+	            });
+	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }
+	    	
+	    }
+ 	   
+ 	  var delItem = function(){
+	    	var obj = $('#dgd_supply_contract');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+	        	var ids=[];
+	        	$(document).sgConfirm({text: '删除后不可恢复，确定删除?',cfn:function(r){ 
+		    		     	if(r){
+	        	
+	        	 	var isGoOn=true;
+	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	        			var selectedObj=$(this).data('data');
+	        			if(selectedObj.status==0){
+	 	        			ids.push(this.value);
+	        			}else{
+	        				$(document).sgPup({message:'message_info',text: "名称为["+selectedObj.name+"]的合同已生效,不能删除!"});
+	        				isGoOn=false;
+	        				return false;
+	        			}
+	 	            });
+	        		if(!isGoOn){
+	        			return;
+	        		}
+	        		 $.ajax( {
+	            		  type : 'post', 
+	            		  async: false,   
+	            		  contentType : 'application/json',     
+	            		  dataType : 'json',     
+	            		  url : '../../sell/deleteSupplyContractBranchDetails',   
+	            		  data:JSON.stringify(ids),
+	            		  success : function(data) {
+	            			  if(data){
+	            				 if(data.success){
+	    	          		 		 $('#dgd_supply_contract').sgDatagrid('reload','sgDatagrid');
+	            				 }
+	            				$(document).sgPup({message:'message_info',text: data.msg});
+	            			  }
+	            		  } ,     
+	            		  error : function(res,error) { 
+	            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	            		  }    
+	            		}); 
+	        	}
+	        }});
+	        	
+	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择要删除的选项！"});
+	        }
+	    }
+ 	   var viewItem = function(){
+	    	var obj = $('#dgd_supply_contract');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){  
+	                	editId=this.value;
+	                	isEdit=false;
+	                	var defaults = {
+	        	                title:'总部供货合同明细',
+	        	                id:'win_supply_contract',
+	        	                form:'form_supply_contract',
+	        	                url:'supply_contract_detail_form.html',
+	        	                success: loadSuccess4View,
+	        	                width: 850,
+	      	                	height:540,
+	      	                	buttons : [
+	      	 	                           {name: '关闭', onpress : winClose}
+	      	 	                       ]
+	        	            };
+	                	
+		    	        $(document).sgWindow(defaults);
+	                }
+	            });
+	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }
+	    	
+	    }    
+ 	   //修改表格的宽度
+        var height =$('#main_bd',window.parent.document).height()-220;
+    	//初始化表格
+    	 var defaults = {
+    		        title: "总部供货合同管理",
+    		        width:  '100%',
+    		        height: height,
+    		        url: '../../sell/findSupplyContractsByPage',
+    		        usepager: true,
+    		        rownumbers:true,
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '合同编号', name : 'code', width : 120, sortable : true},
+    		            {display: '合同名称', name : 'name', width : 160, sortable : true},
+    		           /*  {display: '适配投资公司', name : 'branchName', width : 80, sortable : false}, */
+    		            {display: '生效日期', name : 'validDate', width : 90, sortable : true,formatter:function(value,row){
+    		            	if(value && value.length>10){
+    		            		value=value.substring(0,10);
+    		            	}
+    		            	return value;
+    		            }},
+    		            {display: '到期日期', name : 'matureDate', width : 90, sortable : true,formatter:function(value,row){
+    		            	if(value && value.length>10){
+    		            		value=value.substring(0,10);
+    		            	}
+    		            	return value;
+    		            }},
+    		            {display: '是否生效', name : 'status', width : 50, sortable : true,formatter:function(value,row){
+    		            	if(value==0){
+    		                    value = '<font color="red">否</font>';
+    		                }else if(value==1){
+    		                    value = '<font color="green">是</font>';
+    		                }
+    		                return value;
+    		            }},
+    		            {display: '操作时间', name : 'stamp', width : 120, sortable : false},
+    		            {display: '备注', name : 'remark', width : 90, sortable : false}
+    		        ],
+    		        buttons : [
+    		            {name: '增加', bclass: 'add', onpress : addItem},
+    		            {separator: true},
+    		            {name: '编辑', bclass: 'edit', onpress : editItem},
+    		            {separator: true},
+    		            {name: '删除', bclass: 'delete', onpress : delItem},
+    		            {separator: true},
+    		            /* {name: '审核', bclass: 'check', onpress : editItemStatus},
+    		            {separator: true}, */
+    		            {name: '查看', bclass: 'view', onpress : viewItem},
+    		            {separator: true}
+    		        ],
+    		        searchitems :[
+						{display:'合同编码/名称',name:'nameOrCode',type:'text',width:200},
+						{display:'分公司',html:'<input type="text" name="companyName" id="companyName" style="width:161px;" list="companyDataList"/><input type="hidden" name="companyId" id="companyId" />'},
+    		            {display:'生效月份',name:'validDate',type:'month',width:150},
+    		            {display:'到期月份',name:'matureDate',type:'month',width:200},
+    		            {display:'是否有效',name:'status',html:'<select name="status" style="width:120px;"><option value="" >请选择...</option><option value="0">否</option><option value="1"  >是</option></select>'},
+    		        ],
+    		        exporturl:'../../sell/exportExcel4SupplyContract',//导出excel
+    		        query:{},//查询默认参数
+    		        order:true,
+       		        sortname: "stamp",
+       		        sortorder: "desc"
+    		    };
+    		    $('#dgd_supply_contract').sgDatagrid(defaults); 
+    		    
+    		    //是否有效宽度调整、靠右
+    		     $('#dgd_supply_contract .sDiv input[name=companyName]').prev().width(51);
+    		    $('#dgd_supply_contract .sDiv input[name=matureDate]').prev().width(78);
+				//$('#dgd_supply_contract .sDiv select[name=status]').prev().width(78);
+				//$('#dgd_supply_contract .sDiv select[name=status]').prev().css('text-align','right');
+				
+				//自动查询分公司
+    			var checkCompany = function(){
+    				/* var text=this.value;
+    				text = text.replace(/\s/g,''); //去除空格
+    				if(text!=this.value){//有空格
+    					this.value=text;
+    					$(this).trigger('change');
+    					return false;
+    				} */
+    				var params = {};
+    				params.companyname = this.value;
+    				var obj = $(this);
+    				$.ajax({
+    					  type : 'post', 
+    					  async: true,   
+    					  contentType : 'application/json',     
+    					  dataType : 'json',     
+    					  url : '../../getBranchs',   
+    					  data:JSON.stringify(params),
+    					  success : function(data) {
+    						  if(data){
+    							  var companys = data;
+    							  if(companys.length>0){
+    								     $("#companyDataList").empty();
+    							  		companyDataList = {};
+    							   }
+    							  $.each( companys, function(key,value){
+    								  var op = $("<option></option>");
+    								  op.val(obj.val()+" "+value.companyname);
+    								  $("#companyDataList").append(op);
+    								  
+    								  companyDataList[value.companyname]=value.companyno;
+    								});
+    						  }else{
+    							  $(document).sgPup({message:'message_info',text: data});
+    						  }
+    					  } ,     
+    					  error : function(res,error) { 
+    					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+    					  }    
+    					});
+    			};
+    			
+    			//查询出所有分公司
+    			$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../getBranchs',   
+					  data:JSON.stringify({}),
+					  success : function(data) {
+						  if(data){
+							  var companys = data;
+							  if(companys.length>0){
+								     $("#companyDataList").empty();
+							  		companyDataList = {};
+							   }
+							  $.each( companys, function(key,value){
+								  var op = $("<option></option>");
+								  op.val(value.companyname);
+								  $("#companyDataList").append(op);
+								  
+								  companyDataList[value.companyname]=value.companyno;
+								});
+							  
+							  $("#companyName").on('keyup',checkCompany);
+							  $("#companyName").on('change',function(){
+								    var strs = this.value.split(" ");
+								    if(companyDataList[strs[strs.length-1]]){
+								    	$(this).val(strs[strs.length-1]);
+										
+										$("#companyId").val(companyDataList[strs[strs.length-1]]);
+										
+										if($("#companyId").val().length==0){
+											$("#companyName").val("");
+										}
+								    }else{
+								    	$(this).val('');
+								    	$("#companyId").val("");
+								   }
+								    
+								});
+							  
+						  }else{
+							  $(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					});
+
+    })(jQuery)
+</script>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>电工工作量统计--安装</title>
+</head>
+<body>
+	<div class='datagrid' id="elect_install" style="overflow:auto;">
+    </div>
+</body>
+<script type="text/javascript">
+(function($){
+	
+	var defaults = {
+	        width:  '1520',
+	        height: 410,
+	     	url:'',
+	        isNotCheckall:true,
+	        colModel : [
+				{display: '姓名', name : 'type', width : 60, sortable : false},
+	            {display: '1', name : '1', width : 30, sortable : false},
+	            {display: '2', name : '2', width : 30, sortable : false},
+	            {display: '3', name : '3', width : 30, sortable : false},
+	            {display: '4', name : '4', width : 30, sortable : false},
+	            {display: '5', name : '5', width : 30, sortable : false},
+	            {display: '6', name : '6', width : 30, sortable : false},
+	            {display: '7', name : '1', width : 30, sortable : false},	            
+	            {display: '8', name : '1', width : 30, sortable : false},
+	            {display: '9', name : '1', width : 30, sortable : false},
+	            {display: '10', name : '1', width : 30, sortable : false},
+	            {display: '11', name : '1', width : 30, sortable : false},
+	            {display: '12', name : '1', width : 30, sortable : false},
+	            {display: '13', name : '1', width : 30, sortable : false},	            
+	            {display: '14', name : '1', width : 30, sortable : false},
+	            {display: '15', name : '1', width : 30, sortable : false},
+	            {display: '16', name : '1', width : 30, sortable : false},
+	            {display: '17', name : '1', width : 30, sortable : false},	            
+	            {display: '18', name : '1', width : 30, sortable : false},
+	            {display: '19', name : '1', width : 30, sortable : false},
+	            {display: '20', name : '1', width : 30, sortable : false},
+	            {display: '21', name : '1', width : 30, sortable : false},
+	            {display: '22', name : '1', width : 30, sortable : false},
+	            {display: '23', name : '1', width : 30, sortable : false},
+	            {display: '24', name : '1', width : 30, sortable : false},
+	            {display: '25', name : '1', width : 30, sortable : false},
+	            {display: '26', name : '1', width : 30, sortable : false},
+	            {display: '27', name : '1', width : 30, sortable : false},
+	            {display: '28', name : '1', width : 30, sortable : false},
+	            {display: '29', name : '1', width : 30, sortable : false},
+	            {display: '30', name : '1', width : 30, sortable : false},
+	            {display: '31', name : '1', width : 30, sortable : false},
+	            {display: '其他', name : '1', width : 30, sortable : false},
+	         	{display: '合计', name : 'channelName', width : 60, sortable : false},
+	         	{display: '金额', name : 'channelName', width : 60, sortable : false}
+	        ]
+	    };
+	$('#elect_install').sgDatagrid(defaults);
+})(jQuery)
+</script>
+</html>

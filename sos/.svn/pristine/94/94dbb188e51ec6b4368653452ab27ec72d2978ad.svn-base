@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>集客收费</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../css/sos.css">
+<style type="text/css">
+#vehiclelist .hDiv-header-inner{width: 2800px;}
+#vehiclelist .hDiv th{min-width: 20px;}
+</style>
+</head>
+<body>
+	<div id="nw_document_all">
+	<form id='customer_form' name='customer_form' method='post' class="form">
+		<div class='title'>集客收费></div>
+		<fieldset style="width:100%;">
+			<div class="panel">
+				<div class="row">
+	            	<input type='hidden' id='cust_id' name='cust_id' />
+					<input type='hidden' id='vehicle_id' name='vehicle_id' />
+					<input type='hidden' id='unit_id' name='unit_id' />
+					<input type='hidden' id='data_value' value="1" name='data_value' />
+					<input type='hidden' id='url_type' value="3" name='url_type' />
+					<input type='hidden' id='cust_id_1' name='cust_id_1' />
+					<input type='hidden' id='url_tye' name='url_tye' value='2' />
+					<div class="col-xs-3">
+						<span class="col-xs-4">公司名称:</span>
+						<span class="col-xs-8">
+			            	<input type='text' id="name" name='name' class="form-control" />
+			            	<ul class="show_list" id="customerList"></ul>
+		            	</span>
+	            	</div>
+            	
+					<div class="col-xs-3">	
+						<span class="col-xs-4">车牌号码:</span>
+						<span class="col-xs-8">
+							<input type='text' id="searchnumber" name='searchnumber' class="form-control" />
+							<ul class="show_list" id="vehicleList"></ul>
+						</span>
+					</div>
+	            	<div class="col-xs-3">	
+		            	<span class="col-xs-4">车载电话:</span>
+		            	<span class="col-xs-8">
+			            	<input type='text' id="searchcall" name='searchcall' class="form-control" />
+			            	<ul class="show_list" id="unitList"></ul>
+		            	</span>
+	            	</div>
+	            	<div class="col-xs-3">
+		                <button id="search_btn" type="button" class="btn btn-xs btn-primary" style="width:50px;height:26px; display:none;" onclick="searchcust();" >查询</button> 
+		            	<button id="lock_btn" type="button" class="btn btn-xs btn-primary" style="width:50px;height:26px;display:none;" onclick="lock();" >加锁</button>
+		            	<button id="open_lock_btn" type="button" class="btn btn-xs btn-primary" style="width:50px;height:26px;display:none;" onclick="lock();" >解锁</button>
+		            	<button id="clear_btn" type="button" class="btn btn-xs btn-primary" style="width:50px;height:26px; display:none;" onclick="clearSearch();" >清空</button>
+	            	</div>
+	        	</div>
+			</div>
+			 <div class="panel" id="large_message" style="display:none"><span style="text-align:center;width:100%;"><font color="red" style="font-size:12px;">提示：针对集团客户多个车辆一次性缴费请先加锁，缴费完成系统自动解锁！</font></span>
+			 </div>
+        </fieldset>
+        
+        <div class='title'>基本资料</div>
+		<fieldset style="width:100%;">
+            <div class="panel">
+            	<div class="row">
+            		<div class="col-xs-4">
+            			<span class="col-xs-4">公司名称:</span>
+            			<span class="col-xs-8">
+		            		<input type='text' id="customer_name" name='customer_name' class="form-control" />
+		            	</span>
+            		</div>
+            		<div class="col-xs-4">
+            			<span class="col-xs-4">邮箱:</span>
+            			<span class="col-xs-8">
+		                	<input type='text' id="email" name="email" class="form-control" />
+		                </span>
+            		</div>
+            		<div class="col-xs-4">
+            			<span class="col-xs-4">销售员:</span>
+            			<span class="col-xs-8">
+		                	<input type='text' id="managerName" name="managerName" class="form-control" />
+		                </span>
+            		</div>
+            	</div>
+            </div>
+            <div class="panel">
+            	<div class="row">
+            		<div class="col-xs-4">
+            			<span class="col-xs-4">银行账号:</span>
+            			<span class="col-xs-8">
+		                	<input type='text' id="account" name='account' class="form-control" />
+		                </span>
+            		</div>
+            		<div class="col-xs-4">
+            			<span class="col-xs-4">账号名称:</span>
+            			<span class="col-xs-8">
+		                	<input type='text' id="collection_name" name='collection_name' class="form-control" />
+		                </span>
+            		</div>
+            		<div class="col-xs-4">
+            			<span class="col-xs-4">托收机构:</span>
+            			<span class="col-xs-8">
+			                <select size="1" name="agency" id="agency" style="width:100%;" autocomplete="on" >
+			                    <option value="1">银盛</option>
+			                    <option value="2">金融中心</option>
+			                    <option value="3">银联</option>
+			                </select>
+		                </span>
+            		</div>
+            	</div>
+            </div>
+        </fieldset>
+        
+        <div class='title'style="width:100%;" >选择车辆
+        <input type='checkbox' id="isAll" name="isAll" onclick="selectAll()"  style='vertical-align:middle;font-weight: none;' value='0' />整体缴费
+        </div>
+        </form>
+        <div id="vehiclelist" class="datagird"  style="width:100%;"></div>
+        <form id='customer_form2' name='customer_form2' method='post' class="form">
+        
+		<div class="panel">
+			<div class="row">
+				<div class="col-xs-4 col-xs-offset-4" style="margin-top:10px;">
+					<span class="col-xs-4">合计欠费:</span>
+					<span class="col-xs-8">
+						<input type='number' id="total_arrears" name='total_arrears' class="form-control" style="color:red" />
+					</span>
+				</div>
+			</div>				
+	    </div> 
+		<div class='title'>缴费</div>
+		<fieldset style="width:100%;">
+		
+		<div class="panel">
+			<div class="row">
+				<div class="col-xs-3">
+					<span class="col-xs-6">希望缴费(月):</span>
+					<span class="col-xs-6">
+                		<input type='number' id="month_number" name='month_number' required="true" class="form-control" />
+                	</span>
+				</div>
+				<div class="col-xs-3">
+					<span class="col-xs-4">缴费(天):</span>
+					<span class="col-xs-7">
+                		<input type='number' id="day_number" name='day_number'  value="0" class="form-control" />
+                	</span>
+				</div>
+				<div class="col-xs-6">
+					<span class="col-xs-2">缴费方式:</span>
+					<span class="col-xs-9" style="text-align:left;">
+                		<label style="float:none">
+		                <input type='radio' id="payment" name="payment"  style='vertical-align:middle;' value='0' />托收
+		                </label>
+		                &nbsp;
+		                <label style="float:none" >
+		                <input type='radio' id="payment" name="payment" checked="checked" style='vertical-align:middle;' value='1' />现金
+		                </label>
+		                &nbsp;
+		                <label style="float:none" >
+		                <input type='radio' id="payment" name="payment" style='vertical-align:middle;' value='2' />转账
+		                </label>
+		                &nbsp;
+		                <label style="float:none" >
+		                <input type='radio' id="payment" name="payment" style='vertical-align:middle;' value='3' />刷卡
+		                </label>
+                	</span>
+				</div>
+			</div>
+        </div>
+
+            <div class="panel" id="fee_select">
+            	<div class="row">
+            		<div class="col-xs-3"><span class="col-xs-6">选择缴费项目:</span></div>
+            	</div>
+            </div>
+           
+            <div class="panel" id="servicefee_1">
+            	<div class="row">
+            		<div class="col-xs-3">
+            			<span class="col-xs-offset-7">
+            				<label style="float:none">
+		                		<input type='checkbox' id="payitem0" name="payitem" mark="0"  checked="checked" style='vertical-align:middle;' value='0' />服务费
+		                	</label>
+            			</span>
+            		</div>
+            		<div class="col-xs-3">
+            			<span class="col-xs-4">应缴:</span>
+            			<span class="col-xs-7">
+		                	<input type='number' id="fee0" name='fee0' class="form-control" />
+		                </span>
+            		</div>
+            		<div class="col-xs-6">
+            			<span class="col-xs-2">实缴:</span>
+            			<span class="col-xs-3">
+		                	<input type='number' id="real_amount0" name='real_amount0' class="abcd form-control" />
+		                </span>
+            		</div>
+            	</div>
+            </div>
+            
+            <div class="panel" id="simfee_1">
+            	<div class="row">
+            		<div class="col-xs-3">
+            			<span class="col-xs-offset-7">
+		                	<label style="float:none">
+			                	<input type='checkbox' id="payitem1" mark="1" name="payitem"  checked="checked" style='vertical-align:middle;' value='0' />SIM卡
+			                </label>
+            			</span>
+            		</div>
+            		<div class="col-xs-3">
+            			<span class="col-xs-4">应缴:</span>
+            			<span class="col-xs-7">
+		                	<input type='number' id="fee1" name='fee1' class="form-control" />
+		                </span>
+            		</div>
+            		<div class="col-xs-6">
+            			<span class="col-xs-2">实缴:</span>
+            			<span class="col-xs-3">
+		                	<input type='number' id="real_amount1" name='real_amount1' class="abcd form-control" />
+		                </span>
+            		</div>
+            	</div>
+            </div>
+            
+            <div class="panel" id="webfee_1">
+            	<div class="row">
+            		<div class="col-xs-3">
+            			<span class="col-xs-offset-7">
+			                <label style="float:none">
+			                	<input type='checkbox' id="payitem3" name="payitem"  mark="3" checked="checked" style='vertical-align:middle;' value='0' />网上查车
+			                </label>
+            			</span>
+            		</div>
+            		<div class="col-xs-3">
+            			<span class="col-xs-4">应缴:</span>
+            			<span class="col-xs-7">
+		                	<input type='number' id="fee3" name='fee3' class="form-control" />
+		                </span>
+            		</div>
+            		<div class="col-xs-6">
+            			<span class="col-xs-2">实缴:</span>
+            			<span class="col-xs-3">
+		                	<input type='number' id="real_amount3" name='real_amount3' class="abcd form-control" />
+		                </span>
+            		</div>
+            	</div>
+            </div>
+            
+             <div class="panel" id="policyfee_1">
+             	<div class="row">
+            		<div class="col-xs-3">
+            			<span class="col-xs-offset-7">
+			                <label style="float:none">
+			                	<input type='checkbox' id="payitem2" name="payitem" mark="2" checked="checked" style='vertical-align:middle;' value='0' />盗抢险
+			                </label>
+            			</span>
+            		</div>
+            		<div class="col-xs-3">
+            			<span class="col-xs-4">应缴:</span>
+            			<span class="col-xs-7">
+		                	<input type='number' id="fee2" name='fee2' class="form-control" />
+		                </span>
+            		</div>
+            		<div class="col-xs-6">
+            			<span class="col-xs-2">实缴:</span>
+            			<span class="col-xs-3">
+		                	<input type='number' id="real_amount2" name='real_amount2' class="abcd form-control" />
+		                </span>
+            		</div>
+            	</div>
+            </div>
+            
+            <div class="panel" id="fee_1">
+            	<div class="row">
+            		<div class="col-xs-3">
+            			<span class="col-xs-offset-7">合计</span>
+            		</div>
+            		<div class="col-xs-3">
+            			<span class="col-xs-4">合计应缴:</span>
+            			<span class="col-xs-7">
+		                	<input type='number' id="total_fee" name='total_fee' disabled="disabled" class="form-control" />
+		                </span>
+            		</div>
+            		<div class="col-xs-6">
+            			<span class="col-xs-2">合计实缴:</span>
+            			<span class="col-xs-3">
+		                	<input type='number' id="real_amount" name='real_amount' disabled="disabled" class="form-control" />
+		                </span>
+            		</div>
+            	</div>
+            </div>
+           
+   <!--          
+             <div class="panel">    
+                <span style="width:85px;">选择缴费项目:</span>
+                <input type='checkbox' id="payitem0" name="payitem" mark="0" style='vertical-align:middle;' value='0' />服务费 &nbsp;
+                <input type='checkbox' id="payitem1" mark="1" name="payitem" style='vertical-align:middle;' value='0' />SIM卡 &nbsp;
+                <input type='checkbox' id="payitem3" name="payitem"  mark="3" style='vertical-align:middle;' value='0' />网上查车 &nbsp;
+               	<input type='checkbox' id="payitem2" name="payitem" mark="2" style='vertical-align:middle;' value='0' />盗抢险
+                
+                <span>合计应缴:</span>
+                <input type='number' id="total_fee" name='total_fee' disabled="disabled" style="width:130px;" />
+            </div> -->
+
+            <div class="panel">
+            	<div class="row">
+            		<div class="col-xs-3">
+						<span class="col-xs-6">收据单号:</span>
+						<span class="col-xs-6">
+	                		<input type='text' id="bw_no" name='bw_no' required="true" class="form-control" />
+	                	</span>
+					</div>
+					<div class="col-xs-6">
+            			<span class="col-xs-2">备注:</span>
+            			<span class="col-xs-7">
+		                	<input type='text' id="remark" name='remark' class="form-control" />
+		                </span>
+            		</div>
+            	</div>
+            </div>
+        </fieldset>
+        <fieldset style="width:100%;border-top:0px;">	
+	        <div class='submit'>
+	       		<button type="button" id="countAll" class="btn btn-primary btn-xs" style="display:none;" onclick="count();" >计算</button>
+	            <button type="button" class="btn btn-primary btn-xs" onclick="saveItem();" >确定</button> 
+	            <button type="button" class="btn btn-primary btn-xs" onclick="cancel();" >重置</button>
+	        </div>
+        </fieldset>
+        
+        <div id='titleDiv2' class='title'>缴费历史记录</div>
+
+	</form>
+	
+		<div id="records" class="datagird"></div>
+	</div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/index.js"></script>
+<script type="text/javascript" src="../../jscript/accordion.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/tab.js"></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/tree.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+
+function clearSearch() {
+	$('#name').val('');
+	$('#searchnumber').val('');
+	$('#searchcall').val('');
+	$('#cust_id').val('');
+}
+
+
+
+function selectAll(){
+	 var checklist = document.getElementsByName("vehiclelist_chx");
+	   if(document.getElementById("isAll").checked)
+	   {
+		 $("#countAll").show();   
+	   for(var i=0;i<checklist.length;i++)
+	   {
+	      checklist[i].checked = 1;
+	   } 
+	 }else{
+	  for(var j=0;j<checklist.length;j++)
+	  {
+		  $("#countAll").hide();
+	     checklist[j].checked = 0;
+	  }
+	 }
+	}
+
+
+function lock() {
+	var cust_id = $('#cust_id_1').val();
+	  $.ajax( {
+		  type : 'POST', 
+		  async: false,  
+		  url : "../../customer/lockLargeCustomer",   
+		  data:{id:cust_id},
+		  success : function(data) {
+			  if(data){
+				  $(document).sgPup({message:'message_alert',text: data.msg});
+				  $('#cust_id').val(cust_id);
+				  $("#search_btn").trigger("click");//触发按钮
+			  }
+		  } 
+	});
+	
+	
+}
+
+
+function count() {
+	var cust_id = $('#cust_id_1').val();
+	var month_number =  $("#month_number").val();
+	var day_number =  $("#day_number").val();
+	if(month_number == null || month_number == "" ){
+		month_number ='0';
+	}
+	if(day_number == null || day_number == "" ){
+		day_number ='0';
+	}
+	
+	 var chk_bu = document.getElementById("isAll");
+	 if(chk_bu.checked){
+		  $.ajax( {
+			  type : 'POST', 
+			  async: false,  
+			  url : "../../customer/getTotalFeeMsg",   
+			  data:{cust_id:cust_id},
+			  success : function(data) {
+				  if(data){
+					  var fee0 = data.service_fee * parseInt(month_number) +  data.service_fee * parseInt(day_number)/30;
+					  var fee1 = data.sim_fee * parseInt(month_number) +  data.sim_fee * parseInt(day_number)/30;
+					  var fee2 = data.policy_fee * parseInt(month_number) +  data.policy_fee * parseInt(day_number)/30;
+					  var fee3 = data.web_fee * parseInt(month_number) +  data.web_fee * parseInt(day_number)/30;
+					  var total = parseInt(fee0) + parseInt(fee1) + parseInt(fee2) + parseInt(fee3);
+					  
+					  $('#fee0').val(parseInt(fee0));
+					  $('#fee1').val(parseInt(fee1));
+					  $('#fee2').val(parseInt(fee2));
+					  $('#fee3').val(parseInt(fee3));
+					  
+					  $("#real_amount0").val(parseInt(fee0));
+				   	  $("#real_amount1").val(parseInt(fee1));
+				   	  $("#real_amount2").val(parseInt(fee2));
+				   	  $("#real_amount3").val(parseInt(fee3));
+				      $("#total_fee").val(total);
+				      if(data.arrearage_fee){
+				     	 $("#total_arrears").val(parseInt(data.arrearage_fee));
+				      }else{
+				    	  $("#total_arrears").val("0");
+				      }
+				      
+			   		  $("#real_amount").val(total);
+					  $(document).sgPup({message:'message_alert',text: "计算完成！"});
+				  }
+			  } 
+		});
+		 
+		  $("#data_value").val("1");
+ 	}else{
+ 		 $(document).sgPup({message:'message_alert',text: "不是整体缴费，不需要计算！"});
+ 	}
+}
+
+
+
+var submitkey = true;
+function saveItem(){
+	$(document).sgConfirm({
+		title:'提示',
+		text: '确认保存吗?',
+		cfn:function(r){
+			if(r){
+				
+				if(!submitkey){
+					return false;
+				}
+				var cust_type=0;
+				var cust_id = $('#cust_id_1').val();
+				var month_number = $('#month_number').val(); 
+				if(month_number == null || month_number ==""){
+					$(document).sgPup({message:'message_alert',text: "请输入希望缴费月数!"});
+					return false;
+				}
+				var day_number =  $("#day_number").val();
+				 if(day_number == null || day_number == "" ){
+					day_number ='0';
+				} 
+				var bw_no = $('#bw_no').val() 
+				if(bw_no == null || bw_no ==""){
+					$(document).sgPup({message:'message_alert',text: "请输入单据号!"});
+					return false;
+				}
+				var vehicleIds = [];
+		         
+		         var data_value = $('#data_value').val();
+		         
+		         var chk_bu = document.getElementById("isAll");
+		    	 if(chk_bu.checked){
+		    		 if(data_value==1){
+						 cust_type=1;
+					}
+					 if(data_value==0){
+					 	$(document).sgPup({message:'message_alert',text: "提交前，请先点击计算按钮！"});
+					    return false;
+					 }
+		    	 }else{
+		    		 var obj = $('#vehiclelist');
+				        var bDiv = $('.bDiv',obj);
+				         $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+				                if($(this).attr("checked")){    
+				                	editId=this.value;
+				                	editobj = $(this).data('data');
+				                	vehicleIds.push(editobj.id);
+				                }
+				                
+				            }); 
+		    		 
+		    	 }
+					
+					var paymentItem = new Array();
+			    	 $('input[type="checkbox"][name="payitem"]:checked').each(function(){
+			    		 		  var item = {};
+				            	  var key = $(this).attr("mark");
+				            	  item.customer_id = cust_id;
+				            	  item.feetype_id = parseInt(key) + 1;
+					              var ac_amount = $("#fee"+key).val();
+					              item.ac_amount=ac_amount;
+					              item.real_amount=$("#real_amount"+key).val();
+					            	  if(ac_amount != null && ac_amount !=""){
+					            		  paymentItem.push(item);
+					            	  }
+				           });
+			    	 
+			    	 
+		         
+		      	var feePayment = {};
+		 		feePayment.customer_id=cust_id;
+		 		feePayment.vehicle_id=0;
+		 		feePayment.unit_id=0;
+		 		feePayment.pay_model=$("input[name='payment']:checked").val();
+		 		feePayment.s_months=$('#month_number').val();
+		 		feePayment.ac_amount=$("#total_fee").val();
+		 		feePayment.real_amount=$("#real_amount").val();
+		 		feePayment.bw_no=$('#bw_no').val();
+		 		feePayment.s_days=day_number;
+		 		feePayment.remark=$('#remark').val();
+			 		$.ajax({
+						type : 'post',
+						async : false,
+						contentType : 'application/json',
+						dataType : 'json',
+						url : '../../payment/saveprivate',
+						data : JSON.stringify({
+							feePayment:feePayment,
+							paymentItems:paymentItem,
+							cust_type:cust_type,
+							vehicleIds:vehicleIds
+							
+						}),
+						success : function(data) {
+							if (data) {
+								if(data.success){
+									submitkey=false;
+									setTimeout(function(){
+										submitkey=true;
+									},3000);
+								$(document).sgPup({message:'message_alert',text: data.msg});
+							     $('#cust_id').val(cust_id);
+	 							 $("#search_btn").trigger("click");//触发按钮
+								}
+							}
+						},
+						error : function(res, error) {
+							$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+								+ ";error=" + error});
+						}
+					});
+		    	 
+				$('#customer_form').unbind();//以下两行可以阻止提交2次
+				return false;
+			}
+		}});
+}
+
+
+
+
+
+
+
+
+function cancel(){
+	var cust_id = $('#cust_id_1').val();
+	$('#cust_id').val(cust_id);
+	$("#search_btn").trigger("click");//触发按钮
+	
+}
+
+
+
+function searchcust(){
+	
+	 $('input[type="checkbox"][name="payitem"]').each(	
+            function() {
+          	 // $(this).attr("checked",false);
+          	 var name = $(this).attr("mark");
+         	  $("#fee"+name).val("");
+         	  $("#real_amount"+name).val("");
+            }
+        ); 
+	 
+	 
+	 
+	 
+	$("#day_number").val(""); 
+    $("#month_number").val("");
+    $("#bw_no").val("");
+    $("#remark").val("");
+	$("#total_fee").val("");
+	$("#real_amount").val("");
+	$("#total_arrears").val("");
+	
+	$('#lock_btn').hide();
+	$('#open_lock_btn').hide();
+	$('#large_message').hide();
+	
+	$("#isAll").attr("checked",false);
+	
+	var cust_id = $('#cust_id').val();
+	var unit_id = $('#unit_id').val();
+	var vehicle_id = $('#vehicle_id').val();
+	
+	
+	var plate_no = $('#searchnumber').val();
+	var call_letter = $('#searchcall').val();
+	
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../getLargeCustInfo',
+		data : JSON.stringify({
+			cust_id : cust_id,unit_id:unit_id,vehicle_id:vehicle_id
+		}),
+		success : function(data) {
+			if (data) {
+				$('#customer_name').val("");
+				$('#email').val("");
+				$('#managerName').val("");
+				//客戶信息
+				$('#customer_name').val(data.customer.customer_name);
+				$('#cust_id_1').val(data.customer.customer_id);
+				$('#email').val(data.customer.email);
+				$('#managerName').val(data.managerName);
+				
+				$('#account').val("");
+				$('#collection_name').val("");
+				$('#agency').val("");
+				if(data.collection){
+					$('#account').val(data.collection.ac_no);
+					$('#collection_name').val(data.collection.ac_name);
+					$('#agency').val(data.collection.agency);
+				}
+				
+				if(data.largeCustLock){
+					if(data.largeCustLock.locktag ==0){
+						$('#lock_btn').show();
+						$('#large_message').show();
+					}else if(data.largeCustLock.locktag ==1){
+						$('#open_lock_btn').show();
+					}
+				}else{
+					$('#lock_btn').show();
+					$('#large_message').show();
+				}
+				
+				
+				
+			}
+		},
+			/* error : function(res, error) {
+				$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+					+ ";error=" + error});
+		}  */
+	});
+	
+	 $("#vehiclelist").html("")
+	 
+	 var chkChange=function(index,rowData,isChecked){
+			var chk_bu = document.getElementById("isAll");
+			 if(chk_bu.checked){
+				 $("#data_value").val("0");
+			 }else{
+					var total =0;
+					var serviceFee=0;
+					var simFee=0;
+					var policyFee=0;
+					var webFee=0;
+					var arrearage_fee = 0;
+					
+				    var obj = $('#vehiclelist');
+				    var bDiv = $('.bDiv',obj);
+					var month_number =  $("#month_number").val();
+					var day_number =  $("#day_number").val();
+					if(day_number == null || day_number == "" ){
+						day_number =0;
+					}
+					if(month_number == null || month_number == "" ){
+						month_number =0;
+					}
+					$('input[type=checkbox][checked=checked]', bDiv).each(function() {
+					    if ($(this).attr("checked")) {
+					        editId = this.value;
+					        editobj = $(this).data('data');
+					        $('input[type="checkbox"][name="payitem"]:checked').each(function() {
+					            var mark = $(this).attr("mark");
+					            if (mark == '0') {
+					                var money = editobj.service_money;
+					                if (money != null && money != "") {
+					                	serviceFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+			                        	serviceFee =  parseInt(serviceFee);
+					                }
+		                        	$("#fee0,#real_amount0").val( serviceFee );
+					                if (editobj.arrearage_fee1) {
+					                    arrearage_fee = parseInt(arrearage_fee) + editobj.arrearage_fee1;
+					                }
+					            } else if (mark == '1') {
+					                var money = editobj.sim_money;
+					                if (money != null && money != "") {
+					                	simFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+			                        	simFee =  parseInt(simFee);
+					                }
+			                        $("#fee1,#real_amount1").val(simFee);
+					                if (editobj.arrearage_fee2) {
+					                    arrearage_fee = parseInt(arrearage_fee) + editobj.arrearage_fee2;
+					                }
+					            } else if (mark == '3') {
+					                var money = editobj.web_money;
+					                if (money != null && money != "") {
+					                	webFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+			                        	webFee =  parseInt(webFee);
+					                }
+			            		   	$("#fee3,#real_amount3").val(webFee);
+					                if (editobj.arrearage_fee4) {
+					                    arrearage_fee = parseInt(arrearage_fee) + editobj.arrearage_fee4;
+					                }
+					            } else {
+					                var money = editobj.policy_money;
+					                if (money != null && money != "") {
+					                	policyFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+			                        	policyFee =  parseInt(policyFee);
+					                }
+			                        $("#real_amount2,#fee2").val(policyFee);
+					                if (editobj.arrearage_fee3) {
+					                    arrearage_fee = parseInt(arrearage_fee) + editobj.arrearage_fee3;
+					                }
+					            }
+					        });
+					    }
+					});
+					total = serviceFee + simFee + webFee + policyFee;
+			        $("#total_fee").val(total);
+			        $("#real_amount").val(total);
+					$("#total_arrears").val(arrearage_fee);
+			 }
+		}
+	 
+	 
+	 
+	 
+	var cust_id_1 = $('#cust_id_1').val();
+	var defaults1 = {
+	        title: "",
+	        width:  '100%',
+	        fitColumn: true,//
+	        height: 340,
+	        chkChange:chkChange,
+	        isNotCheckall:true,
+	        url: '../../customer/findLargeVehicles',
+	        datatype:"json",
+	        usepager: true,
+		    rownumbers:true,
+		    useRp: true,
+		    colid:'id',  //主键
+	        query:{cust_id:cust_id_1,plate_no:plate_no,call_letter:call_letter},
+	        colModel : [
+				{display: '车牌号', name : 'plate_no', width : 100},
+				{display: '颜色', name : 'color', width : 60},
+				{display: '车载电话', name : 'call_letter', width : 100},
+				{display: '服务开始日期', name : 'service_startTime', width : 80},
+				{display: '服务截止日期', name : 'service_endTime', width : 80},
+				{display: '服务每月缴费', name : 'service_money', width : 80},
+				{display: '服务缴费间隔', name : 'service_next', width : 80},
+				{display: '服务欠费(月)', name : 'a_months1', width : 80},
+				{display: '服务欠费(天)', name : 'a_days1', width : 80},
+				{display: '服务欠费金额', name : 'arrearage_fee1', width : 80},
+				{display: 'SIM开始日期', name : 'sim_startTime', width : 80},
+				{display: 'SIM截止日期', name : 'sim_endTime', width : 80},
+				{display: 'SIM每月缴费', name : 'sim_money', width : 80},
+				{display: 'SIM缴费间隔', name : 'sim_next', width : 80},
+				{display: 'SIM欠费(月)', name : 'a_months2', width : 80},
+				{display: 'SIM欠费(天)', name : 'a_days2', width : 80},
+				{display: 'SIM欠费金额', name : 'arrearage_fee2', width : 80},
+				{display: '查车开始日期', name : 'web_startTime', width : 80},
+				{display: '查车截止日期', name : 'web_endTime', width : 80},
+				{display: '查车每月缴费', name : 'web_money', width : 80},
+				{display: '查车缴费间隔', name : 'web_next', width : 80},
+				{display: '查车欠费(月)', name : 'a_months4', width : 80},
+				{display: '查车欠费(天)', name : 'a_days4', width : 80},
+				{display: '查车欠费金额', name : 'arrearage_fee4', width : 80},
+				{display: '盗抢险开始日期', name : 'policy_startTime', width : 90},
+				{display: '盗抢险截止日期', name : 'policy_endTime', width : 90},
+				{display: '盗抢险每月缴费', name : 'policy_money', width : 90},
+				{display: '盗抢险缴费间隔', name : 'policy_next', width : 90},
+				{display: '盗抢险欠费(月)', name : 'a_months3', width : 90},
+				{display: '盗抢险欠费(天)', name : 'a_days3', width : 90},
+				{display: '盗抢险欠费金额', name : 'arrearage_fee3', width : 110}
+				
+	        ]
+	    };
+	    $('#vehiclelist').sgDatagrid(defaults1);
+
+		
+
+		  var winCloseView = function() {
+				$(document).sgWindow('close', {
+					id : 'fee_view'
+				});
+				
+			}
+		  
+	    
+		var loadSuccess_view = function(){
+	 		//填充编辑前的值
+	 		   if(editId && editObj){
+	 			   
+	 			     var obj= $('#fee_detail',$('#fee_view'));
+	 				 var settings = obj.data('sgDatagrid');
+					 settings.url='../../payment/findfeeDetailPage';
+					 settings.query={id:editObj.id};
+					 obj.data('sgDatagrid', settings);
+					 obj.sgDatagrid('reload','sgDatagrid'); 
+	 		   }
+	 		  editId=null;
+	 		 editObj=null;
+	 		  
+	 	   }
+		    
+	    
+	    var viewItem = function() {
+    	 	var obj = $('#records');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "只能选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	        	 $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){  
+		                	editId=this.value;
+		                	editObj=$(this).data('data');
+			    			var defaults = {
+			    				title : '缴费明细',
+			    				id : 'fee_view',
+			    				form : 'form_detail',
+			    				url : 'fee_detail.html',
+			    				success: loadSuccess_view,
+			    				width : 810,
+			    				height : 330,
+			    				buttons : [
+			    				   {name : '关闭',onpress : winCloseView} 
+			    				   ]
+			    			};
+			    			$(document).sgWindow(defaults);
+		                }
+		            });
+	   }else{
+		   $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	    }
+    	
+	}			
+	    
+	    
+	  
+		    
+		var cust_type="2";	
+	    if(cust_id_1||vehicle_id||unit_id){
+		    $("#records").html("")
+			var defaults_1 = {
+			        title: "",
+			        width:  '100%',
+			        height: 200,
+			        url : '../../payment/findPaymentRecordsPage',
+				    usepager: true,
+				    rownumbers:true,
+				    useRp: true,
+				    colid:'id',  //主键
+				    query:{cust_id:cust_id_1,vehicle_id:vehicle_id,unit_id:unit_id,cust_type:cust_type},
+			        colModel : [
+						{display: '收费单号', name : 'bw_no', width : 80},
+						{display: '应缴', name : 'ac_amount', width : 80},
+						{display: '实缴', name : 'real_amount', width : 80},
+				        {display: '缴费方式', name : 'pay_model', width : 60, sortable : true,formatter:function(value,row){
+				                if(value==0){
+				                    value = '托收';
+				                }else if(value==1){
+				                    value = '现金';
+				                }else if(value==2){
+				                    value = '转账';
+				                }else{
+				                	 value = '刷卡';
+				                }
+				                return value;
+				            }},    
+						{display: '经办人', name : 'agent_name', width : 80},
+						{display: '缴费日期', name : 'stamp', width : 140},
+						{display: '备注', name : 'remark', width : 200}
+			        ],
+				    buttons : [
+					            {name: '查看明细', bclass: 'view', onpress :viewItem },
+					            {separator: true}
+					           ]
+			    };
+			    $('#records').sgDatagrid(defaults_1);
+	    }
+}
+
+$('input[name="payitem"]').click(function(){
+	var chk_bu = document.getElementById("isAll");
+	 if(chk_bu.checked){
+		 $("#data_value").val("0");
+	 }else{
+			var total =0;
+			var serviceFee=0;
+			var simFee=0;
+			var policyFee=0;
+			var webFee=0;
+			var arrearage_fee = 0;
+			
+		    var obj = $('#vehiclelist');
+		    var bDiv = $('.bDiv',obj);
+			var month_number =  $("#month_number").val();
+			var day_number =  $("#day_number").val();
+			if(day_number == null || day_number == "" ){
+				day_number =0;
+			}
+			if(month_number == null || month_number == "" ){
+				month_number =0;
+			}
+			$('input[type=checkbox][checked=checked]', bDiv).each(function() {
+			    if ($(this).attr("checked")) {
+			        editId = this.value;
+			        editobj = $(this).data('data');
+			        $('input[type="checkbox"][name="payitem"]:checked').each(function() {
+			            var mark = $(this).attr("mark");
+			            if (mark == '0') {
+			                var money = editobj.service_money;
+			                if (money != null && money != "") {
+			                	serviceFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+	                        	serviceFee =  parseInt(serviceFee);
+			                }
+	                        $("#fee0,#real_amount0").val( serviceFee );
+			                if (editobj.arrearage_fee1) {
+			                    arrearage_fee = parseInt(arrearage_fee) + editobj.arrearage_fee1;
+			                }
+			            } else if (mark == '1') {
+			                var money = editobj.sim_money;
+			                if (money != null && money != "") {
+			                	simFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+	                        	simFee =  parseInt(simFee);
+			                }
+	                        $("#fee1,#real_amount1").val(simFee);
+			                if (editobj.arrearage_fee2) {
+			                    arrearage_fee = parseInt(arrearage_fee) + editobj.arrearage_fee2;
+			                }
+			            } else if (mark == '3') {
+			                var money = editobj.web_money;
+			                if (money != null && money != "") {
+			                	webFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+	                        	webFee =  parseInt(webFee);
+			                }
+	            		   	$("#fee3,#real_amount3").val(webFee);
+			                if (editobj.arrearage_fee4) {
+			                    arrearage_fee = parseInt(arrearage_fee) + editobj.arrearage_fee4;
+			                }
+			            } else {
+			                var money = editobj.policy_money;
+			                if (money != null && money != "") {
+			                	policyFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+	                        	policyFee =  parseInt(policyFee);
+			                }
+	                        $("#real_amount2,#fee2").val(policyFee);
+			                if (editobj.arrearage_fee3) {
+			                    arrearage_fee = parseInt(arrearage_fee) + editobj.arrearage_fee3;
+			                }
+			            }
+			        });
+			    }
+			});
+			total = serviceFee + simFee + webFee + policyFee;
+	        $("#total_fee").val(total);
+	        $("#real_amount").val(total);
+			$("#total_arrears").val(arrearage_fee);
+	 }
+});
+	
+	
+
+
+(function($){
+    $('.abcd').bind("change",function() {
+	    var total = '0';
+	    for (var i = 0; i < 4; i++) {
+	        var mount = $("#real_amount" + i).val();
+	        if (mount　 != null && mount != "") {
+	            total = parseInt(total) + parseInt(mount);
+	        }
+	    }
+	    $("#real_amount").val(total);
+	});
+		
+	
+	$('#month_number').bind("change", function(){
+		var chk_bu = document.getElementById("isAll");
+		if(chk_bu.checked){
+			  $("#data_value").val("0");
+		 }else{
+				var total =0;
+				var serviceFee=0;
+				var simFee=0;
+				var policyFee=0;
+				var webFee=0;
+				var month_number =  $("#month_number").val();
+				var day_number =  $("#day_number").val();
+				if(month_number == null || month_number == "" ){
+					month_number =0;
+				}
+				if(day_number == null || day_number == "" ){
+					day_number =0;
+				}
+		        var obj = $('#vehiclelist');
+		        var bDiv = $('.bDiv',obj);
+		        $('input[type=checkbox][checked=checked]', bDiv).each(function() {
+		            if ($(this).attr("checked")) {
+		                editId = this.value;
+		                editobj = $(this).data('data');
+		                $('input[type="checkbox"][name="payitem"]:checked').each(function() {
+		                    var sum = '0';
+		                    var mark = $(this).attr("mark");
+		                    if (mark == '0') {
+		                        var money = editobj.service_money;
+		                        if (money != null && money != "") {
+		                            serviceFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+		                        	serviceFee =  parseInt(serviceFee);
+		                        }
+		                        $("#fee0,#real_amount0").val( serviceFee );
+		                    } else if (mark == '1') {
+		                        var money = editobj.sim_money;
+		                        if (money != null && money != "") {
+		                        	simFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+		                        	simFee =  parseInt(simFee);
+		                        }
+		                        $("#fee1,#real_amount1").val(simFee);
+		                    } else if (mark == '3') {
+		                        var money = editobj.web_money;
+		                        if (money != null && money != "") {
+		                        	webFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+		                        	webFee =  parseInt(webFee);
+		                        }
+		            		   	$("#fee3,#real_amount3").val(webFee);
+		                    } else {
+		                        var money = editobj.policy_money;
+		                        if (money != null && money != "") {
+		                        	policyFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+		                        	policyFee = parseInt(policyFee);
+		                        }
+		                        $("#real_amount2,#fee2").val(policyFee);
+		                    }
+		                });
+		            }
+		        });
+		        total = serviceFee + simFee + webFee + policyFee;
+		        $("#total_fee").val(total);
+		        $("#real_amount").val(total); 
+		 	}
+		});
+	
+	$('#day_number').bind("change", function(){
+		var chk_bu = document.getElementById("isAll");
+		if(chk_bu.checked){
+			  $("#data_value").val("0");
+		 }else{
+				var total =0;
+				var serviceFee=0;
+				var simFee=0;
+				var policyFee=0;
+				var webFee=0;
+				var month_number =  $("#month_number").val();
+				var day_number =  $("#day_number").val();
+				if(month_number == null || month_number == "" ){
+					month_number =0;
+				}
+				if(day_number == null || day_number == "" ){
+					day_number =0;
+				}
+		        var obj = $('#vehiclelist');
+		        var bDiv = $('.bDiv',obj);
+		        $('input[type=checkbox][checked=checked]', bDiv).each(function() {
+		            if ($(this).attr("checked")) {
+		                editId = this.value;
+		                editobj = $(this).data('data');
+		                $('input[type="checkbox"][name="payitem"]:checked').each(function() {
+		                    var sum = '0';
+		                    var mark = $(this).attr("mark");
+		                    // 服务费
+		                    if (mark == '0') {
+		                        var money = editobj.service_money;
+		                        console.log("monthMoney ",money);
+		                        if (money != null && money != "") {
+		                        	serviceFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+		                        	serviceFee =  parseInt(serviceFee);
+		                        	$("#fee0,#real_amount0").val( serviceFee );
+		                        }
+		                    } else if (mark == '1') {
+		                        //sim卡
+		                        var money = editobj.sim_money;
+		                        if (money != null && money != "") {
+		                        	simFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+		                        	simFee =  parseInt(simFee);
+		                        }
+		                        $("#fee1,#real_amount1").val(simFee);
+		                    } else if (mark == '3') {
+		                        //网上查车
+		                        var money = editobj.web_money;
+		                        if (money != null && money != "") {
+		                        	webFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+		                        	webFee =  parseInt(webFee);
+		                        }
+		            		   	$("#fee3,#real_amount3").val(webFee);
+		                    } else {
+		                        //其他
+		                        var money = editobj.policy_money;
+		                        if (money != null && money != "") {
+		                        	policyFee = parseInt(money) * parseInt(month_number) + parseInt(money) * parseInt(day_number) / 30;
+		                        	policyFee =  parseInt(policyFee);
+		                        }
+		                        $("#real_amount2,#fee2").val(policyFee);
+		                    }
+		                });
+		            }
+		        });
+                total = serviceFee + simFee + webFee + policyFee;
+		        $("#total_fee").val(total);
+		        $("#real_amount").val(total);
+		 }
+	 });
+	
+	
+	
+	
+    /* var checkCustomer = function(){
+		var text=this.value;
+		text = text.replace(/\s/g,'');
+		if(text!=this.value){
+			this.value=text;
+			$(this).trigger('change');
+			return false;
+		}
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {nocust_type : 0};
+		params.filter.customer_name = this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../getCustomers',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#name");
+					  if(manager){
+						  if(data.items.length>0){
+							  customerList = {};
+							  $("#customerList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.customer_name);
+							  $("#customerList").append(op);
+							  
+							  customerList[v.customer_name] = v.customer_id;
+	 				  	 }); 
+						}
+				  }
+			  } ,     
+			  error : function(res,error) { 
+				  $(document).sgPup({message:'message_alert',text: res.responseText});  
+			  }    
+			});
+	};
+    
+	
+	    //填充客户
+	    $.ajax( {
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCustomers',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{nocust_type : 0}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#name");
+				  if(manager){
+					  if(data.items.length>0){
+						  customerList = {};
+						  $("#customerList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.customer_name);
+						  $("#customerList").append(op);
+						  
+						  customerList[v.customer_name] = v.customer_id;
+					  	 }); 
+					  manager.on('keyup',checkCustomer);
+					  manager.on('change',function(){
+						  var strs = this.value.split(" ");
+						    if(customerList[strs[strs.length-1]]){
+						    	$('#custname').val('');
+						    	$('#searchnumber').val('');
+						    	$('#searchcall').val('');
+						    	$('#cust_id').val('');
+						    	
+								$(this).val(strs[strs.length-1]);
+								$("#cust_id").val(customerList[strs[strs.length-1]]);
+						    }else{
+						    	$(this).val('');
+						    	$("#cust_id").val("");
+						    }
+						});
+
+					}
+			  }
+		  },     
+		  error : function(res,error) {
+			  $(document).sgPup({message:'message_alert',text: res.responseText}); 
+		  }    
+		}); */
+	
+	var defaults1 = {
+	        title: "",
+	        width:  '100%',
+	        fitColumn: true,
+	        height: 250,
+	        url: '',
+	        datatype:"json",
+		    rownumbers:true,
+		    useRp: true,//
+			colModel : [
+					{display: '车牌号', name : 'plate_no', width : 60},
+					{display: '颜色', name : 'color', width : 50},
+					{display: '服务开始时间', name : 'service_startTime', width : 60},
+					{display: '服务截止日期', name : 'service_endTime', width : 80},
+					{display: '服务每月缴费', name : 'service_money', width : 80},
+					{display: '服务缴费间隔', name : 'service_next', width : 80},
+					{display: 'SIM开始时间', name : 'sim_startTime', width : 80},
+					{display: 'SIM截止日期', name : 'sim_endtTime', width : 80},
+					{display: 'SIM每月缴费', name : 'sim_money', width : 80},
+					{display: 'SIM缴费间隔', name : 'sim_next', width : 80},
+					{display: '查车开始时间', name : 'web_startTime', width : 80},
+					{display: '查车截止日期', name : 'web_endtTime', width : 80},
+					{display: '查车每月缴费', name : 'web_money', width : 80},
+					{display: '查车缴费间隔', name : 'web_next', width : 80},
+					{display: '盗抢险开始时间', name : 'policy_startTime', width : 80},
+					{display: '盗抢险截止日期', name : 'policy_endtTime', width : 80},
+					{display: '盗抢险每月缴费', name : 'policy_money', width : 80},
+					{display: '盗抢险缴费间隔', name : 'policy_next', width : 80}				
+	        ]
+	    };
+	    $('#vehiclelist').sgDatagrid(defaults1);
+	    // $("#vehiclelist .hDiv-header-inner,#vehiclelist_tbl").css("width","2800px");//调整维修表格的宽度
+	    
+	    var cust_id = $('#cust_id').val();
+	    
+		var defaults2 = {
+		        title: "",
+		        width:  '100%',
+		        height: 200,
+		        url: '',
+			    rownumbers:true,
+			    isNotCheckall:true,
+		        colModel : [
+					{display: '收费单号', name : 'bw_no', width : 80},
+					{display: '应缴', name : 'ac_amount', width : 80},
+					{display: '实缴', name : 'real_amount', width : 80},
+					{display: '缴费方式', name : 'feetype_id', width : 60},
+					{display: '经办人', name : 'agent_name', width : 100},
+					{display: '缴费日期', name : 'stamp', width : 140},
+					{display: '备注', name : 'remark', width : 200}
+		        ]
+		    };
+	    $('#records').sgDatagrid(defaults2);
+	
+})(jQuery)
+
+$(document).ready(function(){
+	// $("#vehiclelist .hDiv-header-inner,#vehiclelist_tbl").css("width","2800px");//调整维修表格的宽度
+	// $("#vehiclelist .hDiv-header-inner,#vehiclelist_tbl").css("width","1704px");
+    // $("#vehiclelist .hDiv-header-inner").css("width","10000px");//调整维修表格的宽度
+    // $("#vehiclelist_tbl").css("width","auto");
+});
+</script>
+<script type="text/javascript" src="../../jscript/web/customerList.js"></script>
+<script type="text/javascript" src="../../jscript/web/vehicleList.js"></script>
+<script type="text/javascript" src="../../jscript/web/unitList.js"></script>
+</html>

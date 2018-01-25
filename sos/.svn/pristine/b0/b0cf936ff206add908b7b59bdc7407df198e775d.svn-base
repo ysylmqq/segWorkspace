@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>订单添加</title>
+<style type="text/css">
+.tDiv div.fbutton span {
+	width:60px;
+}
+</style>
+</head>
+<body>
+	<form id='order_add_form' method='post' class="form" style="width:880px;">
+		<div class='title'>订单信息></div>
+		<input type='hidden' id="orderId" name='orderId'/>
+		<fieldset style="width:860px;">
+            <div class="panel">
+                <span>订单号:</span>
+                <input type='text' id="orderNo" name='orderNo' disabled="disabled" style="width:255px;"/>
+                
+                <span>订单接收人:</span>
+                <input type='text' id="receiptName" name='receiptName' required="true" list="userList" style="width:255px;"/>
+                <input type='hidden' id="receiptId" name='receiptId' required="true"  value=""/>
+                <datalist id="userList"></datalist>
+            </div>    
+            <div class="panel">    
+                <span>订单日期:</span>
+                <input type='date' id="stamp" name='stamp' disabled="disabled" style="width:255px;" />
+                
+                
+                <span>总金额(元):</span>
+                <input type='text' id="totalPrice" name='totalPrice' disabled="disabled" style="width:255px;"/>
+            </div>
+        </fieldset>
+
+        <div class="title">订单明细></div>
+		<fieldset class='fieldset' style="width:860px;">
+            <div id="order_detail_panel" style="height:100px; overflow-y:auto">
+				<div id="order_detail_div" class="panel">
+	                <span style="width:30px;">商品:</span>
+	                <input type='text' name='productName' list="productlist" required="true" placeholder="请输入商品名称/编码" style="width:140px;" />
+	                <input type="hidden" name="productId" required='true'/>
+	                <input type='hidden' name='productCode' required="true" />
+	                <span style="width: 30px;">规格:</span>
+	                <input type='text' name='productNorm' disabled="disabled" style="width:140px;" />
+	                <span style="width:30px;">价格:</span>
+	                <input type='text' name='price' placeholder="只允许数字" required="true" value="0" pattern="^\d+\.{0,1}\d*$" style="width:65px;" min="0"/> 
+	                <span style="width:30px;">数量:</span>
+	                <input type='number' name='num' placeholder="只允许数字" required="true" value="0" pattern="^[+]?[1-9]+\d*$" style="width:65px;" onkeyup="this.value=this.value.replace(/\D/g,'')" min="1"/>	                           
+	                <span style="width:30px;">备注:</span>
+	                <input type='text' name='remark' style="width:120px;" />	                
+	                <a href="javascript:void(0);" style="margin:0px;padding:0px;padding-left:10px;padding-top:5px;"><img alt="增加产品" src="../../images/form_add.png" title="增加产品" style="vertical-align:middle"></a>
+	            </div>	            
+			</div>
+            <datalist id="productlist">
+            </datalist>
+        </fieldset>
+        
+        <div class="title">地址列表></div>
+		<fieldset class='fieldset' style="width:860px;">
+            <div id="order_address_detail" class="datagird"></div>
+        </fieldset>
+        
+        <fieldset style="width:860px;border:0px">
+        	<div class="panel" style="padding:0px;margin:0px;"> 
+                <span style="vertical-align:top;width:40px;">备注:</span>
+                <textarea id="orderRemark" name="orderRemark" style="width:780px;height:43px;padding:0px;margin:0px;"></textarea>               
+            </div>
+        </fieldset>
+<!-- 
+        <fieldset style="width:860px;">	
+	        <div class='submit'>
+	            <button id="order_detail_submit" type="submit" >提交</button> <button id="mycancel" type="reset">重置</button>
+	        </div>
+        </fieldset>
+ -->
+	</form>
+</body>
+<script type="text/javascript">
+	(function($){
+			var flag = 0;
+			var productList = null;
+			var managerList = null;
+			$("#stamp","#order_add_form").val(new Date().format('yyyy-MM-dd'));
+			
+			$.ajax( {
+				  type : 'POST', 
+				  async: false,   
+				  url : "order/getOrderNo",   
+				  data:{},
+				  success : function(data) {
+					  if(data){
+						  $("#orderNo").val(data);
+					  }
+				  } 
+			});
+			
+			$('input[name=price]','#order_detail_div').on('change',function(){
+				countAllMoney();
+			});
+			$('input[name=price]','#order_detail_div').on('keyup',function(){
+				countAllMoney();
+			});
+			$('input[name=num]','#order_detail_div').on('change',function(){
+				countAllMoney();
+			});
+			$('input[name=num]','#order_detail_div').on('keyup',function(){
+				countAllMoney();
+			});
+			
+			var checkManager = function(){
+				//debugger;
+				var params = {};
+				params.opname = this.value;
+				var obj = $(this);
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : 'getOrdersRecipient',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  var manager = $("#receiptName","#order_add_form");
+							  managerList = {};
+							  if(manager){
+								  if(data.length>0){
+									  $("#userList").empty();
+								  }
+								  $.each(data,function(k,v){
+									  var op = $("<option></option>");
+									  op.val(obj.val()+" "+v.opname);
+									  $("#userList").append(op);
+									  
+									  managerList[v.opname] = v.opid;
+			 				  	 }); 
+								}
+						  }else{
+						  	$(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					});
+			}
+			
+			//填充员工
+		    $.ajax( {
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : 'getOrdersRecipient',   
+			  data:JSON.stringify({}),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#receiptName","#order_add_form");
+					  managerList = {};
+					  if(manager){
+						  if(data.length>0){
+							  $("#userList").empty();
+							  managerList=[];
+						  }
+						  $.each(data,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(v.opname);
+							  $("#userList").append(op);
+							  
+							  managerList[v.opname] = v.opid;
+	 				  	 }); 
+						  manager.on('keyup',checkManager);
+						  manager.on('change',function(){
+								var strs = this.value.split(" ");
+								$(this).val(strs[strs.length-1]);
+								$("#receiptId","#order_add_form").val(managerList[strs[strs.length-1]]);
+								if($("#receiptId","#order_add_form").val().length==0){
+									$("#receiptName","#order_add_form").val("");
+								}
+							});
+						};
+				  }else{
+				  	$(document).sgPup({message:'message_info',text: data});
+				  }
+			  },     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+			
+			var countAllMoney = function(){
+				var allMoney = 0;
+				var prices = $('input[name=price]','#order_detail_panel');
+				var nums = $('input[name=num]','#order_detail_panel');
+				$.each(prices,function(k,v){
+					allMoney = Number(allMoney)+Number(v.value)*Number(nums[k].value);
+				});
+				$('#totalPrice','#order_add_form').val(allMoney);
+			}
+			
+			var checkProduct = function(){
+				var params = {};
+				params.pageNo = 1;
+				params.pageSize = 15;
+				params.filter = {};
+				params.filter.nameOrCode = this.value;
+				var obj = $(this);
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../product/findProducts',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  var products = data.items;
+							  $("#productlist").empty();
+							  productList = {};
+							  $.each( products, function(key,value){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+								  $("#productlist").append(op);
+								  
+								  productList[value.code] = value.id;
+								});
+
+						  }else{
+							  $(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					});
+			};
+			
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../product/findProducts',   
+				  data:JSON.stringify({pageNo:1,pageSize:15,filter:{type:0}}),
+				  success : function(data) {
+					  if(data){
+						  var products = data.items;
+						  $("#productlist").empty();
+						  productList = {};
+						  $.each( products, function(key,value){
+							  var op = $("<option></option>");
+							  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+							  $("#productlist").append(op);
+							  
+							  productList[value.code] = value.id;
+							});
+						  $("#order_detail_div input[list=productlist]").on('keyup',checkProduct);
+						  $("#order_detail_div input[name=productName]").on('change',function(){
+								var strs = this.value.split(" ");
+								$(this).val(strs[strs.length-3]);
+								$("#order_detail_div input[type=hidden]").val(productList[strs[strs.length-2]]);
+								$("#order_detail_div input[name=productCode]").val(strs[strs.length-2]);
+								$("#order_detail_div input[name=productNorm]").val(strs[strs.length-1]);
+								
+								$.ajax( {
+									  type : 'POST', 
+									  async: false,   
+									  url : "../../order/getPriceByProductId",   
+									  data:{productId:productList[strs[strs.length-2]]},
+									  success : function(data) {
+										  if(data){
+											  $("#order_detail_div input[name=price]").val(data);
+										  }
+									  } 
+								});
+							});
+
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+			
+			
+			$("#order_detail_div a").on('click',function(){
+				var detail_div = $("<div></div>");
+				var detail_id = "order_detail_div_"+flag;
+				detail_div.attr('id',detail_id);
+				detail_div.addClass("panel");
+				detail_div.append($("#order_detail_div").html());
+				
+				$("#order_detail_div").before(detail_div);
+				$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+				$("#"+detail_id+" img").attr('title','删除产品');
+				$("#"+detail_id+" input[name=productName]").on('change',function(){
+					var strs = this.value.split(" ");
+					$(this).val(strs[strs.length-3]);
+					$("#"+detail_id+" input[type=hidden]").val(productList[strs[strs.length-2]]);
+					$("#"+detail_id+" input[name=productCode]").val(strs[strs.length-2]);
+					$("#"+detail_id+" input[name=productNorm]").val(strs[strs.length-1]);
+					
+					$.ajax( {
+						  type : 'POST', 
+						  async: false,   
+						  url : "../../order/getPriceByProductId",   
+						  data:{productId:productList[strs[strs.length-2]]},
+						  success : function(data) {
+							  if(data){
+								  $("#"+detail_id+" input[name=price]").val(data);
+							  }
+						  } 
+					});
+				});
+				$("#"+detail_id+" input[name=productName]").attr('autofocus','autofocus');
+				$("#"+detail_id+" input[name=price]").on('change',function(){
+					countAllMoney();
+				});
+				$("#"+detail_id+" input[name=price]").on('keyup',function(){
+					countAllMoney();
+				});
+				$("#"+detail_id+" input[name=num]").on('change',function(){
+					countAllMoney();
+				});
+				$("#"+detail_id+" input[name=num]").on('keyup',function(){
+					this.value=this.value.replace(/\D/g,'');
+					countAllMoney();
+				});
+				$("#"+detail_id+" a").on('click',function(){
+					$("#"+detail_id).remove();
+					countAllMoney();
+				})
+				$("#"+detail_id + " input[list=productlist]").on('keyup',checkProduct);
+				flag=flag+1;
+			});
+
+			var createRemark = function(){
+				var obj = $('#order_address_detail');
+		        var bDiv = $('.bDiv',obj);
+		        var content = "";
+		        //$(document).sgPup({message:'message_info',text: $('input[type=checkbox][checked=checked]',bDiv).length}) ;
+		        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+		            $(document).sgPup({message:'message_info',text: "请选择一个地址选项！"});
+		            return false;
+		        }else{
+		        	$.each($('input[type=checkbox]:checked',bDiv),function(k,v){
+	                	var ptr = $(this).parent().parent();
+	                	content = content + $(this).data('data').name +" " + $(this).data('data').phone +" " + $(this).data('data').address+" "+$("select[name=pay_type]",ptr).find('option:selected').text()+" "+$("input[name=addrRemark]",ptr).val() +"\r";
+		            });
+		        	$("#orderRemark","#order_add_form").empty();
+		        	$("#orderRemark","#order_add_form").append(content);
+		        	
+		        }
+			}
+			
+			//初始化地址列表
+		   	 var defaults = {
+		   		        width:  850,
+		   		        height: 110,
+		   		        url: '../../order/findCustomerAddress',
+		   		        isNotCheckall:true,
+		   		     	colid:'id',  //主键
+		   		        rownumbers:true,//序号
+		   		        colModel : [
+		   		            {display: '收货人', name : 'name', width : 60, sortable : false},
+		   		            {display: '联系电话', name : 'phone', width : 80, sortable : false},
+		   		         	{display: '收货地址', name : 'address', width : 120, sortable : false},
+		   		         	{display: '运输方式', name : 'transport_type', editable:true, width : 80, sortable : false, html:"<select name='transport_type' style='width:80px;'><option value='0'>航空</option><option value='1'>汽运</option><option value='2'>中铁</option><option value='3' selected>快递</option><option value='4'>指定货运</option></select>"},
+		   		         	{display: '指定货运', name : 'specify_freight', editable:true, width :110, sortable : false, html:"<input type='text' style='width:110px;' placeholder='请输入指定货运' name='specify_freight' />"},
+		   		         	{display: '运费承接方', name : 'pay_type', editable:true, width : 80, sortable : false, html:"<select name='pay_type' style='width:80px;'><option value='0'>客户提付</option><option value='1'>赛格支付</option><option value='2'>赛格垫付</option><option value='3' selected>送货上门</option></select>"},
+		   		         	{display: '备注', name : 'addrRemark',editable:true, width : 160, sortable : false, html:"<input type='text' style='width:160px;' name='addrRemark' />"}
+		   		        ],
+		   		        buttons : [
+		   	   		  	            {name: '生成总备注', bclass: 'add', onpress : createRemark}
+		   	    			        ]
+		   		    };
+		   	$('#order_address_detail').sgDatagrid(defaults);
+		   	
+		  
+	})(jQuery)
+</script>
+</html>

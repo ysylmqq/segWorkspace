@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>派工单跟单</title>
+<style>
+
+</style>
+</head>
+<body>
+	<form id='follow' method='post' class="form" style="width:370px;">
+		<fieldset style="width:350px;">
+			<div class="panel">
+                <span>客户:</span>
+                <input type='text' id="customer" name='customer'  style="width:200px;" disabled="disabled"/>
+                <input type='hidden' id="taskId" name="taskId" />
+                 <input type='hidden' id="dispatch_id" name="dispatch_id" />
+            </div>
+            <div class="panel">
+                <span>电工:</span>
+                
+                <select id='company' name='company' style="width:204px;" onchange='initCompanyno();'>
+                	<option value='-1' selected='true'>全部</option>
+                </select>
+                
+               <!--  <select size="1" name="type" id="type" style="width:204px;" autocomplete="on">
+                    <option value="1">全部</option>
+                    <option value="2">许鹏飞(已到达 2014-01-10 14:10)</option>
+                    <option value="3">张小红(已离开 2014-01-10 17:10)</option>
+                </select> -->
+            </div>
+            <div class="panel">    
+                <span>到达时间:</span>
+                <input type='datetime-local' id="arrival_time" name='arrival_time'  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>数量:</span>
+                <input type='text' id="num" name="num"  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>离开时间:</span>
+                <input type='datetime-local' id="departure_time" name='departure_time'  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>任务结束:</span>
+                <input type='checkbox'  id="is_over" name="is_over" disabled="disabled" style='vertical-align:middle;' />
+            </div>
+            <div class="panel">
+            	<span style="vertical-align:top;">备注:</span>
+                <textarea id="remark" name="remark" style="width:204px;" rows="2"></textarea>
+            </div>
+        </fieldset>
+
+	</form>
+</body>
+<script type="text/javascript">
+
+function initCompanyno() {
+	var company = document.getElementById('company');
+	$('#companyno').val(company.options[company.selectedIndex].value);
+}
+
+ (function($) {
+	/*  
+	 var company = $('#company');
+	 $.ajax({
+		  type : 'post', 
+		  async: true,   
+		  url : 'dispatchElectrician/getElectriciansBytaskId',   
+		  data:{id:$("#taskId").val()},
+		  success : function(data) {
+			  if(data){
+				  
+				  $.each(data,function(k,v){
+				  	  company.append("<option value='" +v.id+"'>" + v.name+"</option>");
+				  });
+			  }else{
+			  	alert(data);
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ alert(res.responseText);}     
+		  }    
+		});
+	  */
+	 
+	/*  
+	var company = $('#company');
+    $.ajax( {
+    	debugger;
+	  type : 'post', 
+	  async: false,   
+	  url : 'dispatchElectrician/getElectriciansBytaskId',   
+	  data:{id:$('#taskId').val()},
+	  success : function(data) {
+		  if(data){
+			  if(company){
+				  $.each(data,function(k,v){
+				  	  company.append("<option value='" +v.id+"'>" + v.name+"</option>");
+
+				  }); 
+			  }
+		  }else{
+			  alert(data);
+		  }
+	  } ,     
+	  error : function(res,error) { 
+	  	 alert("responseText="+res.responseText+";error="+error);     
+	  }    
+	}); */
+})(jQuery)
+
+
+</script>
+</html>

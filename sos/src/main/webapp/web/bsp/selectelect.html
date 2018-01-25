@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>选择电工</title>
+<style>
+
+</style>
+</head>
+<body>
+<div id="ba_select_electrician"  style="overflow:hidden"></div>
+<!--  
+
+
+	<form id='selectelect_form' method='post' class="form" style="width:580px;">
+		<fieldset style="width:560px;">
+           	<div class="hDiv" style="margin:0px;padding:0px;width:550px;">
+                <table>
+                    <thead>
+                    <tr>
+                        <th style="width:40px;"></th>
+                        <th style="width:80px;">电工名称</th>
+                        <th style="width:110px;">所属营业处</th>
+                        <th style="width:160px;">已安排任务</th>
+                        <th style="width:50px;">负责人</th>
+                    </tr>
+                    <tr><th><input type="checkbox" name="diangong"  value="1" title="张三"></th><th>张三</th><th>梅林营业处</th><th>安装（华远4S店 10：00－12：00）</th><th><input type="radio" name="betreuer"/></th></tr>
+                    <tr><th><input type="checkbox" name="diangong"  value="2" title="李四" ></th><th>李四</th><th>梅林营业处</th><th></th><th><input type="radio" name="betreuer"/></th></tr>
+                    <tr><th><input type="checkbox" name="diangong"  value="3" title="王五"></th><th>王五</th><th>梅林营业处</th><th></th><th><input type="radio" name="betreuer"/></th></tr>
+                    </thead>
+                </table>
+            </div>
+        </fieldset>
+	</form>
+-->
+</body>
+
+<script type="text/javascript">
+	(function($){
+		
+		var chkChange=function(index,rowData,isChecked){
+			var id=rowData.id;
+			if(isChecked){
+				var phone = rowData.phone;
+				var name = rowData.name;
+		     	$("."+id).removeAttr("disabled");
+				
+				
+			}else{
+				$("."+id).attr("disabled","disabled");
+				$("."+id).attr("checked",false); 
+			}
+		}
+		var head_defaults = {
+	            id: 'grid1',
+	            chkChange:chkChange,
+	            isNotCheckall:true,
+	            url: 'dispatchElectrician/getDispatchElectricia',
+		        colid:'id',  //主键
+	            rownumbers:true,
+	            colModel : [
+	                {display: '电工姓名', name : 'name', width : 90},
+	                {display: '所属营业处', name : 'company', width : 150},
+	                {display: '已安排任务', name : 'describe', width : 250},
+	                {display: '负责人', name : 'check', width : 50}
+	            ]
+	        };
+	    $("#ba_select_electrician").sgDatagrid(head_defaults);
+	 	 
+	 	 
+	 
+	 	
+	 	 
+		
+
+		
+		
+	    
+	    
+	})(jQuery)
+	
+	
+
+		
+</script>
+</html>

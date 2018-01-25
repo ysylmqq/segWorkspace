@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>维修回单</title>
+<style>
+
+</style>
+</head>
+<body>
+	<form id='answer_task' method='post' class="form" style="width:690px;">
+		<fieldset style="width:670px;">
+			<div class="panel">
+				<span>电工:</span>
+                <input type='text' id="managersName" name='managersName' list="userDataList"  style="width:200px;" />
+                <input type='hidden' id="answer_userid" name='answer_userid'   />
+				<datalist id="userDataList"></datalist>
+			
+                <span style="padding-left:50px;">工单号:</span>
+                <input type='text' id="billnum" name='billnum' list="billList"  style="width:200px;" />
+                  <input type='hidden' id="taskId" name='taskId'   />
+                  	<datalist id="billList"></datalist>
+            </div>
+            <div class="panel">
+                <span>日期:</span>
+                <input type='date' id="answer_time" name='answer_time'  style="width:200px;" />
+                
+                <span style="padding-left:50px;">产品型号:</span>
+                <input type='text' id="call_letter" name='call_letter'  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>客户:</span>
+                <input type='text' id="customer_name" name='customer_name'  disabled="disabled" style="width:200px;" />
+                
+                <span style="padding-left:50px;">联系电话:</span>
+                <input type='text' id="phone" name='phone'  disabled="disabled" style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>车牌号:</span>
+                <input type='text' id="car_num" name='car_num'  disabled="disabled"  style="width:200px;" />
+                
+                <span style="padding-left:50px;">车载电话:</span>
+                <input type='text' id="call_letter" name='call_letter'  disabled="disabled"  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>车型:</span>
+                <input type='text' id="cartype_name" name='cartype_name'   disabled="disabled" style="width:200px;" />
+                
+                <span style="padding-left:50px;">是否出车:</span>
+                <input type="checkbox" id="isturnout" name='isturnout' style='vertical-align:middle;' />
+            </div>
+            <div class="panel" id="mileage" style="display: none;">
+                <span>电工里程:</span>
+                <input type='text' id="mileages" name='mileages'  style="width:200px;" />
+            </div>
+            
+            <div class="panel">    
+                <span>维修地点:</span>
+                <input type='text' id="place" name='place'  disabled="disabled"  style="width:553px;" />
+            </div>
+            <div class="panel">    
+                <span>故障现象:</span>
+                <input type='text' id="phenomenon" name='phenomenon'  style="width:553px;" />
+            </div>
+            <div class="panel">    
+                <span>故障原因:</span>
+                <input type='text' id="reason" name='reason'  disabled="disabled"  style="width:553px;" />
+            </div>
+            <div class="panel">    
+                <span>故障排除:</span>
+                <input type='text' id="exclude" name='exclude'  style="width:553px;" onfocus="selectexclude();"/>
+            </div>
+            <div id="fitting">
+            	<div class="panel">
+	                <span>配件名:</span>
+	                <input type='text' id="fittings" name='fittings'  style="width:200px;" />
+	                
+	                <span style="padding-left:50px;">回收品类别:</span>
+	                <select size="1" name="type" id="type" style="width:204px;" >
+	                    <option value="1">报废</option>
+	                    <option value="2">回收</option>
+	                    <option value="3">退货</option>
+	                </select>
+                </div>
+                
+                <div class="panel">
+	                <span>旧条形码:</span>
+	                <input type='text' id="oldcode" name='oldcode'  style="width:200px;" />
+	                	
+	                <span style="padding-left:50px;">新条形码:</span>
+	                <input type='text' id="newcode" name='newcode'  style="width:150px;" />
+	                <a href="javascript:void(0);" style="margin:0px;padding:0px;padding-left:10px;padding-top:5px;"><img alt="增加更换配件" src="images/form_add.png" title="增加更换配件" style="vertical-align:middle"></a>
+                </div>
+            </div>
+            <div class="panel">
+            	<span style="vertical-align:top;">备注:</span>
+                <textarea id="remark" name="remark" style="width:555px;" rows="2"></textarea>
+            </div>
+        </fieldset>
+
+	</form>
+</body>
+<script type="text/javascript">
+	$("[name = isturnout]:checkbox").bind("click", function () {
+		var chk = document.getElementById("isturnout");
+		if(chk.checked){
+			$("#mileage").show();
+		}else{
+			$("#mileage").hide();
+		}
+	})
+
+	var flag = 0;
+	$("#fitting a").on('click',function(){
+		var detail_div = $("<div></div>");
+		var detail_id = "fitting"+flag;
+		detail_div.attr('id',detail_id);
+		detail_div.addClass("panel");
+		detail_div.append($("#fitting").html());
+		detail_div.append("<hr/>");
+		
+		$("#fitting").before(detail_div);
+		$("#"+detail_id+" img").attr('src','images/form_del.png');
+		$("#"+detail_id+" img").attr('title','删除更换配件');
+		
+		$("#"+detail_id+" a").on('click',function(){
+			$("#"+detail_id).remove();
+		})
+		//$("#"+detail_id + " input[list=productList]").on('keyup',checkProduct);
+		flag=flag+1;
+	});
+	
+	
+	
+	var winClose = function() {
+		$(document).sgWindow('close', {
+			id : 'selectexclude'
+		});
+	}
+	
+	var selectexclude = function() {
+		var defaults = {
+			title : '故障排除',
+			id : 'selectexclude',
+			form : 'selectexclude_form',
+			url : 'web/bsp/answer/selectexclude.html',
+			width : 330,
+			height : 280,
+			buttons : [ {
+				name : '确定',
+				onpress : comfire
+			}, {
+				name : '取消',
+				onpress : winClose
+			} ]
+		};
+		$(document).sgWindow(defaults);
+	}
+	
+	
+	
+	   var comfire = function(){
+	        var obj = $('#exclude_sel');
+	        var bDiv = $('.bDiv',obj);
+	        var codes='';
+	         $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){    
+	                	editId=this.value;
+	                	editobj = $(this).data('data');
+	                	if(codes.length==0){
+	                		codes = editobj.code;
+	                	}else{
+	                		codes = codes + "," + editobj.code;
+	                	}
+	                }
+	            });
+	         $("#exclude","#answer_task").val(codes);
+	         $(document).sgWindow('close',{id:'selectexclude'}); 
+	 	   };
+	
+	
+	
+	
+	//自动查询经办人
+	var checkUser = function(){
+		var params = {opname:text};
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : 'getElctrician',   
+			//  data:JSON.stringify(params),
+			  data:JSON.stringify({}),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#managersName");
+					  if(manager){
+						  if(data.length>0){
+							  userDataList = {};
+							  $("#userDataList").empty();
+						  }
+						  $.each(data,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.opname);
+							  $("#userDataList").append(op);
+							  
+							  userDataList[v.opname] = v.opid;
+	 				  	 }); 
+						}
+				  }else{
+				  	alert(data);
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	 alert("responseText="+res.responseText+";error="+error);     
+			  }    
+			});
+	}
+	
+	
+	
+	  $.ajax( {
+		  type : 'POST', 
+		  async: true,  
+		  url : "getElctrician",   
+		  data:{},
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#managersName"); 
+				  userDataList = {};
+				  if(data.length>0){
+					  $("#userDataList").empty();
+				  }
+				  $.each(data,function(k,v){
+					  var op = $("<option></option>");
+					  op.val(v.opname);
+					  $("#userDataList").append(op);
+					  userDataList[v.opname] = v.opid;
+					  
+				  	 }); 
+				  manager.on('keyup',checkUser);
+				  manager.on('change',function(){
+					  $("#billnum").val("");
+						$("#taskId").val("");
+					    $("#customer_name","#answer_task").val("");
+						  $("#phone","#answer_task").val("");
+						  $("#cartype_name","#answer_task").val("");
+						  $("#call_letter","#answer_task").val("");
+						  $("#car_num","#repair").val("");
+						  $("#reason","#answer_task").val("");
+						  $("#place","#answer_task").val("");
+					  	var strs = this.value.split(" ");
+						$(this).val(strs[strs.length-1]);
+						$("#answer_userid").val(userDataList[strs[strs.length-1]]);
+						if($("#answer_userid").val().length==0){
+							$("#managersName").val("");
+						}else{
+							  $.ajax( {
+								  type : 'POST', 
+								  async: true,  
+								  url : "task/getTaskList",   
+								  data:{id:$("#answer_userid","#answer_task").val()},
+								  success : function(data) {
+									  if(data){
+										  var billnum = $("#billnum"); 
+										  billList = {};
+										  if(data.length>0){
+											  $("#billList").empty();
+										  }
+										  $.each(data,function(k,v){
+											  var opp = $("<option></option>");
+											  opp.val(v.billno);
+											  $("#billList").append(opp);
+											  billList[v.billno] = v.id;
+										  	 }); 
+										  billnum.on('change',function(){
+											  	var strs = this.value.split(" ");
+												$(this).val(strs[strs.length-1]);
+												
+												  $("#customer_name","#answer_task").val("");
+												  $("#phone","#answer_task").val("");
+												  $("#cartype_name","#answer_task").val("");
+												  $("#call_letter","#answer_task").val("");
+												  $("#car_num","#answer_task").val("");
+												  $("#reason","#answer_task").val("");
+												  $("#place","#answer_task").val("");
+												
+												$("#taskId").val(billList[strs[strs.length-1]]);
+												if($("#taskId").val().length==0){
+													$("#billnum").val("");
+													 billList = {};
+												}else{
+													  $.ajax( {
+														  type : 'POST', 
+														  async: false,  
+														  url : "task/getTaskDetailMsg",   
+														  data:{id:$("#taskId","#answer_task").val()},
+														  success : function(data) {
+															  if(data){
+																  var a = data.phone;
+																  $("#customer_name","#answer_task").val(data.customerName);
+																  $("#phone","#answer_task").val(data.phone);
+																  $("#cartype_name","#answer_task").val(data.cName);
+																  $("#call_letter","#answer_task").val(data.letter);
+																  $("#car_num","#answer_task").val(data.carNum);
+																  $("#reason","#answer_task").val(data.symptom);
+																  $("#place","#answer_task").val(data.place);
+															  }
+														  } 
+													});
+												    
+													
+													
+												}
+											});
+										/*   
+										  $("#time","#dispathch_police").val(data.time);
+										  $("#reservation_id","#dispathch_police").val(data.rid); */
+									  }else{
+										  	alert(data);
+									  }
+								  },     
+								  error : function(res,error) { 
+									  	 alert("responseText="+res.responseText+";error="+error);     
+									  }    
+							});
+							
+							
+							
+						}
+					});
+				/*   
+				  $("#time","#dispathch_police").val(data.time);
+				  $("#reservation_id","#dispathch_police").val(data.rid); */
+			  }else{
+				  	alert(data);
+			  }
+		  },     
+		  error : function(res,error) { 
+			  	 alert("responseText="+res.responseText+";error="+error);     
+			  }    
+	});
+	
+	
+	
+/* 	
+	 //填充经办人
+    $.ajax( {
+    	debugger;
+	  type : 'post', 
+	  async: false,   
+	  contentType : 'application/json',     
+	  dataType : 'json',     
+	  url : 'getElctrician',   
+	  data:JSON.stringify({}),
+	  //data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+	  success : function(data) {
+		  if(data){
+			  var manager = $("#managersName");
+			  userDataList = {};
+			  if(manager){
+				  if(data.items.length>0){
+					  $("#userDataList").empty();
+				  }
+				  $.each(data.items,function(k,v){
+					  var op = $("<option></option>");
+					  op.val(v.opname);
+					  $("#userDataList").append(op);
+					  
+					  userDataList[v.opname] = v.opid;
+				  	 }); 
+				  manager.on('keyup',checkUser);
+				  manager.on('change',function(){
+					  	var strs = this.value.split(" ");
+						$(this).val(strs[strs.length-1]);
+						$("#answer_userid").val(userDataList[strs[strs.length-1]]);
+						if($("#answer_userid").val().length==0){
+							$("#managersName").val("");
+						}
+					});
+				}
+		  }else{
+		  	alert(data);
+		  }
+	  },     
+	  error : function(res,error) { 
+	  	 alert("responseText="+res.responseText+";error="+error);     
+	  }    
+	}); */
+
+</script>
+</html>

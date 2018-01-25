@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ <link href="../../bslib/css/bootstrap.min.css" rel="stylesheet" />
+ <link href="../../bslib/css/bootstrap-datetimepicker.css" rel="stylesheet" />
+ <link href="../../bslib/css/base.css" rel="stylesheet" />
+ <link rel="stylesheet" type="text/css" href="./wo.css">
+ <script src="../../bslib/js/jquery-1.11.1.min.js" type="text/javascript"></script>
+ <script src="../../bslib/js/bootstrap.min.js" type="text/javascript"></script>
+ <script src="../../bslib/js/util.js" type="text/javascript"></script>
+ <script src="./wo.js" type="text/javascript"></script>
+ <!-- datepicker -->
+ <script type="text/javascript" src="../../bslib/js/bootstrap-datetimepicker.js"></script>
+ <title>派工</title>
+</head>
+<body>
+ <audio src="../../bslib/media/urgency.mp3" loop="loop" hidden class="hidden" id="urgency"></audio>
+ <!-- 任务单详情 -->
+ <div class="panel panel-default" id="wo_detail" dropzone="move">
+  <div class="panel-heading">任务单详情<button type="button" class="close closeit" aria-hidden="true" onclick="$('#wo_detail').hide();">&times;</button></div>
+  <div class="panel-body">
+   <div class="container-fluid">
+    <div class="form-horizontal" role="form" id="wo_detail_save">
+     <div class="form-group">
+      <span class="col-sm-2 control-label nogap-right nogap-left">车牌号码：</span>
+      <div class="col-sm-4 nogap-left">
+       <input class="form-control" id="wo_detail_plate" value="粤B.VX325">
+      </div>
+      <span class="col-sm-2 control-label nogap-right nogap-left">联系人：</span>
+      <div class="col-sm-4 nogap-left">
+       <input class="form-control" value="张三">
+      </div>
+     </div>
+     <div class="form-group">
+      <span class="col-sm-2 control-label nogap-right nogap-left">联系电话：</span>
+      <div class="col-sm-4 nogap-left">
+       <input class="form-control" value="18588416137">
+      </div>
+      <span class="col-sm-2 control-label nogap-right nogap-left">预约时间：</span>
+      <div class="col-sm-4 nogap-left">
+       <input class="form-control form_datetime" value="2014-12-18 20:10">
+      </div>
+     </div>
+     <div class="form-group">
+      <span class="col-sm-2 control-label nogap-right nogap-left">预约地点：</span>
+      <div class="col-sm-10 nogap-left">
+       <input class="form-control" value="西乡街道荔园路与107国道交汇处">
+      </div>
+     </div>
+     <div class="form-group">
+      <span class="col-sm-2 control-label nogap-right nogap-left">电工：</span>
+      <div class="col-sm-4 nogap-left">
+       <input type="text" class="form-control" id="wman">
+      </div>
+      <span class="col-sm-2 control-label nogap-right nogap-left">出工时间：</span>
+      <div class="col-sm-4 nogap-left">
+       <input type="text" class="form-control form_datetime" placeholder="" value="2014-12-19 08:59">
+      </div>
+     </div>
+     <div class="form-group">
+      <span class="col-sm-2 control-label nogap-right nogap-left">备注：</span>
+      <div class="col-sm-10 nogap-left">
+       <input type="text" class="form-control" placeholder="">
+      </div>
+     </div>
+     <div class="form-group">
+      <span class="col-sm-2 control-label nogap-right nogap-left">完工时间：</span>
+      <div class="col-sm-4 nogap-left">
+       <input type="text" class="form-control form_datetime" placeholder="" value="2014-12-19 08:59">
+      </div>
+      <div class="col-sm-1"></div>
+      <div class="col-sm-2">
+       <input type="button" class="btn btn-default" value="取消"  onclick="$('#wo_detail').hide();$('#wowaitting .selected').removeClass('selected');">
+      </div>
+      <div class="col-sm-2">
+       <input type="button" class="btn btn-primary" value="保存">
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+
+ <!-- 电工右键菜单 -->
+ <div id="wlist_contextmenu" class="dropdown" style="position: absolute; z-index: 10;">
+  <a id="wlist_contextmenu_link" href="javascript:" class="dropdown-toggle hidden" data-toggle="dropdown"></a>
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+   <li role="presentation" id="pg"><a role="menuitem" href="javascript:;">派工</a></li>
+   <li role="presentation" id="rwd"><a role="menuitem" href="javascript:;">任务单</a></li>
+   <li role="presentation" class="divider"></li>
+   <li role="presentation" id="zb"><a role="menuitem" href="javascript:;">值班</a></li>
+   <li role="presentation" id="xx"><a role="menuitem" href="javascript:;">休息</a></li>
+  </ul>
+ </div>
+
+ <!-- 总体 -->
+ <div id="main_panel" class="body-panel">
+  <!-- 左 -->
+  <div id="left_panel">
+   <div class="panel panel-default">
+    <div class="panel-heading">电工</div>
+    <div class="panel-body" style="overflow:auto;height:423px;">
+     <ul class="list-group tree" id="w_tree" >
+      <li class='list-group-item noborder'><i class='glyphicon glyphicon-chevron-up'></i> <span>分公司一</span>
+       <ul class="list-group">
+        <li class='list-group-item noborder'><i class='glyphicon glyphicon-chevron-up'></i> <span>营业处一</span>
+         <ul class="list-group">
+          <li class='list-group-item noborder leaf' wman="张三"><u class='glyphicon glyphicon-user' style="color: green;"></u> <span class="btn-default">张三 <span class="badge">5</span></span></li>
+          <li class='list-group-item noborder leaf' wman="李四"><u class='glyphicon glyphicon-user' style="color: gray;"></u> <span class="btn-default">李四 <span class="badge">99</span></span></li>
+          <li class='list-group-item noborder leaf'><u class='glyphicon glyphicon-user' style="color: gray;"></u> <span class="btn-default">李四 <span class="badge">99</span></span></li>
+          <li class='list-group-item noborder leaf'><u class='glyphicon glyphicon-user' style="color: gray;"></u> <span class="btn-default">李四 <span class="badge">99</span></span></li>
+          <li class='list-group-item noborder leaf'><u class='glyphicon glyphicon-user' style="color: gray;"></u> <span class="btn-default">李四 <span class="badge">99</span></span></li>
+          <li class='list-group-item noborder leaf'><u class='glyphicon glyphicon-user' style="color: gray;"></u> <span class="btn-default">李四 <span class="badge">99</span></span></li>
+         </ul>
+        </li>
+        <li class='list-group-item noborder'><i class='glyphicon glyphicon-chevron-up'></i> <span>营业处二</span>
+         <ul class="list-group">
+          <li class='list-group-item noborder leaf' wman="张三"><u class='glyphicon glyphicon-user' style="color: green;"></u> <span class="btn-default">张三 <span class="badge">5</span></span></li>
+          <li class='list-group-item noborder leaf' wman="李四"><u class='glyphicon glyphicon-user' style="color: gray;"></u> <span class="btn-default">李四 <span class="badge">99</span></span></li>
+          <li class='list-group-item noborder leaf'><u class='glyphicon glyphicon-user' style="color: gray;"></u> <span class="btn-default">李四 <span class="badge">99</span></span></li>
+          <li class='list-group-item noborder leaf'><u class='glyphicon glyphicon-user' style="color: gray;"></u> <span class="btn-default">李四 <span class="badge">99</span></span></li>
+          <li class='list-group-item noborder leaf'><u class='glyphicon glyphicon-user' style="color: gray;"></u> <span class="btn-default">李四 <span class="badge">99</span></span></li>
+          <li class='list-group-item noborder leaf'><u class='glyphicon glyphicon-user' style="color: gray;"></u> <span class="btn-default">李四 <span class="badge">99</span></span></li>
+         </ul>
+        </li>
+       </ul>
+      </li>
+      <li class='list-group-item noborder'><i class='glyphicon glyphicon-chevron-right'></i> <span>分公司二</span></li>
+     </ul>
+    </div>
+   </div>
+   <div class="panel panel-default" id="wowaitting">
+    <div class="panel-heading">分配任务<button type="button" class="close closeit" aria-hidden="true" onclick="" title="新增任务单">+</button></div>
+    <div class="panel-body">
+     <span class="nobreak red">粤B.VX325</span>
+     <span class="nobreak">粤B.VX324321</span>
+     <span class="nobreak">粤B.VX323</span>
+     <span class="nobreak">粤B.VX326</span>
+     <span class="nobreak">粤B.VX326</span>
+     <span class="nobreak">粤B.VX326</span>
+     <span class="nobreak">粤B.VX326</span>
+    </div>
+   </div>
+  </div>
+  <!-- 右 -->
+  <div id="right_panel">
+   <ul class="nav nav-tabs hidden" role="tablist">
+    <li role="presentation" class="active"><a href="#wolist_search" role="tab" data-toggle="tab" id="wolist_search_link"></a></li>
+    <li role="presentation" class=""><a href="#wolist_temp" role="tab" data-toggle="tab" id="wolist_temp_link"></a></li>
+   </ul>
+   <div class="tab-content">
+    <div role="tabpanel" class="tab-pane fade in active" id="wolist_search">
+     <div class="panel panel-default nogap-bottom">
+      <div class="panel-heading">任务单列表</div>
+      <div class="panel-body" id="wolist_panel">
+<!--       <div class="row" style="margin-bottom: 15px;">
+       <div class="container-fluid">
+        <div class="col-xs-5">
+         <div class="input-group">
+          <span class="input-group-addon">开始日期：</span>
+          <input type="text" class="form-control form_datetime" placeholder="请输入开始日期">
+         </div>
+        </div>
+        <div class="col-xs-5">
+         <div class="input-group">
+          <span class="input-group-addon">结束日期：</span>
+          <input type="text" class="form-control form_datetime" placeholder="请输入结束日期">
+         </div>
+        </div>
+        <div class="col-xs-2"><button class="btn btn-default">查询</button></div>
+       </div>
+      </div> -->
+      <div class="row">
+       <div class="container-fluid">
+        <div style="overflow-y: auto;">
+         <table class="table table-striped table-hover nobreak" id="wolist_table">
+          <thead>
+           <tr>
+            <th style="text-align: center;">车牌号码</th>
+            <th style="text-align: center;">联系人</th>
+            <th style="text-align: center;">联系电话</th>
+            <th style="text-align: center;">预约时间</th>
+            <th style="text-align: center;">预约地点</th>
+            <th style="text-align: center;">报障内容</th>
+            <th style="text-align: center;">电工</th>
+            <th style="text-align: center;">出工时间</th>
+            <th style="text-align: center;">完工时间</th>
+            <th style="text-align: center;">备注</th>
+           </tr>
+          </thead>
+          <tbody>
+           <tr><td>粤B.VX325</td><td>戴秀球</td><td>13923402773</td><td>2014-12-18</td><td>西乡街道荔园路与107国道交汇处</td><td>T过电正常</td><td>钟岳南</td><td>2012-12-18 17:50</td><td>2012-12-18 17:51</td><td>无</td></tr>
+           <tr><td>粤B.VX325</td><td>戴秀球</td><td>13923402773</td><td>2014-12-18</td><td>西乡街道荔园路与107国道交汇处</td><td>T过电正常</td><td>钟岳南</td><td>2012-12-18 17:50</td><td>2012-12-18 17:51</td><td>无</td></tr>
+           <tr><td>粤B.VX325</td><td>戴秀球</td><td>13923402773</td><td>2014-12-18</td><td>西乡街道荔园路与107国道交汇处</td><td>T过电正常</td><td>钟岳南</td><td>2012-12-18 17:50</td><td>2012-12-18 17:51</td><td>无</td></tr>
+           <tr><td>粤B.VX325</td><td>戴秀球</td><td>13923402773</td><td>2014-12-18</td><td>西乡街道荔园路与107国道交汇处</td><td>T过电正常</td><td>钟岳南</td><td>2012-12-18 17:50</td><td>2012-12-18 17:51</td><td>无</td></tr>
+           <tr class="completed" title="已完成"><td>粤B.VX325</td><td>戴秀球</td><td>13923402773</td><td>2014-12-18</td><td>西乡街道荔园路与107国道交汇处</td><td>T过电正常</td><td>钟岳南</td><td>2012-12-18 17:50</td><td>2012-12-18 17:51</td><td>无</td></tr>
+           <tr class="completed" title="已完成"><td>粤B.VX325</td><td>戴秀球</td><td>13923402773</td><td>2014-12-18</td><td>西乡街道荔园路与107国道交汇处</td><td>T过电正常</td><td>钟岳南</td><td>2012-12-18 17:50</td><td>2012-12-18 17:51</td><td>无</td></tr>
+           <tr class="completed" title="已完成"><td>粤B.VX325</td><td>戴秀球</td><td>13923402773</td><td>2014-12-18</td><td>西乡街道荔园路与107国道交汇处</td><td>T过电正常</td><td>钟岳南</td><td>2012-12-18 17:50</td><td>2012-12-18 17:51</td><td>无</td></tr>
+           <tr class="completed" title="已完成"><td>粤B.VX325</td><td>戴秀球</td><td>13923402773</td><td>2014-12-18</td><td>西乡街道荔园路与107国道交汇处</td><td>T过电正常</td><td>钟岳南</td><td>2012-12-18 17:50</td><td>2012-12-18 17:51</td><td>无</td></tr>
+          </tbody>
+         </table>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div role="tabpanel" class="tab-pane fade" id="wolist_temp">
+    <div class="panel panel-default nogap-bottom">
+     <div class="panel-heading">[ <span id="wolist_temp_wname"></span> ] 任务列表<button type="button" class="close closeit" aria-hidden="true" onclick="$('#wolist_search_link').tab('show');">&times;</button></div>
+     <div class="panel-body">
+      <div class="row">
+       <div class="container-fluid">
+        <div style="overflow-y: auto;">
+         <table class="table table-striped table-hover nobreak" id="wolist_table">
+          <thead>
+           <tr>
+            <th style="text-align: center;">车牌号码</th>
+            <th style="text-align: center;">联系人</th>
+            <th style="text-align: center;">联系电话</th>
+            <th style="text-align: center;">预约时间</th>
+            <th style="text-align: center;">预约地点</th>
+            <th style="text-align: center;">报障内容</th>
+            <th style="text-align: center;">出工时间</th>
+            <th style="text-align: center;">完工时间</th>
+            <th style="text-align: center;">备注</th>
+           </tr>
+          </thead>
+          <tbody>
+           <tr><td>粤B.VX325</td><td>戴秀球</td><td>13923402773</td><td>2014-12-18</td><td>钟岳南</td><td>T过电正常</td><td>2012-12-18 17:50</td><td>2012-12-18 17:51</td><td>无</td></tr>
+           <tr class="green"><td>粤B.VX325</td><td>戴秀球</td><td>13923402773</td><td>2014-12-18</td><td>钟岳南</td><td>T过电正常</td><td>2012-12-18 17:50</td><td>2012-12-18 17:51</td><td>无</td></tr>
+           <tr class="completed" title="已完成"><td>粤B.VX325</td><td>戴秀球</td><td>13923402773</td><td>2014-12-18</td><td>钟岳南</td><td>T过电正常</td><td>2012-12-18 17:50</td><td>2012-12-18 17:51</td><td>无</td></tr>
+          </tbody>
+         </table>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+</body>
+<script type="text/javascript">
+$.fn.datetimepicker.dates['zh'] = {
+ days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+ daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+ daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+ months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+ monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+ meridiem : [ "上午", "下午" ],
+ today : "今天"
+};
+$(".form_datetime").datetimepicker({
+ language : "zh",
+ autoclose : 1,
+ minView: "hour",
+ format : 'yyyy-mm-dd hh:ii'
+});
+
+/* 树的打开与关闭 */
+$(".tree").on("click", ".list-group-item>i", function(e) {
+ $(this).siblings("ul").slideToggle();
+ $(this).toggleClass("glyphicon-chevron-right").toggleClass("glyphicon-chevron-up");
+ e.preventDefault();
+ return false;
+});
+
+Util.noSelecterOnDblclick(document.getElementById("wolist_table"));
+Util.noSelecterOnDblclick($(".tree")[0]);
+//  <embed id="sound" src="msg.wav" width="42" height="35" hidden="true" autostart="false"></embed>
+// 如果是ie就直接写document.getElementById("sound").play()
+// 如果是mozilla-firefox就就把document.getElementById("sound").autostart=true;
+
+// $('#wolist_temp_link').tab('show');
+</script>
+</html>

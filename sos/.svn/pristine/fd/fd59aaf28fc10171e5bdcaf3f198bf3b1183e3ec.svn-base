@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+.fieldset {
+	background:#f2f2e6; 
+	padding:10px; 
+	border:1px solid #fff; 
+	border-color:#666661 #666661 #666661 #666661; 
+	margin-bottom:3px; 
+	width:600px;
+}
+
+.fieldset legend {
+	background:#bfbf30; 
+	color:#fff; 
+	font:17px/21px Calibri, Arial, Helvetica, sans-serif; 
+	padding:0 10px; 
+	font-weight:bold; 
+	border:1px solid #fff; 
+	border-color:#e5e5c3 #505014 #505014 #e5e5c3;
+}
+</style>
+</head>
+<body>
+	<form id='whs_borrow_return_form' method='post' >
+		<div class="form">
+			<fieldset>
+	            <legend>入库数据</legend>
+	            <div>
+	                <label>经办人:</label>
+	                <select size="1" name="managersId" id="managersId" required="true"  autocomplete="on">
+	                    <option value="">--请选择--</option>
+	                </select>
+	            </div>
+	            <div>    
+	                <label>归还仓库:</label>
+	                <select size="1" name="inWhsId" id="inWhsId"  required="true"  autocomplete="on">
+	                    <option value="">--请选择--</option>
+	                </select>
+	            </div>
+	            <div>    
+	                <label>归还人:</label>
+	                <select size="1" name="returnId" id="returnId"  required="true"  autocomplete="on">
+	                    <option value="">--请选择--</option>
+	                </select>
+	            </div>
+	            <div>    
+	                <label>入库单号:</label>
+	                <input type='text' id="stockInNO" name='stockInNO' placeholder="只允许数字" required="true" pattern="^[+]?[1-9]+\d*$"  onkeyup="this.value=this.value.replace(/\D/g,'')" />
+	            </div>
+	            <div>                
+	                <label>入库日期:</label>
+	                <input type='date' id="stamp" name='stamp' required="true" style="width:315px;" />
+                </div>
+	            <div>    
+	                <label>备注:</label>
+	                <input type='text' id="remark" name='remark'  />
+	            </div>
+	        </fieldset>
+		</div>
+
+		<fieldset class='fieldset'>
+			<legend>归还明细</legend>
+			<div id="whs_borrow_return_grid" class="datagird"></div>
+		</fieldset>
+	</form>
+</body>
+<script type="text/javascript">
+	(function($){
+		//填充员工
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getOrgOperators',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}),
+		  success : function(data) {
+			  if(data){
+				  //alert(JSON.stringify(data));
+				  var managerId=$("#managersId");
+				  if(managerId ){
+					  $.each(data,function(k,v){
+						  managerId.append("<option value='" +v.opid+"'>" + v.opname+"</option>");
+ 				  }); 
+				  }
+				  
+				  var returnId=$("#returnId");
+				  if(returnId ){
+					  $.each(data,function(k,v){
+						  returnId.append("<option value='" +v.opid+"'>" + v.opname+"</option>");
+ 				  }); 
+				  }
+				 
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+		
+		//填充入库仓库
+	    $.ajax( {
+	 		  type : 'post', 
+	 		  //async: false,   
+	 		  contentType : 'application/json',     
+	 		  dataType : 'json',     
+	 		  url : '../../stock/findWareHouses',   
+	 		  data:JSON.stringify({}),
+	 		  success : function(data) {
+	 			  if(data){
+	 				  //alert(JSON.stringify(data));
+	 				  var inWhsId=$("#inWhsId");
+	 				  if(inWhsId){
+	 					  $.each(data,function(k,v){
+	 						  inWhsId.append("<option value='" +v.id+"'>" + v.name+"</option>");
+	     				  }); 
+	 				  }
+	 				 
+	 			  }else{
+	 				  $(document).sgPup({message:'message_info',text: data});
+	 			  }
+	 		  } ,     
+	 		  error : function(res,error) { 
+	 		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	 		  }    
+	 		});
+		
+	    $("#stamp").val(new Date().format('yyyy-MM-dd'));
+	 
+	})(jQuery)
+</script>
+</html>

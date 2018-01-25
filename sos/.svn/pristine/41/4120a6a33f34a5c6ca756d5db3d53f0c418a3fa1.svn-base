@@ -1,0 +1,8 @@
+#ldap
+LdapUser=Manager
+LdapPassword=secret
+Root=dc=chinagps,dc=com
+#LdapURL=ldap://90.0.12.31/
+
+LdapURL=ldap://202.105.139.94:1944/
+#LdapURL2=ldap://192.168.3.181/

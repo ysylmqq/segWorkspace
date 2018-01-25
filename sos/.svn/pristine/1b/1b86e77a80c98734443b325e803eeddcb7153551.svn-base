@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>备忘录提示</title>
+<style type="text/css">
+.form input[type=radio] {cursor:pointer; height:14px; }
+</style>
+</head>
+<body>
+	<form id='sys_memo_form' method='post' class="form" style="width:370px;">
+		<fieldset style="width:360px;">
+            <div class="panel">
+                <textarea id='sys_memo_remark' disabled="disabled" style="width:350px;height:90px;"></textarea>
+                <input type="hidden" name="sys_memo_id" id="sys_memo_id" />
+            </div>
+            <!-- 
+            <div class="panel" style="text-height:20px;">
+                <span style="width:60px;">不再提示:</span>
+                <input type="radio" name="isAlert" id="isAlertYes" value="0" />是&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="radio" name="isAlert" id="isAlertNo" value="1" checked="checked"  />否
+                
+            </div> 
+            -->
+        </fieldset>
+
+
+	</form>
+</body>
+<script type="text/javascript">
+	(function($){
+		$.ajax({
+	  		  type : 'post', 
+	  		  async: true,   
+	  		  contentType : 'application/json',     
+	  		  dataType : 'json',     
+	  		  url : 'sys/findUserRemarks', 
+	  		  data:JSON.stringify({pageNo:1,pageSize:1,filter:{isAlert:1}}),
+	  		  success : function(data) {
+	  			  if(data){
+	  				  if(data.items){
+	  					  $("#sys_memo_remark").val(data.items[0].content);
+	  					  $("#sys_memo_id").val(data.items[0].id);
+	  				  }
+	  			  }else{
+	  				  alert(data);
+	  			  }
+	  		  } ,     
+	  		  error : function(res,error) { 
+	  		  	 //alert("responseText="+res.responseText+";error="+error);     
+	  		  }    
+	  		});		   	
+		  
+	})(jQuery)
+</script>
+</html>

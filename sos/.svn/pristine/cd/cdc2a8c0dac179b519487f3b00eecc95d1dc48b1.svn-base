@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>海马绑定列表查询 </title>
+<link rel="stylesheet" type="text/css" href="../../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../../bslib/css/bootstrap-datetimepicker.css" /><!-- +++++ -->
+<link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../../css/sos.css">
+</head>
+<body>
+<div id="monitoring"><!-- nw_document_all -->
+ <div id="dgd_unit_innet" class="datagrid"></div>
+ <datalist id="companyDataList"></datalist>
+ </div>
+ <!-- 打印iframe -->
+<iframe id="ifm_print_stock_main" name="ifm_print_stock_main" style="display: none"></iframe>
+</body>
+<script type="text/javascript" src="../../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../../bslib/js/bootstrap-datetimepicker.js"></script><!-- ++++ -->
+<script type="text/javascript" src="../../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../../jscript/index.js"></script>
+<script type="text/javascript" src="../../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../../jscript/form.js"></script>
+<script type="text/javascript" src="../../../jscript/pup.js" ></script>
+<script type="text/javascript" src="../../../jscript/window.js"></script>
+<script type="text/javascript" src="../../../jscript/jquery.form.js"></script>
+<script type="text/javascript" src="../../../jscript/web/report/Tbox.js"></script>
+<script type="text/javascript">
+    var level='0';//判断用户是总部、分公司、营业处的人
+    (function($){
+        var companyDataList = null;
+        var lastMonthDay=new Date();//上个月的今天
+        //lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+        lastMonthDay.setDate(1);
+        lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+        var today=new Date().format('yyyy-MM-dd');
+        
+          //修改表格的宽度
+        var height =$('#main_bd',window.parent.document).height()-288;
+        var startDateHTML = '<span class="ltext" style="width:80px;"><input type="text" name="scan_start" id="scan_start" style="width:80px;" class="form-control form_datetime" value='+today+' /></span>';//扫描开始日期
+        var endDateHTML = '<span class="ltext" style="width:14px;">---</span><span class="ltext" style="width:80px;"><input type="text" name="scan_end" id="scan_end" style="width:80px;" class="form-control form_datetime" value='+today+' /></span>';//扫描结束日期
+        var syncStartDateHTML = '<span class="ltext" style="width:80px;"><input type="text" name="stamp_start" id="stamp_start" style="width:80px;" class="form-control form_datetime" value='+today+' /></span>';//同步开始日期
+        var syncEndDateHTML = '<span class="ltext" style="width:14px;">---</span><span class="ltext" style="width:80px;"><input type="text" name="stamp_end" style="width:80px;" id="stamp_end" class="form-control form_datetime" value='+today+' /></span>';//同步结束日期
+        //初始化表格
+         var defaults = {
+             title: "海马绑定列表查询 ",
+             width:  '100%',
+             fitColumn:  true,
+             height: height,
+             //url: '../../unit/findBoundInNets',
+             url:'',
+             usepager: true,
+             rownumbers:true,
+             useRp: true,
+             colid:'id',  //主键
+             colModel : [
+                 {display: '呼号', name : 'call_letter', width:'90px',sortable : false},
+                 {display: 'IMEI', name : 'imei', width:'120px',sortable : false},
+                 {display: '条码', name : 'barcode', width:'150px',sortable : false},
+                 {display: 'VIN码', name : 'vin',width:'150px', sortable : false},
+                 {display: '车型', name : 'vehicle_type', width:'100px',sortable : false},
+                 {display: '工厂扫描时间', name : 'scan_time', width:'100px',sortable : false},
+                 {display: '同步时间', name : 'stamp',width:'100px',sortable : false}
+             ],
+             buttons : [
+								//{name: '下载模板',bclass : 'download',onpress : downFile},
+								//{name: '导入海马续费表',bclass : 'import',onpress : importItem}
+             ],
+             searchitems :[
+                 {display:'扫描日期',html:startDateHTML+endDateHTML},
+                 {display:'同步日期',html:syncStartDateHTML+syncEndDateHTML},
+                 {html:'<span class="ltext"><input type="hidden" name="subcoNo" id="subcoNo" value="201"/><input type="hidden" name="cdate_table" id="cdate_table" value="2"/></span>'},
+                 /*{display:null,html:"<div class='pGroup1' style='padding-top: 6px; display:inline;'><a type='button' class='button' href='../../../bound/exportExcelHmTBoxServerExpire' ><span class='button_span'><span>导出服务期满的客户列表</span></span></a></div>&nbsp"}*/
+             ],
+             query:{ subcoNo:201},
+             exporturl:'../../../bound/exportExcelHmBoundInNets',//导出海马绑定列表excel
+						 exporturl2:'../../../bound/exportExcelHmTBoxServerExpire',
+         };
+         $('#dgd_unit_innet').sgDatagrid(defaults); 
+         
+         //重新赋值url
+         var settings =  $('#dgd_unit_innet').data('sgDatagrid');
+         settings.url='../../../bound/findHmBoundInNets';
+         $('#dgd_unit_innet').data('sgDatagrid',settings);
+         
+    })(jQuery)
+</script>
+<script type="text/javascript">
+$.fn.datetimepicker.dates['zh'] = {
+    days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+    daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+    daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+    months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+    monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+    meridiem : [ "上午", "下午" ],
+    today : "今天"
+};
+$(document).ready(function(){
+    $(".hDiv-header-inner,#dgd_unit_innet_tbl").css("width","1000px");
+    $(".form_datetime").datetimepicker({
+        language : "zh",
+        autoclose: true,
+        minView: "month",
+        format : 'yyyy-mm-dd'
+    });
+    
+});
+$(function(){
+	var second_p=$(".sDiv .pGroup").eq(3);
+	second_p.after("<div class='pGroup'><a type='button' class='button' href='../../../bound/exportExcelHmTBoxServerExpire'>"+"<span>导出服务期满的客户列表</span></a></div>");
+	$("th[axis=checkbox]").remove();
+
+});
+$(".button_span").click(function(){
+	var scan_start = $("#scan_start");
+	var scan_end = $("#scan_end");
+	var stamp_start = $("#stamp_start");
+	var stamp_end = $("#stamp_end");
+	if(scan_start.val()==""&&scan_end.val()!=""){
+		alert("请输入扫描开始日期!");
+		return false;
+	}
+	if(scan_start.val()!=""&&scan_end.val()==""){
+		alert("请输入扫描结束日期!");
+		return false;
+	}
+	if(stamp_start.val()==""&&stamp_end.val()!=""){
+		alert("请输入同步开始日期!");
+		return false;
+	}
+	if(stamp_start.val()!=""&&stamp_end.val()==""){
+		alert("请输入同步结束日期!");
+		return false;
+	}
+});
+</script>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>销售明细页面</title>
+<style type="text/css">
+progress {
+    display: inline-block;
+    width: 160px;
+    height: 20px;
+    border: 1px solid #0064B4;  
+    background-color:red;
+    color: #0064B4; /*IE10*/
+}
+/*ie6-ie9*/
+progress ie {
+    display:block;
+    height: 100%;
+    background: #0064B4;
+}
+
+progress::-moz-progress-bar { background: #0064B4; }
+progress::-webkit-progress-bar { background: #e6e6e6; }
+progress::-webkit-progress-value  { background: red; }
+
+.myprogress::-webkit-progress-value {background:blue;}
+</style>
+</head>
+<body>
+<form id='writeOff_add_form' method='post' class="form" style="width:100%" >
+	<fieldset style="width:840px;">
+		<div class='submit' style="text-align:left;">
+            	<span style="width:30px;">年月:</span>
+                <input type='month' id="stamp" name='stamp' style="width:165px;" />
+                <button id="stockin_detail_submit" type="submit"  >查找</button>
+                <span style="widht:100px;"></span>
+               <span style="width:60px;padding-right:0px;"> 图例：</span><progress max="100" value="100" style="width:40px;margin-left:20px;"></progress> 年度
+        	<progress class="myprogress" max="100" value="100" style="width:40px;margin-left:20px;"></progress> 月度
+        </div>
+
+	</fieldset>
+	<hr>
+	<fieldset  style="width:840px;">
+		<div class="panel">
+        	<progress max="1000" value="600" style="width:600px;margin-left:100px;"></progress> 600/1000　（60%）
+        	<br/>
+        	深圳分公司：
+        	<br/>
+        	<progress class="myprogress" max="300" value="200" style="width:300px;margin-left:100px;"></progress> 200/300　（67%）
+        </div>
+        <hr>
+        <div class="panel">
+        	<progress max="1000" value="500" style="width:600px;margin-left:100px;"></progress> 500/1000　（50%）
+        	<br/>
+        	湖南分公司：
+        	<br/>
+        	<progress class="myprogress" max="300" value="240" style="width:300px;margin-left:100px;"></progress> 240/300　（80%）
+        </div>
+        <hr>
+        <div class="panel">
+        	<progress max="1000" value="350" style="width:600px;margin-left:100px;"></progress> 350/1000　（35%）
+        	<br/>
+        	湖北分公司：
+        	<br/>
+        	<progress class="myprogress" max="300" value="180" style="width:300px;margin-left:100px;"></progress> 180/300　（60%）
+        </div>
+	</fieldset>
+
+</form>
+</body>
+</html>

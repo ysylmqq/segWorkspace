@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>UBI资料导入</title>
+</head>
+<body>
+	<form id="ubi_import" method="post" class="form" name="ubi_import"  action="../../../preload/importCVFile" target="import_ubi" enctype="multipart/form-data">
+		<div class="form">
+			<fieldset style="width: 270px;">
+				<div class="panel" >
+					<div class="row">
+		                <span class="col-xs-3">选择文件:</span>
+		                <span class="col-xs-9">
+		                	<input type='file' id='cv_file' name='cv_file' style="width:100%;" />
+		                </span>
+		            </div>
+	           	</div>
+			</fieldset>
+		</div>
+	</form>
+</body>
+<script type="text/javascript">
+
+function callback(msg,flag){   
+	if(msg.indexOf('覆盖')>0){
+		rm({text: msg,cfn:function(r){
+			if(r){
+				//再次提交	
+				$('input[type=submit]','#ubi_import').trigger('click');
+			}else{//取消
+				//移除遮罩层
+				$('div#imp_mask',window.document.body).remove();
+			}
+		}});
+	}else{
+		$(document).sgPup({message:'message_info',text: msg});
+	}
+//	if(flag) {
+		 //移除遮罩层
+		 $('div#imp_mask',window.document.body).remove();
+		 $(document).sgWindow('close',{id:'import_ubi'});
+		 $('#ubi_datagrid').sgDatagrid('reload','sgDatagrid');
+//	}
+}   
+</script>
+</html>

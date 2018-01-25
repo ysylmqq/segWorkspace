@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+       
+</head>
+<body>
+    <div id="news_list" class="datagrid"></div>
+</body>
+
+<script type="text/javascript">
+(function($){
+	
+	
+	function GetDateStr(AddDayCount) {
+	    var dd = new Date();
+	    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+	    return dd.format('yyyy-MM-dd');
+	}
+	
+	
+	var winClose = function() {
+		$(document).sgWindow('close', {
+			id : 'add_unitType'
+		});
+	}
+	
+	var winClose3 = function() {
+		$(document).sgWindow('close', {
+			id : 'news_view'
+		});
+	}
+	
+	var winClose_edit = function() {
+		$(document).sgWindow('close', {
+			id : 'news_edit'
+		});
+	}
+	
+	
+
+	var loadSuccess = function(){
+ 		//填充编辑前的值
+ 		   if(editId && editObj){
+ 			   
+ 			  /*  var address='';
+ 			  
+ 			    $.ajax( {
+ 					  type : 'POST', 
+ 					  async: false,   
+ 					  url : "../../news/getAddress",   
+ 					  data:{},
+ 					  success : function(data) {
+ 						  if(data){
+ 							 address = data;
+ 						  }
+ 					  } 
+ 				}); */
+ 			  	  var content ="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+				  $("#title",$("#news_view_form")).text(editObj.title);
+				  $("#new_origin",$("#news_view_form")).text(editObj.new_origin);
+				  $("#add_time",$("#news_view_form")).text(editObj.add_time);
+				  
+				  $("#content",$("#news_view_form")).html(content + editObj.content);
+				  $('#img_little','#news_view_form').attr("src",editObj.img_little); 
+				  $('#img_large','#news_view_form').attr("src",editObj.img_large); 
+				  
+				  
+				//填充协议
+					var abc = $('#image','#news_view_form');
+				    $.ajax( {
+					  type : 'post', 
+					  async: false,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../news/getNewsImages',   
+					  data : JSON.stringify({
+			    			id : editObj.id
+			    		}),
+					  success : function(data) {
+						  if(data){
+							  if(abc){
+								  $.each(data,function(k,v){
+									  /* protocol_id.append("<option value='" +v.valueId+"'>" + v.sname+"</option>"); */
+									   abc.append("<img src='" +v.src+"'><br/>"); 
+									 /*  abc.append("<img src='../../images/footer_bg.png'><br/>" ); */
+								  }); 
+							  }
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	 alert("responseText="+res.responseText+";error="+error);     
+					  }    
+					});
+				    
+				  
+				  
+ 		   }
+ 		  editId=null;
+ 		 editObj=null; 
+ 		  
+ 	   }
+	
+	
+	var loadSuccess_edit = function(){
+ 		//填充编辑前的值
+ 		   if(editId && editObj){
+ 				  $("#id",$("#news_edit_form")).val(editObj.id);
+				  $("#title",$("#news_edit_form")).val(editObj.title);
+				  $("#content",$("#news_edit_form")).val(editObj.content);
+				  $("#is_top",$("#news_edit_form")).val("0");
+				  
+				  if(editObj.is_top){
+					  $("#is_top",$("#news_edit_form")).val("1");
+				  }
+				  
+				  if(editObj.content != null && editObj.content.length >0){
+					  var sum = 500 - parseInt(editObj.content.length);  
+					  $("#remLen",$("#news_edit_form")).val(sum);
+				  }
+				  $("#new_origin",$("#news_edit_form")).val(editObj.new_origin);
+ 		   }
+ 		  editId=null;
+ 		 editObj=null; 
+ 		  
+ 	   }
+
+	
+    var viewItem = function() {
+	 	var obj = $('#news_list');
+        var bDiv = $('.bDiv',obj);
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            $(document).sgPup({message:'message_info',text: "只能选择一条记录！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+        	 $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){  
+	                	editId=this.value;
+	                	editObj=$(this).data('data');
+		    			var defaults = {
+		    				title : '资讯查看',
+		    				id : 'news_view',
+		    				form : 'news_view_form',
+		    				url : 'news_view.html',
+		    				success: loadSuccess,
+		    				width : 700,
+		    				height : 400,
+		    				buttons : [ {
+		    					name : '关闭',
+		    					onpress : winClose3
+		    				} ]
+		    			};
+		    			$(document).sgWindow(defaults);
+	                }
+	            });
+   }else{
+	   $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+    }
+	
+}
+    
+    
+    var addItem = function(){
+    	var defaults = {
+   			title : '新增',
+   			id : 'add_unitType',
+   			form : 'unittype_add_form',
+   			url : 'unittype_add.html',
+   			width : 500,
+   			height : 160,
+   			buttons : [ {
+   				name : '保存',
+   				type : 'submit',
+   			    onpress : save
+   			}, {
+   				name : '关闭',
+   				onpress : winClose
+   			} ]
+   		};
+   		$(document).sgWindow(defaults);
+    }
+    
+    
+    var checkItem = function(){
+        var obj = $('#news_list');
+        var bDiv = $('.bDiv',obj);
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+       	 $(document).sgConfirm({text: '确定审核该资讯吗?',cfn:function(r){ 
+		    if(r){
+     		var flag = false;
+     		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){    
+	                	editId=this.value;
+	                	editobj = $(this).data('data');
+	                		var pids=[];
+	                		pids.push(editobj.id);
+		                	//打开窗口
+		                	$.ajax( {
+           					  type : 'post', 
+			            		  async: false,   
+			            		  dataType : 'json',     
+			            		  url : '../../news/operateNews',   
+			            		  data:{ids:pids,type:1},
+			            		  success : function(data) {
+			            			  if(data){
+			            				 if(data.success){
+			            					 $(document).sgPup({message:'message_info',text: "操作成功！"});
+			            				 }else{
+			            					 $(document).sgPup({message:'message_info',text: "操作失败！"});
+			            				 }
+			            			  }
+			            		  } ,     
+			            		  error : function(res,error) { 
+			            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			            		  }    
+			            		}); 
+	                }
+	            });
+     		$('#news_list').sgDatagrid('reload','sgDatagrid');
+     	}	
+     	 }});
+       	 
+        }
+    }
+    
+    
+
+    var editItem = function() {
+    	 	var obj = $('#news_list');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "只能选择一条记录！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	        	 $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){  
+		                	editId=this.value;
+		                	editObj=$(this).data('data');
+			    			var defaults = {
+			    				title : '编辑',
+			    				id : 'news_edit',
+			    				form : 'news_edit_form',
+			    				url : 'news_edit.html',
+			    				success: loadSuccess_edit,
+			    				width : 650,
+			    				height : 280,
+			    				buttons : [ {
+			    	   				name : '保存',
+			    	   				type : 'submit',
+			    	   			    onpress : save
+			    	   			},{
+			    					name : '关闭',
+			    					onpress : winClose_edit
+			    				} ]
+			    			};
+			    			$(document).sgWindow(defaults);
+		                }
+		            });
+	   }else{
+		   $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	    }
+    	
+	}
+    
+    
+	 var deleteItem = function(){
+	        var obj = $('#news_list');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else{
+	        	 $(document).sgConfirm({text: '确定删除吗?',cfn:function(r){ 
+	    		   if(r){
+	        		var flag = false;
+	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){    
+		                	editId=this.value;
+		                	editobj = $(this).data('data');
+		                		var ids=[];
+		                		ids.push(editId);
+			                	//打开窗口
+			                	$.ajax( {
+				            		  type : 'post', 
+				            		  async: false,   
+				            		  contentType : 'application/json',     
+				            		  dataType : 'json',     
+				            		  url : '../../news/delete',   
+				            		  data:JSON.stringify(ids),
+				            		  success : function(data) {
+				            			  if(data){
+				            				 if(data.success){
+				    	          		 		flag = true; 
+				            				 }else{
+				            					flag = false; 
+				            				 }
+				            			  }
+				            		  } ,     
+				            		  error : function(res,error) { 
+				            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				            		  }    
+				            		}); 
+		                	
+		                }
+		            });
+	        		if(flag){
+	        			$(document).sgPup({message:'message_info',text: "删除成功！"});
+	        		}else{
+	        			//$(document).sgPup({message:'message_info',text: "删除不成功！"});
+	        		}
+	        		$('#news_list').sgDatagrid('reload','sgDatagrid');
+	        	}	
+	        	
+	        }});
+	        }
+	    }
+    
+
+    function save() {
+    	 var url = 	'../../news/update';
+    	$.ajax({
+    		type : 'post',
+    		async : false,
+    		contentType : 'application/json',
+    		dataType : 'json',
+    		url : url,
+    		data : JSON.stringify({
+    			id : $('#id', '#news_edit_form').val(),
+    			title : $('#title', '#news_edit_form').val(),
+    			content : $('#content', '#news_edit_form').val(),
+    			is_top : $('#is_top', '#news_edit_form').val(),
+    			new_origin : $('#new_origin', '#news_edit_form').val()
+    		}),
+    		success : function(data) {
+    			if (data) {
+    				if (data.success) {
+    					 $(document).sgWindow('close',{id:'news_edit'});
+    					 $('#news_list').sgDatagrid('reload','sgDatagrid');
+    				}
+    				 $(document).sgPup({message:'message_info',text: data.msg});
+    			}
+    		},
+    		error : function(res, error) {
+    			alert("responseText=" + res.responseText
+    					+ ";error=" + error);
+    		}
+    	});
+    	$('#news_edit_form').unbind();//以下两行可以阻止提交2次
+    	return false;
+    }
+    
+
+	   
+	 	   
+	 	   
+    var today = new Date().format('yyyy-MM-dd');
+    var twoDayBefore = GetDateStr(-2);
+
+    var defaults = {
+        title: "资讯管理",
+        width:  970,
+        height: 395,
+        url: '../../news/findNewsByPage',
+        datatype:"json",
+        usepager: true,
+	    rownumbers:true,
+        useRp: true,
+        colid:'id',  //主键
+        colModel : [
+			{display: '资讯标题', name : 'title', width : 130, formatter:function(value,row){
+				if(value.length >16){
+			        value = value.substr(0,10)+"...";
+			    }else{
+			    	value = value;
+			    }
+			    return value;
+			}},
+            {display: '资讯来源', name : 'new_origin', width : 100},
+			{display: '是否置顶', name : 'is_top', width : 60, formatter:function(value,row){
+				if(value==1){
+                    value = "是";
+                }else{
+                	value = "否";
+                }
+                return value;
+            }},
+            {display: '状态', name : 'state', width : 80, formatter:function(value,row){
+				if(value==0){
+                    value = "待审";
+                }else{
+                	value = "已审";
+                }
+                return value;
+            }},
+			{display: '发布者', name : 'op_name', width : 80},
+			{display: '发布时间', name : 'add_time', width : 120}
+        ],
+        
+        buttons : [
+			{name: '查看', bclass: 'view', onpress : viewItem},
+			{separator: true},      
+			{name: '编辑', bclass: 'edit', onpress : editItem},
+			{separator: true},
+			{name: '审核', bclass: 'check', onpress : checkItem},
+	        {separator: true},
+			{name: '删除', bclass: 'delete', onpress : deleteItem},
+	        {separator: true}
+			/*
+			{name: '转单', bclass: 'add', onpress : shiftItem},
+			{separator: true},
+          
+            {name: '工单结束', bclass: 'add', onpress : endItem},
+            {separator: true} */
+        ],
+        searchitems :[
+            {display:'资讯标题',name:'title',type:'text',width:'120'},
+            {display:'资讯状态',name:'state',html:'<select style="width:120px"  name="state"><option value="" selected>请选择...</option><option value="0">未审核</option><option value="1">已审核</option></select>'},
+            {display:'开始时间',name:'startDate',type:'date',width:'120px',value:twoDayBefore},
+	      	{display:'结束时间',name:'endDate',type:'date',width:'140px',value:today}
+        ],
+        sortname: "id",
+        sortorder: "desc"
+    };
+    
+    $('#news_list').sgDatagrid(defaults);
+    
+    
+    
+    
+    
+})(jQuery);
+
+
+
+
+</script>
+</html>

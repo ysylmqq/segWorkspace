@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>派工单</title>
+<style>
+
+</style>
+</head>
+<body>
+	<form id='dispathch_police' method='post' class="form" style="width:690px;">
+		<fieldset style="width:850px;">
+					<div class="panel">
+		                <span>工单号:</span>
+		                <input type='text' id="billnum" name='billnum'  style="width:200px;" disabled="disabled"/>
+		                 <input type='hidden' id="taskId" name='taskId'  />
+                   <input type='hidden' id="reservation_id" name='reservation_id'  />
+		            </div>
+		            <div class="panel">
+		                <span>客户姓名:</span>
+		                <input type='text' id="customerName" name='customerName' required="true"  list="customerList"  style="width:200px;" />
+		                <input type="hidden" name="customerId" id="customerId" required="true" value="" />
+		                <datalist id='customerList'></datalist>
+		                <span style="padding-left:50px;">联系电话:</span>
+		                <input type='text' id="phone" name='phone'  style="width:200px;" />
+		            </div>
+		            <div class="panel">
+		                <span>车牌号:</span>
+		                <input type='text' id="car_num" name='car_num'  style="width:200px;" />
+		                <input type='hidden' id="vehicleId" name='vehicleId'  style="width:200px;" />
+		                
+		                <span style="padding-left:50px;">产品型号:</span>
+		                <input type='text' id="code" name='code'  style="width:200px;" />
+		            </div>
+		            <div class="panel">    
+		                <span>车型:</span>
+		                <input type='text' id="cartype_name" name='cartype_name'   list="carTypeList" style="width:200px;" />
+		                 <input type="hidden" name="cartype_id" id="cartype_id" required="true" value="" />
+		                   <datalist id='carTypeList'></datalist>
+		                
+		                <span style="padding-left:50px;">车辆颜色:</span>
+		                <input type='text' id="color" name='color'  style="width:200px;" />
+		            </div>
+		            <div class="panel">
+		                <span>类型:</span>
+		                <select size="1" name="type" id="type" style="width:204px;" autocomplete="on">
+		                    <option value="1">出警</option>
+		                    <option value="2">代驾</option>
+		                    <option value="3">送油</option>
+		                </select>
+		            </div>
+		            <div class="panel">    
+		                <span>定位地点:</span>
+		                <input type='text' id="place" name='place'  style="width:400px;" />
+		                
+		                <span style="padding-left:40px;">营业厅:</span>
+		                <input type='checkbox'  id ="is_busines"  style='vertical-align:middle;' />
+		            </div>
+		            <div class="panel">
+		            	<span style="vertical-align:top;">注意事项:</span>
+		                <textarea id="note" name="note" style="width:555px;" rows="2"></textarea>
+		            </div>
+		        </fieldset>
+
+        <fieldset style="width:670px;">
+            <div class="panel">
+                <span>电工:</span>
+                <input type='text' id="electrician" name='electrician'  style="width:200px;" onfocus="selectelect();"/>
+                <input type='hidden' id="electricianIds" name='electricianIds'  style="width:200px;" />
+                <span style="padding-left:50px;">电工电话:</span>
+                <input type='text' id="electrician_phone" name='electrician_phone'  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>开始时间:</span>
+                <input type='time' id="start_time" name='start_time'  style="width:200px;" />
+                
+                <span style="padding-left:50px;">预计时长:</span>
+                <input type='time' id="duration" name='duration'  style="width:200px;" />
+            </div>
+        </fieldset>
+
+	</form>
+</body>
+<script type="text/javascript">
+	var winClose = function() {
+		$(document).sgWindow('close', {
+			id : 'selectelect'
+		});
+	}
+	
+	var selectelect = function() {
+		var defaults = {
+			title : '选择电工',
+			id : 'selectelect',
+			form : 'selectelect_form',
+			url : 'web/bsp/selectelect.html',
+			width : 600,
+			height : 280,
+			buttons : [ {
+				name : '确定',
+				onpress : comfire
+			}, {
+				name : '取消',
+				onpress : winClose
+			} ]
+		};
+		$(document).sgWindow(defaults);
+	}
+	
+	  var comfire = function(){
+		   
+		   //拼电工的Id,姓名 电话
+	        var obj = $('#ba_select_electrician');
+	        var bDiv = $('.bDiv',obj);
+	        var namevalue='';
+	        var ids='';
+	        var phones='';
+	         $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){    
+	                	editId=this.value;
+	                	alert(JSON.stringify($(this).data('data')));
+	                	editobj = $(this).data('data');
+	                	if(namevalue.length==0){
+	                		namevalue = editobj.name;
+	                		ids = editobj.id;
+	                		if(editobj.phone==null || editobj.phone.length==0){
+	                			phones =  "暂无";
+	                		}else{
+	                			phones =  editobj.phone;
+	                		}
+	                	}else{
+	                		namevalue = namevalue + "," + editobj.name
+	                		ids = ids + "," + editobj.id;
+	                		if(editobj.phone==null || editobj.phone.length==0){
+	                			phones = phones + ",暂无";
+	                		}else{
+	                			phones = phones + "," + editobj.phone;
+	                		}
+	                	}
+	                }
+	                
+	            });
+		   
+	        $("#electrician","#dispathch_police").val(namevalue);
+	        $("#electrician_phone","#dispathch_police").val(phones);
+	        $("#electricianIds","#dispathch_police").val(ids);
+	         $(document).sgWindow('close',{id:'selectelect'}); 
+	 		
+	 	   };
+
+</script>
+</html>

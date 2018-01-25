@@ -1,0 +1,221 @@
+package com.gboss.pojo;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import com.gboss.util.CustomDateSerializer;
+
+/**
+ * @Package:com.gboss.pojo
+ * @ClassName:Combo
+ * @Description:套餐
+ * @author:bzhang
+ * @date:2014-9-12 上午9:06:21
+ */
+@Entity
+@Table(name = "t_fee_sim_combo")
+public class Combo extends BaseEntity {
+	
+	/** 
+	 * @Fields serialVersionUID : TODO 
+	 */ 
+	private static final long serialVersionUID = 1L;
+
+	private Long combo_id;
+	
+	private Long subco_no;
+	
+	private Long sync_id;//同步id
+	
+	private Integer feetype_id;//计费类型
+	
+	private Integer sim_type =1;//套餐类型
+	
+	private String combo_code;//套餐编号
+	
+	private String combo_name;//套餐名
+	
+	private Float voice_time;//总共通话时间
+	
+	private Float data;//总共流量
+	
+	private Integer telco;
+	
+	private Float month_fee;//套餐费
+	
+	private Long op_id;//操作員id
+	
+	private Date create_date;
+	
+	private Integer flag=1;//状态
+	
+	private Date stamp;
+	
+	private String remark;
+	
+	private Float voice_price;//超出套餐语音价格
+	
+	private Float data_price;//超出套餐流量价格
+	
+
+	@Id
+	@Column(name = "combo_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public Long getCombo_id() {
+		return combo_id;
+	}
+	public void setCombo_id(Long combo_id) {
+		this.combo_id = combo_id;
+	}
+	
+	@Column(name = "subco_no")
+	public Long getSubco_no() {
+		return subco_no;
+	}
+	public void setSubco_no(Long subco_no) {
+		this.subco_no = subco_no;
+	}
+	
+	@Column(name = "feetype_id")
+	public Integer getFeetype_id() {
+		return feetype_id;
+	}
+	public void setFeetype_id(Integer feetype_id) {
+		this.feetype_id = feetype_id;
+	}
+	
+	@Column(name = "sim_type")
+	public Integer getSim_type() {
+		return sim_type;
+	}
+	public void setSim_type(Integer sim_type) {
+		this.sim_type = sim_type;
+	}
+	
+	@Column(name = "combo_code")
+	public String getCombo_code() {
+		return combo_code;
+	}
+	public void setCombo_code(String combo_code) {
+		this.combo_code = combo_code;
+	}
+	
+	@Column(name = "combo_name")
+	public String getCombo_name() {
+		return combo_name;
+	}
+	public void setCombo_name(String combo_name) {
+		this.combo_name = combo_name;
+	}
+	
+	@Column(name = "voice_time")
+	public Float getVoice_time() {
+		return voice_time;
+	}
+	public void setVoice_time(Float voice_time) {
+		this.voice_time = voice_time;
+	}
+	
+	@Column(name = "data")
+	public Float getData() {
+		return data;
+	}
+	public void setData(Float data) {
+		this.data = data;
+	}
+	
+	@Column(name = "telco")
+	public Integer getTelco() {
+		return telco;
+	}
+	public void setTelco(Integer telco) {
+		this.telco = telco;
+	}
+	
+	@Column(name = "month_fee")
+	public Float getMonth_fee() {
+		return month_fee;
+	}
+	public void setMonth_fee(Float month_fee) {
+		this.month_fee = month_fee;
+	}
+	
+	@Column(name = "op_id")
+	public Long getOp_id() {
+		return op_id;
+	}
+	public void setOp_id(Long op_id) {
+		this.op_id = op_id;
+	}
+	
+	@Column(name = "create_date")
+	public Date getCreate_date() {
+		return create_date;
+	}
+	public void setCreate_date(Date create_date) {
+		this.create_date = create_date;
+	}
+	
+	@Column(name = "flag")
+	public Integer getFlag() {
+		return flag;
+	}
+	public void setFlag(Integer flag) {
+		this.flag = flag;
+	}
+	
+	@Column(name = "remark")
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	
+	@Column(name = "voice_price")
+	public Float getVoice_price() {
+		return voice_price;
+	}
+	public void setVoice_price(Float voice_price) {
+		this.voice_price = voice_price;
+	}
+	
+	@Column(name = "data_price")
+	public Float getData_price() {
+		return data_price;
+	}
+	public void setData_price(Float data_price) {
+		this.data_price = data_price;
+	}
+	
+	@Column(name = "sync_id")
+	public Long getSync_id() {
+		return sync_id;
+	}
+	public void setSync_id(Long sync_id) {
+		this.sync_id = sync_id;
+	}
+	@Column(name = "stamp",nullable=false,updatable=true,insertable=true)
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonSerialize(using = CustomDateSerializer.class)
+	public Date getStamp() {
+		return stamp;
+	}
+
+	public void setStamp(Date stamp) {
+		this.stamp = stamp;
+	}
+	
+
+}
+

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>打印发票</title>
+</head>
+<body>
+	<form id='whs_stockin_allocated_form' method='post' class="form" style="width:870px;">
+		<div class='title'>打印发票信息查询></div>
+		<fieldset style="width:850px;">
+			<div class="panel">
+					<span>1:</span>
+					
+	            	<span>开始时间:</span>
+	                <input type='month' id="stamp" required="true" name='stamp' style="width:165px;" />
+	                
+					<span>结束时间:</span>
+	                <input type='month' id="stamp" required="true" name='stamp' style="width:165px;" />
+	        </div>
+	        <div class="panel">
+	        		<span>2:</span>
+	        		
+	            	<span>过滤条件:</span>
+	                <select style="width:168px;">
+	                	<option>请选择..</option>
+	                	<option>客户名称</option>
+	                	<option>车牌号码</option>
+	                </select>
+	                
+					<span>值:</span>
+	                <input type='text' id="value" name='value' style="width:165px;" />
+	        </div>
+	        <div class="panel">
+	        		<span>3:</span>
+	        		
+	            	<span>查询类型:</span>
+	                <select style="width:168px;">
+	                	<option>请选择..</option>
+	                	<option>一般投递客户</option>
+	                	<option>特殊投递客户</option>
+	                </select>
+
+	        </div>
+	        
+	        <div class="panel">
+	        		<span>4:</span>
+
+					<span>发票类型:</span>
+	                <select style="width:168px;">
+	                	<option>请选择..</option>
+	                	<option>第一次打印</option>
+	                	<option>补打</option>
+	                </select>
+	        </div>
+	        
+        </fieldset>
+        <fieldset style="width:850px;">
+			<div class="panel">
+	            <div style="width:100%;color: #1b1d20;font-size: 14px;font-weight: bold">说明：</div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">1：只有前面的选择后，后面的条件才有效。</div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">2：不选择发票类型查询时只显示未超过打印频率的记录，如加急打印发票，需选择补打发票。</div>
+	        </div>
+	    </fieldset>
+        <fieldset style="width:850px;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="stockin_detail_submit" type="submit" >提交</button> <button id="mycancel" type="button">重置</button>
+	        </div>
+        </fieldset>
+	</form>
+</body>
+</html>

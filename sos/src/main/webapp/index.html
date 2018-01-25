@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>赛格导航门店系统</title>
+	<meta charset="utf-8">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-Control" content="no-cache">
+	<meta http-equiv="Expires" content="0">
+
+	<link rel="stylesheet" type="text/css" href="css/jichu.css">
+	<link rel="stylesheet" type="text/css" href="css/base.css" />
+	<link rel="stylesheet" type="text/css" href="css/common.css" />
+	<link rel="stylesheet" type="text/css" href="css/window.css">
+	<link rel="stylesheet" type="text/css" href="css/form.css">
+	<link rel="stylesheet" type="text/css" href="css/pup.css">
+	<link rel="stylesheet" type="text/css" href="css/zTreeStyle.css">
+
+
+	
+</head>
+<body>
+	<div id="containerFrame" class="containerFrame clearfix">
+		<nav class="asideFrame">
+			<div id="navFrame" class="navFrame">
+			</div>
+		</nav>
+		<article class="mainFrame">
+			<div id="main_hd" class="cleafix" >
+		      	<img src="images/logo.png">
+		      	<section id="welcome">
+		      		<a id="webgis" href="javascript:void(0);" style="height: inherit;"><img
+                    src="images/icon_webgis.png"
+                    style=" vertical-align:middle ;padding-right: 10px;margin-bottom: 5px;" title="点击进入车辆监控"
+                    alt="点击进入车辆监控"></a>
+		      		<a id="afee" href="javascript:void(0);" style="height: inherit;"><img
+                    src="images/icon_fee.png"
+                    style=" vertical-align:middle ;padding-right: 30px;margin-bottom: 5px;" title="点击进入计费系统"
+                    alt="点击进入计费系统"></a>
+		      		
+					<span id="welcometext">欢迎！</span>
+					<input type="text" id="company_input" name="company_input" readonly value="" style="width:100px;" onclick="showCompanyTree(); return false;"/>
+		<!-- 			<select size="1" name="companyname" id="companyname" style="width:100px;" onchange="return changeCompany()">
+                	</select> -->
+					<a id="updateuser"
+					href="javascript:void(0);"><img src="images/update.png"
+					style="vertical-align: middle; padding-left: 12px;" title="修改用户资料"
+					alt="修改用户资料"></a><a id="updatepwd" href="javascript:void(0);"><img
+					src="images/pwd.png"
+					style="vertical-align: middle; padding-left: 12px;" title="修改密码"
+					alt="修改密码"></a><a id="setmainpage" href="javascript:void(0);"><img
+					src="images/star.png"
+					style="vertical-align: middle; padding-left: 12px;" title="设为主页"
+					alt="设为主页"></a><a id="addMemo" href="javascript:void(0);"><img
+					src="images/note.png"
+					style="vertical-align: middle; padding-left: 12px;" title="备忘"
+					alt="备忘"></a>
+					<a id="addOftenVehicle" href="javascript:void(0);"><img
+                    src="images/often_vehicle.png"
+                    style="vertical-align: middle; padding-left: 12px;" title="最近操作"
+                    alt="最近操作"></a>
+					<a href="javascript:logout();"><img
+					src="images/logout.png"
+					style="vertical-align: middle; padding-left: 12px;" title="退出"
+					alt="退出"></a>
+				</section>
+				<div id="menuContent" class="menuContent" style="display:none; position: absolute; background-color:#fff;border:1px solid #ccc;">
+					<ul id="company_tree" class="ztree" style="margin-top:0; width:160px;"></ul>
+				</div>
+    		</div>
+    		<div id="main_bd" onmouseover="hideAll();">
+     			<div id="tabs" class="easyui-tabs"  fit="true" border="false" >
+	                <div title="首页" id="homepageDiv">
+						<iframe id="homepage" src="web/nw/fast.html" style="width:100%;height:100%;border:none">
+						</iframe>
+					</div>
+					</div>
+        		</div>
+    		<div id="mm" class="easyui-menu cs-tab-menu">
+				<div id="mm-tabupdate">刷新</div>
+				<div class="menu-sep"></div>
+				<div id="mm-tabclose">关闭</div>
+				<div id="mm-tabcloseother">关闭其他</div>
+				<div id="mm-tabcloseall">关闭全部</div>
+			</div>
+		</article>
+		<footer id="footerFrame">
+			<div class="footer_ct">
+				<div class="footerLine"></div>
+				<p> Copyright©2008-2013 All rights reserved. 深圳赛格导航版权所有 粤ICP备13001872号 </p>
+			</div>
+		</footer>
+	</div>
+
+	<script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+	<script src="js/gbossIframe.js"></script>
+	<script type="text/javascript" src="jscript/html5.js"></script>
+	<script type="text/javascript" src="jscript/window.js"></script>
+	<script type="text/javascript" src="jscript/form.js"></script>
+	<script type="text/javascript" src="jscript/pup.js" ></script>
+	<script type="text/javascript" src="jscript/jquery.ztree.all-3.5.min.js" ></script>
+	<script type="text/javascript" src="jscript/storage_vehicle.js" ></script>
+	<script type="text/javascript" src="jscript/cook.js" ></script>
+	<script type="text/javascript">
+	var setting = {
+			view: {
+				dblClickExpand: false
+			},
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+			callback: {
+				beforeClick: beforeClick,
+				onClick: onClick
+			}
+		};
+
+		function beforeClick(treeId, treeNode) {
+	//		var check = (treeNode && !treeNode.isParent);
+			var check = (treeNode.id != 3);
+			if (!check) alert("请选择分公司!");
+			return check;
+		}
+		
+		function onClick(e, treeId, treeNode) {
+			var zTree = $.fn.zTree.getZTreeObj("company_tree");
+			nodes = zTree.getSelectedNodes();
+			var companyno = getCookie("companyno");
+			if(companyno == nodes[0].companyno){	//点击的节点未变化，不切换
+				hideMenu();
+				return;
+			}
+			changeCompany_tree();
+		}
+
+		function showCompanyTree() {
+			var cityObj = $("#company_input");
+			var cityOffset = $("#company_input").offset();
+			$("#menuContent").css({left:cityOffset.left-94 + "px", top:cityOffset.top + cityObj.outerHeight() + "px"}).slideDown("fast");
+
+			$("body").bind("mousedown", onBodyDown);
+		}
+		function hideMenu() {
+			$("#menuContent").fadeOut("fast");
+			$("body").unbind("mousedown", onBodyDown);
+		}
+		
+		function onBodyDown(event) {
+			if (!(event.target.id == "menuBtn" || event.target.id == "menuContent" || $(event.target).parents("#menuContent").length>0)) {
+				hideMenu();
+			}
+		}
+		
+		$.ajax({
+			type : "post",
+			async : false,
+			contentType : "application/json",
+			dataType : 'json',
+			url : 'getCurrentCompanys',
+			data : JSON.stringify({}),
+			success : function(data) {
+				if (data) {
+					$.each(data,function(k,v){
+						if(data.length==1&&v.companyno==201){
+							$("#webgis").hide();
+							$("#afee").hide();
+						}
+					});
+					var zNodes = data;
+					$.fn.zTree.init($("#company_tree"), setting, zNodes);
+					var companyno = getCookie("companyno");
+					if(data.length >0){
+						companyno = data[0].companyno;
+					}
+					if(companyno!=null&&companyno!=''){
+						var treeObj = $.fn.zTree.getZTreeObj("company_tree");
+						var nodes = treeObj.getNodesByParam("id", companyno, null);
+						treeObj.checkNode(nodes[0], true, true);
+						var cityObj = $("#company_input");
+						cityObj.attr("value", nodes[0].companyname);
+						$.ajax({
+							type : 'post',
+							async : false,
+							contentType : 'application/json',
+							dataType : 'json',
+							url : 'setSessionCompany',
+							data : JSON.stringify({parameter : companyno}),
+							success : function(data) {
+								setCookie("companyno", companyno);
+							},
+							error : function(res, error) {
+							}
+						});
+					}
+				}
+			}
+		});
+		
+		function changeCompany_tree(){
+			var zTree = $.fn.zTree.getZTreeObj("company_tree");
+			var nodes = zTree.getSelectedNodes();
+			var companyno = nodes[0].companyno;
+			var companyname = nodes[0].companyname;
+			$.ajax({
+				type : 'post',
+				async : false,
+				contentType : 'application/json',
+				dataType : 'json',
+				url : 'setSessionCompany',
+				data : JSON.stringify({parameter : companyno}),
+				success : function(data) {
+					if (data.success) {
+						var zTree = $.fn.zTree.getZTreeObj("company_tree");
+						nodes = zTree.getSelectedNodes();
+						var v = "";
+						nodes.sort(function compare(a,b){return a.id-b.id;});
+						for (var i=0, l=nodes.length; i<l; i++) {
+							v += nodes[i].name + ",";
+						}
+						if (v.length > 0 ) v = v.substring(0, v.length-1);
+						var cityObj = $("#company_input");
+						cityObj.attr("value", v);
+						setCookie("companyno", companyno);
+						hideMenu();
+						$(document).sgPup({message:'message_alert',text: "切换到"+companyname+"."});
+					}
+				},
+				error : function(res, error) {
+				}
+			});
+		}
+	</script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$(".item").mouseover(function(){
+				$(this).addClass("current");
+			});
+			$(".item").mouseout(function(){
+				$(this).removeClass("current");
+			});
+			resetWindowSize();//重设大小
+		});
+	</script>
+	<script type="text/javascript">
+	function changeCompany(){
+		var companyno = $('#companyname').val();
+		var companyname = $('#companyname option:selected').text();
+		$.ajax({
+			type : 'post',
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : 'setSessionCompany',
+			data : JSON.stringify({parameter : companyno}),
+			success : function(data) {
+				if (data.success) {
+					$(document).sgPup({message:'message_alert',text: "切换到"+companyname+"."});
+				}
+			},
+			error : function(res, error) {
+			}
+		});
+		setCookie("companyno", companyno);
+	}
+	
+	function hideAll(){
+		for(var i=0;i<10;i++){
+			$('#div'+i).hide();
+		}
+	}
+	
+	function divhide(k){
+		$('#div'+k).hide();
+	}
+	
+	function divhidden(k){
+		('#li'+k).hide;
+	}
+	
+	function divshow(k){
+		$('#div'+k).show();
+		for(var i=0;i<10;i++){
+			if(i!=k){
+				$('#div'+i).hide();
+			}
+		}
+	}
+	
+	function addTab(title, url){
+		if ($('#tabs').tabs('exists', title)){
+			$('#tabs').tabs('select', title);//选中并刷新
+			var currTab = $('#tabs').tabs('getSelected');
+			var url = $(currTab.panel('options').content).attr('src');
+			if(url != undefined && currTab.panel('options').title != '首页') {
+				$('#tabs').tabs('update',{
+					tab:currTab,
+					options:{
+						content:createFrame(url)
+					}
+				})
+			}
+		} else {
+			var content = createFrame(url);
+			$('#tabs').tabs('add',{
+				title:title,
+				content:content,
+				closable:true
+			});
+		}
+		tabClose();
+	}
+
+	function createFrame(url) {
+		window.mainUrl = url;
+		var rid = Math.random();
+		var s = '<iframe scrolling="no" frameborder="0"  src="'+url+'?randomId='+rid+'" style="width:100%;height:100%;"></iframe>';
+		return s;
+	}
+			
+	function tabClose() {
+		/*双击关闭TAB选项卡*/
+		$(".tabs-inner").dblclick(function(){
+			var subtitle = $(this).children(".tabs-closable").text();
+			$('#tabs').tabs('close',subtitle);
+		})
+		/*为选项卡绑定右键*/
+		$(".tabs-inner").bind('contextmenu',function(e){
+			$('#mm').menu('show', {
+				left: e.pageX,
+				top: e.pageY
+			});
+
+			var subtitle =$(this).children(".tabs-closable").text();
+
+			$('#mm').data("currtab",subtitle);
+			$('#tabs').tabs('select',subtitle);
+			return false;
+		});
+	}		
+	//绑定右键菜单事件
+	function tabCloseEven() {
+		//刷新
+		$('#mm-tabupdate').click(function(){
+			var currTab = $('#tabs').tabs('getSelected');
+			var url = $(currTab.panel('options').content).attr('src');
+			if(url != undefined && currTab.panel('options').title != '首页') {
+				$('#tabs').tabs('update',{
+					tab:currTab,
+					options:{
+						content:createFrame(url)
+					}
+				})
+			}
+		})
+		//关闭当前
+		$('#mm-tabclose').click(function(){
+			var currtab_title = $('#mm').data("currtab");
+			$('#tabs').tabs('close',currtab_title);
+		})
+		//全部关闭
+		$('#mm-tabcloseall').click(function(){
+			$('.tabs-inner span').each(function(i,n){
+				var t = $(n).text();
+				if(t != '首页') {
+					$('#tabs').tabs('close',t);
+				}
+			});
+		});
+		//关闭除当前之外的TAB
+		$('#mm-tabcloseother').click(function(){
+			var prevall = $('.tabs-selected').prevAll();
+			var nextall = $('.tabs-selected').nextAll();		
+			if(prevall.length>0){
+				prevall.each(function(i,n){
+					var t=$('a:eq(0) span',$(n)).text();
+					if(t != '首页') {
+						$('#tabs').tabs('close',t);
+					}
+				});
+			}
+			if(nextall.length>0) {
+				nextall.each(function(i,n){
+					var t=$('a:eq(0) span',$(n)).text();
+					if(t != '首页') {
+						$('#tabs').tabs('close',t);
+					}
+				});
+			}
+			return false;
+		});
+		//关闭当前右侧的TAB
+		$('#mm-tabcloseright').click(function(){
+			var nextall = $('.tabs-selected').nextAll();
+			if(nextall.length==0){
+				//msgShow('系统提示','后边没有啦~~','error');
+				alert('后边没有啦~~');
+				return false;
+			}
+			nextall.each(function(i,n){
+				var t=$('a:eq(0) span',$(n)).text();
+				$('#tabs').tabs('close',t);
+			});
+			return false;
+		});
+		//关闭当前左侧的TAB
+		$('#mm-tabcloseleft').click(function(){
+			var prevall = $('.tabs-selected').prevAll();
+			if(prevall.length==0){
+				alert('到头了，前边没有啦~~');
+				return false;
+			}
+			prevall.each(function(i,n){
+				var t=$('a:eq(0) span',$(n)).text();
+				$('#tabs').tabs('close',t);
+			});
+			return false;
+		});
+
+		//退出
+		$("#mm-exit").click(function(){
+			$('#mm').menu('hide');
+		})
+	}
+
+	$(function() {
+		tabCloseEven();
+		$('.cs-navi-tab').click(function() {
+			var $this = $(this);
+			var href = $this.attr('src');
+			var title = $this.text();
+			addTab(title, href);
+		});
+	});
+	
+	function GetDateStr(AddDayCount) {
+	    var dd = new Date();
+	    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+	    return dd.format('yyyy-MM-dd');
+	}
+
+	function logout() {
+		$(document).sgConfirm({
+			title:'提示',
+			text: '确认退出系统?',
+			cfn:function(r){
+				if(r){
+					location.href = "logout";
+				}
+			}});
+	}
+
+	(function($) {
+		$.ajax({
+			type : 'post',
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : 'getCurrentOperator',
+			data : JSON.stringify({}),
+			success : function(data) {
+				if (data) {
+					$('#welcometext').html("欢迎！" + data.opname + ".");
+					if(data.url){
+					}else{
+						data.url='homepage.html';
+					}
+					window.mainUrl = data.url;
+					window.mainModule = data.moduleid;
+					//alert(data.mainUrl+":"+data.mainModuleid);
+					
+					$("#homepage").attr('src',  data.url);
+					if(data.url&&data.url!=''){
+						$.ajax({
+							type : 'post',
+							async : false,
+							contentType : 'application/json',
+							dataType : 'json',
+							url : 'getCurrentModule',
+							data : JSON.stringify({parameter : data.url}),
+							success : function(data2) {
+								if (data2) {
+									$("#homepageDiv").attr('title',  data2.modulename);
+								}
+							},
+							error : function(res, error) {
+							}
+						});
+					}
+				}
+			},
+			error : function(res, error) {
+				window.location.reload();
+			}
+		});
+		/**
+		$.ajax({
+			type : "post",
+			async : false,
+			contentType : "application/json",
+			dataType : 'json',
+			url : 'getCurrentCompanys',
+			data : JSON.stringify({}),
+			success : function(data) {
+				if (data) {
+					var companyList = {};
+					$.each(data,function(k,v){
+						$("#companyname").append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+						companyList[v.companyno] = v.companyname;
+						if(data.length==1&&v.companyno==201){
+							$("#webgis").hide();
+							$("#afee").hide();
+						}
+					});
+					var companyno = getCookie("companyno");
+					if(companyno!=null&&companyno!=''&&companyList[companyno]){
+						//第一次进入时判定是否选择了公司并且写入session
+						$("#companyname").val(companyno);
+						$.ajax({
+							type : 'post',
+							async : false,
+							contentType : 'application/json',
+							dataType : 'json',
+							url : 'setSessionCompany',
+							data : JSON.stringify({parameter : companyno}),
+							success : function(data) {
+							},
+							error : function(res, error) {
+							}
+						});
+					}
+				}
+			},
+			error : function(res, error) {
+			}
+		});*/
+		
+		$("#setmainpage").on('click', function() {
+			var query = {};
+			query.mainUrl = window.mainUrl;
+			query.mainModuleid = window.mainModule;
+			$.ajax({
+				type : 'post',
+				async : false,
+				contentType : 'application/json',
+				dataType : 'json',
+				url : 'updateOperator',
+				data : JSON.stringify(query),
+				success : function(data) {
+					if (data) {
+						$(document).sgPup({message:'message_alert',text: "个人主页修改成功！"});
+					} else {
+						alert(data);
+					}
+				},
+				error : function(res, error) {
+					//alert("responseText="+res.responseText+";error="+error);     
+				}
+			});
+		});
+
+		var toAdd = function() {
+			//备忘保存
+			$('#sys_memo_form').on(
+					'submit',
+					function(e) {
+						//做表单提交
+						var params = {};
+
+						params.content = $('#sys_memo_remark',
+								'#sys_memo_form').val();
+						params.isAlert = 1;
+
+						//alert(JSON.stringify(params));
+						$.ajax({
+							type : 'post',
+							async : false,
+							contentType : 'application/json',
+							dataType : 'json',
+							url : 'sys/addUserRemark',
+							data : JSON.stringify(params),
+							success : function(data) {
+								if (data) {
+									if (data.success) {
+										$(document).sgPup({message:'message_alert',text: data.msg});
+									} else {
+										$(document).sgPup({message:'message_alert',text: "增加备忘录失败！"});
+									}
+
+								} else {
+									alert(data);
+								}
+							},
+							error : function(res, error) {
+								$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+									+ ";error=" + error});
+							}
+						});
+
+						$(document).sgWindow('close', {
+							id : 'sys_memo_window'
+						});
+						if ($('#sys_memo_grid').length > 0)
+							$('#sys_memo_grid').sgDatagrid('reload',
+									'sgDatagrid');
+						$("#sys_memo_form").unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+						e.stopPropagation();
+						return false;
+					});
+		};
+		
+		var toUpdateUser = function() {
+			//修改用户资料
+			$('#sys_user_form').on(
+					'submit',
+					function(e) {
+						//做表单提交
+						var params = {};
+						params.mobile = $('#mobile','#sys_user_form').val();
+						params.phone = $('#phone','#sys_user_form').val();
+						params.fax = $('#fax','#sys_user_form').val();
+						params.mail = $('#email','#sys_user_form').val();
+						params.post = $('#post','#sys_user_form').val();
+						params.remark = $('#remark','#sys_user_form').val();
+						//alert(JSON.stringify(params));
+						$.ajax({
+							type : 'post',
+							async : false,
+							contentType : 'application/json',
+							dataType : 'json',
+							url : 'updateOperator',
+							data : JSON.stringify(params),
+							success : function(data) {
+								if (data) {
+									if (data.success) {
+										$(document).sgPup({message:'message_alert',text: data.msg});
+									} else {
+										$(document).sgPup({message:'message_alert',text: "修改用户资料失败！"});
+									}
+
+								} else {
+									alert(data);
+								}
+							},
+							error : function(res, error) {
+								$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+									+ ";error=" + error});
+							}
+						});
+
+						$(document).sgWindow('close', {
+							id : 'sys_user_window'
+						});
+						$("#sys_user_form").unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+						e.stopPropagation();
+						return false;
+					});
+		};
+		
+		var toUpdatePWD = function() {
+			//修改用户资料
+			$('#sys_pwd_form').on(
+					'submit',
+					function(e) {
+						//做表单提交
+						var params = {};
+						params.oldPassword = $('#oldpwd','#sys_pwd_form').val();
+						params.newPassword = $('#newpwd','#sys_pwd_form').val();
+						var newpwd2 = $('#newpwd2','#sys_pwd_form').val();
+						if(newpwd2!=params.newPassword){
+							$(document).sgPup({message:'message_alert',text: "两次新密码输入不一致！"});
+							return false;
+						}
+						//alert(JSON.stringify(params));
+						$.ajax({
+							type : 'post',
+							async : false,
+							contentType : 'application/json',
+							dataType : 'json',
+							url : 'updatePassword',
+							data : JSON.stringify(params),
+							success : function(data) {
+								if (data) {
+									if (data.success) {
+										$(document).sgPup({message:'message_alert',text: data.msg});
+									} else {
+										$(document).sgPup({message:'message_alert',text: "修改密码失败！"});
+									}
+
+								} else {
+									alert(data);
+								}
+							},
+							error : function(res, error) {
+								$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+									+ ";error=" + error});
+							}
+						});
+
+						$(document).sgWindow('close', {
+							id : 'sys_pwd_window'
+						});
+						$("#sys_pwd_form").unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+						e.stopPropagation();
+						return false;
+					});
+		};
+		
+		var loadSuccess = function(){
+			$.ajax({
+				type : 'post',
+				async : false,
+				contentType : 'application/json',
+				dataType : 'json',
+				url : 'getCurrentOperator',
+				data : JSON.stringify({}),
+				success : function(data) {
+					if (data) {
+						$("#mobile","#sys_user_form").val(data.mobile);
+						$("#phone","#sys_user_form").val(data.phone);
+						$("#fax","#sys_user_form").val(data.fax);
+						$("#email","#sys_user_form").val(data.mail);
+						$("#post","#sys_user_form").val(data.post);
+						$("#remark","#sys_user_form").val(data.remark);
+					} else {
+						alert(data);
+					}
+				},
+				error : function(res, error) {
+					
+				}
+			})
+		}
+		
+		$("#updateuser").on('click', function() {
+			//debugger;
+			var adddefaults = {
+				title : '修改用户资料',
+				id : 'sys_user_window',
+				form : 'sys_user_form',
+				url : 'web/hp/user.html',
+				width : 380,
+				height : 270,
+				success: loadSuccess,
+				buttons : [ {
+					name : '确定',
+					type : 'submit',
+					onpress : toUpdateUser
+				}, {
+					name : '关闭',
+					onpress : toCloseUser
+				} ]
+			};
+			$(document).sgWindow(adddefaults);
+		});
+		
+		$("#afee").on('click', function() {
+			var feeWin=window.open('http://f.952100.com/','fee');
+			feeWin.focus();
+		});
+		
+		$("#webgis").on('click', function() {
+			var webgisWin=window.open('http://s.952100.com/web/vm/vehicle_monitor.html','webgis');
+			webgisWin.focus();
+		});
+		
+		$("#updatepwd").on('click', function() {
+			//debugger;
+			var adddefaults = {
+				title : '修改密码',
+				id : 'sys_pwd_window',
+				form : 'sys_pwd_form',
+				url : 'web/hp/pwd.html',
+				width : 320,
+				height : 150,
+				buttons : [ {
+					name : '确定',
+					type : 'submit',
+					onpress : toUpdatePWD
+				}, {
+					name : '关闭',
+					onpress : toClosePWD
+				} ]
+			};
+			$(document).sgWindow(adddefaults);
+		});
+
+		$("#addMemo").on('click', function() {
+			//debugger;
+			var adddefaults = {
+				title : '增加备忘',
+				id : 'sys_memo_window',
+				form : 'sys_memo_form',
+				url : 'web/hp/sys_memo_add_form.html',
+				width : 380,
+				height : 150,
+				buttons : [ {
+					name : '确定',
+					type : 'submit',
+					onpress : toAdd
+				}, {
+					name : '关闭',
+					type : 'button',
+					onpress : toClose
+				} ]
+			};
+			$(document).sgWindow(adddefaults);
+		});
+
+		var toSubmit = function(e) {
+			//备忘修改
+			$('#sys_memo_form').on(
+					'submit',
+					function(e) {
+						//做表单提交
+						var params = {};
+
+						params.id = $('#sys_memo_id', '#sys_memo_form')
+								.val();
+						params.content = $('#sys_memo_remark',
+								'#sys_memo_form').val();
+						//params.isAlert= $('input[name="isAlert"]:checked','#sys_memo_form').val();
+						params.isAlert = 0;
+						//alert(JSON.stringify(params));
+						$.ajax({
+							type : 'post',
+							async : false,
+							contentType : 'application/json',
+							dataType : 'json',
+							url : 'sys/updateUserRemark',
+							data : JSON.stringify(params),
+							success : function(data) {
+								if (data) {
+									if (data.success) {
+										$(document).sgPup({message:'message_alert',text: data.msg});
+									} else {
+										$(document).sgPup({message:'message_alert',text: "备忘录修改失败！"});
+									}
+
+								} else {
+									alert(data);
+								}
+							},
+							error : function(res, error) {
+								$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+									+ ";error=" + error});
+							}
+						});
+
+						$(document).sgWindow('close', {
+							id : 'sys_memo_window'
+						});
+						$("#sys_memo_form").unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+						e.stopPropagation();
+						return false;
+					});
+		}
+
+		var toClose = function() {
+			$("#sys_memo_window" + "_mask").remove();
+			$("#sys_memo_window").remove();
+		}
+		
+		var toCloseUser = function() {
+			$("#sys_user_window" + "_mask").remove();
+			$("#sys_user_window").remove();
+		}
+		
+		var toClosePWD = function() {
+			$("#sys_pwd_window" + "_mask").remove();
+			$("#sys_pwd_window").remove();
+		}
+		
+		var oftenVehicleWinLoad=function(){
+			// var data=window.gbossLocalStorage.getItems('storage_vehicle');
+			var data=getItems('storage_vehicle');
+			if(data){
+				$('#dgd_often_vehicle').sgDatagrid('appendData',data);
+			}
+		}
+		var clearItems=function(){
+    		// window.gbossLocalStorage.removeItem('storage_vehicle');
+    		window.localStorage.removeItem('storage_vehicle');
+    		$('#often_vehicle_window #dgd_often_vehicle .bDiv table').empty();
+    	}
+		$("#addOftenVehicle").on('click', function() {
+			var adddefaults = {
+				title : '最近操作车牌号码、车载电话',
+				id : 'often_vehicle_window',
+				form : 'often_vehicle_form',
+				url : 'web/hp/often_vehicle.html',
+				width : 440,
+				height : 280,
+				success : oftenVehicleWinLoad,
+				buttons : [ {
+					name:'清空',
+					type:'button',
+					onpress:clearItems
+				},{
+					name : '关闭',
+					type : 'button',
+					onpress : function() {
+		    			$(document).sgWindow('close', {
+		    				id: 'often_vehicle_window'
+		    			});
+		    		}
+				} ]
+			};
+			$(document).sgWindow(adddefaults);
+		});
+
+		$.ajax({
+			type : 'post',
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : 'sys/findUserRemarks',
+			data : JSON.stringify({
+				pageNo : 1,
+				pageSize : 1,
+				filter : {
+					isAlert : 1
+				}
+			}),
+			success : function(data) {
+				if (data) {
+					if (data.items.length > 0) {
+						//debugger;
+						var remarkdefaults = {
+							title : '备忘提示',
+							id : 'sys_memo_window',
+							form : 'sys_memo_form',
+							url : 'web/hp/sys_memo_form.html',
+							width : 380,
+							height : 150,
+							buttons : [ {
+								name : '不再提示',
+								type : 'submit',
+								onpress : toSubmit
+							}, {
+								name : '关闭',
+								type : 'submit',
+								onpress : toClose
+							} ]
+						};
+						$(document).sgWindow(remarkdefaults);
+					}
+				} else {
+					alert(data);
+				}
+			},
+			error : function(res, error) {
+				//alert("responseText="+res.responseText+";error="+error);     
+			}
+		});
+
+	})(jQuery);
+	</script>
+	<script type="text/javascript">
+	    (function($) {
+	        var defaults = {
+	            url : 'moduleList',
+	        };
+	        $('#navFrame').sgNav(defaults);
+	    })(jQuery);
+	</script>
+
+
+<script type="text/javascript">
+$(window).resize(function() {
+	var a = $(window).width()-95;//左侧栏宽度95
+	var b = $("#tabs").find("div.panels").children("div.panel").length;
+	$("#tabs").css('width',a+'px');
+	$(".tabs-panels").css('width',a+'px');
+	$(".tabs-header").css('width','100%');
+	$(".tabs-header").find(".tabs-wrap").css('width','100%');
+	$(".tabs-panels").find("div.panel").css('width','100%');
+	$(".tabs-panels").find("div.panel").find("div.panel-body").css('width','100%');
+	resetWindowSize();
+});
+
+function resetWindowSize(){
+	if($(window).height()>842){
+		var h1 = $(window).height()-138;//main_bd
+		var h2 = h1-29;//tabs-panels tabs-panels-noborder
+		$("#main_bd,#tabs").css('height',h1+'px');
+		// $("#main_bd").css('border-bottom','#ccc 1px solid');
+		$(".tabs-panels").css('height',h2+'px');
+		$(".panel,.panel-body").css('height','100%');
+		// $("#homepage").attr("scrolling","no");//scrolling="no"
+	}
+}
+
+</script>
+</body>
+</html>

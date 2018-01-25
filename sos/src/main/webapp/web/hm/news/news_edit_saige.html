@@ -1,0 +1,134 @@
+
+<link href="../../../umeditor/themes/default/css/umeditor.css" type="text/css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="../../../jscript/web/city/select2.css">
+
+    <div class="container-fluid">
+        <div class="row">
+            
+            <div class="col-sm-12 bco-f2" id="new_add_alwaysShow">
+                <div class="col-sm-12 form-inline">
+                    <h3 class="s3-title foc-blue1">资讯内容</h3>
+                    <input id="new_update_id" type="hidden"/>
+                    <input type="hidden" id="zd_filter_org_select"/>
+                    <input type="hidden" id="zd_filter_vehicle_select"/>
+                    <input type="hidden" id="zd_filter_cartype_select"/>
+                    <input type="hidden" id="vehicle_startTime"/>
+                    <input type="hidden" id="vehicle_endTime"/>
+                    <input type="hidden" id="province"/>
+                    <input type="hidden" id="district"/>
+                    <input type="hidden" id="city"/>
+                </div>
+                <div class="col-sm-12" style="text-align: right">
+                    <label class="checkbox-inline foc-heiti" style="font-size: 14px;line-height: 22px">
+                        <input id="zx_isTop" name="is_top" type="checkbox" value="1"> 置顶显示<small>(勾选此项，会将要发布的消息置顶到第一条）</small>
+                    </label>
+                </div>
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                    <label class="redfont sbaman2">资讯标题：</label>
+                    <input id="zx_title" name="title" class="form-control" style="width: 100%;height: 30px;" type="text" />
+                </div>
+                <div class="col-sm-12 form-inline tareachange" style="margin: 20px 0 5px 0;">
+                    <label class="redfont sbaman2">资讯摘要：</label>
+                    <div class="placeholder"><span>这里输入摘要</span></div>
+                    <textarea class="form-control" id="zx_summary" name="summary" rows="5" style="width: 100%;height: auto"></textarea>
+                </div>
+                <div style='float:left;margin:0 0 5px 15px;text-align: left;font-family: arial, "Microsoft YaHei", SimHei, "\9ed1\4f53"'>
+                    您还可以输入:<input name="remLen" type="text" value="1500" style="color:red;border:none;width:32px;background:#f2f2f2;text-align: center" readonly="readonly">个字符
+                </div>
+                <div class="col-sm-12 form-inline">
+                    <!--style给定宽度可以影响编辑器的最终宽度-->
+                    <script type="text/plain" id="myEditor">
+                        <p>这里输入资讯内容</p>
+                    </script>
+                   
+                </div>
+
+                <div class="col-sm-12 form-inline">
+                    <label class="sbaman fnmleft">有效日期：</label>
+                    <div class="fnmline">
+                        <input class="form-control" id="start_time" type="date" name="startTime"/>
+                    </div>
+                    <span class="fnmline">&nbsp;&nbsp;-&nbsp;&nbsp;</span>
+                    <div class="fnmline">
+                        <input class="form-control" id="end_time" type="date" name="endTime"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+   <!-- 预览模块 -->
+    <div class="modal fade" id="seeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <div class="mobile-outborder">
+                        <img src="../../../images/iPhone6exp.png" alt="iPhone6 Plus"/>
+                        <article class="mobile-inborder">
+                            <h4 id="seeModal_h4"></h4>
+                            <div class="container-fluid">
+                                <p class="sm_title">
+                                    <span>发布时间：</span><small id="seeModal_small"></small>
+                                </p>
+                                <section class="news-content"  id="new_view_context">
+
+                                </section>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+<script type="text/javascript">
+window.UMEDITOR_HOME_URL = "../../../umeditor/";
+</script>
+<script type="text/javascript" charset="utf-8" src="../../../umeditor/umeditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../../umeditor/umeditor.min.js"></script>
+<script type="text/javascript" src="../../../umeditor/lang/zh-cn/zh-cn.js"></script>
+<script>
+var um = UM.getEditor('myEditor');
+(function($){
+   function loadSuccess_edit(data){
+     	
+         //填充编辑前的值
+         if(data){
+             $("#new_update_id").val(data.id);
+             $("#zx_title").val(data.title);
+             $('#zx_summary').val(data.summary);
+             if(data.isTop==1){
+          	   $("#zx_isTop").prop("checked", true);//选中
+             }
+             
+             UM.getEditor('myEditor').execCommand('cleardoc');
+  	         UM.getEditor('myEditor').execCommand('insertHtml', data.content);
+  	         if(data.startTime)
+  	          $("#start_time").val(data.startTime.substring(0,10));
+             if(data.endTime)
+         	  $("#end_time").val(data.endTime.substring(0,10));
+         	
+         }
+         editId=null;
+         editObj=null;
+     }
+     
+     $.ajax( {
+         type : 'post',
+         async: true,
+         dataType : 'json',
+         url : '../../../news/news/search/'+editId,
+         success : function(data) {
+          if(data){                            	
+               
+          	loadSuccess_edit(data.obj);
+             }
+         } ,
+         error : function(res,error) {
+             if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}
+         }
+     });
+   
+})(jQuery)
+</script>

@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>盗抢险管理</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../css/sos.css">
+</head>
+<body>
+	<div id="nw_document_all">
+	<form id='policy' name='policy' method='post' class="form">
+		<div class='title'>盗抢险管理></div>
+		<fieldset style="width:850px;">
+			<div class="panel">
+				<div class='submit' style="text-align:left;">
+	            	<input type='hidden' id='cust_id' name='cust_id' />
+					<input type='hidden' id='vehicle_id' name='vehicle_id' />
+					<input type='hidden' id='unit_id' name='unit_id' />
+					
+					<input type='hidden' id='url_type' name='url_type' value='3' />
+					
+					<input type='hidden' id='cust_id_1' name='cust_id_1' />
+					<input type='hidden' id='vehicle_id_1' name='vehicle_id_1' />
+					<input type='hidden' id='unit_id_1' name='unit_id_1' />
+				<div class="searchDis">
+	            	<span>车牌号码:</span>
+	            	<input type='text' id="searchnumber" name='searchnumber' style="width:150px;" />
+	            	 <ul class="show_list" id="vehicleList">
+	            	 </ul>
+	           </div>
+	           
+	           <div class="searchDis"> 	
+	            	<span>车载电话:</span>
+	            	<input type='text' id="searchcall" name='searchcall' style="width:150px;"/>
+	            	 <ul class="show_list" id="unitList">
+	            	 </ul>
+	           </div> 	 
+	            <div class="searchDis">	
+	            	<span>车架号码:</span>
+	            	<input type='text' id="vin" name='vin' style="width:150px;"/>
+	            	 <ul class="show_list" id="vinList">
+	            	 </ul>
+	           </div> 	 
+	             	<button id="search_btn" type="button" style="width:80px;height:26px;display:none" onclick="searchcust();" >查询</button> 
+	        	</div>
+	        	
+	        	
+	        	<!-- <div class="panel">
+				<div class='submit' style="text-align:left;">
+	            	<span>客户名称:</span>
+	            	<input type='text' id="custname" name='custname' style="width:150px;" list="customerList"/>
+            		<datalist id='customerList'></datalist>
+	            	<button id="search_btn" type="button" style="width:80px;height:26px;" onclick="searchcust();" >查询</button>
+	            	<button id="clear_btn" type="button" style="width:80px;height:26px;" onclick="clearSearch();" >清除查询</button>
+	        	</div>
+			</div> -->
+	        	
+	        	
+	        	
+			</div>
+        </fieldset>
+        
+        <div class='title'>基本资料</div>
+		<fieldset style="width:850px;">
+            <div class="panel">    
+                <span>姓名:</span>
+                <input type='text' id="customer_name" name='customer_name' style="width:150px;" />
+                
+                
+                <span>车牌号码:</span>
+                	<input type='text' id="number_plate" name='number_plate' style="width:150px;" />
+                	
+                <span style="width:100px;">车载电话:</span>
+                <input type='text' id="call_letter" name='call_letter' style="width:150px;" />	
+             
+            </div>
+            <div class="panel">
+                <span>身份证号码:</span>
+                <input type='text' id="idcard" name='idcard'  style="width:150px;" />
+                <span>车型:</span>
+               	    <input type='text' id="cartype" name='cartype' style="width:150px;" />
+                <span style="width:100px;">颜色:</span>
+               	    <input type='text' id="color" name='color' style="width:150px;" />
+            </div>
+            <div class="panel">
+              <span >在网状态:</span>
+                <select size="1" name="state" id="state" style="width:154px;" autocomplete="on">
+                    <option value="0">在网</option>
+                    <option value="1">离网</option>
+                    <option value="2">欠费离网</option>
+                    <option value="3">非入网</option>
+                    <option value="4">研发测试</option>
+                    <option value="5">电工测试</option>
+                </select>
+              <span>终端型号:</span>
+                <input type='text' id="unitcode" name='unitcode' style="width:150px;" />
+               <span style="width:100px;">机身编号:</span>
+                <input type='text' id="code" name='code' style="width:150px;" />
+            </div>
+            
+            
+            <div class="panel">
+              <span>发动机号:</span>
+                <input type='text' id="ennum" name='ennum' style="width:150px;" />
+              <span>车架号:</span>
+                <input type='text' id="chassnum" name='chassnum' style="width:150px;" />
+              <span style="width:100px;">安装日期:</span>
+                <input type='date' id="time" name='time' style="width:150px;" />
+            </div>
+            
+            
+            <div class="panel">
+              <span>销售经理:</span>
+                <input type='text' id="manager_name" name='manager_name' style="width:150px;" />
+              <span>新车价:</span>
+                <input type='text' id="money" name='money' style="width:150px;" />
+              <span style="width:100px;">车辆初次登记日:</span>
+                <input type='date' id="registerTime" name='registerTime' style="width:150px;" />
+            </div>
+        </fieldset>
+
+        
+        <div id='titleDiv2' class='title'>盗抢险历史记录</div>
+
+	</form>
+	
+		<div id="records" class="datagird"></div>
+	</div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/storage_vehicle.js" ></script>
+<script type="text/javascript">
+
+
+function clearSearch() {
+	
+		$('#custname').val('');
+	  	$('#cust_id').val('');
+		$('#searchcall').val('');
+	  	$('#unit_id').val('');
+	  	$('#vehicle_id').val('');
+		$('#searchnumber').val('');
+		$('#vin').val('');
+}
+
+
+
+
+			function formatDateStr(str)
+			{
+				var result='';
+				if(str != null && str.length > 9){
+					for(var i = 0; i < 10; i++){
+					      result = result + str.charAt(i)
+					}
+				   return result;
+				 }else{
+					return "";
+				 }
+			}
+
+		
+		function formatStr(str)
+		{
+			   	var result='';
+			   	if(str == null){
+			   		return "";
+			   	}else{
+			   		for(var i = 0; i < str.length; i++){
+			   		      if (i % 4 == 0 && i != 0){
+			   		      	result = result + " " + str.charAt(i)
+			   		      }
+			   		      else{
+			   		      	result = result + str.charAt(i)
+			   		     }
+			   		}
+			   	return result;
+			   }
+		}
+		
+		
+		function removeStr(str)
+		{
+			   	if(str == null || str.length ==0){
+			   		return "";
+			   	}else{
+			   		return str.replace(/[ ]/g,"");
+			   	}
+		}
+		
+		  
+		   function getCusinfoAge(str)
+		   {
+			   if(str!= null && str.length >=4 ){
+				   var m = str.substr(0,4);
+				   var Y = new Date().getFullYear();   
+			       var age = Y-m;
+			       if(age >= 65){
+			      	 return true;   
+			       }
+			        return false; 
+			   }
+			   return false; 
+		   }
+		
+		   
+
+			  var winCloseEdit = function() {
+					$(document).sgWindow('close', {
+						id : 'police_edit'
+					});
+					
+				}
+			  
+
+			  var winCloseView = function() {
+					$(document).sgWindow('close', {
+						id : 'police_view'
+					});
+					
+				}
+			  
+			  
+
+			  var winCloseAdd = function() {
+					$(document).sgWindow('close', {
+						id : 'policy_add'
+					});
+					
+				}
+			  
+			  
+			  var winCloseOver = function() {
+					$(document).sgWindow('close', {
+						id : 'police_over'
+					});
+					
+				}
+			  
+			  
+			  
+			  var loadSuccess_over = function(){
+				  var cust_id = $('#cust_id_1').val();
+				  var vehicle_id = $('#vehicle_id_1').val();
+				  var unit_id = $('#unit_id_1').val();
+				  $('#vehicle_id').val(vehicle_id);
+				  $('#unit_id').val(unit_id);
+				  $('#cust_id').val(cust_id);
+				 $("#search_btn").trigger("click");//触发按钮 
+			 		//填充编辑前的值
+			 		   if(editId && editObj){
+			 			 	 $("#id","#police_over").val(editObj.id);	
+			 		   }
+			 	 }
+			  
+			  
+			  
+
+			  
+			  var loadSuccess_Edit = function(){
+				  
+				  var cust_id = $('#cust_id_1').val();
+				  var vehicle_id = $('#vehicle_id_1').val();
+				  var unit_id = $('#unit_id_1').val();
+				  $('#vehicle_id').val(vehicle_id);
+				  $('#unit_id').val(unit_id);
+				  $('#cust_id').val(cust_id);
+				 $("#search_btn").trigger("click");//触发按钮 
+			 		//填充编辑前的值
+			 		   if(editId && editObj){
+			 			 	 $("#id","#police_edit").val(editObj.id);	
+							 $("#policyno","#police_edit").val(editObj.policy_no);	
+							 $("#company","#police_edit").val(editObj.company);	
+							 $("#customer_name","#police_edit").val(editObj.loginname); 
+							 $("#loginname","#police_edit").val(editObj.loginname);
+							 $("#color","#police_edit").val(editObj.color);
+							 
+							 $("#idcard","#police_edit").val(formatStr(editObj.cust_id_no));	
+							 $("#phone","#police_edit").val(editObj.phone);
+							 
+							 $("#person","#police_edit").val(editObj.policyholder);	
+							 $("#ywidcard","#police_edit").val(formatStr(editObj.ph_id_no));	
+							 $("#birthday","#police_edit").val(formatDateStr(editObj.birthday));	
+							 $("#mobile","#police_edit").val(editObj.tel);	
+							 
+							 $("#policyFee","#police_edit").val(editObj.fee);	
+							 
+							 $("#is_buypilfer","#police_edit").val(editObj.is_buy_tp);	
+							 
+							 $("#ratio","#police_edit").val(editObj.ratio);
+							 
+							 
+							 if(editObj.ratio == '100'){
+								  	$("#ratio2","#police_edit").attr('checked', 'checked'); 
+							  }else{
+									  $("#ratio1","#police_edit").attr('checked', 'checked'); 
+							  }
+							  if(editObj.is_buy_tp == '1'){
+								  	$("#is_buypilfer1","#police_edit").attr('checked', 'checked'); 
+							  }else{
+									  $("#is_buypilfer2","#police_edit").attr('checked', 'checked'); 
+							  }
+							  if(editObj.is_contain == '1'){
+								  	$("#is_contain2","#police_edit").attr('checked', 'checked'); 
+								 } 
+							 $("#carNum","#police_edit").val(editObj.carNum);
+							 $("#vCode","#police_edit").val(editObj.plate_code);	
+							 
+							 
+							 $("#money","#police_edit").val(editObj.vehicle_price);	
+							 $("#ennum","#police_edit").val(editObj.engine_no);	
+							 $("#registerTime","#police_edit").val(formatDateStr(editObj.register_date));	
+							 $("#chassnum","#police_edit").val(editObj.vin);
+							 
+							 $("#ucall","#police_edit").val(editObj.unittype);
+							 $("#code","#police_edit").val(editObj.barcode);
+							 $("#uTime","#police_edit").val(formatDateStr(editObj.fix_time));
+							 
+							 $("#start_time","#police_edit").val(formatDateStr(editObj.is_bdate));
+							 $("#end_time","#police_edit").val(formatDateStr(editObj.is_edate));
+							 $("#policyMoney","#police_edit").val(editObj.amount);
+							 $("#address","#police_edit").val(editObj.address);
+							 $("#sales_person","#police_edit").val(editObj.sales);
+			 			  
+							  
+			 		   }
+			 		 
+			 		  
+			 	   }
+			  
+			  
+			  
+			  var loadSuccess_View = function(){
+					  
+					  var cust_id = $('#cust_id_1').val();
+					  var vehicle_id = $('#vehicle_id_1').val();
+					  var unit_id = $('#unit_id_1').val();
+					  $('#vehicle_id').val(vehicle_id);
+					  $('#unit_id').val(unit_id);
+					  $('#cust_id').val(cust_id);
+					  $("#search_btn").trigger("click");//触发按钮 
+				 		//填充编辑前的值
+				 		   if(editId && editObj){
+				 			 	 $("#id","#police_view").val(editObj.id);	
+								 $("#policyno","#police_view").val(editObj.policy_no);	
+								 $("#company","#police_view").val(editObj.company);	
+								 $("#customer_name","#police_view").val(editObj.loginname); 
+								 $("#loginname","#police_view").val(editObj.loginname);
+								 $("#color","#police_view").val(editObj.color);
+								 
+								 $("#idcard","#police_view").val(formatStr(editObj.cust_id_no));	
+								 $("#phone","#police_view").val(editObj.phone);
+								 
+								 $("#person","#police_view").val(editObj.policyholder);	
+								 $("#ywidcard","#police_view").val(formatStr(editObj.ph_id_no));	
+								 $("#birthday","#police_view").val(formatDateStr(editObj.birthday));	
+								 $("#mobile","#police_view").val(editObj.tel);	
+								 
+								 $("#policyFee","#police_view").val(editObj.fee);	
+								 
+								 $("#is_buypilfer","#police_view").val(editObj.is_buy_tp);	
+								 
+								 $("#ratio","#police_view").val(editObj.ratio);
+								 
+								 
+								 if(editObj.ratio == '100'){
+									  	$("#ratio2","#police_view").attr('checked', 'checked'); 
+								  }else{
+										  $("#ratio1","#police_view").attr('checked', 'checked'); 
+								  }
+								  if(editObj.is_buy_tp == '1'){
+									  	$("#is_buypilfer1","#police_view").attr('checked', 'checked'); 
+								  }else{
+										  $("#is_buypilfer2","#police_view").attr('checked', 'checked'); 
+								  }
+								  if(editObj.is_contain == '1'){
+									  	$("#is_contain2","#police_view").attr('checked', 'checked'); 
+									 } 
+								 $("#carNum","#police_view").val(editObj.carNum);
+								 $("#vCode","#police_view").val(editObj.plate_code);	
+								 
+								 
+								 $("#money","#police_view").val(editObj.vehicle_price);	
+								 $("#ennum","#police_view").val(editObj.engine_no);	
+								 $("#registerTime","#police_view").val(formatDateStr(editObj.register_date));	
+								 $("#chassnum","#police_view").val(editObj.vin);
+								 
+								 $("#ucall","#police_view").val(editObj.unittype);
+								 $("#code","#police_view").val(editObj.barcode);
+								 $("#uTime","#police_view").val(formatDateStr(editObj.fix_time));
+								 
+								 $("#start_time","#police_view").val(formatDateStr(editObj.is_bdate));
+								 $("#end_time","#police_view").val(formatDateStr(editObj.is_edate));
+								 $("#policyMoney","#police_view").val(editObj.amount);
+								 $("#address","#police_view").val(editObj.address);
+								 $("#sales_person","#police_view").val(editObj.sales);
+				 			  
+								  
+				 		   }
+				 		 
+				 		  
+				 	   }
+			  
+			  var editItem = function(){
+				 	var obj = $('#records');
+			        var bDiv = $('.bDiv',obj);
+			        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+			            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+			        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+			            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+			        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+			            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+			                if($(this).attr("checked")){    
+			                	editId=this.value;
+			                	editObj=$(this).data('data');
+				                	//打开窗口
+					                var defaults = {
+					    	                title:'盗抢险编辑',
+					    	                id:'police_edit',
+					    	                form:'police_edit_form',
+					    	                url:'police_edit.html',
+					    	                success: loadSuccess_Edit,
+					    	                width: 850,
+					    	                height: 335,
+					    	                buttons : [
+					    	                           {name: '保存', type: 'submit', onpress : saveEditpolicy},
+					    	                           {name : '关闭',onpress : winCloseEdit} 
+					    	                       ]
+					    	            };
+					    	          $(document).sgWindow(defaults);
+			                }
+			            });
+			        }
+			    }
+			  
+			  
+			  
+			   var openItem = function(){
+			        var obj = $('#records');
+			        var bDiv = $('.bDiv',obj);
+
+			       if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+			            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+			        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>=1){
+			       	 $(document).sgConfirm({text: '确定开启该保单吗?',cfn:function(r){ 
+					    if(r){
+			     		var flag = false;
+			     		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+				                if($(this).attr("checked")){    
+				                	editId=this.value;
+				                	editobj = $(this).data('data');
+				                		var pids=[];
+				                		pids.push(editobj.id);
+					                	//打开窗口
+					                	$.ajax( {
+			           					  type : 'post', 
+						            		  async: false,   
+						            		  dataType : 'json',     
+						            		  url : '../../policy/operatePolicy',   
+						            		  data:{ids:pids,type:2},
+						            		  success : function(data) {
+						            			  if(data){
+						            				 if(data.success){
+						            					 $(document).sgPup({message:'message_info',text: "操作成功！"});
+						            				 }else{
+						            					 $(document).sgPup({message:'message_info',text: "操作失败！"});
+						            				 }
+						            			  }
+						            		  } ,     
+						            		  error : function(res,error) { 
+						            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+						            		  }    
+						            		}); 
+				                }
+				            });
+			     		$('#records').sgDatagrid('reload','sgDatagrid');
+			     	}	
+			     	 }});
+			       	 
+			        }
+			    }
+			  
+			   
+			   var endItem = function(){
+				 	var obj = $('#records');
+			        var bDiv = $('.bDiv',obj);
+			        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+			            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+			        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+			            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+			        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+			            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+			                if($(this).attr("checked")){    
+			                	editId=this.value;
+			                	editObj=$(this).data('data');
+				                	//打开窗口
+					                var defaults = {
+					    	                title:'盗抢险作废',
+					    	                id:'police_over',
+					    	                form:'police_over',
+					    	                url:'police_over.html',
+					    	                success: loadSuccess_over,
+					    	                width: 300,
+					    	                height: 120,
+					    	                buttons : [
+					    	                           {name: '保存', type: 'submit', onpress : overPolicy},
+					    	                           {name : '关闭',onpress : winCloseOver} 
+					    	                       ]
+					    	            };
+					    	          $(document).sgWindow(defaults);
+			                }
+			            });
+			        }
+			    }
+			  
+			  
+			  var stopItem = function(){
+			        var obj = $('#records');
+			        var bDiv = $('.bDiv',obj);
+			      if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+			            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+			        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>=1){
+			       	 $(document).sgConfirm({text: '确定作废该盗抢险吗?',cfn:function(r){ 
+					    if(r){
+			     	//if(window.confirm('确定结束该工作单吗?')){
+			     		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+				                if($(this).attr("checked")){    
+				                	editId=this.value;
+				                	editobj = $(this).data('data');
+				                		var pids=[];
+				                		pids.push(editobj.id);
+					                	//打开窗口
+					                	$.ajax( {
+			           					  type : 'post', 
+						            		  async: false,   
+						            		  dataType : 'json',     
+						            		  url : '../../policy/operatePolicy',   
+						            		  data:{ids:pids,type:0},
+						            		  success : function(data) {
+						            			  if(data){
+						            				 if(data.success){
+						            					 $(document).sgPup({message:'message_info',text: "操作成功！"});
+						            				 }else{
+						            					 $(document).sgPup({message:'message_info',text: "操作失败！"});
+						            				 }
+						            			  }
+						            		  } ,     
+						            		  error : function(res,error) { 
+						            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+						            		  }    
+						            		}); 
+				                }
+				            });
+			     		  var vehicle_id = $('#vehicle_id_1').val();
+						  var unit_id = $('#unit_id_1').val();
+						  $('#vehicle_id').val(vehicle_id);
+						  $('#unit_id').val(unit_id);
+						 $("#search_btn").trigger("click");//触发按钮 
+			     	}	
+			     	 }});
+			       	 
+			        }
+			    }
+			   
+
+			    var viewItem = function() {
+			    	
+			    	 	var obj = $('#records');
+				        var bDiv = $('.bDiv',obj);
+				        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+				            $(document).sgPup({message:'message_info',text: "只能选择一个选项！"});
+				        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+				            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+				        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+				        	 $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+					                if($(this).attr("checked")){  
+					                	editId=this.value;
+					                	editObj=$(this).data('data');
+						    			var defaults = {
+						    				title : '盗抢险明细',
+						    				id : 'police_view',
+						    				form : 'police_view_form',
+						    				url : 'police_view.html',
+						    				success: loadSuccess_View,
+						    				width : 850,
+						    				height : 335,
+						    				buttons : [
+						    				   {name : '打印',onpress : printBill}, 
+						    				   {name : '关闭',onpress : winCloseView} 
+						    				   ]
+						    			};
+						    			$(document).sgWindow(defaults);
+					                }
+					            });
+				   }else{
+					   $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+				    }
+			    	
+				}
+			  
+
+			  var loadSuccess = function(){
+			 		//填充编辑前的值
+								  	  var vehicle_id = $('#vehicle_id_1').val();
+									  var unit_id = $('#unit_id_1').val();
+									  $('#vehicle_id').val(vehicle_id);
+									  $('#unit_id').val(unit_id);
+									  $("#search_btn").trigger("click");//触发按钮  
+			 			
+							    	  $("#idcard","#police_edit").val(formatStr($('#idcard','#policy').val()));
+									  $("#carNum","#police_edit").val($('#number_plate','#policy').val());
+									  $("#money","#police_edit").val($('#money','#policy').val());
+									  $("#vehicle_id","#police_edit").val($('#vehicle_id_1','#policy').val());
+									  $("#ennum","#police_edit").val($('#ennum','#policy').val());
+									  $("#chassnum","#police_edit").val($('#chassnum','#policy').val());
+									  $("#registerTime","#police_edit").val(formatDateStr($('#registerTime','#policy').val()));
+									  $("#customer_name","#police_edit").val($('#customer_name','#policy').val());
+									  $("#customer_id","#police_edit").val($('#cust_id_1','#policy').val());
+									  $("#loginname","#police_edit").val($('#customer_name','#policy').val()); 
+									  $("#ucall","#police_edit").val(formatStr($('#unitcode','#policy').val()));
+									  $("#code","#police_edit").val($('#code','#policy').val());
+									  $("#uTime","#police_edit").val(formatDateStr($('#time','#policy').val()));
+									  $("#unit_id","#police_edit").val($('#unit_id_1','#policy').val());
+									  $("#sales_person","#police_edit").val($('#manager_name','#policy').val());
+									  $("#color","#police_edit").val($('#color','#policy').val());
+									  
+							
+			 		  
+			 	   }
+			
+			
+
+			
+			 var addItem = function(){
+				 var state = $('#state','#policy').val()
+				 if(state == 1){
+					 $(document).sgPup({message:'message_info',text: "该车辆已经离网，不能办理盗抢险！"});
+				 }else{
+					  var defaults = {
+				                title:'盗抢险办理',
+				                id:'policy_add',
+				                form:'policy_edit_form',
+				                url:'police_edit.html',
+				                success: loadSuccess,
+				                width: 850,
+				                height: 335,
+				                buttons : [
+				                           {name: '保存', type: 'submit', onpress : saveEditpolicy},
+				                           {name : '关闭',onpress : winCloseAdd} 
+				                       ]
+				            };
+				          $(document).sgWindow(defaults);
+					 
+				 }
+				 
+		}
+			
+			
+
+			    var printBill = function(){
+			    	
+			    	var ratio=$("input[name='ratio']:checked").val();
+
+			    	//保单打印信息
+				   	  $.ajax({
+			    			type : 'post',
+			    			async : false,
+			    			url : '../../policy/updatePolicyprintMsg',
+			    			 data:{id:$("#id","#police_view").val()},
+			    			success : function(data) {
+			    				if (data) {
+			    					
+			    				}
+			    			},
+			    			error : function(res, error) {
+			    				$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+			    					+ ";error=" + error});
+			    			}
+			    		});
+			    	
+			    	if(ratio == 80){
+					    	if($('#company','#police_view').val() == 1){
+					    	
+					    		window.open('../print/print_policy1A.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+					    	}else{
+					    		window.open('../print/print_policy2A.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+					    	}
+				 		 
+			    	}else{
+			    		
+				 			 	if($('#company','#police_view').val() == 1){
+						    		window.open('../print/print_policy1B.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+						    	}else{
+						    		window.open('../print/print_policy2B.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+						    	}
+			    	
+			    	}
+
+			    	
+					/* $("#task",subWinBody).show(); */
+					//新增遮罩层
+					var mask=$('<div id="print_mask"></div>');
+					mask.addClass('window-mask');
+					mask.css('z-index',$('div.window').css('z-index')+1);//如果有弹出窗口，则将遮罩层置为最上层
+			       var span=$('<span></span');
+			       var span=$('<span></span');
+			       span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+			       span.text('正在打印中...');
+			       mask.append(span);
+				   $(document.body).append(mask);
+				    
+			    	
+				    
+				 }; 
+			
+			 
+			    var saveEditpolicy = function(){
+			    	var vehicle_id = $('#vehicle_id_1').val();
+					var unit_id = $('#unit_id_1').val();
+					var cust_id = $('#cust_id_1').val();
+				    var params = {};
+				    var url='../../policy/add';
+				    if($('#id','#police_edit').val()){
+				    	url='../../policy/update';
+				    	params.insurance_id = $('#id','#police_edit').val();
+				    }
+					params.is_buy_tp=$("input[name='is_buypilfer']:checked").val();
+					params.ratio=$("input[name='ratio']:checked").val();
+					params.payment=0;
+					params.is_contain=0;
+					params.customer_name = $("#loginname","#police_edit").val();
+					params.customer_id = cust_id;
+					params.plate_no = $("#carNum","#police_edit").val();
+					params.color = $("#color","#police_edit").val();
+					
+					
+					params.unit_id=unit_id;
+				 	params.policy_no=$('#policyno','#police_edit').val();;
+				 	params.vehicle_id=vehicle_id;
+					params.ic_no=$('#company','#police_edit').val();
+					params.vehicle_price=$('#money','#police_edit').val();
+					params.fee=$('#policyFee','#police_edit').val();
+					params.amount=$('#policyMoney','#police_edit').val();
+					
+					params.policyholder=$('#person','#police_edit').val();
+					
+					var ph_id_no=$('#ywidcard','#police_edit').val();
+					params.ph_id_no=removeStr(ph_id_no);
+					
+					params.birthday=$('#birthday','#police_edit').val();
+					params.phone=$('#phone','#police_edit').val();
+					params.tel=$('#mobile','#police_edit').val();
+					params.is_bdate=$('#start_time','#police_edit').val();
+					params.is_edate=$('#end_time','#police_edit').val();
+					params.address=$('#address','#police_edit').val();
+					params.sales=$('#sales_person','#police_edit').val();
+					var cust_id_no=$('#idcard','#police_edit').val();
+					params.cust_id_no=removeStr(cust_id_no);
+					params.plate_code= $("#vCode","#police_edit").val();
+					params.engine_no= $("#ennum","#police_edit").val();
+					params.vin= $("#chassnum","#police_edit").val();
+					params.register_date= $("#registerTime","#police_edit").val();
+					params.fix_time= $("#uTime","#police_edit").val();
+					params.gps_code= $("#ucall","#police_edit").val();
+					params.barcode= $("#code","#police_edit").val();
+					
+				 	
+				 	
+				 	 if(!params.policy_no){
+			  	         	$(document).sgPup({message:'message_info',text: "请输入保单号！"});
+			  	         	   return false;
+			  	         }
+				 	
+				 //	 if(!params.policyholder){
+			     //    	$(document).sgPup({message:'message_info',text: "请输入意外投保人！"});
+			     //    	   return false;
+			     //    }
+				 	 
+				 //	if(!params.birthday){
+			     //    	$(document).sgPup({message:'message_info',text: "请输入意外投保人生日！"});
+			     //    	   return false;
+			     //    }
+				 	 
+		    		 	 
+		    		 if(!params.is_bdate){
+			         	$(document).sgPup({message:'message_info',text: "请选择服务开始时间！"});
+			         	   return false;
+			          }
+		    		 
+		    		 if(!params.is_edate){
+			         	$(document).sgPup({message:'message_info',text: "请选服务结束时间！"});
+			         	   return false;
+			         } 
+		    		if(!params.fee){
+			         	$(document).sgPup({message:'message_info',text: "请输入保险费用！"});
+			         	   return false;
+			         } 
+		    		if(!params.plate_code){
+			         	$(document).sgPup({message:'message_info',text: "请输入厂牌型号！"});
+			         	   return false;
+			         } 
+		    		
+		    		if(!params.engine_no){
+			         	$(document).sgPup({message:'message_info',text: "请输入发动机号！"});
+			         	   return false;
+			         } 
+		    		
+		    		if(params.amount==0){
+			         	$(document).sgPup({message:'message_info',text: "请选择保险金额！"});
+			         	   return false;
+			         } 
+		    		
+		    		
+		    		if(getCusinfoAge(params.birthday)){
+		    		   $(document).sgPup({message:'message_info',text: "意外投保人超过65岁,不能办理!"});
+		    		   return false;
+		    		}
+		    		
+		    		if(params.vin == null || (params.vin!=null && params.vin.length!=17)){
+			         	$(document).sgPup({message:'message_info',text: "车架号必填且长度必须17位！"});
+			         	   return false;
+			         } 
+		    		
+		    		//alert(JSON.stringify(params));
+				 	
+				 	//if(window.confirm('确定保存接单吗?')){
+				 	  $(document).sgConfirm({text: '请仔细核对清楚与原始单据是否一致，确定提交吗?',cfn:function(r){ 
+					  if(r){ 
+					          $.ajax( {
+					      		  type : 'post', 
+					      		  async: false,   
+					      		  contentType : 'application/json',     
+					      		  dataType : 'json',     
+					      		  url : url,   
+					      		  data:JSON.stringify(params),
+					      		  success : function(data) {
+					      			  if(data){
+					      				 if(data.success){
+						          		 	/*  $('#records').sgDatagrid('reload','sgDatagrid'); */
+						          		 	  $('#vehicle_id').val(vehicle_id);
+											  $('#unit_id').val(unit_id);
+											  $('#cust_id').val(cust_id);
+											  $("#search_btn").trigger("click");//触发按钮 */
+						          		 	  $(document).sgWindow('close', {id : 'policy_add'});
+						          		 	  $(document).sgWindow('close', {id : 'police_edit'});
+					      				 }
+					      				$(document).sgPup({message:'message_alert',text: data.msg});
+					      				 
+					      			  }
+					      		  } ,     
+					      		  error : function(res,error) { 
+					      		  	 alert(res.responseText);     
+					      		  }   
+					          });
+					  } 	  
+					          }}); 
+					  
+			  			 $('#police_edit').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+				    	return false;
+				 }; 
+				 
+				 
+				 
+				    var overPolicy = function(){
+				    	var vehicle_id = $('#vehicle_id_1').val();
+						var unit_id = $('#unit_id_1').val();
+						var cust_id = $('#cust_id_1').val();
+					    var params = {};
+					    var url='../../policy/over';
+						params.insurance_id= $("#id","#police_over").val();
+						params.remark= $("#remark","#police_over").val();
+		
+					 	  $(document).sgConfirm({text: '确定作废该盗抢险吗?',cfn:function(r){ 
+						  if(r){ 
+						          $.ajax( {
+						      		  type : 'post', 
+						      		  async: false,   
+						      		  contentType : 'application/json',     
+						      		  dataType : 'json',     
+						      		  url : url,   
+						      		  data:JSON.stringify(params),
+						      		  success : function(data) {
+						      			  if(data){
+						      				 if(data.success){
+							          		 	/*  $('#records').sgDatagrid('reload','sgDatagrid'); */
+							          		 	  $('#vehicle_id').val(vehicle_id);
+												  $('#unit_id').val(unit_id);
+												  $('#cust_id').val(cust_id);
+												  $("#search_btn").trigger("click");//触发按钮 */
+							          		 	  $(document).sgWindow('close', {id : 'police_over'});
+						      				 }
+						      				$(document).sgPup({message:'message_alert',text: data.msg});
+						      				 
+						      			  }
+						      		  } ,     
+						      		  error : function(res,error) { 
+						      		  	 alert(res.responseText);     
+						      		  }   
+						          });
+						  } 	  
+						          }}); 
+						  
+				  			 $('#police_over').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+					    	return false;
+					 };
+				 
+				 
+
+
+function searchcust(){
+	
+	
+	var cust_id = $('#cust_id').val();
+	var vehicle_id = $('#vehicle_id').val();
+	var unit_id = $('#unit_id').val();
+	
+
+	
+	/* 
+	if(cust_id=='' && vehicle_id =='' && unit_id==''){
+		$(document).sgPup({message:'message_alert',text: "请输入查询条件!"});
+		return false;
+	} */
+	/* 
+	$('#searchnumber').val("");
+	$('#searchcall').val(""); 
+	$('#searchvin').val("");  */
+	
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../getCustInfoForPolicy',
+		data : JSON.stringify({
+			cust_id : cust_id,
+			vehicle_id : vehicle_id,
+			unit_id : unit_id
+		}),
+		success : function(data) {
+			if (data) {
+				//客戶信息
+				$('#customer_name').val(data.customer.customer_name);
+				$('#idcard').val(data.customer.id_no);
+				//车辆信息
+				$('#number_plate').val(data.vehicle.plate_no);
+				$('#cartype').val(data.model);
+				$('#color').val(data.vehicle.color);
+				$('#state').val(data.unit.reg_status);
+				
+				$('#call_letter').val(data.unit.call_letter);
+				$('#unitcode').val(data.unittype);
+				$('#code').val(data.vehicle.chassis_no);
+				
+				
+				$('#ennum').val(data.vehicle.engine_no);
+				$('#chassnum').val(data.vehicle.vin);
+				$('#time').val("");
+				if(data.unit.fix_time!=null){
+					$('#time').val(data.unit.fix_time.substring(0,10));
+				}
+				
+				
+				$('#manager_name').val(data.unit.sales);
+				$('#money').val(data.vehicle.buy_money);
+				$('#registerTime').val("");
+				if(data.vehicle.register_date!=null){
+					$('#registerTime').val(data.vehicle.register_date.substring(0,10));
+				}
+
+				$('#vehicle_id').val(data.vehicle.vehicle_id);
+				$('#unit_id').val(data.unit.unit_id);
+				$('#cust_id').val(data.unit.customer_id);
+				
+				//最近操作车牌号码联系电话
+		//		window.gbossLocalStorage.addItem('storage_vehicle',
+		//				{plateNo:data.vehicle.plate_no,callLetter:data.unit.call_letter});
+				 $('#vehicle_id_1').val(data.vehicle.vehicle_id);
+				 $('#unit_id_1').val(data.unit.unit_id); 
+				 $('#cust_id_1').val(data.unit.customer_id);
+				
+		
+			}/* else{
+				$(document).sgPup({message:'message_alert',text: "没有符合查询条件的查询结果，请重新输入！"});
+			} */
+		},
+		error : function(res, error) {
+			$(document).sgPup({message:'message_alert',text: "没有符合查询条件的查询结果，请重新输入！"});
+		}
+	});
+	
+	//开始时间小于  表    借宿时间大于输入字段借宿时间
+	
+	
+	
+	   
+	    if(cust_id || vehicle_id || unit_id ){
+		    $("#records").html("")
+			var defaults_1 = {
+			        title: "",
+			        width:  '100%',
+			        height: 200,
+			        url : '../../policy/findPolicyPage',
+				    usepager: true,
+				    rownumbers:true,
+				    useRp: true,
+				    colid:'id',  //主键
+				    query:{cust_id:cust_id,vehicle_id:vehicle_id,unit_id:unit_id},
+			        colModel : [
+									                    
+						{display: '保单号', name : 'policy_no', width : 100},
+						{display: '投保公司', name : 'company', width : 100, sortable : true,formatter:function(value,row){
+    	  	                if(value==1){
+    	  	                    value = '太平洋保险';
+    	  	                }else if(value==2){
+    	  	                    value = '深圳平安保险';
+    	  	                }
+    	  	                return value;
+    	  	            }},
+						{display: '意外投保人', name : 'policyholder', width : 80},
+						
+						{display: '是否打印', name : 'is_print', width : 60, sortable : true,formatter:function(value,row){
+    	  	                if(value==1){
+    	  	                    value = '是';
+    	  	                }else{
+    	  	                    value = '否';
+    	  	                }
+    	  	                return value;
+    	  	            }},
+    	  	          {display: '状态', name : 'status', width : 60, sortable : true,formatter:function(value,row){
+  	  	                if(value==0){
+  	  	                    value = '<font color="red">停办<font>';
+  	  	                }else if(value==2){
+  	  	                    value = '有效';
+  	  	                }else if(value==9){
+  	  	                    value = '<font color="red">作废<font>';
+  	  	                }
+  	  	                return value;
+  	  	            }},
+						{display: '销售经理', name : 'sales', width : 80},
+						{display: '保险金额(元)', name : 'amount', width : 110},
+						{display: '办理日期', name : 'stamp', width : 130}
+			        ],
+				    
+				    buttons : [
+				   			{name: '办理', bclass: 'add', onpress : addItem},
+				   			{separator: true},
+				   		    {name: '编辑', bclass: 'edit', onpress :editItem },
+				            {separator: true},
+				            {name: '查看', bclass: 'view', onpress :viewItem },
+				            {separator: true},
+				            {name: '开启', bclass: 'open', onpress : openItem},
+				            {separator: true},
+				            {name: '停办', bclass: 'lock', onpress : stopItem},
+				            {separator: true},
+				            {name: '作废', bclass: 'delete', onpress : endItem},
+				            {separator: true}
+				           ]
+				    
+			    };
+			    $('#records').sgDatagrid(defaults_1);
+		  
+	    }
+	    
+	
+	  
+	/*   
+	  $('#vehicle_id').val("");
+	  $('#unit_id').val("");
+	   */
+	
+	
+}
+
+
+(function($){
+	
+	/* var vehicleList;
+	var unitList;
+	var vinList;
+	
+	var checkUnit = function(){
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {};
+		params.filter.call_letter =  $("#searchcall");
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../getpaupdateUnits',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#searchcall");
+					  if(manager){
+						  if(data.items.length>0){
+							  unitList = {};
+							  $("#unit_id").val();
+							  $("#unitList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.call_letter);
+							  $("#unitList").append(op);
+							  
+							  unitList[v.call_letter] = v.unit_id;
+	 				  	 }); 
+						}
+				  }
+			  } ,     
+			  error : function(res,error) { 
+				  $(document).sgPup({message:'message_alert',text: res.responseText});  
+			  }    
+			});
+	};
+	
+	
+	
+	$("#searchcall").on('keyup',checkUnit);
+	$("#searchcall").on('change',function(){
+		  var strs = this.value.split(" ");
+		    if(unitList[strs[strs.length-1]]){
+		    	
+		    	$('#custname').val('');
+			  	$('#cust_id').val('');
+				$('#searchcall').val('');
+			  	$('#unit_id').val('');
+			  	$('#vehicle_id').val('');
+				$('#searchnumber').val('');
+				$('#vin').val('');
+		    	
+				$(this).val(strs[strs.length-1]);
+				$("#unit_id").val(unitList[strs[strs.length-1]]);
+		    }else{
+		    	$(this).val('');
+		    	$("#unit_id").val("");
+		    }
+		});
+	
+	
+
+	 
+	 
+	var checkVehicle = function(){
+	var params = {};
+	params.pageNo = 1;
+	params.pageSize = 10;
+	params.filter = {};
+	params.filter.plate_no = $("#searchnumber").val();
+	var obj = $(this);
+	$.ajax({
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getVehicles',   
+		  data:JSON.stringify(params),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#searchnumber");
+				  if(manager){
+					  if(data.items.length>0){
+						  vehicleList = {};
+						  $("#vehicle_id").val();
+						  $("#vehicleList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(obj.val()+" "+v.plate_no);
+						  $("#vehicleList").append(op);
+						  
+						  vehicleList[v.plate_no] = v.vehicle_id;
+				  	 }); 
+					}
+			  }
+		  } ,     
+		  error : function(res,error) { 
+			  $(document).sgPup({message:'message_alert',text: res.responseText});  
+		  }    
+		});
+};
+
+
+
+
+$('#searchnumber').on('keyup',checkVehicle);
+$('#searchnumber').on('change',function(){
+	  var strs = this.value.split(" ");
+	  var plate_no;
+	  if(strs.length==3){
+		  plate_no = strs[1]+" "+strs[2];
+	  }else if(strs.length==4){
+		  plate_no = strs[1]+" "+strs[2]+" "+strs[3];
+	  }else{
+		  plate_no = strs[strs.length-1];
+	  }
+	
+		$('#custname').val('');
+	  	$('#cust_id').val('');
+		$('#searchcall').val('');
+	  	$('#unit_id').val('');
+	  	$('#vehicle_id').val('');
+		$('#searchnumber').val('');
+		$('#vin').val('');
+
+	    if(vehicleList[plate_no]){
+			$(this).val(plate_no);
+			$("#vehicle_id").val(vehicleList[plate_no]);
+			if($("#vehicle_id").val().length==0){
+				$("#searchnumber").val("");
+			}
+	    }else if(vehicleList[this.value]){
+	    	$("#vehicle_id").val(vehicleList[this.value]);
+	    	
+	    	if($("#vehicle_id").val().length==0){
+				$("#searchnumber").val("");
+			}
+	    }else{
+	    	$(this).val('');
+	    	$("#vehicle_id").val("");
+	    }
+	});
+
+
+
+var checkVin = function(){
+	var params = {};
+	params.pageNo = 1;
+	params.pageSize = 10;
+	params.filter = {};
+	params.filter.vin =  $("#vin");
+	var obj = $(this);
+	$.ajax({
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getVehicles',   
+		  data:JSON.stringify(params),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#vin");
+				  if(manager){
+					  if(data.items.length>0){
+						  vinList = {};
+						  $("#vehicle_id").val();
+						  $("#vinList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(obj.val()+" "+v.vin);
+						  $("#vinList").append(op);
+						  
+						  vinList[v.vin] = v.vehicle_id;
+ 				  	 }); 
+					}
+			  }
+		  } ,     
+		  error : function(res,error) { 
+			  $(document).sgPup({message:'message_alert',text: res.responseText});  
+		  }    
+		});
+};
+
+
+		$("#vin").on('keyup',checkVin);
+		$("#vin").on('change',function(){
+			  var strs = this.value.split(" ");
+			    if(vinList[strs[strs.length-1]]){
+			    	$('#custname').val('');
+				  	$('#cust_id').val('');
+					$('#searchcall').val('');
+				  	$('#unit_id').val('');
+				  	$('#vehicle_id').val('');
+					$('#searchnumber').val('');
+					$('#vin').val('');
+					$(this).val(strs[strs.length-1]);
+					$("#vehicle_id").val(vinList[strs[strs.length-1]]);
+			    }else{
+			    	$(this).val('');
+			    	$("#vehicle_id").val("");
+			    }
+			});
+
+ */
+
+	
+	var defaults = {
+	        title: "",
+	        width:  '100%',
+	        height: 200,
+	        url: '',
+		    rownumbers:true,
+		    isNotCheckall:true,
+	        colModel : [
+				{display: '保单号', name : 'ac_amount', width : 80},
+				{display: '投保公司', name : 'real_amount', width : 80},
+				{display: '意外投保人', name : 'bw_no', width : 80},
+				{display: '是否打印', name : 'agent_name', width : 60},
+				{display: '状态', name : 'agent_name', width : 60},
+				{display: '销售经理', name : 'agent_name', width : 100},
+				{display: '保险金额(元)', name : 'feetype_id', width : 120},
+				{display: '办理日期', name : 'stamp', width : 140}
+	        ]
+	    };
+	    $('#records').sgDatagrid(defaults);
+	
+})(jQuery)
+
+
+</script>
+<script type="text/javascript" src="../../jscript/web/vehicleList.js"></script>
+<script type="text/javascript" src="../../jscript/web/unitList.js"></script>
+<script type="text/javascript" src="../../jscript/web/vinList.js"></script>
+<script type="text/javascript">
+
+
+
+//打印页面元素设置
+var callback=function(subWinBody,subWin){
+	$.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCurrentCompany',   
+		  data:JSON.stringify({}),
+		  success : function(data)  {
+			  if(data){
+
+				 var customer_name = '<div >'+$('#customer_name','#police_view').val()+'</div>';
+				 $("#headInput",subWinBody).append(customer_name);
+				 
+				 var date=new Date;
+				 var year=date.getFullYear();
+				 var month=date.getMonth()+1;
+				 month =(month<10 ? "0"+month:month);
+				 var day = date.getDate(); 
+				 
+				// var mydate = (year.toString()+"&nbsp;&nbsp;&nbsp;"+month.toString()+"&nbsp;&nbsp;"+day.toString()); 
+				 
+				 var mydate = "<em style='padding-right:20px;'>" +(year.toString()+"</em><em style='padding-right:20px;'>"+month.toString()+"</em><em style='padding-right:20px;'>"+day.toString()); 
+				 
+				
+				  $("#headInput2",subWinBody).append(""); 
+				  
+				  $("#headInput3",subWinBody).append(""); 
+				  
+				  
+				 $("#loginname",subWinBody).append($("#loginname","#police_view").val()); 
+				 
+				 $("#ywloginname",subWinBody).append($("#person","#police_view").val()); 
+				 
+				   var idcard=$('#idcard','#police_view').val();
+				 	idcard = idcard.replace(/[ ]/g,"");
+				   var idcardStr = '';
+				  if(idcard != null && idcard.length>0){
+					for(var i = 0; i < idcard.length; i++){
+					    var card = '';
+					if(i ==0 ){
+						card = idcard.charAt(i)+'<em style="padding-right:4px;"></em>';
+					}else{
+						card = '<em style="padding-right:4px;">'+idcard.charAt(i)+'</em>';
+					}
+						idcardStr = idcardStr + card;
+					}
+				  } 
+				 
+				 $("#card",subWinBody).append(idcardStr); 
+				  
+				 
+				 $("#phone",subWinBody).append($("#phone","#police_view").val());  
+				 
+				 var ywidcard=$('#ywidcard','#police_view').val();
+					ywidcard = ywidcard.replace(/[ ]/g,"");
+				   var ywidcardStr = '';
+				  if(ywidcard != null && ywidcard.length>0){
+					for(var i = 0; i < ywidcard.length; i++){
+					    var card2 = '';
+					if(i ==0 ){
+						card2 = ywidcard.charAt(i)+'<em style="padding-right:4px;"></em>';
+					}else{
+						card2 = '<em style="padding-right:4px;">'+ywidcard.charAt(i)+'</em>';
+					}
+					ywidcardStr = ywidcardStr + card2;
+					}
+				  } 
+				 
+				 $("#icard",subWinBody).append(ywidcardStr);
+				 
+				 
+				 
+				 var birthday = $("#birthday","#police_view").val();
+				 var str = birthday.toString();
+				   var year2 = str.substr(0,4);
+		 		   var month2 = str.substr(5,2);
+		 		   var day2 = str.substr(8,2);
+				 
+				 $("#birthday",subWinBody).append("<em style='padding-right:20px;'>" +(year2+"</em><em style='padding-right:20px;'>"+month2+"</em><em style='padding-right:20px;'>"+day) );
+				 
+				// $("#birthday",subWinBody).append($("#birthday","#police_view").val());  
+				 $("#mobile",subWinBody).append($("#mobile","#police_view").val());  
+				  
+				 
+				 
+				 
+				 var is_buypilfer = $("input[name='is_buypilfer']:checked").val();
+				 var is_buy='';
+				 if(is_buypilfer == 0){
+					is_buy = "<em style='padding-left:17px'>√</em>";
+				 }else if(is_buypilfer == 1){
+					is_buy = "<em style='padding-left:61px'>√</em>";
+				 }
+				 $("#is_buypilfer",subWinBody).append(is_buy);  
+				 
+				 
+				 
+				 $("#car_num",subWinBody).append($("#carNum","#police_view").val());  
+				
+				 $("#ucode",subWinBody).append($("#vCode","#police_view").val());  
+				 $("#money",subWinBody).append($("#money","#police_view").val());  
+				  
+				 $("#engine_no",subWinBody).append($("#ennum","#police_view").val());  
+				  
+				 $("#chassis_nos",subWinBody).append($("#chassnum","#police_view").val());
+				 
+				 var regTime = $("#registerTime","#police_view").val();
+				 var str = regTime.toString();
+				   var year = str.substr(0,4);
+		 		   var month = str.substr(5,2);
+		 		   var day = str.substr(8,2);
+				 
+				 $("#register_time",subWinBody).append("<em style='padding-right:20px;'>" +(year+"</em><em style='padding-right:20px;'>"+month+"</em><em style='padding-right:20px;'>"+day) );
+				  
+				 $("#call_letter",subWinBody).append($("#ucall","#police_view").val());  
+				 $("#code",subWinBody).append($("#code","#police_view").val());
+				 
+				   var fix_time = $("#uTime","#police_view").val();
+				   var str = fix_time.toString();
+				   var year = str.substr(0,4);
+		 		   var month = str.substr(5,2);
+		 		   var day = str.substr(8,2);
+				 $("#time",subWinBody).append("<em style='padding-right:20px;'>" +(year+"</em><em style='padding-right:20px;'>"+month+"</em><em style='padding-right:20px;'>"+day));
+				 
+				 $("#address",subWinBody).append($("#address","#police_view").val());
+				  
+				 $("#sales_person",subWinBody).append($("#sales_person","#police_view").val());
+				 
+				 
+			   var start_time = $("#start_time","#police_view").val();
+				   var str = start_time.toString();
+				   var year = str.substr(0,4);
+		 		   var month = str.substr(5,2);
+		 		   var day = str.substr(8,2);
+				var bigin = "<em style='padding-right:30px;'>" +(year+"</em><em style='padding-right:30px;'>"+month+"</em><em style='padding-right:30px;'>"+day+ "<em style='padding-right:55px;'></em>");
+				 
+				 
+			   var end_time = $("#end_time","#police_view").val();
+				   var str1 = end_time.toString();
+				   var year1 = str1.substr(0,4);
+		 		   var month1 = str1.substr(5,2);
+		 		   var day1 = str1.substr(8,2);
+				var end = "<em style='padding-right:30px;'>" +(year1+"</em><em style='padding-right:30px;'>"+month1+"</em><em style='padding-right:30px;'>"+day1);
+				$("#headInput4",subWinBody).append(bigin + end); 
+				
+				var moneyplace ='';
+				var money = $("#policyMoney","#police_view").val();
+				if(money == 100000){
+					moneyplace = "<em style='padding-left:45px;'>√</em>";
+				}else if(money == 150000){
+					moneyplace = "<em style='padding-left:90px;'>√</em>";
+				}else if(money == 200000){
+					moneyplace = "<em style='padding-left:135px;'>√</em>";
+				}else if(money == 300000){
+					moneyplace = "<em style='padding-left:180px;'>√</em>";
+				}else if(money == 400000){
+					moneyplace = "<em style='padding-left:225px;'>√</em>";
+				}else if(money == 500000){
+					moneyplace = "<em style='padding-left:270px;'>√</em>";
+				}else if(money == 600000){
+					moneyplace = "<em style='padding-left:315px;'>√</em>";
+				}else if(money == 700000){
+					moneyplace = "<em style='padding-left:360px;'>√</em>";
+				}else if(money == 800000){
+					moneyplace = "<em style='padding-left:405px;'>√</em>";
+				}else if(money == 900000){
+					moneyplace = "<em style='padding-left:450px;'>√</em>";
+				}else if(money == 1000000){
+					moneyplace = "<em style='padding-left:495px;'>√</em>";
+				}
+				
+				$("#headInput5",subWinBody).append(moneyplace); 
+				
+				$("#headInput6",subWinBody).append(data.companyname); 
+				
+				$("#headInput7",subWinBody).append(data.address); 
+				
+				
+				  
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+	
+  if (navigator.appName == 'Microsoft Internet Explorer'){
+  	subWin.print();  
+  }else{ 
+  	subWin.focus();
+  	subWin.print();  
+  }
+  
+  
+}
+</script>
+</html>

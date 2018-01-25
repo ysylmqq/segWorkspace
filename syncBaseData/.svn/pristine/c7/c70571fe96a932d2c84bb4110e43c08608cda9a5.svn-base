@@ -1,0 +1,28 @@
+#sysnDadaUrl=http://182.92.237.91/
+#sysnDadaUrl=http://101.200.228.44/
+#sysnDadaUrl=http://102.200.233.150/
+sysnDadaUrl=http://101.200.233.150/
+sysnDadaPort=80
+sysnSeries=sync/car/series
+sysnModel=sync/car/models
+ssssList=sync/car/ssssList
+insuracerList=sync/car/insuracerList
+packList=sync/car/packList
+info=sync/car/info
+bindInfo=sync/car/bindInfo
+account=sync/car/accounts
+# second
+dalaytime=180
+# second
+ahead_of_time = 30
+
+#read\u3001connect timeout
+request_time_out = 30
+
+#\u6d77\u9a6c\u9ad8\u4f4e\u914d
+fee_mon_low=25
+
+fee_mon_high=50
+
+# ip white list
+ips=123.57.49.232,182.92.237.91,113.247.250.242,127.0.0.1

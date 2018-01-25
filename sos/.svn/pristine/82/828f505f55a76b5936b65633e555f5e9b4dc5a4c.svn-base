@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<form id='whs_stockin_allocated_form' method='post' class="form" style="width:830px;">
+		<fieldset style="width:820px;">
+			<div class="panel">
+	            	<span style="width:120px;">02交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">02总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">03交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">03总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">04交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">04总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">05交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">05总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">06交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">06总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">07交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">07总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">08交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">08总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">09交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">09总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">10交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">10总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">11交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">11总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">12交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">12总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">15交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">15总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">16交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">16总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">17交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">17总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">18交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">18总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">21交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">21总结文件:</span>
+	                <input type="file">
+	        </div>
+	        <div class="panel">
+	            	<span style="width:120px;">91交易文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">91总结文件:</span>
+	                <input type="file">
+	        </div>
+	    </fieldset>
+	    <fieldset style="width:820px;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="stockin_detail_submit" type="submit" >开始上传</button> <button id="mycancel" type="button" style="width:90px;">解除数据锁</button>
+	        </div>
+        </fieldset>
+    </form>
+</body>
+</html>

@@ -1,0 +1,201 @@
+/* CSS Document */
+@charset "utf-8";
+
+/*表单行间距*/
+.form .panel {
+	margin-bottom:5px;
+	text-align: left;
+	font-size: 13px;
+	font-family: "Lucida Grande", Arial, Helvetica, sans-serif;
+	box-shadow: none;
+	background: transparent;
+}
+
+.form .displayInfo {
+	margin-bottom: 0;
+}
+
+.form div.submit,.form div.submit_2{
+	margin-bottom:0px;
+	text-align:center;
+}
+
+.form label {
+	/*width: 100px;*/
+	float: left;
+    /*padding-top: 3px;*/
+	text-align: right;
+	/*padding-right: 5px;*/
+	line-height: 24px;
+}
+
+.form span {
+	/*width: 34%;*/
+    /*padding-top: 3px;*/
+	text-align: right;
+	/*padding-right: 1%;*/
+	display:inline-block;
+	line-height: 24px;
+	vertical-align:middle;
+}
+
+#customer_form span {
+	/*width: 10%;*/
+}
+
+.searchDis_3 span{
+	width: 41%;
+}
+
+.form span.caption {
+	width: auto;
+}
+/*input[type=text]*/
+input[type=text],input[type=email],input[type=tel],input[type=password],input[type=date],input[type=number]{
+	/*width:260px;*/
+	height:24px;
+	padding:0 3px 0 2px;
+	font-size: 12px;
+	color: #000;
+}
+
+input[required=true]{
+    border: 1px solid #f56363;
+    height: 24px;
+}
+
+input[required=required]{
+    border: 1px solid red;
+}
+
+.form input[type=file]{
+	width:260px;
+}
+/*textarea*/
+.form textarea{
+	/*width:260px;*/
+	height:36px;
+	overflow-y:scroll
+}
+.form textarea[required=true]{
+    border: 1px solid red;
+}
+.form textarea[required=required]{
+    border: 1px solid red;
+}
+/*select 单选*/
+.form select{
+	/*width:260px;*/
+	height:24px;
+	padding:0;
+	font-size: 13px;
+}
+
+.form select[required=true]{
+    border: 1px solid red;
+}
+
+.form select[required=required]{
+    border: 1px solid red;
+}
+
+/*.form input[type=number]{
+	width:260px;
+	height:20px;
+}*/
+/*select multiple多选*/
+.form select[multiple=multiple]{
+	width:264px;
+	height:140px;
+	overflow-y:scroll
+}
+.form .head{
+	background:#e2e5ec;
+    margin: 0px;
+    padding: 0px;
+    height:20px;
+    line-height:20px;
+    border-bottom:1px solid #cbcbd5; 
+}
+
+.form .title{
+    /*background:#e2e5ec;*/
+    margin: 0px;
+    padding: 0px;
+    font-weight:bold;
+    height:20px;
+    line-height:20px;
+    padding-top:2px;
+    padding-left:5px;
+}
+.form fieldset {
+	/*background:#e2e5ec; */
+	/*padding:10px;*/
+	padding:10px;
+	border:1px solid #cbcbd5; 
+	margin-bottom:0px;
+    border-right: 0px;
+    border-left: 0px;
+	width:600px;
+}
+
+.form legend {
+	background:#bfbf30; 
+	color:#fff; 
+	font:17px/21px Calibri, Arial, Helvetica, sans-serif;
+	padding:0 10px;
+	font-weight:bold; 
+	border:1px solid #fff;
+}
+
+/*Checkbox*/
+.form input[type=checkbox] {
+	cursor:pointer; 
+	height:20px; 
+}
+/*radio*/
+.form input[type=radio] {cursor:pointer; height:20px; }
+
+.form input:focus,textarea:focus,select:focus {
+	/*background-color:#6F3;*/
+}
+
+.show_validate_message {
+	color:#F00;
+	text-align:center
+}
+
+.submit button{
+    margin:0 5px 0 0;
+    /*width:80px;
+    background-color:#4791d2;
+    border:1px solid #dedede;
+    border-top:1px solid #eee;
+    border-left:1px solid #eee;
+
+    font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size:12px;
+    line-height:130%;
+    text-decoration:none;
+    text-align:center;
+    font-weight:bold;
+    color:#fff;
+    cursor:pointer;
+    border-radius: 3px;*/
+    padding:2px 10px; /* Links */
+}
+
+input::-webkit-input-placeholder { 
+color: #999; 
+-webkit-transition: color.5s; 
+} 
+input:focus::-webkit-input-placeholder, input:hover::-webkit-input-placeholder { 
+color: #c2c2c2; 
+-webkit-transition: color.5s; 
+}
+
+#sys_user_form .panel span.title,#sys_pwd_form .panel span.title{width: 60px;text-align: right;font-weight: normal;}
+#sys_pwd_form .panel span.title{width: 80px;}
+#sys_user_form .panel input,#sys_user_form .panel textarea,#sys_pwd_form .panel input{border-radius: 4px;}
+
+

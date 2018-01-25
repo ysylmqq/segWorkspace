@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>离网汇总</title>
+<link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../../css/gbossIframe.css">
+</head>
+<body>
+	<div class="jfxtTab">
+		<div class="bills">
+			<section id="monitoring"  class="datagrid"></section>
+			<input type="hidden" id="drill_4sId" />
+		</div>
+	</div>
+	<script type="text/javascript" src="../../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../../jscript/pup.js"></script>
+	<script type="text/javascript" src="../../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../../jscript/form.js"></script>
+	<script type="text/javascript" src="../../../jscript/web/report/offNetSum.js"></script>
+</body>
+</html>

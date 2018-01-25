@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>维修</title>
+<style>
+
+</style>
+</head>
+<body>
+	<div style="overflow-y:hidden;overflow-x:hidden;width:100%;height: 100%; ">
+		<aside id="bm_left" class="bsp_left">
+			<form id='repair' method='post' class="form" style="width:870px;">
+				<div class='title'>维修工单></div>
+				<fieldset style="width:850px;">
+					<div class="panel">
+		                <span>工单号:</span>
+		                <input type='text' id="billnum" name='billnum'  style="width:200px;" disabled="disabled" />
+		            </div>
+		            <div class="panel">    
+		                <span>客户姓名:</span>
+		                <input type='text' id="customerName" name='customerName'  list="customerList"  style="width:200px;" />
+		                <input type="hidden" name="customerId" id="customerId" required="true" value="" />
+		                <datalist id='customerList'></datalist>
+		                
+		                <span style="padding-left:50px;">联系电话:</span>
+		                <input type='text' id="phone" name='phone'  style="width:200px;" />
+		            </div>
+		            <div class="panel">
+		                <span>车牌号:</span>
+		                <input type='text' id="car_num" name='car_num'  style="width:200px;" />
+		                <input type='hidden' id="vehicleId" name='vehicleId'  style="width:200px;" />
+		                
+		                <span style="padding-left:50px;">产品型号:</span>
+		                <input type='text' id="code" name='code'  style="width:200px;" />
+		            </div>
+		            <div class="panel">    
+		                <span>车型:</span>
+		                 <input type='text' id="cartype_name" name='cartype_name'   list="carTypeList" style="width:200px;" />
+		                 <input type="hidden" name="cartype_id" id="cartype_id" required="true" value="" />
+		                   <datalist id='carTypeList'></datalist>
+		                
+		                <span style="padding-left:50px;">类型:</span>
+		                <select size="1" name="type" id="type" style="width:204px;" autocomplete="on">
+		                    <option value="1">维修</option>
+						    <option value="2">回收</option>
+						    <option value="3">拆除</option>
+						    <option value="4">抢修</option>
+						    <option value="5">换装</option>
+						    <option value="6">过户</option>
+						    <option value="7">升级</option>
+						    <option value="8">换号</option>
+						    <option value="9">办停</option>
+						    <option value="10">更改资料</option>
+						    <option value="11">重新开通</option>
+						    <option value="12">新业务办理</option>
+		                </select>
+		            </div>
+		            <div class="panel">    
+		                <span>地点:</span>
+		                <input type='text' id="place" name='place'  style="width:400px;" />
+		                
+		                <span style="padding-left:40px;">营业处:</span>
+		                <input type='checkbox' id ="is_busines" style='vertical-align:middle;' />
+		            </div>
+		            <div class="panel">    
+		                <span style="vertical-align:top;">故障现象:</span>
+		                <textarea id="symptom" name="symptom" style="width:555px;" rows="2"></textarea>
+		            </div>
+		            <div class="panel">
+		            	<span style="vertical-align:top;">注意事项:</span>
+		                <textarea id="note" name="note" style="width:555px;" rows="2"></textarea>
+		            </div>
+		        </fieldset>
+		        
+		        <fieldset style="width:850px;">
+		        	<div class="panel">
+		                <span>直接派工:</span>
+		                <input type='checkbox' style='vertical-align:middle;' id="dispatching" name="dispatching" />
+		            </div>
+		            <div class="panel" id="divObj1" style="display:none">
+		                <span>电工:</span>
+		                <input type='text' id="electrician" name='electrician'  style="width:200px;" />
+		                 <input type='hidden' id="electricianIds" name='electricianIds'  style="width:200px;" />
+		                
+		                <span style="padding-left:50px;">电工电话:</span>
+		                <input type='text' id="electrician_phone" name='electrician_phone'  style="width:200px;" />
+		            </div>
+		            <div class="panel" id="divObj2" style="display:none">    
+		                <span>开始时间:</span>
+		                <input type='time' id="start_time" name='start_time'  style="width:200px;" />
+		                
+		                <span style="padding-left:50px;">预计时长:</span>
+		                <input type='time' id="duration" name='duration'  style="width:200px;" />
+		            </div>
+		        </fieldset>
+		
+		
+		        <fieldset style="width:850px;border-top:0px;">	
+			        <div class='submit'>
+			            <button id="repair_save" type="submit" >保存</button> 
+			            <button id="repair_sendmsg" type="button" >发送短信</button> 
+			            <button id="repair_print" type="button" >打印</button>
+			        </div>
+		        </fieldset>
+		
+			</form>
+		</aside>
+		<article id="bm_main" class="bsp_main accordion" ></article>
+	</div>
+</body>
+<script type="text/javascript">
+	var winClose = function() {
+		$(document).sgWindow('close', {
+			id : 'selectelect'
+		});
+	}
+
+	$(function () {
+		var myclick = function(treenode){
+	        alert(treenode.value+treenode.content+treenode.url);
+	    }
+	    var defaults = {
+	        url:"web/bsp/bsp_left.json",
+	        onclick: myclick,
+	        width:200,
+	        div_height: 495,
+	        isexpend:false
+	    };
+	    $('#bm_main').sgAccordion(defaults);
+	    
+		
+		$("#repair #electrician").on('click',function(){
+			var defaults = {
+					title : '选择电工',
+					id : 'selectelect',
+					form : 'selectelect_form',
+					url : 'web/bsp/selectelect.html',
+					width : 600,
+					height : 280,
+					buttons : [ {
+						name : '确定',
+						onpress : comfire
+						
+					}, {
+						name : '取消',
+						onpress : winClose
+					} ]
+				};
+				$(document).sgWindow(defaults);
+		});
+
+		
+		
+		
+		   var comfire = function(){
+			   
+			   //拼电工的Id,姓名 电话
+		        var obj = $('#ba_select_electrician');
+		        var bDiv = $('.bDiv',obj);
+		        var namevalue='';
+		        var ids='';
+		        var phones='';
+		         $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){    
+		                	editId=this.value;
+		                	alert(JSON.stringify($(this).data('data')));
+		                	editobj = $(this).data('data');
+		                	if(namevalue.length==0){
+		                		namevalue = editobj.name;
+		                		ids = editobj.id;
+		                		if(editobj.phone==null || editobj.phone.length==0){
+		                			phones =  "暂无";
+		                		}else{
+		                			phones =  editobj.phone;
+		                		}
+		                	}else{
+		                		namevalue = namevalue + "," + editobj.name
+		                		ids = ids + "," + editobj.id;
+		                		if(editobj.phone==null || editobj.phone.length==0){
+		                			phones = phones + ",暂无";
+		                		}else{
+		                			phones = phones + "," + editobj.phone;
+		                		}
+		                	}
+		                }
+		                
+		            });
+			   
+		        $("#electrician","#repair").val(namevalue);
+		        $("#electrician_phone","#repair").val(phones);
+		        $("#electricianIds","#repair").val(ids);
+		         $(document).sgWindow('close',{id:'selectelect'}); 
+		 		
+		 	   };
+		 	   
+		 	   
+		 	    
+			    $.ajax( {
+					  type : 'POST', 
+					  async: false,   
+					  url : "task/getTaskNo",   
+					  data:{},
+					  success : function(data) {
+						  if(data){
+							  $("#billnum").val(data);
+						  }
+					  } 
+				});
+			    
+			    
+			    
+			    var checkCustomer = function(){
+					var text=this.value;
+					text = text.replace(/\s/g,'');
+					if(text!=this.value){
+						this.value=text;
+						$(this).trigger('change');
+						return false;
+					}
+					var params = {};
+					params.pageNo = 1;
+					params.pageSize = 10;
+					params.filter = {};
+					params.filter.customer_name = this.value;
+					var obj = $(this);
+					$.ajax({
+						  type : 'post', 
+						  async: true,   
+						  contentType : 'application/json',     
+						  dataType : 'json',     
+						  url : 'getCustomers',   
+						  data:JSON.stringify(params),
+						  success : function(data) {
+							  if(data){
+								  var manager = $("#customerName");
+								  if(manager){
+									  if(data.items.length>0){
+										  customerList = {};
+										  $("#customerList").empty();
+									  }
+									  $.each(data.items,function(k,v){
+										  var op = $("<option></option>");
+										  op.val(obj.val()+" "+v.customer_name);
+										  $("#customerList").append(op);
+										  
+										  customerList[v.customer_name] = v.id;
+				 				  	 }); 
+									}
+							  }else{
+							  	alert(data);
+							  }
+						  } ,     
+						  error : function(res,error) { 
+						  	 alert(res.responseText);     
+						  }    
+						});
+				};
+			    
+				
+				$("#repair #customerName").on('click',function(){
+				    //填充客户
+				    $.ajax( {
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : 'getCustomers',   
+					  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+					  success : function(data) {
+						  if(data){
+							  var manager = $("#customerName");
+							  if(manager){
+								  if(data.items.length>0){
+									  customerList = {};
+									  $("#customerList").empty();
+								  }
+								  $.each(data.items,function(k,v){
+									  var op = $("<option></option>");
+									  op.val(v.customer_name);
+									  $("#customerList").append(op);
+									  
+									  customerList[v.customer_name] = v.id;
+								  	 }); 
+								  manager.on('keyup',checkCustomer);
+								  manager.on('change',function(){
+									  debugger;
+									  var strs = this.value.split(" ");
+									    if(customerList[strs[strs.length-1]]){
+											$(this).val(strs[strs.length-1]);
+											$("#customerId","#repair").val(customerList[strs[strs.length-1]]);
+											 $("#phone","#repair").val("");
+											 $("#vehicleId","#repair").val("");
+											  $("#cartype_name","#repair").val("");
+											  $("#code","#repair").val("");
+											  $("#cartype_id","#repair").val("");
+											  $("#car_num","#repair").val("");
+											  
+											  
+											
+											  $.ajax( {
+												  type : 'POST', 
+												  async: false,  
+												  url : "customer/getDetailMsg",   
+												  data:{id:$("#customerId","#repair").val()},
+												  success : function(data) {
+													  debugger;
+													  if(data){
+														  var a = data.phone;
+														  $("#phone","#repair").val(data.phone);
+														  $("#vehicleId","#repair").val(data.id);
+														  $("#cartype_name","#repair").val(data.cartypeName);
+														  $("#code","#repair").val(data.code);
+														  $("#cartype_id","#repair").val(data.cartypeId);
+														  $("#car_num","#repair").val(data.number_plate);
+													  }
+												  } 
+											});
+										    
+											if($("#customerId","#repair").val().length==0){
+												$("#customerName","#repair").val("");
+											}
+									    }else{
+									    	$(this).val('');
+									    	$("#customerId","#repair").val("");
+									    }	
+									});
+			
+								}
+						  }else{
+						  	alert(data);
+						  }
+					  },     
+					  error : function(res,error) { 
+					  	 alert(res.responseText);     
+					  }    
+					});
+				});
+			    
+
+			  
+			    
+			    $("#repair").on('submit',function(e){
+	    			//做表单提交
+	                var params = {};
+	                var url='task/add';
+	                var chk_bu = document.getElementById("is_busines");
+	            	if(chk_bu.checked){
+	            		params.isoffice="1";
+	    	    	}else{
+	    	    		params.isoffice="0";
+	    	    	}
+	                   
+	       		 	params.billno=$('#billnum','#repair').val();
+	       		    params.billtype="2";
+	    			params.phone=$('#phone','#repair').val();
+	    			params.place=$('#place','#repair').val();
+	    			params.cartype_id=$('#cartype_id','#repair').val();
+	       			params.customerId=$('#customerId','#repair').val();
+	       			params.electricianIds=$('#electricianIds','#repair').val();
+	       			params.electrician_phone=$('#electrician_phone','#repair').val();
+	       			params.electricianNames=$('#electrician','#repair').val();
+	       			params.start_time=$('#start_time','#repair').val();
+	       			//params.duration=$('#duration','#repair').val();
+	       		    params.type=$('#type','#repair').val();
+	       	     	params.note=$('#note','#repair').val();
+	       	        params.symptom=$('#symptom','#repair').val();
+	       	        params.vehicleId=$('#vehicleId','#repair').val();
+	       			params.code=$('#code','#repair').val();
+	       	     
+	       			
+	       			
+	       		 	alert(JSON.stringify(params));
+	       		 	if(window.confirm('确定保存接单吗?')){
+	       		 		
+	         		 	 
+	         		 	if(!params.customerId){
+	     	         	   alert('请选择客户！');
+	     	         	   return false;
+	     	            }
+	       		 		
+	                      $.ajax( {
+	   	           		  type : 'post', 
+	   	           		  async: false,   
+	   	           		  contentType : 'application/json',     
+	   	           		  dataType : 'json',     
+	   	           		  url : url,   
+	   	           		  data:JSON.stringify(params),
+	   	           		  success : function(data) {
+	   	           			  if(data){
+	   	           				 if(data.success){
+	   	           					// $(document).sgWindow('close',{id:'win_managers'}); 
+	   	   	          		 		 $('#repair').sgDatagrid('reload','sgDatagrid');
+	   	   	          		 		
+	   	           				 }
+	   	           				 alert(data.msg);
+	   	           			  }
+	   	           		  } ,     
+	   	           		  error : function(res,error) { 
+	   	           		  	 alert(res.responseText);     
+	   	           		  }    
+	   	           		}); 
+	       		 	}
+	   	        $('#repair').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	   			e.stopPropagation();
+	   	    	return false;
+	   	  
+	   	 	   });
+			    
+		
+		
+	    $("[name = dispatching]:checkbox").bind("click", function () {
+	    	var chk = document.getElementById("dispatching");
+	    	if(chk.checked){
+	    		$("#divObj1").show();
+	    		$("#divObj2").show();
+	    	}else{
+	    		$("#divObj1").hide();
+	    		$("#divObj2").hide();
+	    	}
+	    })
+	});
+
+</script>
+</html>

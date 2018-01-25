@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>出入库明细</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap-datetimepicker.css" /><!-- +++++ -->
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+	<div id="whs_detail_grid" class="datagird" ></div>
+	<datalist id="userDataList"></datalist>
+  	<datalist id="productDataList"></datalist>
+
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../bslib/js/bootstrap-datetimepicker.js"></script><!-- ++++ -->
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script>
+	<script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+	(function($){
+	 var userDataList = {};//销售经理 key:name,value:id
+		var productDataList=[];//商品数组 key:商品名称,value code:productId
+	 var now =new Date();
+	 var begeinDate =new Date();
+	begeinDate.setDate(1);
+	begeinDate=begeinDate.format('yyyy-MM-dd');
+	 //now.setYear(2013);
+	 //now.setMonth(3);
+	 //now.setDate(7);
+	 now=now.format('yyyy-MM-dd');
+
+	var startDateHTML = '<span class="ltext"><input type="text" name="startDate" class="form-control form_datetime" value='+begeinDate+' /></span>';//开始日期
+	var endDateHTML = '<span class="ltext"><input type="text" name="endDate" class="form-control form_datetime" value='+now+' /></span>';//结束日期
+	
+		//初始化表格
+   	 var defaults = {
+   		        title: "出入库明细",
+   		     	width:  '100%',
+		        height: 345,
+   		        url: '../../stock/findStockInOutDetailsPage',
+	   		    usepager: true,
+	 	        rownumbers:true,
+	 	        useRp: true,
+	 	        //colid:'id',  //主键
+	 	        query:{startDate:begeinDate,endDate:now},
+   		        colModel : [
+					{display: '商品编码', name : 'productCode', width : 100, sortable : false},
+   		            {display: '商品名称', name : 'productName', width : 100, sortable : false},
+   		         	{display: '商品规格', name : 'norm', width : 150, sortable : false},
+   		         	{display: '出入库单号', name : 'stockCode', width : 120, sortable : false},
+				   	{display: '出入库数量', name : 'inOutNum', width : 80, sortable : false},
+   		            {display: '结余数量', name : 'surplusNum', width : 80, sortable : false},
+   		         	{display: '操作类型', name : 'type', width : 120, sortable : false},
+   		     		{display: '经办人', name : 'managersName', width : 60, sortable : false},
+   		     		{display: '客户', name : 'channelName', width : 60, sortable : false},
+   		         	{display: '日期', name : 'stamp', width : 70, sortable : false},
+		         	{display: '仓库', name : 'whsName', width : 80, sortable : false}
+   		        ],
+		        searchitems :[
+		                      {display:'营业处仓库',html:'<span class="ltext"><select size="1" name="whsId" id="whsId" class="form-control"><option value="">--请选择--</option> </select></span>'},
+		            {display:'商品名称',html:'<span class="ltext"><input type="text" name="productNameCondn" list="productDataList" class="form-control" /> <input type="hidden" id="productId" name="productId" /></span>'},
+		            {display:'出入库单号',html:'<span class="ltext"><input type="text" name="stockCode" class="form-control" /></span>'},
+		         	{display:'经办人',html:'<span class="ltext"><input type="text" name="managersName" id="managersName" list="userDataList" class="form-control" /><input type="hidden" name="managersId" id="managersId" /></span>'},
+		            {display:'开始日期',html:startDateHTML},
+			      	{display:'结束日期',html:endDateHTML}
+		        ],
+		        exporturl:'../../stock/exportExcel4InOutDetails',
+		        order: false,
+   		        sortname: "productNameCondn",
+   		        sortorder: "asc"
+   		    };
+   		    $('#whs_detail_grid').sgDatagrid(defaults); 
+   		  
+   		    
+   		//自动查询商品
+   			var checkProduct = function(){
+   				/* var text=this.value;
+   				text = text.replace(/\s/g,''); //去除空格
+   				if(text!=this.value){//有空格
+   					this.value=text;
+   					$(this).trigger('change');
+   					return false;
+   				} */
+   				var params = {};
+   				params.pageNo = 1;
+   				params.pageSize = 15;
+   				params.filter = {};
+   				params.filter.nameOrCode = this.value;
+   				var obj = $(this);
+   				$.ajax({
+   					  type : 'post', 
+   					  async: true,   
+   					  contentType : 'application/json',     
+   					  dataType : 'json',     
+   					  url : '../../product/findProducts',   
+   					  data:JSON.stringify(params),
+   					  success : function(data) {
+   						  if(data){
+   							  var products = data.items;
+   							  if(products.length>0){
+   								  $("#productDataList").empty();
+   							      productDataList=[];
+   							  }
+   							  var key=null;
+   							  $.each( products, function(key,value){
+   								  var op = $("<option></option>");
+   								  key=value.code;
+   								  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+   									 
+   								  $("#productDataList").append(op);
+   								  productDataList[key]=value.id;
+   							 });
+   						  }else{
+   							  $(document).sgPup({message:'message_info',text: data});
+   						  }
+   					  } ,     
+   					  error : function(res,error) { 
+   					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+   					  }    
+   					});
+   			};
+   			
+   		  //填充商品
+   			$.ajax({
+   				  type : 'post', 
+   				  async: true,   
+   				  contentType : 'application/json',     
+   				  dataType : 'json',     
+   				  url : '../../product/findProducts',   
+   				  data:JSON.stringify({pageNo:1,pageSize:15,filter:{type:0}}),
+   				  success : function(data) {
+   					  if(data){
+   						  var products = data.items;
+   						  $("#productDataList").empty();
+   						  var key=null;
+   						  productDataList=[];
+   						  $.each( products, function(key,value){
+   							  var op = $("<option></option>");
+   							  key=value.code;
+   							  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+   							  
+   							  $("#productDataList").append(op);
+   							  productDataList[key]=value.id;
+   						 });
+   						var productNameCondn=$('input[name=productNameCondn]',$('#whs_detail_grid'));
+   						productNameCondn.on('keyup',checkProduct);
+   						
+   						productNameCondn.on('change',function(){
+   							var strs = this.value.split(" ");
+   							$(this).val(strs[strs.length-3]);
+   							if($(this).val()){
+								$("#productId",$('#whs_detail_grid')).val(productDataList[strs[strs.length-2]]);
+								if($("#productId",$('#whs_detail_grid')).val().length==0){
+									$("#productNameCondn",$('#whs_detail_grid')).val("");
+								}
+						    }else{
+						    	$(this).val('');
+						    	$("#productId",$('#whs_detail_grid')).val("");
+						    }
+						
+							});
+
+   					  }else{
+   						  $(document).sgPup({message:'message_info',text: data});
+   					  }
+   				  } ,     
+   				  error : function(res,error) { 
+   				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+   				  }    
+   				}); 
+   		//自动查询经办人
+			var checkUser = function(){
+				/* var text=this.value;
+				text = text.replace(/\s/g,''); //去除空格
+				if(text!=this.value){//有空格
+					this.value=text;
+					$(this).trigger('change');
+					return false;
+				} */
+				var params = {};
+				params.pageNo = 1;
+				params.pageSize = 10;
+				params.filter = {};
+				params.filter.opname = this.value;
+				params.filter.isCompany = true;//查询机构下的的所有操作人
+				var obj = $(this);
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../getOrgOperators',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  var manager = $("#managersName","#whs_detail_grid");
+							  						  
+							  if(manager){
+								  if(data.items.length>0){
+							  		  userDataList = {};
+									  $("#userDataList").empty();
+								  }
+								  $.each(data.items,function(k,v){
+									  var op = $("<option></option>");
+									  op.val(obj.val()+" "+v.opname);
+									  $("#userDataList").append(op);
+									  
+									  userDataList[v.opname] = v.opid;
+			 				  	 }); 
+								}
+						  }else{
+						  	$(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					});
+			}
+			
+		  //填充经办人
+		    $.ajax( {
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../getOrgOperators',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#managersName","#whs_detail_grid");
+					  if(manager){
+						  if(data.items.length>0){
+					  		  userDataList = {};
+							  $("#userDataList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(v.opname);
+							  $("#userDataList").append(op);
+							  
+							  userDataList[v.opname] = v.opid;
+						  	 }); 
+						  manager.on('keyup',checkUser);
+						  manager.on('change',function(){
+							  	var strs = this.value.split(" ");
+								 if(userDataList[strs[strs.length-1]]){
+										$(this).val(strs[strs.length-1]);
+										$("#managersId","#whs_detail_grid").val(userDataList[strs[strs.length-1]]);
+										if($("#managersId","#whs_detail_grid").val().length==0){
+											$("#managersName","#whs_detail_grid").val("");
+										}
+								    }else{
+								    	$(this).val('');
+								    	$("#managersId","#whs_detail_grid").val("");
+								    }
+								
+							});
+
+						};
+				  }else{
+				  	$(document).sgPup({message:'message_info',text: data});
+				  }
+			  },     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+		  
+		  //填充营业处仓库
+		    $.ajax( {
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../stock/findWarehouses',   
+			  data:JSON.stringify({}),
+			  success : function(data) {
+				  if(data){
+					  var whsId=$("#whsId","#whs_detail_grid");
+					  if(whsId.get(0)){
+						  $.each(data,function(k,v){
+							  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+						  }); 
+					  }
+					 
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});	
+			
+	})(jQuery)
+</script>
+<script type="text/javascript">
+	$.fn.datetimepicker.dates['zh'] = {
+	    days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+	    daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+	    daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+	    months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+	    monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+	    meridiem : [ "上午", "下午" ],
+	    today : "今天"
+	};
+	$(document).ready(function(){
+	    $(".form_datetime").datetimepicker({
+	        language : "zh",
+	        autoclose: true,
+	        minView: "month",
+	        format : 'yyyy-mm-dd'
+	    });
+	});
+</script>
+</html>

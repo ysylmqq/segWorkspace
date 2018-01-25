@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>收货地址</title>
+</head>
+
+<body>
+ <div id="dgd_address" class="datagrid"></div>
+</body>
+<script type="text/javascript">
+    (function($){
+       var editId=null;//编辑时选中行ID
+       var editObj=null;//编辑时选中行对象
+ 	   var loadSuccess = function(){
+ 		   $("#id",$("#form_address")).val('');
+ 		//填充编辑前的值
+ 		   if(editId){
+             $('#form_address input,select').each(function(){
+            	 $(this).val(editObj[$(this).attr('name')]);
+             });	
+ 		   }
+ 		  editId=null;
+ 		  
+ 	   }
+    	
+       var winClose = function (){
+          $(document).sgWindow('close',{id:'win_address'});
+       }
+ 	   var save = function(){
+ 		//手机、固话其中之一项必填
+           if (($('#phone').val().replace(/\s/g,"").length<1&&$('#tel').val().replace(/\s/g,"").length<1)) { 
+             $('#phone').get(0).setCustomValidity('手机号码和固话必填一项!'); 
+             $('#phone').focus;
+             return false;
+           }else{
+        	   $('#phone').get(0).setCustomValidity('');
+           }
+           $("#form_address").unbind('submit');
+ 		  $("#form_address").on('submit',function(e){
+ 			  			if(!$('#name','#form_address').val()){
+ 			  				return false;
+ 			  			}
+       		           //做表单提交	
+	                    var params = {};
+	                    $.each($("#form_address").serializeArray(),function(k,v){
+	                        	params[v.name]= v.value;
+	                     });
+		                 var url='../../order/addCustomerAddress';
+		    		     if($('#id',"#form_address").val()){
+		    		    	url='../../order/updateCustomerAddress';
+		    		     }
+		    		     $(document).sgConfirm({text: '确定保存地址信息吗?',cfn:function(r){ 
+		    		     	if(r){
+		                    $.ajax( {
+		            		  type : 'post', 
+		            		  async: false,   
+		            		  contentType : 'application/json',     
+		            		  dataType : 'json',     
+		            		  url : url,   
+		            		  data:JSON.stringify(params),
+		            		  success : function(data) {
+		            			  if(data){
+		            				 if(data.success){
+		    	          		 		 $("#win_address input[type=reset]").trigger("click");
+		            					 $(document).sgWindow('close',{id:'win_address'}); 
+		    	          		 		 $('#dgd_address').sgDatagrid('reload','sgDatagrid');
+		            				 }
+		            				$(document).sgPup({message:'message_info',text: data.msg});
+		            			  }
+		            		  } ,     
+		            		  error : function(res,error) { 
+		            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		            		  }    
+		            		}); 
+		    		     }
+		    		 }});
+            $('#form_address').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+  		    e.stopPropagation();
+         	return false;
+         });
+ 	   };
+
+ 	   var addItem = function(){
+ 		    editId=null;
+ 	       	editObj=null;
+ 	        var defaults = {
+ 	                title:'收货地址管理',
+ 	                id:'win_address',
+ 	                form:'form_address',
+ 	                url:'web/order/address_form.html',
+ 	                success: loadSuccess,
+ 	                width: 580,
+	                height:255,
+ 	                buttons : [
+ 	                           {name: '确定', type: 'submit', onpress : save},
+ 	                           {name: '关闭', onpress : winClose},
+ 	                           {name: '重置', type: 'reset'}
+ 	                       ]
+ 	            };
+ 	        $(document).sgWindow(defaults);
+ 	        
+ 	    }
+ 	    var editItem = function(){
+ 	    	var obj = $('#dgd_address');
+ 	        var bDiv = $('.bDiv',obj);
+ 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+ 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+ 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+ 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+ 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+ 	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	                if($(this).attr("checked")){  
+ 	                	editId=this.value;
+ 	                	editObj=$(this).data('data');
+ 	                	var defaults = {
+ 	        	                title:'收货地址明细',
+ 	        	                id:'win_address',
+ 	        	                form:'form_address',
+ 	        	                url:'web/order/address_form.html',
+ 	        	                success: loadSuccess,
+ 	        	                width: 580,
+ 	      	                    height:255,
+ 	        	                buttons : [
+  	        	                           {name: '确定', type: 'submit', onpress : save},
+	        	                           {name: '关闭', onpress : winClose},
+ 	        	                           {name: '重置', type: 'reset'}
+ 	        	                       ]
+ 	        	            };
+ 	                	
+ 		    	        $(document).sgWindow(defaults);
+ 	                }
+ 	            });
+ 	        }else{
+ 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+ 	        }
+ 	    	
+ 	    }
+ 	    
+ 	   var editItem2 = function(){
+	    	var obj = $('#dgd_address');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){  
+	                	editId=this.value;
+	                	if(	$(this).data('data').isDefault==0){
+	                		$(document).sgConfirm({text: '只能设置一个默认收货地址，确定设置?',cfn:function(r){ 
+							  if(r){
+		                	 $.ajax( {
+			            		  type : 'post', 
+			            		  async: false,   
+			            		  contentType : 'application/json',     
+			            		  dataType : 'json',     
+			            		  url : '../../order/updateCustomAddressIsDefault',   
+			            		  data:JSON.stringify({id:this.value}),
+			            		  success : function(data) {
+			            			  if(data){
+			            				 if(data.success){
+			    	          		 		 $('#dgd_address').sgDatagrid('reload','sgDatagrid');
+			            				 }
+			            				$(document).sgPup({message:'message_info',text: data.msg});
+			            			  }
+			            		  } ,     
+			            		  error : function(res,error) { 
+			            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			            		  }    
+			            		}); 
+		                	}
+		                }});
+	                	}else{
+	                		$(document).sgPup({message:'message_info',text: "该地址已为默认地址!"});
+	                	}
+	                }
+	            });
+	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }
+	    	
+	    }
+ 	   var delItem = function(){
+	    	var obj = $('#dgd_address');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	      	    var ids=[];
+ 	        	
+ 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	 	        		ids.push(this.value);
+ 	 	        		if(	$(this).data('data').isDefault==0){
+ 	 	        			$(document).sgConfirm({text: '删除后不可恢复，确定删除?',cfn:function(r){ 
+							  if(r){
+ 	 	 	        		 $.ajax( {
+ 	 		            		  type : 'post', 
+ 	 		            		  async: false,   
+ 	 		            		  contentType : 'application/json',     
+ 	 		            		  dataType : 'json',     
+ 	 		            		  url : '../../order/deleteCustomerAddresss',   
+ 	 		            		  data:JSON.stringify(ids),
+ 	 		            		  success : function(data) {
+ 	 		            			  if(data){
+ 	 		            				 if(data.success){
+ 	 		    	          		 		 $('#dgd_address').sgDatagrid('reload','sgDatagrid');
+ 	 		            				 }
+ 	 		            				$(document).sgPup({message:'message_info',text: data.msg});
+ 	 		            			  }
+ 	 		            		  } ,     
+ 	 		            		  error : function(res,error) { 
+ 	 		            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+ 	 		            		  }    
+ 	 		            		}); 
+ 	 	 	        	};
+ 	 	 	        }});
+ 	 		        	}else{
+ 	 		        		 $(document).sgPup({message:'message_info',text: "默认地址不能删除！"});
+ 	 		        	}
+ 	 	            });
+ 	        		
+	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择要删除的选项！"});
+	        }
+	    }     
+ 	   //修改表格的宽度
+        var height =$('#main_bd',window.parent.document).height()-129;
+    	//初始化表格
+    	 var defaults = {
+    		        title: "收货地址管理",
+    		        width:  '100%',
+    		        height: height,
+    		        url: '../../order/findCustomerAddress',
+    		        rownumbers:true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '收货人姓名', name : 'name', width : 70, sortable : false},
+    		            {display: '详细地址', name : 'address', width : 120, sortable : false},
+    		            {display: '手机号码', name : 'phone', width : 86, sortable : false},
+    		            {display: '固话', name : 'tel', width : 76, sortable : false},
+    		            {display: '邮箱', name : 'email', width : 76, sortable : false},
+    		            {display: '邮政编码', name : 'postcode', width : 60, sortable : false},
+    		            {display: '是否为默认地址', name : 'isDefault', width : 90, sortable : false,formatter:function(value,row){
+    		            	 if(value==0){
+     		                    value = '<font color="red">否</font>';
+     		                }else if(value==1){
+     		                    value = '<font color="green">是</font>';
+     		                }
+    		                return value;
+    		            }},
+    		            {display: '备注', name : 'remark', width : 90, sortable : false}
+    		        ],
+    		        buttons : [
+    		            {name: '增加', bclass: 'add', onpress : addItem},
+    		            {separator: true},
+    		            {name: '编辑', bclass: 'edit', onpress : editItem},
+    		            {separator: true},
+    		            {name: '设为默认地址', bclass: 'check', onpress : editItem2},
+    		            {separator: true},
+    		            {name: '删除', bclass: 'delete', onpress : delItem},
+    		            {separator: true}
+    		        ],
+    		        searchitems :[
+    		            {display:'收货人姓名',name:'name',type:'text'}
+    		        ]
+    		        //query:{name:''},//查询默认参数
+    		    };
+    		    $('#dgd_address').sgDatagrid(defaults); 
+
+    })(jQuery)
+</script>
+</html>

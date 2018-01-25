@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>挂账转移</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css"><link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+
+<body>
+<div id="nw_document_all">
+ <div id="dgd_borrow_turn" class="datagrid"></div>
+ <datalist id="userDataList"></datalist>
+  <datalist id="productDataList">
+            </datalist>
+</div>            
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+    (function($){
+    	var userDataList = {};//销售经理 key:name,value:id
+		var productDataList=[];//商品数组 key:商品名称,value code:productId
+		
+		var lastMonthDay=new Date();//上个月的今天
+    	//lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+		lastMonthDay.setDate(1);
+    	lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+		var today=new Date().format('yyyy-MM-dd');
+		
+       var editId=null;//编辑时选中行ID
+       var editObj=null;//编辑时选中行对象
+       var editIds=null;//批量修改挂账转移的ID
+       var editNums=null;//编辑对象的所有未还库的数量
+ 	   var loadSuccess = function(){
+    	   if(editObj&&editIds&&editIds.length>0){
+    		 $('#spn_num','#form_borrow_turn').text(editNums);
+    	   }
+ 	   }
+    	
+       var winClose = function (){
+          $(document).sgWindow('close',{id:'win_borrow_turn'});
+       }
+
+ 	  var save4edit = function(){
+		   $("#form_borrow_turn").on('submit',function(e){
+			   var str='';
+			   var str2='该';
+			   if(editIds&&editIds.length>1){
+				   str='统一';
+				   str2='这些';
+			   }
+         $(document).sgConfirm({text: '确定要'+str+'转移'+str2+'挂账信息吗?',cfn:function(r){ 
+                            if(r){
+		
+	        		 $.ajax( {
+	           		  type : 'POST', 
+	           		  async: false,   
+	           		  //contentType : 'application/json',     
+	           		  dataType : 'json',     
+	           		  url : '../../stock/saveBorrowTo',  
+	           		  data:{ids:editIds,borrowerId:$('#managersId','#form_borrow_turn').val(),borrowerName:$('#managersName','#form_borrow_turn').val()},
+	           		  success : function(data) {
+	           			  if(data){
+	           				 if(data.success){
+	           					 $(document).sgWindow('close',{id:'win_borrow_turn'}); 
+	   	          		 		 $('#dgd_borrow_turn').sgDatagrid('reload','sgDatagrid');
+	           				 }
+	           				$(document).sgPup({message:'message_info',text: data.msg});
+	           			  }
+	           		  } ,     
+	           		  error : function(res,error) { 
+	           		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	           		  }    
+	           		}); 
+		  		 }
+          }});
+			   $('#form_borrow_turn').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+				e.stopPropagation();
+	        	return false;
+	        });
+ 
+	   };
+
+ 	    var editItem = function(){
+ 	    	var obj = $('#dgd_borrow_turn');
+ 	        var bDiv = $('.bDiv',obj);
+ 	       	editIds=[];
+ 	       	editObj=null;
+ 	       editNums=0;
+ 	         var isGoOn=true;
+ 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+ 	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	        			editIds.push(this.value);
+ 	        			editObj=$(this).data('data');
+ 	        			 if(editObj.status==2){
+ 	        				isGoOn=false;
+ 	        				$(document).sgPup({message:'message_info',text: editObj.borrowerName+"借用的名为["+editObj.productName+"]商品已经转移，不能再次转移!"});
+ 	        				return false;
+ 	        			} 
+ 	        			if(editObj.num){
+ 	        			  editNums=editNums+Number(editObj.num);
+ 	        			}
+ 	 	            });
+ 	        		if(!isGoOn){
+ 	        			return false;
+ 	        		}
+ 	        		//打开窗口
+	                var defaults = {
+	    	                title:'挂账转移',
+	    	                id:'win_borrow_turn',
+	    	                form:'form_borrow_turn',
+	    	                url:'borrow_turn_form.html',
+	    	                success: loadSuccess,
+	    	               	width: 408,
+		   	                height: 220,
+		   	                buttons : [
+	   	                           {name: '确定', type: 'submit', onpress : save4edit},
+	   	                           {name: '关闭', onpress : winClose}
+	    	                       ]
+	    	            };
+	    	        $(document).sgWindow(defaults);
+ 	        	
+ 	        }else{
+ 	            $(document).sgPup({message:'message_info',text: "请选择要编辑的选项！"});
+ 	        }
+ 	    }
+ 	   //修改表格的宽度
+        var height =$('#main_bd',window.parent.document).height()-190;
+    	//初始化表格
+    	 var defaults = {
+    		        title: "挂账转移",
+    		        width:  '100%',
+    		        height: height,
+    		        url: '../../stock/findBorrowDetailsByPage',
+    		        usepager: true,
+    		        rownumbers:true,
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '借用人', name : 'borrowerName', width : 90, sortable : false},
+						{display: '代理商', name : 'channelName', width : 90, sortable : false},
+    		            {display: '最终客户', name : 'customerName', width : 90, sortable : false},
+						{display: '时间', name : 'stamp', width : 120, sortable : false},
+    		            {display: '商品名称', name : 'productName', width : 110, sortable : false},
+    		            {display: '商品规格', name : 'norm', width : 150, sortable : false},
+    		            {display: '借用数量', name : 'borrowNum', width : 50, sortable : false,isAdd:true,formatter:function(value,row){
+    		            	if(value){
+    		            		return Number(value);
+    		            	}else{
+    		            		return value;
+    		            	}
+    		            }},
+    		            {display: '已还库数量', name : 'returnNum', width : 60, sortable : false,isAdd:true},
+    		            {display: '已销账数量', name : 'writeoffsNum', width : 60, sortable : false,isAdd:true},
+    		            {display: '已核销数量', name : 'writeoffsNum2', width : 60, sortable : false,isAdd:true},
+    		            {display: '未还库数量', name : 'num', width : 60, sortable : false,isAdd:true,formatter:function(value,row){
+    		            	if(value){
+    		            		return Number(value);
+    		            	}else{
+    		            		return value;
+    		            	}
+    		            }},
+    		            {display: '仓库', name : 'whsName', width : 100, sortable : true},
+    		            {display: '目的经办人', name : 'toBorrowerName', width : 100, sortable : true}
+    		        ],
+    		        buttons : [
+    		            {name: '转移', bclass: 'edit', onpress : editItem},
+    		            {separator: true}
+    		        ],
+    		        searchitems :[
+    		            {display:'营业处仓库',html:'<select size="1" name="whsId" id="whsId" style="width:141px"><option value="">--请选择--</option> </select>'},
+						{display:'开始日期',name:'startDate',type:'date',value:lastMonthDay,width:150},
+				      	{display:'结束日期',name:'endDate',type:'date',value:today,width:150},
+				        {display:'状态',name:'status',html:'<select name="status" style="width:153px;"><option value="" >请选择...</option><option value="0" selected>未销</option><option value="1">已销</option><option value="2">已转移</option></select>'},
+				      	{display:'借用人',html:'<input type="text" name="managersName" id="managersName" style="width:161px;" list="userDataList"/><input type="hidden" name="managersId" id="managersId" />'},
+				      	{display:'商品名称',html:'<input type="text" name="productNameCondn" list="productDataList" style="width:150px;" /> <input type="hidden" id="productId" name="productId" />'}
+    		        ],
+    		        exporturl:'./../../stock/exportExcel4BorrowDetailsTurn',//导出excel
+    		        query:{status:0}//查询默认参数
+    		    };
+    		    $('#dgd_borrow_turn').sgDatagrid(defaults); 
+    		    
+    		    //填充仓库
+			    $.ajax( {
+				  type : 'post', 
+				  async: false,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : './../../stock/findWarehouses',   
+				  data:JSON.stringify({}),//除开本仓库
+				  success : function(data) {
+					  if(data){
+						  var whsId=$("#whsId");
+						  if(whsId.get(0)){
+							  $.each(data,function(k,v){
+								  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+							  }); 
+						  }
+						 
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+    		  
+    		  //自动查询商品
+       			var checkProduct = function(){
+       				/* var text=this.value;
+       				text = text.replace(/\s/g,''); //去除空格
+       				if(text!=this.value){//有空格
+       					this.value=text;
+       					$(this).trigger('change');
+       					return false;
+       				} */
+       				var params = {};
+       				params.pageNo = 1;
+       				params.pageSize = 15;
+       				params.filter = {};
+       				params.filter.nameOrCode = this.value;
+       				var obj = $(this);
+       				$.ajax({
+       					  type : 'post', 
+       					  async: true,   
+       					  contentType : 'application/json',     
+       					  dataType : 'json',     
+       					  url : '../../product/findProducts',   
+       					  data:JSON.stringify(params),
+       					  success : function(data) {
+       						  if(data){
+       							  var products = data.items;
+       							  if(products.length>0){
+       								  $("#productDataList").empty();
+       							      productDataList=[];
+       							  }
+       							  var key=null;
+       							  $.each( products, function(key,value){
+       								  var op = $("<option></option>");
+       								  key=value.code;
+       								  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+       									 
+       								  $("#productDataList").append(op);
+       								  productDataList[key]=value.id;
+       							 });
+       						  }else{
+       							  $(document).sgPup({message:'message_info',text: data});
+       						  }
+       					  } ,     
+       					  error : function(res,error) { 
+       					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+       					  }    
+       					});
+       			};
+       			
+       		  //填充商品
+       			$.ajax({
+       				  type : 'post', 
+       				  async: true,   
+       				  contentType : 'application/json',     
+       				  dataType : 'json',     
+       				  url : '../../product/findProducts',   
+       				  data:JSON.stringify({pageNo:1,pageSize:15,filter:{type:0}}),
+       				  success : function(data) {
+       					  if(data){
+       						  var products = data.items;
+       						  $("#productDataList").empty();
+       						  var key=null;
+       						  productDataList=[];
+       						  $.each( products, function(key,value){
+       							  var op = $("<option></option>");
+       							  key=value.code;
+       							  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+       							  
+       							  $("#productDataList").append(op);
+       							  productDataList[key]=value.id;
+       						 });
+       						var productNameCondn=$('input[name=productNameCondn]',$('#dgd_borrow_turn'));
+       						productNameCondn.on('keyup',checkProduct);
+       						
+       						productNameCondn.on('change',function(){
+       							var strs = this.value.split(" ");
+       							$(this).val(strs[strs.length-3]);
+       							if($(this).val()){
+    								$("#productId",$('#dgd_borrow_turn')).val(productDataList[strs[strs.length-2]]);
+    								if($("#productId",$('#dgd_borrow_turn')).val().length==0){
+    									$("#productNameCondn",$('#dgd_borrow_turn')).val("");
+    								}
+    						    }else{
+    						    	$(this).val('');
+    						    	$("#productId",$('#dgd_borrow_turn')).val("");
+    						    }
+    						
+    							});
+
+       					  }else{
+       						  $(document).sgPup({message:'message_info',text: data});
+       					  }
+       				  } ,     
+       				  error : function(res,error) { 
+       				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+       				  }    
+       				}); 
+       		  
+       		  //自动查询经办人
+       			var checkUser = function(){
+       				/* var text=this.value;
+       				text = text.replace(/\s/g,''); //去除空格
+       				if(text!=this.value){//有空格
+       					this.value=text;
+       					$(this).trigger('change');
+       					return false;
+       				} */
+       				var params = {};
+       				params.pageNo = 1;
+       				params.pageSize = 10;
+       				params.filter = {};
+       				params.filter.opname = this.value;
+       				params.filter.isCompany = true;//查询机构下的的所有操作人
+       				var obj = $(this);
+       				$.ajax({
+       					  type : 'post', 
+       					  async: true,   
+       					  contentType : 'application/json',     
+       					  dataType : 'json',     
+       					  url : '../../getOrgOperators',   
+       					  data:JSON.stringify(params),
+       					  success : function(data) {
+       						  if(data){
+       							  var manager = $("#managersName","#dgd_borrow_turn");
+       							  						  
+       							  if(manager){
+       								  if(data.items.length>0){
+       							  		  userDataList = {};
+       									  $("#userDataList").empty();
+       								  }
+       								  $.each(data.items,function(k,v){
+       									  var op = $("<option></option>");
+       									  op.val(obj.val()+" "+v.opname);
+       									  $("#userDataList").append(op);
+       									  
+       									  userDataList[v.opname] = v.opid;
+       			 				  	 }); 
+       								}
+       						  }else{
+       						  	$(document).sgPup({message:'message_info',text: data});
+       						  }
+       					  } ,     
+       					  error : function(res,error) { 
+       					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+       					  }    
+       					});
+       			}
+       			
+       		  //填充经办人
+       		    $.ajax( {
+       			  type : 'post', 
+       			  async: false,   
+       			  contentType : 'application/json',     
+       			  dataType : 'json',     
+       			  url : '../../getOrgOperators',   
+       			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+       			  success : function(data) {
+       				  if(data){
+       					  var manager = $("#managersName","#dgd_borrow_turn");
+       					  userDataList = {};
+       					  if(manager){
+       						  if(data.items.length>0){
+       							  $("#userDataList").empty();
+       						  }
+       						  $.each(data.items,function(k,v){
+       							  var op = $("<option></option>");
+       							  op.val(v.opname);
+       							  $("#userDataList").append(op);
+       							  
+       							  userDataList[v.opname] = v.opid;
+       						  	 }); 
+       						  manager.on('keyup',checkUser);
+       						  manager.on('change',function(){
+       							  	var strs = this.value.split(" ");
+       								 if(userDataList[strs[strs.length-1]]){
+       										$(this).val(strs[strs.length-1]);
+       										$("#managersId","#dgd_borrow_turn").val(userDataList[strs[strs.length-1]]);
+       										if($("#managersId","#dgd_borrow_turn").val().length==0){
+       											$("#managersName","#dgd_borrow_turn").val("");
+       										}
+       								    }else{
+       								    	$(this).val('');
+       								    	$("#managersId","#dgd_borrow_turn").val("");
+       								    }
+       								
+       							});
+
+       						};
+       				  }else{
+       				  	$(document).sgPup({message:'message_info',text: data});
+       				  }
+       			  },     
+       			  error : function(res,error) { 
+       			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+       			  }    
+       			});
+    })(jQuery)
+</script>
+</html>

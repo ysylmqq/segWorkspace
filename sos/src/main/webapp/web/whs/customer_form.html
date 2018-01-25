@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>最终客户列表</title>
+</head>
+
+<body style="padding: 0px;margin: 0px;">
+ <div id="dgd_customer" class="datagrid"></div>
+</body>
+<script type="text/javascript">
+    (function($){
+    	var query={};
+    	
+    	//初始化表格
+   	 	var defaults = {
+   		        width:  '100%',
+   		        height: 310,
+   		        url: '../../customer/list',
+   		        colid:'id',  //主键
+   		    	usepager: true,
+		        rownumbers:true,
+		        useRp: true,
+   		        colModel : [
+   		           		{display: '客户姓名', name : 'customer_name', width : 80, sortable : false},
+    		            {display: '性别', name : 'sex', width : 40, sortable : false},
+    		            {display: '手机', name : 'mobile', width : 120, sortable : false},
+    		            {display: '身份证', name : 'idcard', width : 130, sortable : false},
+    		            {display: '邮箱', name : 'email', width : 110, sortable : false},
+    		            {display: '联系电话', name : 'phone', width : 110, sortable : false}
+   		        ],
+   		        buttons : [
+   		        ],
+   		        searchitems :[
+						{display:'客户姓名',name:'customer_name',type:'text'},
+   		            	{display:'手机',name:'mobile',type:'text'},
+   		             	{display:'身份证',name:'idcard',type:'text'}
+   		        ],
+   		        //exporturl:'',//导出excel
+   		        query:query//查询默认参数
+   		    };
+   		    $('#dgd_customer').sgDatagrid(defaults);
+   		    
+    })(jQuery)
+    
+</script>
+</html>

@@ -1,0 +1,53 @@
+
+<meta charset="UTF-8">
+
+<div id="ba_left_electrician" class="datagrid" style="overflow:hidden"></div>
+
+<script type="text/javascript">
+
+	(function($){
+		var head_defaults = {
+	            id: 'grid1',
+	            width:  198,
+	            height: 460,
+	            url: 'onduty/getOntutyDetail',
+	            colModel : [
+	                {display: '电工姓名', name : 'name', width : 50},
+	                {display: '状态', name : 'status', width : 54},
+	                {display: '忙闲', name : 'is_busy', width : 45}
+	            ]
+	        };
+	    $("#ba_left_electrician").sgDatagrid(head_defaults);
+	})(jQuery)
+	
+	$(function () {
+		$("#ba_left_electrician a").on('click',function(){
+			var id = $(this).attr("id");
+			alert(id);
+			
+			var defaults = {
+					title : '电工状态',
+		   			id : 'electricianStatus',
+		   			form : 'electricianStatus_form',
+		   			url : 'web/bsp/electricianStatus.html',
+		   			width : 420,
+		   			height : 290,
+		   			buttons : [ {
+		   				name : '保存',
+		   				onpress : winClose
+		   			}, {
+		   				name : '关闭',
+		   				onpress : winClose
+		   			} ]
+		        };
+			$(document).sgWindow(defaults);
+		});
+		
+	});
+	
+	var winClose = function() {
+		$(document).sgWindow('close', {
+			id : 'electricianStatus'
+		});
+	}
+</script>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>电工安装明细表</title>
+</head>
+<body>
+	<div class='datagrid' id="installation" style="overflow:auto;">
+    </div>
+</body>
+<script type="text/javascript">
+    (function($) {
+    	var today=new Date().format('yyyy-MM');
+    	var height = 476;
+    	//初始化表格
+    	var defaults = {
+    		        title: "电工安装明细表",
+    		        width:  '100%',
+    		        height: height,
+    		        rownumbers:true,
+    		        url:'',
+    		        isNotCheckall:true,
+    		        colModel : [
+						{display: '安装日期', name : 'stamp', width : 70},
+						{display: '客户姓名', name : 'productCode', width : 70},
+    		            {display: '车牌', name : 'productName', width : 70},
+    		            {display: '车载电话', name : 'norm', width : 70},
+    		            {display: '车型', name : 'unit', width : 50},
+    		            {display: '车架号', name : 'inNum', width : 70},
+    		            {display: '产品型号', name : 'price', width : 70},
+    		            {display: '销售人', name : 'code', width : 50},
+    		            {display: '安装人', name : 'whsName', width : 50},
+    		            {display: '单号', name : 'billno', width : 70},
+    		            {display: '名称/地点', name : 'location', width : 70},
+    		            {display: '备注(是否开通)', name : 'remark', width : 90}
+    		        ],
+    		        buttons : [
+    		        ],
+    		        searchitems :[
+				      	{display:'年月',name:'month',type:'month',width:150,value:today}
+    		        ],
+    		        query:{startDate:today,endDate:today},
+    		        exporturl:'./stock/exportExcel4StockIn',//导出excel
+    		        isCount:true//是否合计
+    		    };
+    		    $('#installation').sgDatagrid(defaults);
+  		  //复制一个导出->打印,再把它插入到原来导出的后面
+		  $("#installation .sDiv>.pGroup:first").clone().insertAfter($("#installation .sDiv>.pGroup:last"));
+		  $("#installation .sDiv>.pGroup:last a.button").attr('id','aprint');
+		  $("#installation .sDiv>.pGroup:last span.button_span span").html('打印');
+    })(jQuery);
+</script>
+</html>

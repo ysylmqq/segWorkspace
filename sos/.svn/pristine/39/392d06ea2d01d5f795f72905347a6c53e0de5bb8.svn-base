@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>业务处理主页面</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+
+<body>
+<div id="nw_document_all" >
+	<div id="tabContainer" class="tab_container f12">
+	    <ul class="tabs">
+	        <li><a href="#tab1">当前库存</a></li>
+	        <li><a href="#tab2">出入库明细</a></li>
+	        <li><a href="#tab3">库存预警</a></li>
+	    </ul>
+	    <div class="tab_div_container">
+	        <div id="tab1" class="tab_content" src="whs_list.html"></div>
+	        <div id="tab2" class="tab_content" src="detail_list.html"></div>
+	        <div id="tab3" class="tab_content" src="alarm_list.html"></div>
+	    </div>
+	</div>
+</div>
+</body>
+	<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../bslib/js/bootstrap-datetimepicker.js"></script><!-- ++++ -->
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script>
+	<script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+    (function($) {
+        var defaults = {
+            width: '100%',
+            height: 600
+        };
+
+        $('#tabContainer').sgTab(defaults);
+    })(jQuery);
+</script>
+</html>

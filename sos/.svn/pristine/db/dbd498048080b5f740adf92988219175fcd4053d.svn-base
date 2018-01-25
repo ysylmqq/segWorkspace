@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>总部商品导入</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+
+<body style="padding: 0px;margin: 0px;">
+<div id="nw_document_all">
+ <div id="dgd_product_in" class="datagrid"></div>
+</div>
+</body>
+ <script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script>
+	<script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+    (function($){
+    	function isvalidatefile(obj) {
+    		
+    		var extend = obj.substring(obj.lastIndexOf(".") + 1);
+    		//$(document).sgPup({message:'message_info',text: extend);
+    		if (extend == "") {
+    		} else {
+    			if (!(extend.toLocaleLowerCase() == "xls" || extend.toLocaleLowerCase() == "xlsx")) {
+    				$(document).sgPup({message:'message_info',text: "请上传后缀名为xls或xlsx的文件!"});
+    				
+    				return false;
+    			}
+    		}
+    		return true;
+    	}
+    	 var save = function(){
+   		   $("#form_productInImp").on('submit',function(e){
+   			if ($('#productInFile').val() == '') {
+   				$(document).sgPup({message:'message_info',text: '请选择上传导入文件!'});
+   				$('#productInFile').focus();
+   				return false;
+   			}else{
+   				var file=$('#productInFile')[0];
+   				var files=file.files;
+   				if(files){
+	   				var filesLength=files.length;
+	   				if(filesLength>50){
+	   					$(document).sgPup({message:'message_info',text: '一次性最多上传50个文件!'});
+	   	   				$('#productInFile').focus();
+	   					return false;
+	   				}
+	   				var isGoOn=true;
+	   				for(var i=0;i<filesLength;i++){
+		   				if(!isvalidatefile(files[i].name)){
+		   					isGoOn=false;
+		   					break;
+		   				}
+	   				}
+	   				if(!isGoOn){
+	   				  return false;
+	   				}
+   				
+   				}
+   			}
+			var mask=$('<div id="imp_mask"></div>');
+			mask.addClass('window-mask');
+			mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+	        var span=$('<span></span');
+	        span.css({position:'absolute',left:$(window).outerWidth()/2-80,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+	        span.text('正在导入中...请稍作休息！');
+	        mask.append(span);
+		    $(document.body).append(mask);
+		    
+   	        	return true;
+   	        }); 
+   	   };
+   	   
+   	 var winClose= function (){
+         $(document).sgWindow('close',{id:'win_productInImp'});
+      }
+    	var impItem = function(){
+    		var defaults = {
+ 	                title:'商品导入',
+ 	                id:'win_productInImp',
+ 	                form:'form_productInImp',
+ 	                url:'product_in_import.html',
+ 	                width: 458,
+ 	                height: 205,
+ 	                buttons : [
+ 	                           {name: '确定', type: 'submit', onpress : save},
+ 	                           {name: '关闭', onpress : winClose}
+ 	                       ]
+ 	            };
+    		$(document).sgWindow(defaults);
+ 	    }
+    	var impItem2 = function(){
+    		var defaults = {
+ 	                title:'商品导入',
+ 	                id:'win_productInImp',
+ 	                form:'form_productInImp',
+ 	                url:'product_in_import2.html',
+ 	                width: 458,
+ 	                height: 205,
+ 	                buttons : [
+ 	                           {name: '确定', type: 'submit', onpress : save},
+ 	                           {name: '关闭', onpress : winClose}
+ 	                       ]
+ 	            };
+    		$(document).sgWindow(defaults);
+ 	    }
+    	 //修改表格的宽度
+         var height =$('#main_bd',window.parent.document).height()-191;
+    	//初始化表格
+    	 var defaults = {
+   		        title: "总部商品",
+   		        width:  '100%',
+   		        height: height,
+   		        url: '../../product/findInProducts',
+   		        usepager: true,
+   		        rownumbers:true,
+   		        useRp: true,
+   		        colid:'id',  //主键
+   		        colModel : [
+   		                 {display: '编码', name : 'code', width : 120, sortable : true},
+     		            {display: '名称', name : 'name', width : 140, sortable : false},
+     		            {display: '规格', name : 'norm', width : 130, sortable : false},
+     		           {display: '单位', name : 'unit', width : 100, sortable : false},
+   		            {display: '类别', name : 'type', width : 60, sortable : false,formatter:function(value,row){
+   		             if(value==0){
+		                    value = '<a href="#" onClick="findParts(\''+row.id+'\')">成品</a>';
+		                }else if(value==1){
+		                    value = '配件';
+		                }
+		                return value;
+   		            }},
+   		            {display: '是否在销', name : 'issell', width : 60,formatter:function(value,row){
+   		            	if(value==0){
+		                    value = '<font color="red">否</font>';
+		                }else if(value==1){
+		                    value = '<font color="green">是</font>';
+		                }
+   		                return value;
+   		            }}
+   		        ],
+   		        buttons : [
+					{name: '导入BOM', bclass: 'add', onpress : impItem},
+					{separator: true},
+					{name: '导入外购商品', bclass: 'add', onpress : impItem2},
+					{separator: true}
+   		        ],
+   		        searchitems :[
+						{display:'编码',name:'code',type:'text',width:120},
+   		            	{display:'名称',name:'name',type:'text',width:120},
+   		            	{display:'规格',name:'norm',type:'text',width:140},
+   		            	{display:'类型',name:'type',html:'<select name="type"><option value="0" selected>成品</option><option value="1">配件</option></select>'}
+   		        ],
+   		        query:{type:0},
+   		        exporturl:'../../product/exportAllInProducts'//导出excel
+   		    };
+   		    $('#dgd_product_in').sgDatagrid(defaults);
+   		    
+    })(jQuery)
+    
+    //配件信息窗口加载成功后
+    var partWinLoad = function(){
+    	if($('#dgd_part').get(0)){
+        	var query={productId:editId};//type:1,如果是配件转成了成品，则查询配件时，把type=1的条件去掉 
+        	
+        	$('#dgd_part','#win_product_part').sgDatagrid('reload',{query:query,url:'../../product/findParts'});
+    	}
+ 	}
+    
+    //查询成品的配件信息
+   	function findParts(productId){
+    	editId=productId;
+    	//打开窗口
+         var defaults = {
+	                title:'配件信息',
+	                id:'win_product_part',
+	                url:'product_part.html',
+	                success: partWinLoad,
+	                width: 828,
+	                 height: 445,
+	                buttons : [
+	                           {name: '关闭', type: 'button', onpress : function (){
+	                               $(document).sgWindow('close',{id:'win_product_part'});
+	                            }
+	                           }
+	                       ]
+	            };
+	        $(document).sgWindow(defaults);
+   	}
+</script>
+</html>

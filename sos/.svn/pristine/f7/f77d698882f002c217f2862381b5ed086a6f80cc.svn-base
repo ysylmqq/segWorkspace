@@ -1,0 +1,44 @@
+/* CSS Document */
+@charset "utf-8";
+
+.accordion {
+	margin:0;
+	padding:0;
+	width:200px;
+	font-size:12px;
+	font-family:"Times New Roman", Times, serif;
+}
+
+.accordion a {
+	text-decoration:none;
+}
+
+.accordion_li{
+	display:block;
+	border-bottom: 1px solid #cbcbd5;
+    background-color:#4791d2;
+	color: #fff;
+	padding:5px;
+}
+
+.accordion_li_open{
+	display:block;
+	border-bottom: 1px solid #cbcbd5;;
+    background: url(../images/x.png) repeat-x top;
+	color: #606978;
+	padding:5px;
+}
+
+.accordion_ul_li{
+	display:block;
+	border-bottom: 1px solid #cbcbd5;
+	background: #e2e5ec;
+  	color: #606978;
+  	padding:5px;
+  	padding-left: 20px;
+}
+
+.accordion div{
+	background-color:#e2e5ec;
+	color: #606978;
+}

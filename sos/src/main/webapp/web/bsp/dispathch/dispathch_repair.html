@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>维修派工单</title>
+<style>
+
+</style>
+</head>
+<body>
+	<form id='dispatch_repair' method='post' class="form" style="width:690px;">
+		<fieldset style="width:670px;">
+			<div class="panel">
+                <span>工单号:</span>
+                <input type='text' id="billnum" name='billnum'  style="width:200px;" disabled="disabled" />
+                <input type='hidden' id="reservation_id" name='reservation_id'   />
+                 <input type='hidden' id="taskId" name='taskId'   />
+                 <span style="padding-left:50px;">客户姓名:</span>
+                 <input type='text' id="customerName" name='customerName' disabled="disabled"  style="width:200px;" />
+                
+            </div>
+            <div class="panel">
+                <span>车牌号:</span>
+                <input type='text' id="car_num" name='car_num'  style="width:200px;" disabled="disabled"/>
+                
+                <span style="padding-left:50px;">产品型号:</span>
+                <input type='text' id="code" name='code'  style="width:200px;" disabled="disabled"/>
+            </div>
+            <div class="panel">    
+                <span>车型:</span>
+                <input type='text' id="cartype_name" name='cartype_name'  style="width:200px;" disabled="disabled" />
+                
+                <span style="padding-left:50px;">类型:</span>
+                 <select size="1" name="type" id="type" style="width:204px;" disabled="disabled"  autocomplete="on">
+		                    <option value="1">维修</option>
+						    <option value="2">回收</option>
+						    <option value="3">拆除</option>
+						    <option value="4">抢修</option>
+						    <option value="5">换装</option>
+						    <option value="6">过户</option>
+						    <option value="7">升级</option>
+						    <option value="8">换号</option>
+						    <option value="9">办停</option>
+						    <option value="10">更改资料</option>
+						    <option value="11">重新开通</option>
+						    <option value="12">新业务办理</option>
+		         </select>
+            </div>
+            <div class="panel">    
+                <span>地点:</span>
+                <input type='text' id="place" name='place'  style="width:400px;" disabled="disabled" />
+                
+                <span style="padding-left:40px;">营业厅:</span>
+                <input type='checkbox' id ="is_busines" name="is_busines" style='vertical-align:middle;'  disabled="disabled"/>
+            </div>
+            <div class="panel">    
+                <span style="vertical-align:top;">故障现象:</span>
+                <textarea id="symptom" name="symptom" style="width:555px;" rows="2" disabled="disabled"></textarea>
+            </div>
+            <div class="panel">
+            	<span style="vertical-align:top;">注意事项:</span>
+                <textarea id="note" name="note" style="width:555px;" rows="2" disabled="disabled"></textarea>
+            </div>
+        </fieldset>
+        
+        <fieldset style="width:670px;">
+            <div class="panel">
+                <span>预约时间:</span>
+                <input type='text' id="time" name='time' disabled="disabled" style="width:200px;" />
+            </div>
+        </fieldset>
+        
+        <fieldset style="width:670px;">
+            <div class="panel">
+                <span>电工:</span>
+                <input type='text' id="electrician" name='electrician'  style="width:200px;" onfocus="selectelect();"/>
+                 <input type='hidden' id="electricianIds" name='electricianIds'  style="width:200px;" />
+                
+                <span style="padding-left:50px;">电工电话:</span>
+                <input type='text' id="electrician_phone" name='electrician_phone'  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>开始时间:</span>
+                <input type='time' id="start_time" name='start_time'  style="width:200px;" />
+                
+                <span style="padding-left:50px;">预计时长:</span>
+                <input type='time' id="duration" name='duration'  style="width:200px;" />
+            </div>
+        </fieldset>
+
+	</form>
+</body>
+<script type="text/javascript">
+	var winClose = function() {
+		$(document).sgWindow('close', {
+			id : 'selectelect'
+		});
+	}
+	
+	var selectelect = function() {
+		var defaults = {
+			title : '选择电工',
+			id : 'selectelect',
+			form : 'selectelect_form',
+			url : 'web/bsp/selectelect.html',
+			width : 600,
+			height : 280,
+			buttons : [ {
+				name : '确定',
+				onpress : comfire
+			}, {
+				name : '取消',
+				onpress : winClose
+			} ]
+		};
+		$(document).sgWindow(defaults);
+	}
+	
+	
+	   var comfire = function(){
+			   //拼电工的Id,姓名 电话
+		        var obj = $('#ba_select_electrician');
+		        var bDiv = $('.bDiv',obj);
+		        var namevalue='';
+		        var ids='';
+		        var phones='';
+		         $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){    
+		                	editId=this.value;
+		                	alert(JSON.stringify($(this).data('data')));
+		                	editobj = $(this).data('data');
+		                	if(namevalue.length==0){
+		                		namevalue = editobj.name;
+		                		ids = editobj.id;
+		                		if(editobj.phone==null || editobj.phone.length==0){
+		                			phones =  "暂无";
+		                		}else{
+		                			phones =  editobj.phone;
+		                		}
+		                	}else{
+		                		namevalue = namevalue + "," + editobj.name
+		                		ids = ids + "," + editobj.id;
+		                		if(editobj.phone==null || editobj.phone.length==0){
+		                			phones = phones + ",暂无";
+		                		}else{
+		                			phones = phones + "," + editobj.phone;
+		                		}
+		                	}
+		                }
+		                
+		            });
+			   
+		        $("#electrician","#dispatch_repair").val(namevalue);
+		        $("#electrician_phone","#dispatch_repair").val(phones);
+		        $("#electricianIds","#dispatch_repair").val(ids);
+		         $(document).sgWindow('close',{id:'selectelect'}); 
+		 		
+		 	   };
+</script>
+</html>

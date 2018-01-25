@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>资讯发布</title>
+<script type="text/javascript"> 
+	function myreload(){
+		$('#hot_news').sgDatagrid('reload','sgDatagrid');
+	}
+</script>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+</head>
+<body>    
+	<form id='news_form' name='news_form' method='post' class="form" action="../../news/add" enctype="multipart/form-data"  target="uploadframe">
+	
+		<div class='title'>资讯内容</div>
+		<fieldset style="width:850px;">
+			<div class="panel">
+					<span>资讯标题:</span>
+	            	<input type='text' id="title" required="true" name="title" style="width:555px;"/>
+	            	<input type='hidden' id="type"  name="type" value="1" />
+	        </div>
+	        	          
+	        	          
+             <div class="panel">    
+		                <span style="vertical-align:top;">资讯正文:</span>
+		                <textarea id="content" name="content"  required="true" onKeyDown="textCounter(this.form.content,this.form.remLen,500);" onKeyUp="textCounter(this.form.content,this.form.remLen,500);" style="width:555px;height: 110px;" ></textarea>
+		                您还可以输入:<input name="remLen" type="text" value="500" style="width:25px;" readonly="readonly">个字符
+		     </div>   
+		      <div class="panel">    
+                <span>是否置顶:</span>
+                 <select id="is_top" name="is_top" style="width:150px;">
+	                	<option value="1">是</option>
+	                	<option value="0">否</option>
+	              </select>   
+                
+                <span style="padding-left:160px;">资讯来源:</span>
+                <select id="new_origin" name="new_origin" style="width:150px;">
+	                	<option value="网易资讯">网易资讯</option>
+	                	<option value="新浪网">新浪网</option>
+	              </select>  
+            </div>
+        </fieldset>
+        
+        <div class='title'>资讯图片</div>
+		<fieldset style="width:850px;">
+            <div class="panel">    
+                <span style="width:120px;">资讯大图<font color="red">(自动压缩)</font>:</span>
+                  <input type="file" id="file_large" name="file_large" accept="image/*"  style="width:200px;" />
+			 <!-- <button id="search_btn" type="button" style="width:80px;height:26px;" onclick="searchcust();" >清空</button>                 -->
+            </div>
+             <div class="panel">    
+                <span style="width:120px;">资讯小图<font color="red">(自动压缩)</font>:</span>
+                  <input type="file" id="file_small" name="file_small" accept="image/*"  style="width:200px;" />
+            </div>
+             <div class="panel" id="upload_panel">    
+                <span style="width:120px;">资讯配图<font color="red">(自动压缩)</font>:</span>
+                  <input type="file" id="file" name="file" accept="image/*"  style="width:200px;" />
+                    <a href="javascript:void(0);" style="margin:0px;padding:0px;padding-top:5px;"><img alt="增加单据" src="../../images/form_add.png" title="增加单据" style="vertical-align:middle"></a>
+            </div>
+        </fieldset>
+        
+        <fieldset style="width:850px;border-top:0px;">	
+	        <div class='submit'>
+	      	    <button id="news_submit" type="submit" onclick="return viewNews();">预览</button> 
+	            <button id="news_submit" type="submit" onclick="return checkField();">保存</button> 
+	        	<button id="news_submit" type="submit" style="width:100px;" onclick="news_reset();">重置</button>
+	        </div>
+        </fieldset>
+        
+        <div class="title" id="new_news">最新资讯</div>
+        <fieldset style="width:850px; height:98px">
+			<div id="hot_news" class="datagird"></div>
+		</fieldset>
+        <iframe id="uploadframe" name="result_frame" style="visibility:hidden;"></iframe>
+      </form>
+      
+        
+</body>
+
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/index.js"></script>
+<script type="text/javascript" src="../../jscript/accordion.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/tab.js"></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/tree.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+
+function textCounter(field, countfield, maxlimit) {  
+	// 函数，3个参数，表单名字，表单域元素名，限制字符；  
+	if (field.value.length > maxlimit)  
+	//如果元素区字符数大于最大字符数，按照最大字符数截断；  
+	field.value = field.value.substring(0, maxlimit);  
+	else  
+	//在记数区文本框内显示剩余的字符数；  
+	countfield.value = maxlimit - field.value.length;  
+	}  
+
+
+function news_reset(){
+	document.news_form.reset();
+}
+
+function GetQueryString(name) {
+
+	   var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
+
+	   var r = window.location.search.substr(1).match(reg);
+
+	   if (r!=null) return unescape(r[2]); return null;
+
+	}
+
+
+function checkField(){
+	var title = $('#title').val();
+	var content = $('#content').val();
+	if(title=='' || title == null){
+		$(document).sgPup({message:'message_alert',text: "请输入资讯标题!"});
+		return false;
+	}
+	if(content==''){
+		$(document).sgPup({message:'message_alert',text: "请输入资讯内容!"});
+		return false;
+	}
+}
+
+function viewNews(){
+	var title = $('#title').val();
+	var content = $('#content').val();
+	$('#type').val("0");
+	
+	if(title==''){
+		$(document).sgPup({message:'message_alert',text: "请输入资讯标题!"});
+		return false;
+	}
+	if(content==''){
+		$(document).sgPup({message:'message_alert',text: "请输入资讯内容!"});
+		return false;
+	}
+}
+
+
+
+(function($){
+	
+	
+	
+	
+	var flag = 0;
+	$("#upload_panel a").on('click',function(){
+		var detail_div = $("<div></div>");
+		var detail_id = "upload_panel"+flag;
+		detail_div.attr('id',detail_id);
+		detail_div.addClass("panel");
+		detail_div.append($("#upload_panel").html());
+		
+		$("#upload_panel").before(detail_div);
+		$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+		$("#"+detail_id+" img").attr('title','删除单据');
+		
+		$("#"+detail_id+" a").on('click',function(){
+			$("#"+detail_id).remove();
+		})
+		//$("#"+detail_id + " input[list=productList]").on('keyup',checkProduct);
+		flag=flag+1;
+	});
+	
+	
+	var loadSuccess = function(){
+ 		//填充编辑前的值
+ 		   if(editId && editObj){
+ 			   
+ 			   var address='';
+ 			  
+ 			  /*   $.ajax( {
+ 					  type : 'POST', 
+ 					  async: false,   
+ 					  url : "../../news/getAddress",   
+ 					  data:{},
+ 					  success : function(data) {
+ 						  if(data){
+ 							 address = data;
+ 						  }
+ 					  } 
+ 				}); */
+ 			  	  var content ="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+				  $("#title",$("#news_view_form")).text(editObj.title);
+				  $("#new_origin",$("#news_view_form")).text(editObj.new_origin);
+				  $("#add_time",$("#news_view_form")).text(editObj.add_time);
+				  
+				  $("#content",$("#news_view_form")).html(content + editObj.content);
+				  $('#img_little','#news_view_form').attr("src",editObj.img_little); 
+				  $('#img_large','#news_view_form').attr("src",editObj.img_large); 
+				  
+				  
+				//填充协议
+					var abc = $('#image','#news_view_form');
+				    $.ajax( {
+					  type : 'post', 
+					  async: false,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../news/getNewsImages',   
+					  data : JSON.stringify({
+			    			id : editObj.id
+			    		}),
+					  success : function(data) {
+						  if(data){
+							  if(abc){
+								  $.each(data,function(k,v){
+									  /* protocol_id.append("<option value='" +v.valueId+"'>" + v.sname+"</option>"); */
+									   abc.append("<img src='"+v.src+"'><br/>"); 
+									 /*  abc.append("<img src='../../images/footer_bg.png'><br/>" ); */
+								  }); 
+							  }
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	 alert("responseText="+res.responseText+";error="+error);     
+					  }    
+					});
+				    
+				  
+				  
+ 		   }
+ 		  editId=null;
+ 		 editObj=null; 
+ 		  
+ 	   }
+	
+	
+	var winClose3 = function() {
+		$(document).sgWindow('close', {
+			id : 'news_view'
+		});
+	}
+	
+	
+	   var viewItem = function() {
+		 	var obj = $('#hot_news');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "只能选择一条记录！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	        	 $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){  
+		                	editId=this.value;
+		                	editObj=$(this).data('data');
+			    			var defaults = {
+			    				title : '资讯查看',
+			    				id : 'news_view',
+			    				form : 'news_view_form',
+			    				url : 'news_view.html',
+			    				success: loadSuccess,
+			    				width : 700,
+			    				height : 400,
+			    				buttons : [ {
+			    					name : '关闭',
+			    					onpress : winClose3
+			    				} ]
+			    			};
+			    			$(document).sgWindow(defaults);
+		                }
+		            });
+	   }else{
+		   $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	    }
+		
+	}
+    
+    
+    $("#hot_news").html("")
+    
+    var defaults = {
+        title: "",
+        width:  '90%',
+        height: '100%',
+        url: '../../news/getNewsList',
+	    rownumbers:true,
+        colid : 'id', //主键
+        colModel : [
+			{display: '资讯标题', name : 'title', width : 240, formatter:function(value,row){
+				if(value.length >16){
+                    value = value.substr(0,16)+"...";
+                }else{
+                	value = value;
+                }
+                return value;
+            }},
+			{display: '资讯来源', name : 'new_origin', width : 100},
+			{display: '是否置顶', name : 'is_top', width : 100, formatter:function(value,row){
+				if(value==1){
+                    value = "是";
+                }else{
+                	value = "否";
+                }
+                return value;
+            }},
+			{display: '发布者', name : 'op_name', width : 100},
+			{display: '发布时间', name : 'add_time', width : 160}
+        ],
+        buttons : [
+          			{name: '查看', bclass: 'view', onpress : viewItem},
+        			{separator: true}      
+                ]
+    };
+    $('#hot_news').sgDatagrid(defaults);
+})(jQuery)
+</script>
+</html>

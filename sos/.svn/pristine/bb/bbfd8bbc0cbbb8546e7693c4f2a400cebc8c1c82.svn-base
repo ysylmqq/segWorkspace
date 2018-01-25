@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>集团SIM卡费</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/tree.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+    <div id="fee_ls_all">
+	<form id='search_form' name='search_form' method='post' class="form">
+		<input type='hidden' id='cust_id' name='cust_id' >
+		<input type='hidden' id='cust_id_value' name='cust_id_value' >
+        <div class='title'>集团SIM卡费></div>
+        <fieldset style="width:850px;">
+        	<div class="panel">
+				<div class='submit' id="divObj1" style="text-align:left;">
+					<span>客户名称:</span>
+	            	<input type='text' id="custname" name='custname' style="width:150px;" list="customerList"/>
+            		<datalist id='customerList'></datalist>
+	            	
+	            	<button id="search_btn" type="button" style="width:80px;height:26px;" onclick="searchlargesim();" >查询</button>
+	        	</div>
+			</div>
+			<hr>
+			<div class="panel">
+				<span>客户名称:</span>
+            	<input type='text' id="customer_name" name='customer_name' style="width:150px;" disabled="disabled" />
+            	
+            	<span>托收账号:</span>
+            	<input type='text' id="account" name='account' style="width:150px;" disabled="disabled" />
+			</div>
+		</fieldset>
+		<div class='title'>选择车辆</div>
+	</form>
+			<div id='company_vehicle' style="background:#e2e5ec;padding-left:30px;"></div>
+			
+	<form id='largesim_form' name='largesim_form' method='post' class="form" style="width:870px;">
+		<fieldset style="width:850px;">
+			<div class="panel">
+				<span>SIM卡月租费:</span>
+                <input type='number' id="price" name='price' style="width:150px;"/>
+                
+                <span>服务时长(月):</span>
+                <input type='number' id="s_months" name='s_months' onblur="javascript:getlargeAmount();" style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>应缴金额:</span>
+                <input type='number' id="ac_amount" name='ac_amount' style="width:150px;" />
+                
+                <span>实缴金额:</span>
+                <input type='number' id="real_amount" name='real_amount' style="width:150px;" />
+            </div>
+        </fieldset>
+        <div class='title'>合计</div>
+        <fieldset style="width:850px;">
+			<div class="panel">
+                <span>应收金额:</span>
+                <input type='number' id="total_ac_amount" name='total_ac_amount' required="true" onblur="getlargeAcamount();" style="width:150px;" />
+                
+                <span>实收金额:</span>
+                <input type='number' id="total_real_amount" name='total_real_amount' required="true" onblur="getlargeRealamount();" style="width:150px;" />
+            
+            	<span>收据单号:</span>
+                <input type='text' id="bw_no" name='bw_no' required="true" style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>经办人:</span>
+                <input type="text" name="agent_name" id="agent_name" required="true" list="userList" style="width:150px;" autocomplete="on" />
+                <input type="hidden" name="agent_id" id="agent_id" />
+                <datalist id="userList"></datalist>
+   
+                <span>交款方式:</span>
+                <input type="radio" name="pay_model" id="pay_model" value="0" checked="checked"  style="position: relative; top:5px;margin-right:5px;" />现金
+           		&nbsp;&nbsp;
+           		<input type="radio" name="pay_model" id="pay_model" value="1" style="position: relative; top:5px;margin-right:5px;" />刷卡 
+           		&nbsp;&nbsp;
+           		<input type="radio" name="pay_model" id="pay_model" value="2" style="position: relative; top:5px;margin-right:5px;" />转帐
+           		&nbsp;&nbsp;&nbsp;&nbsp;
+           		<input type="checkbox" name="is_invoice" id="is_invoice" style="position: relative; top:5px;margin-right:5px;" />发票
+            </div>
+            <div class="panel">    
+                <span>备注:</span>
+                <input type='text' id="remark" name='remark' style="width:650px;" />
+            </div>
+        </fieldset>
+        <fieldset style="width:850px;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="largesim_submit" type="submit" onclick="largesim_save();">保存</button> 
+	            <button id="largesim_reset" type="button" onclick="largesim_reset();">重置</button>
+	        </div>
+        </fieldset>
+	</form>
+    </div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript" src="../../jscript/tree.js"></script>
+<script type="text/javascript">
+function getlargeAmount(){
+	var price = $("#price").val();
+	var month = $("#s_months").val();
+	var amount = price*month;
+	$("#ac_amount").val(amount);
+}
+
+function getlargeAcamount(){
+	var treebox = $('input[name=treeCheckbox]');
+	var num = 0;
+	treebox.each(function(k,v){
+		var id = $(this).attr("id");
+		var box = document.getElementById(id);
+		if(box.checked){
+			num++;
+		}
+	});
+	var total_acamount = 0;
+	var acamounts = $('input[name=ac_amount]');
+	acamounts.each(function(k,v){
+		total_acamount = Number(total_acamount) + Number(acamounts[k].value);
+	});
+	$('#total_ac_amount').val(total_acamount*num);
+}
+
+function getlargeRealamount(){
+	var treebox = $('input[name=treeCheckbox]');
+	var num = 0;
+	treebox.each(function(k,v){
+		var id = $(this).attr("id");
+		var box = document.getElementById(id);
+		if(box.checked){
+			num++;
+		}
+	});
+	var total_realamount = 0;
+	var realamounts = $('input[name=real_amount]');
+	realamounts.each(function(k,v){
+		total_realamount = Number(total_realamount) + Number(realamounts[k].value);
+	});
+	$('#total_real_amount').val(total_realamount*num);
+}
+
+function largesim_save(){
+	$("#largesim_form").on('submit',
+			function(e){
+		var payments = new Array();
+		var treebox = $('input[name=treeCheckbox]');
+		var is_invoice = 0;
+		var is_invoicebox = document.getElementById("is_invoice");
+		if(is_invoicebox.checked){
+			is_invoice = 1;
+		}
+		treebox.each(function(k,v){
+			var vehicle_id = $(this).attr("id");
+			var vehicle_box = document.getElementById(vehicle_id);
+			if(vehicle_box.checked){
+				var obj = {};
+				obj.item_id = 0;
+				obj.s_months = $('#s_months').val();
+				obj.ac_amount = $('#ac_amount').val();
+				obj.real_amount = $('#real_amount').val();
+				obj.customer_id = $('#cust_id_value').val();
+				obj.vehicle_id = vehicle_id;
+				obj.feetype_id = 2;
+				obj.pay_model = $("input[name='pay_model']:checked").val();
+				obj.bw_no = $('#bw_no').val();
+				obj.agent_id = $("#agent_id").val();
+				obj.agent_name = $('#agent_name').val();
+				obj.remark = $('#remark').val();
+				obj.is_invoice = is_invoice;
+				payments.push(obj);
+			}
+		});
+		
+		$.ajax({
+			type : 'post',
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : '../../payment/addBatch',
+			data : JSON.stringify(
+				payments
+			),
+			success : function(data) {
+				if (data) {
+					$(document).sgPup({message:'message_alert',text: data.msg});
+				}
+			},
+			error : function(res, error) {
+				$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+					+ ";error=" + error});
+			}
+		});
+		$('#largesim_form').unbind();//以下两行可以阻止提交2次
+		e.stopPropagation();
+		return false;
+	});
+}
+
+function largesim_reset(){
+	document.largesim_form.reset();
+}
+
+function searchlargesim(){
+	var cust_id = $('#cust_id').val();
+	if(cust_id==''){
+		$(document).sgPup({message:'message_alert',text: "必须选择客户!"});
+		return false;
+	}
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../getCustInfo',
+		data : JSON.stringify({
+			cust_id : cust_id
+		}),
+		success : function(data) {
+			if (data) {
+				$('#customer_name').val(data.customer.customer_name);
+				$('#cust_id_value').val(data.customer.customer_id);
+				if(data.collection){
+					$('#account').val(data.collection.ac_no);	
+				}
+				$('#company_vehicle').empty();
+				//填充车辆树
+				var defaults = {
+		       		isexpend: true,
+		            url: '../../vehicle/tree',
+		            data : JSON.stringify({
+		            	customer_id : data.customer.customer_id,
+		            	customer_name : data.customer.customer_name,
+		            	pay_model : 2 //这儿的pay_model指的是需要显示哪种服务截止时间
+					}),
+		            root: '车辆列表',
+		            hasbox : true
+		        };
+		        $('#company_vehicle').sgTree(defaults);
+			}
+		},
+		error : function(res, error) {
+			$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+				+ ";error=" + error});
+		}
+	});
+}
+
+	(function($){
+		
+        var checkUser = function(){
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.opname = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getOrgOperators',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#agent_name","#largesim_form");
+						  						  
+						  userList = {};
+						  if(manager){
+							  if(data.items.length>0){
+								  $("#userList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.opname);
+								  $("#userList").append(op);
+								  
+								  userList[v.opname] = v.opid;
+		 				  	 }); 
+							}
+					  }else{
+					  	alert(data);
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	 alert("responseText="+res.responseText+";error="+error);     
+				  }    
+				});
+		}
+		
+	  //填充员工
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getOrgOperators',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#agent_name","#largesim_form");
+				  userList = {};
+				  if(manager){
+					  if(data.items.length>0){
+						  $("#userList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userList").append(op);
+						  
+						  userList[v.opname] = v.opid;
+					  	 }); 
+					  manager.on('keyup',checkUser);
+					  manager.on('change',function(){
+						  	var strs = this.value.split(" ");
+							$(this).val(strs[strs.length-1]);
+							$("#agent_id","#largesim_form").val(userList[strs[strs.length-1]]);
+							if($("#agent_id","#largesim_form").val().length==0){
+								$("#agent_name","#largesim_form").val("");
+							}
+						});
+
+					};
+			  }else{
+			  	alert(data);
+			  }
+		  },     
+		  error : function(res,error) { 
+		  	 alert("responseText="+res.responseText+";error="+error);     
+		  }    
+		});
+	  
+	    var checkCustomer = function(){
+			var text=this.value;
+			text = text.replace(/\s/g,'');
+			if(text!=this.value){
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			}
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {cust_type : 1};
+			params.filter.customer_name = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getCustomers',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#custname");
+						  if(manager){
+							  if(data.items.length>0){
+								  customerList = {};
+								  $("#customerList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.customer_name);
+								  $("#customerList").append(op);
+								  
+								  customerList[v.customer_name] = v.customer_id;
+		 				  	 }); 
+							}
+					  }
+				  } ,     
+				  error : function(res,error) { 
+					  $(document).sgPup({message:'message_alert',text: res.responseText});  
+				  }    
+				});
+		};
+		
+	    //填充客户
+	    $.ajax( {
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCustomers',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{cust_type : 1}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#custname");
+				  if(manager){
+					  if(data.items.length>0){
+						  customerList = {};
+						  $("#customerList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.customer_name);
+						  $("#customerList").append(op);
+						  
+						  customerList[v.customer_name] = v.customer_id;
+					  	 }); 
+					  manager.on('keyup',checkCustomer);
+					  manager.on('change',function(){
+						  var strs = this.value.split(" ");
+						    if(customerList[strs[strs.length-1]]){
+								$(this).val(strs[strs.length-1]);
+								$("#cust_id").val(customerList[strs[strs.length-1]]);
+						    }else{
+						    	$(this).val('');
+						    	$("#cust_id").val("");
+						    }
+						});
+
+					}
+			  }
+		  },     
+		  error : function(res,error) {
+			  $(document).sgPup({message:'message_alert',text: res.responseText}); 
+		  }    
+		});
+	    
+	})(jQuery)
+</script>
+</html>

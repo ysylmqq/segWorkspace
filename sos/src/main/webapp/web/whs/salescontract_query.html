@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>销售合同</title>
+</head>
+<body>
+	<div id="dlg_salecontract" class="datagird"></div>
+</body>
+<script type="text/javascript">
+	(function($){
+		//初始化表格
+	   	 var defaults = {
+	   		        width:  '100%',
+	   		        height: 310,
+	   		        //url: '../../sell/findSalesContracts',
+	   		        url:'',
+		   		    usepager: true,
+		 	        rownumbers:true,
+		 	        useRp: true,
+		 	        colid:'id',  //主键
+		 	        query:{},
+	   		        colModel : [
+	   		            {display: '合同名称', name : 'name', width : 140, sortable : false},
+	   		            {display: '商品名称', name : 'productName', width : 160, sortable : false},
+	   		            {display: '商品规格', name : 'norm', width : 160, sortable : false},
+	   		         	{display: '销售价格(元)', name : 'price', width : 80, sortable : false},
+	   		      		{display: '安装费用(元)', name : 'fixFee', width : 80, sortable : false},
+	   		            {display: '合同签订日期', name : 'signDate', width : 75, sortable : true},
+	   		            {display: '合同生效日期', name : 'validDate', width : 75, sortable : false},
+	   		            {display: '合同到期日期', name : 'matureDate', width : 75, sortable : false},
+	   		   			{display: '备注', name : 'remark', width : 140, sortable : false}
+	   		      
+	   		        ],
+	   		     	buttons : [
+	   			        ],
+	   		        searchitems :[
+						{display:'合同名称',name:'name',type:'text'}
+	   		        ]
+	   		 };
+	   		$('#dlg_salecontract').sgDatagrid(defaults);
+	   		$('div.sDiv', $('#dlg_salecontract')).remove();
+			
+	})(jQuery);
+</script>
+</html>

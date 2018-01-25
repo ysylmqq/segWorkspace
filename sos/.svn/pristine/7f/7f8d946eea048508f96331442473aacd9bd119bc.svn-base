@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>出车提成汇总表</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+	<form id='summary_form' method='post' class="form">
+		<fieldset style="width:835px;">
+			<div class='submit' style="text-align:left;">
+	            	<span style="width:30px;">年月:</span>
+	                <input type="month" id="stamp" name='stamp' style="width:165px;" />
+	                <button id="stockin_detail_submit" type="submit" style="width:80px;height:26px;" >查询</button>
+	                <button id="stockin_detail_submit" type="submit" style="width:80px;height:26px;" >导出Excel</button>
+	                <button id="stockin_detail_submit" type="submit" style="width:80px;height:26px;" >打印</button>
+	        </div>	        
+		</fieldset>
+		<fieldset style="width:835px;">
+			<div id="summary_list" class="datagird"></div>
+		</fieldset>
+	</form>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript">
+(function($){
+	var defaults = {
+	        width:  '820',
+	        height: '405',
+	     	url:'',
+	        colModel : [
+	            {display: '姓名', name : 'productName', width : 60, sortable : false},
+	         	{display: '车牌', name : 'norm', width : 60, sortable : false},
+	            {display: '个人出车次数', name : 'num', width : 80, sortable : false},
+	            {display: '抢修次数', name : 'num', width : 60, sortable : false},
+	            {display: '上门次数', name : 'num', width : 60, sortable : false},
+	            {display: '晚上出车次数', name : 'num', width : 80, sortable : false},
+	            {display: '出警次数', name : 'num', width : 60, sortable : false},
+	            {display: '超出公里数', name : 'num', width : 80, sortable : false}
+	        ],
+	        query:{writeoffsStatus:0}//未销
+	    };
+	$('#summary_list').sgDatagrid(defaults);
+
+})(jQuery)
+
+</script>
+</html>

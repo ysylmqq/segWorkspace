@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>工单查看</title>
+<style>
+
+</style>
+</head>
+<body>
+	<div style="overflow-y:auto;overflow-x:hidden;width:100%;height: 100%; ">
+			<form id='view_task_cl' method='post' class="form" style="width:690px;">
+				<fieldset style="width:680px;">
+			<div class="panel">
+				<span>工单号:</span>
+                <input type='text' id="billnum" name='billnum' disabled="disabled"  style="width:200px;" />
+			
+                <span style="padding-left:50px;">工单类型:</span>
+		                <select size="1" name="type" id="type" style="width:204px;" disabled="disabled" onchange="changeType();">
+		                    <option value="1">新装</option>
+		                    <option value="2">维修</option>
+		                    <option value="3">出警</option>
+		                    <option value="4">其他</option>
+		                </select>
+            </div>
+            <div class="panel">    
+                <span>客户:</span>
+               <input type='text' id="customerName" name='customerName' disabled="disabled"  list="customerList"  style="width:200px;" />
+		                <datalist id='customerList'></datalist>
+                
+                <span style="padding-left:50px;">联系电话:</span>
+                <input type='text' id="phone" name='phone'  disabled="disabled" style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>车牌号:</span>
+                <input type='text' id="car_num" name='car_num' disabled="disabled" style="width:200px;" />
+		                <input type='hidden' id="vehicleId" name='vehicleId'  style="width:200px;" />
+                
+                <span style="padding-left:50px;">产品型号:</span>
+                <input type='text' id="code" name='code'  disabled="disabled" style="width:200px;" />
+            </div>
+            
+            <div class="panel" id="car">    
+		                <span>车型:</span>
+		                <input type='text' id="cartype_name" name='cartype_name' disabled="disabled"  style="width:200px;" />
+		                 <input type="hidden" name="cartype_id" id="cartype_id" required="true" value="" />
+		                <span style="padding-left:50px;">车辆颜色:</span>
+		                <input type='text' id="color" name='color' disabled="disabled"  style="width:200px;" />
+		            </div>
+            
+            
+             <div class="panel" id="new">
+               			<span>商品名称:</span>
+		                <input type='text' id="product_name" name='product_name'  disabled="disabled" placeholder="请输入商品名称" list="productDataList" style="width:200px;" />
+		                <input type="hidden" id="productId" name="productId" />
+		                <datalist id='productDataList'></datalist>
+		                
+		                <span style="padding-left:50px;">销售经理:</span>
+		                <input type='text' id="managerName" name='managerName' disabled="disabled" list="userDataList"  style="width:200px;" />
+		           	    <datalist id='userDataList'></datalist>
+		     </div>
+            
+           <div class="panel">    
+		                <span>地点:</span>
+		                <input type='text' id="place" name='place' disabled="disabled"  style="width:400px;" />
+		                
+		                <span style="padding-left:40px;">营业处:</span>
+		                <input type='checkbox' id ="is_busines"  disabled="disabled" style='vertical-align:middle;' />
+		            </div>
+		            
+		            
+             <div class="panel" id="sm">    
+		                <span style="vertical-align:top;">故障现象:</span>
+		                <textarea id="symptom" name="symptom" disabled="disabled" style="width:555px;" rows="2"></textarea>
+		     </div>   
+            <div class="panel" id="rk">
+            	<span style="vertical-align:top;">注意事项:</span>
+                <textarea id="note" name="note" style="width:555px;" disabled="disabled" rows="2"></textarea>
+            </div>
+            <div class="panel" id="rt">
+		            	<span style="vertical-align:top;">要求:</span>
+		                <textarea id="requirements" name="requirements" disabled="disabled" style="width:555px;" rows="2"></textarea>
+		    </div>
+            
+        </fieldset>
+			</form>
+	</div>
+</body>
+<script type="text/javascript">
+
+</script>
+</html>

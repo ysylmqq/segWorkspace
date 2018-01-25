@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>资讯发布</title>
+<script type="text/javascript"> 
+</script>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+</head>
+<body>    
+	<form id='news_edit_form' name='news_edit_form' method='post' class="form" >
+	
+		<div class='title'>资讯内容</div>
+		<fieldset style="width:630px;">
+			<div class="panel">
+					<span>资讯标题:</span>
+	            	<input type='text' id="title" required="true" name="title" style="width:400px;"/>
+	            	<input type='hidden' id="id"  name="id" />
+	        </div>
+	        	          
+	        	          
+             <div class="panel">    
+		                <span style="vertical-align:top;">资讯正文:</span>
+		                <textarea id="content" name="content"  required="true" onKeyDown="textCounter(this.form.content,this.form.remLen,500);" onKeyUp="textCounter(this.form.content,this.form.remLen,500);" style="width:400px;height: 110px;" ></textarea>
+		                您还能输入:<input name="remLen" id="remLen" type="text" value="500" style="width:25px;" readonly="readonly">个字
+		     </div>   
+		      <div class="panel">    
+                <span>是否置顶:</span>
+                 <select id="is_top" name="is_top" style="width:140px;">
+	                	<option value="1">是</option>
+	                	<option value="0">否</option>
+	              </select>   
+                
+                <span style="padding-left:100px;">资讯来源:</span>
+                <select id="new_origin" name="new_origin" style="width:140px;">
+	                	<option value="网易资讯">网易资讯</option>
+	                	<option value="新浪网">新浪网</option>
+	              </select>  
+            </div>
+        </fieldset>
+        
+      </form>
+      
+        
+</body>
+
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/index.js"></script>
+<script type="text/javascript" src="../../jscript/accordion.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/tab.js"></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/tree.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+
+function textCounter(field, countfield, maxlimit) {  
+	// 函数，3个参数，表单名字，表单域元素名，限制字符；  
+	if (field.value.length > maxlimit)  
+	//如果元素区字符数大于最大字符数，按照最大字符数截断；  
+	field.value = field.value.substring(0, maxlimit);  
+	else  
+	//在记数区文本框内显示剩余的字符数；  
+	countfield.value = maxlimit - field.value.length;  
+	}  
+
+
+function news_reset(){
+	document.news_edit_form.reset();
+}
+
+function GetQueryString(name) {
+
+	   var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
+
+	   var r = window.location.search.substr(1).match(reg);
+
+	   if (r!=null) return unescape(r[2]); return null;
+
+	}
+
+
+function checkField(){
+	var title = $('#title').val();
+	var content = $('#content').val();
+	if(title=='' || title == null){
+		$(document).sgPup({message:'message_alert',text: "请输入资讯标题!"});
+		return false;
+	}
+	if(content==''){
+		$(document).sgPup({message:'message_alert',text: "请输入资讯内容!"});
+		return false;
+	}
+}
+
+function viewNews(){
+	var title = $('#title').val();
+	var content = $('#content').val();
+	$('#type').val("0");
+	
+	if(title==''){
+		$(document).sgPup({message:'message_alert',text: "请输入资讯标题!"});
+		return false;
+	}
+	if(content==''){
+		$(document).sgPup({message:'message_alert',text: "请输入资讯内容!"});
+		return false;
+	}
+}
+
+
+
+(function($){
+	
+	
+    
+})(jQuery)
+</script>
+</html>

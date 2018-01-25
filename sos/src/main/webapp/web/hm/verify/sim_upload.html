@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+<form id="sim_verify" method="post" class="form" name="sim_verify"  action="../../../preload/verifySim" target="import_imp" enctype="multipart/form-data">
+	<div class="form">
+		<fieldset style="width: 270px;">
+            <div class="panel">
+	            <div class="row">
+	            	<span class="col-xs-3">模板下载:</span>
+	            	<span class="col-xs-9" style="text-align:left;">
+		                <a href="../../../excelFile/VERIFY_SIM.xls" id="sim0" >SIM卡校验模板</a>
+	                </span>
+	            </div>
+            </div>
+			<div class="panel" >
+				<div class="row">
+	                <span class="col-xs-3">选择文件:</span>
+	                <span class="col-xs-9">
+	                	<input type='file' id='sim_file' name='sim_file' style="width:100%;" />
+	                </span>
+	            </div>
+           	</div>
+        </fieldset>
+	</div>
+</form>
+<iframe name='import_imp' id="import_imp" style="display:none;" ></iframe> 
+</body>
+</html>

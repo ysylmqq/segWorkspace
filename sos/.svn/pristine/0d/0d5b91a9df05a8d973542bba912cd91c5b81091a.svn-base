@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>库存初始化</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css"><link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+    <style type="text/css">
+.hDiv table th,td {
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #fff;
+	overflow: hidden;
+	vertical-align: top !important;
+	padding-left: 4px;
+	padding-right: 4px;
+	line-height: 28px;
+	word-break:break-all;
+}
+
+.hDiv table thead th[rowspan],.hDiv th[colspan] {
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #fff;
+	overflow: hidden;
+	vertical-align: middle !important;
+	text-align: center !important;
+	line-height: 28px;
+}
+
+/* 表格主体 */
+.hDiv table tbody {
+	border: 1px solid #cbcbd5;
+	border-top: 0px;
+	overflow-y: scroll;
+	border-bottom: 1px solid #ccc;
+	background-color: #fff;
+}
+
+.hDiv table tbody tr.normalRow {
+	background-color: #dfe6ef;
+}
+
+.hDiv table tbody tr:hover {
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4791d2),
+		to(#4791d2), color-stop(.6, #4791d2));
+	background: -moz-linear-gradient(0% 65% 90deg, #4791d2, #4791d2, #4791d2 100%);
+	color: #fff;
+}
+</style>
+</head>
+
+<body>
+<div id="nw_document_all">
+	<div id="dgd_stock_init" class="datagrid" style="">
+		<div class="mDiv">库存初始化</div>
+		<div class="sDiv">
+			<form>
+<!-- 				<div class="pGroup">
+					<span class="label">开始日期:</span><input type="date" name="startDate"
+						style="width: 150px;">
+				</div>
+				<div class="pGroup">
+					<span class="label">结束日期:</span><input type="date" name="endDate"
+						style="width: 150px;">
+				</div>
+				<div class="pGroup">
+					<span class="label">借用人:</span><input type="text"
+						name="borrowerName2" id="borrowerName2" style="width: 161px;"
+						list="userDataList"><input type="hidden" name="borrowerId2"
+						id="borrowerId2" >
+				</div>
+			<div class="pGroup">
+					<span class="label" style="width:52px;">代理商:</span><input type="text"
+						name="channelName2" id="channelName2" list="channeDataList"><input
+						type="hidden" name="channelId2" id="channelId2" value="">
+				</div> -->	
+				<div class="pGroup">
+				  <span class="label">营业处仓库:</span>
+				  <select size="1" name="whsId2" id="whsId2" style="width:150px">
+				    <option value="">--请选择--</option> 
+				  </select>
+				</div>
+				<div class="pGroup">
+					<span class="label">商品名称:</span><input type="text"
+						name="productName2" id="productName2" list="productDataList" style="width: 150px;">
+							<input type="hidden" id="productId" name="productId" />
+							<datalist id="productDataList"></datalist>
+				</div>
+			</form>
+			<div class="pGroup">
+				<a type="button" class="button" id="aquery"><span class="button_span"><span
+						class="pSearch">查询</span></span></a>
+			</div>
+			<div class="pGroup">
+				<a type="button" class="button" id="aexport"><span class="button_span"><span>导出Excel</span></span></a>
+			</div>
+		</div>
+		<div class="tDiv">
+			<div class="fbutton" id="div_add">
+				<span class="add">增加</span>
+			</div>
+			<div class="btnseparator"></div>
+			<div class="fbutton" id="div_edit">
+				<span class="edit">编辑</span>
+			</div>
+			<div class="btnseparator"></div>
+			<div class="fbutton" id="div_delete">
+				<span class="delete">删除</span>
+			</div>
+			<div class="btnseparator"></div>
+		</div>
+		<div class="hDiv" style="min-height:479px;max-height:479px;overflow: auto;table-layout: fixed;">
+		   <form class="form" id="form_stock">
+			<table  style="">
+				<thead>
+					<tr>
+						<th axis="checkbox"><input type="checkbox" name="checkall"
+							style="margin-top: 8px;"></th>
+						<th axis="rownumbers" style="width: 38px;">序号</th>
+						<th axis="whsId" style="width: 140px;" isSelected="true"><div>营业处仓库</div></th>
+						<th axis="productName" style="width: 140px;" editable="true" isrequest="true"><div>商品名称</div></th>
+						<th axis="productCode" style="width: 100px;"  disabled="true"><div>商品编码</div></th>
+						<th axis="norm" style="width: 180px;" disabled="true" ><div>商品规格</div></th>
+						<th axis="num" style="width: 80px;" editable="true" isnum="true" isrequest="true"><div>数量</div></th>
+						<th axis="remark" style="width: 180px;" editable="true" ><div>备注</div></th>
+						<th axis="saveOperate" style="width: 200px;"><div>操作</div></th>
+					</tr>
+				</thead>
+			</table>
+			</form>
+		</div>
+	</div>
+         <datalist id="productDataList"></datalist>
+ </div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+    (function($){
+    	var productDataList=[];//商品数组 key:商品名称,value:productId
+       var editId=null;//编辑时选中行ID
+       var editObj=null;//编辑时选中行对象
+       var editIds=null;//批量修改库存初始化的ID
+	   
+	 //列头
+  		var colModel=[];
+  		colModel.push({name:'checkbox'});
+  		colModel.push({name:'rownumbers'});
+  		colModel.push({name:'whsId'});
+  		colModel.push({name:'productName'});
+  		colModel.push({name:'productCode'});
+  		colModel.push({name:'norm'});
+  		colModel.push({name:'num'});
+  		colModel.push({name:'remark'});
+  		colModel.push({name:'saveOperate'});
+			//自动查询商品
+			var checkProduct = function(){
+				/* var text=this.value;
+				text = text.replace(/\s/g,''); //去除空格
+				if(text!=this.value){//有空格
+					this.value=text;
+					$(this).trigger('change');
+					return false;
+				} */
+				var params = {};
+				params.pageNo = 1;
+				params.pageSize = 15;
+				params.filter = {};
+				params.filter.nameOrCode = this.value;
+				var obj = $(this);
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../product/findProducts',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  var products = data.items;
+							  if(products.length>0){
+								  $("#productDataList").empty();
+							  	productDataList=[];
+							  }
+							  var key=null;
+							  $.each( products, function(key,value){
+								  var op = $("<option></option>");
+								  key=value.code;
+								  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+									 
+								  $("#productDataList").append(op);
+								  productDataList[key]=value.id;
+							 });
+						  }else{
+							  $(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					});
+			};
+			
+			//填充商品
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../product/findProducts',   
+				  data:JSON.stringify({pageNo:1,pageSize:15,filter:{type:0}}),
+				  success : function(data) {
+					  if(data){
+						  var products = data.items;
+						  $("#productDataList").empty();
+						  var key=null;
+						  productDataList=[];
+						  $.each( products, function(key,value){
+							  var op = $("<option></option>");
+							  key=value.code;
+							  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+							  
+							  $("#productDataList").append(op);
+							  productDataList[key]=value.id;
+						 });
+						  
+						  var productNameCondn=$('input[name=productName2]',$('#dgd_stock_init'));
+	   						productNameCondn.on('keyup',checkProduct);
+	   						
+	   						productNameCondn.on('change',function(){
+	   							var strs = this.value.split(" ");
+	   							$(this).val(strs[strs.length-3]);
+	   							if($(this).val()){
+									$("#productId",$('#dgd_stock_init')).val(productDataList[strs[strs.length-2]]);
+									if($("#productId",$('#dgd_stock_init')).val().length==0){
+										$("#productName2",$('#dgd_stock_init')).val("");
+									}
+							    }else{
+							    	$(this).val('');
+							    	$("#productId",$('#dgd_stock_init')).val("");
+							    }
+							
+								});
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+			
+			//填充营业处仓库
+		    $.ajax( {
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : './../../stock/findWarehouses',   
+			  data:JSON.stringify({}),
+			  success : function(data) {
+				  if(data){
+					  var whsId=$("#whsId2",$('#dgd_stock_init'));
+					  if(whsId.get(0)){
+						  $.each(data,function(k,v){
+							  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+						  }); 
+					  }
+					 
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});	
+			//添加
+			$('#div_add').on('click',function(){
+				editId=null;
+	 			editIds=[];
+	 	       	editObj=null;
+		 	   	var rowDatas=[];
+		     	rowDatas.push({checkbox:'',rownumbers:'',whsId:'',productName:'',norm:'',num:'',remark:'',saveOperate:''});
+		     	var obj=$('#dgd_stock_init');
+	       	  	appendData(rowDatas,obj,colModel);
+			});
+			//编辑
+			$('#div_edit').on('click',function(){
+				var bDiv = $('#dgd_stock_init .hDiv table tr:gt(0)');
+				  if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+		 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+		 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+		 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+			    	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+			    		    //输入框变成可输入状态  
+			    		    $('input',$(this).parent().parent()).attr('readonly',false);
+			          	    $('input',$(this).parent().parent()).css('border','2px inset');
+			          	    $('input',$(this).parent().parent()).css('background','white');
+			          	    $('select',$(this).parent().parent()).attr('readonly',false);
+			          	    $('select',$(this).parent().parent()).attr('disabled',false);
+			          	    $('select',$(this).parent().parent()).css('border','2px inset');
+			          	    $('select',$(this).parent().parent()).css('background','white');
+			          		//显示保存按钮
+			            	$('td:last div',$(this).parent().parent()).show();
+			          });
+			      }
+			});
+			//删除
+			$('#div_delete').on('click',function(){
+				var bDiv = $('#dgd_stock_init .hDiv table tr:gt(0)');
+			      if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+			          $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+			      }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+			    	      var ids=[];
+			    	      $(document).sgConfirm({text: '删除后不可恢复，确定删除?',cfn:function(r){ 
+		    		     	if(r){
+		 	     
+		 	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		 	        			if(this.value){
+		 	        				if(this.value=='on'){
+		 	        					ids.push('-1');
+		 	        				}else{
+		 	 	        				ids.push(this.value);
+		 	        				}
+		 	        			}
+		 	 	            });
+		 	        		 $.ajax( {
+			            		  type : 'post', 
+			            		  async: false,   
+			            		  contentType : 'application/json',     
+			            		  dataType : 'json',     
+			            		  url : '../../stock/deleteStocks',   
+			            		  data:JSON.stringify(ids),
+			            		  success : function(data) {
+			            			  if(data){
+			            				 if(data.success){
+			    	          		 		 //$('#dgd_setup').sgDatagrid('reload','sgDatagrid');
+			    	          		 		 $('#aquery').trigger('click');
+			            				 }
+			            				$(document).sgPup({message:'message_info',text: data.msg});
+			            			  }
+			            		  } ,     
+			            		  error : function(res,error) { 
+			            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			            		  }    
+			            		}); 
+		 	        	}
+		 	        }});
+			      }else{
+			          $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+			      }  
+			});
+			//查询
+			$('#aquery').on('click',function(){
+				var param={};
+				param.productId=$("#productId").val();
+				param.whsId=$("#whsId2").val();
+				param.onlyStock=true;
+				 $.ajax({
+			            type: "POST",
+			            async:false,
+			            contentType : 'application/json',
+			            url: '../../stock/findAllCurrentStocks',
+			            data: JSON.stringify(param),
+			            dataType : 'json',
+			            success: function(data){
+			            	if(data){
+			            	   var obj=$('#dgd_stock_init');
+			            	   addData(data,obj,colModel);
+			            	   //设置可编辑的外框border 为0
+			            	   $('#dgd_stock_init .hDiv table input').attr('readonly',true);
+			            	   $('#dgd_stock_init .hDiv table input').css('border','0px');
+			            	   $('#dgd_stock_init .hDiv table input').css('background','transparent');
+			            	   $('#dgd_stock_init .hDiv table select').attr('readonly',true);
+			            	   $('#dgd_stock_init .hDiv table select').attr('disabled',true);
+			            	   $('#dgd_stock_init .hDiv table select').css('border','0px');
+			            	   $('#dgd_stock_init .hDiv table select').css('background','transparent');
+			            	
+			            	   //隐藏保存按钮
+			            	   $('td:last div','#dgd_stock_init .hDiv table tr').hide();
+			            	}else{
+			            		$('#dgd_stock_init .hDiv table tbody').empty();
+			            	}
+			            } ,     
+			  		  error : function(res,error) { 
+			 		  	 //    if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}  
+			 		  	$('#dgd_stock_init .hDiv table tbody').empty();
+			 		  }  
+			        });
+			}); 
+			
+			//导出
+			$('#aexport').on('click',function(){
+				var url="../../stock/exportExcel4CurrentStocks"
+						+"?productId="+$("#productId").val()+"&onlyStock=true";
+		        window.location.href=url;
+			}); 
+			//添加数据
+			var addData=function(json,obj,colModel){
+		        $('tbody',tbl).remove();
+		        var tby = $('<tbody></tbody>') ;
+		        var hdv = $('.hDiv',obj);
+		        var tbl = $("#"+obj.attr("id")+" table");
+		        $.each(json,function(i,row){
+		            var tr = $('<tr></tr>');
+	            	$.each(colModel,function(k,v){
+	            		var td = $('<td></td>');
+	            		var th_this= $('thead th[axis='+v.name+']', hdv);
+		                var editable = $(th_this).attr('editable');
+		                var isSelected = $(th_this).attr('isSelected');
+		                var disabled = $(th_this).attr('disabled');
+		                var isnum = $(th_this).attr('isnum');
+		                var isDateTime = $(th_this).attr('isDateTime');
+		                var isFloat= $(th_this).attr('isFloat');
+		                var isrequest = $(th_this).attr('isrequest');
+		                var formatter = $(th_this).attr('formatter');
+		                var tdx = v.name;
+
+		                if(tdx=='checkbox'){
+		                    var check = $('<input type="checkbox" style="margin-top:8px;" />');
+		                     check.attr('axis','id');
+		                     check.attr('name',obj.attr("id")+"_chx");
+		                     check.attr('value',row['id']);                    
+		                     check.data('data',row);                   
+		                     td.append(check);
+		                     // 此处添加onchange事件代码
+		                     check.change(function(){
+		                         if (!check.attr("checked")) {
+		                             check.attr("checked","checked");
+		                         }else if(check.attr("checked")){
+		                             check.removeAttr("checked");
+		                         }; 
+		                     });
+		                 }else if(tdx=='rownumbers'){
+		                 	var tdwidth = $(th_this).css('width');
+		                     td.css('width',tdwidth);
+		                     //var num =$('tr', tbl).length+1;
+		                 	 var num = i+1;
+		                 	 var dv = $('<div></div>');
+			                 dv.css('width',tdwidth);
+			                 dv.css('padding-top','5px');
+			                 dv.css('line-height','16px');
+			                 dv.append(num);
+		                 	td.append(dv);              	
+		                 }else if(tdx=='saveOperate'){//操作，保存按钮
+			                 	var tdwidth = $(th_this).css('width');
+			                     td.css('width',tdwidth);
+			                     //var num =$('tr', tbl).length+1;
+			                 	 var num = i+1;
+			                 	 var dv = $('<div class="submit" ></div>');
+				                 dv.css('width',tdwidth);
+				                 dv.css('padding-top','5px');
+				                 dv.css('line-height','16px');
+				                 var btn=$('<button type="submit" style="width:64px;" >保存</button>');
+				                 dv.append(btn);
+				                 btn.on('click',function(){
+				                		 $('#form_stock').unbind('submit');
+				                		 var trSave= $(this).parents('tr');
+				                		 $('#form_stock').on('submit',function(){
+				                			$(document).sgConfirm({text: '确定保存吗?',cfn:function(r){ 
+		    		     						if(r){
+				                				 try{
+							                			var id=$('input[type=checkbox]:first',trSave).attr('value');
+							                			var whsId=$('select[name=whsId]',trSave).val();
+							                			var whsName=$('select[name=whsId]',trSave).find('option:selected').text();
+								                		var productId=$('input[name=productId]',trSave).val();
+								                		var num=$('input[name=num]',trSave).val();//num
+								                		var productName=$('input[name=productName]',trSave).val();
+								                		var remark=$('input[name=remark]',trSave).val();
+								                		var param={
+								                				id:id,
+								                				whsId:whsId,
+								                				whsName: whsName,
+								                				productId:productId,
+								                				productName:productName,
+								                				num:num,
+								                				remark:remark
+								                		};
+								                		
+								                		//alert(JSON.stringify(param));
+								                		 $.ajax({
+										            		  type : 'post', 
+										            		  async: false,   
+										            		  contentType : 'application/json',     
+										            		  dataType : 'json',     
+										            		  url : '../../stock/saveStock',   
+										            		  data:JSON.stringify(param),
+										            		  success : function(data) {
+										            			  if(data){
+										            				 if(data.success){
+										    	          		 		 $('#aquery').trigger('click');
+										            				 }
+										            				$(document).sgPup({message:'message_info',text: data.msg});
+										            			  }
+										            		  } ,     
+										            		  error : function(res,error) { 
+										            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+										            		  }    
+										            		}); 
+							                		}catch(e){
+							                			$(document).sgPup({message:'message_info',text: e});
+							                		}
+				                			 }
+				                			}});
+				                			 return false;
+				                		 });
+				                		
+				                 });
+				                 //取消
+				                 var btn2=$('<button type="button" style="width:64px;">取消</button>');
+				                 dv.append(btn2);
+				                 btn2.on('click',function(){
+				                	 	var trSave= $(this).parents('tr');
+				                		var id=$('input[type=checkbox]:first',trSave).attr('value');
+				                		if(id){//编辑
+				                			   //设置可编辑的外框border 为0
+							            	   $('input',trSave).attr('readonly',true);
+							            	   $('input',trSave).css('border','0px');
+							            	   $('input',trSave).css('background','transparent');
+							            	   $('select',trSave).attr('readonly',true);
+							            	   $('select',trSave).attr('disabled',true);
+							            	   $('select',trSave).css('border','0px');
+							            	   $('select',trSave).css('background','transparent');
+							            	
+							            	   //隐藏保存按钮
+							            	   $('td:last div',trSave).hide();
+							      
+				                		}else{
+				                			$(this).parents('tr').remove();
+				                		}
+				                 });
+			                 	 td.append(dv);   
+			                 	 
+			              }else{
+		                	 var tdwidth = $(th_this).css('width');
+		                     td.css('width',tdwidth);
+		                     var dv = $('<div></div>');
+		                     dv.css('width',tdwidth);
+		                     //padding-top: 5px; line-height: 16px;
+		                     dv.css('padding-top','5px');
+		                     dv.css('line-height','16px');
+		                	 if(editable){
+		                		 td.css('margin',0);
+		                		 td.css('padding',2);
+		                     	 var editinput = $("<input type='text' />");
+		                     	 editinput.attr('name',tdx);
+		                     	 editinput.width(tdwidth);
+		                     	 editinput.css('margin',0);
+		                    	 editinput.css('padding',0);
+		     
+		                     	 if(disabled){
+		                     		 editinput.attr('disabled','disabled');
+		                     	 }
+		                     	 if(isnum){
+		                     		editinput.attr('type','number');
+		                     	 }
+		                     	 if(isDateTime){
+			                     	//editinput.attr('type','datetime');
+		                           	editinput.attr('pattern','^((((1[6-9]|[2-9]\\d)\\d{2})-(0?[13578]|1[02])-(0?[1-9]|[12]\\d|3[01]))|(((1[6-9]|[2-9]\\d)\\d{2})-(0?[13456789]|1[012])-(0?[1-9]|[12]\\d|30))|(((1[6-9]|[2-9]\\d)\\d{2})-0?2-(0?[1-9]|1\\d|2[0-8]))|(((1[6-9]|[2-9]\\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))-0?2-29-))(\\s(([01]\\d{1})|(2[0123])):([0-5]\\d):([0-5]\\d))?$');
+			                     } 
+		                     	 if(isFloat){
+			                        editinput.attr('pattern','^(-?\\d+)(\\.\\d+)?$');
+				                 }
+		                     	 if(isrequest){
+		                     		editinput.attr('required',true);
+		                     	 }
+		                     	 editinput.val(row[tdx]);
+		                     	 dv.append(editinput);
+		                     	if(tdx=='productName'){//商品名称
+			                     		var hiddenId=$("<input type='hidden' name='productId'/>");
+			                     		hiddenId.val(row['productId']);	
+			                     	   dv.append(hiddenId);
+			                     		//加上事件自动搜索的事件
+			                     		editinput.attr('list','productDataList');
+			                     		editinput.on('keyup',checkProduct);
+			                     		editinput.on('change',function(){
+			                     			var strs = this.value.split(" ");
+			                     			$(this).val(strs[strs.length-3]);
+			                     			if($(this).val()){
+			                     				//设置productId
+			                     				hiddenId.val(productDataList[strs[strs.length-2]]);
+			                     				//设置商品编码
+			                     	        	$(this).parents('td').nextAll('td:eq(0)').find('div').html(strs[strs.length-2]);
+			                     				//设置商品规格
+			                     	        	$(this).parents('td').nextAll('td:eq(1)').find('div').html(strs[strs.length-1]);
+			                     			}else{
+			                     				//设置productId
+			                     				hiddenId.val('');
+			                     				//设置商品编码
+			                     	        	$(this).parents('td').nextAll('td:eq(0)').find('div').html('');
+			                     				//设置商品规格
+			                     	        	$(this).parents('td').nextAll('td:eq(1)').find('div').html('');
+			                     			}
+			   							});
+			                     	 }
+			                     }else if(isSelected){
+			                		 td.css('margin',0);
+			                		 td.css('padding',2);
+			                     	 var editinput = $("<select />");
+			                     	 editinput.attr('name',tdx);
+			                     	 editinput.width(tdwidth);
+			                     	 editinput.css('margin',0);
+			                    	 editinput.css('padding',0);
+			                    	
+			                     	 
+			                     	if(tdx=='whsId'){//仓库id
+			                     		//填充营业处仓库
+			                		    $.ajax( {
+			                			  type : 'post', 
+			                			  async: false,   
+			                			  contentType : 'application/json',     
+			                			  dataType : 'json',     
+			                			  url : './../../stock/findWarehouses',   
+			                			  data:JSON.stringify({}),
+			                			  success : function(data) {
+			                				  if(data){
+			                					  var whsId=editinput;
+			                					  whsId.empty();
+			                					  if(whsId.get(0)){
+			                						  $.each(data,function(k,v){
+			                							  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+			                						  }); 
+			                					  }
+			                					 
+			                				  }else{
+			                					  $(document).sgPup({message:'message_info',text: data});
+			                				  }
+			                			  } ,     
+			                			  error : function(res,error) { 
+			                			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			                			  }    
+			                			});	
+			                     	}
+			                     	
+			                     	 editinput.val(row[tdx]);
+			                     	 dv.append(editinput);
+		     
+		                     }else{                         
+								if(formatter){
+									 dv.html((formatter)(row[tdx],row));
+								}else{
+									 dv.html(row[tdx]);
+								}
+		                     }
+		                	 td.append(dv);
+		                     
+		                 }
+		           
+		                tr.append(td);
+		                td = null;
+	            	});
+		            tby.append(tr);
+		        });
+		        //var tbl_id =  "#"+obj.attr("id")+"_tbl";
+		        $('tr', tbl).unbind();
+		        //$(tbl).empty();
+		        $('tbody',tbl).empty();
+		        tbl.append(tby);
+		        $('tbody tr:odd',tbl).addClass('normalRow');
+
+		        tby = null;
+		        hdv = null;
+		        tbl = null;
+		        tbl_id = null;
+		        json = null;
+			}; 	
+			
+			//追加数据
+			var appendData=function(json,obj,colModel){
+		        var tbl = $("#"+obj.attr("id")+" table");
+		        $('tr', tbl).unbind();
+		        
+		        var tby = $('tbody',tbl);
+		        if(!tby.get(0)){
+		        	tby=$('<tbody></tbody>') ;
+		        	tbl.append(tby);
+		        };
+		        var hdv = $('.hDiv',obj);
+		        $.each(json,function(i,row){
+		            var tr = $('<tr></tr>');
+	            	$.each(colModel,function(k,v){
+	            		var td = $('<td></td>');
+	            		var th_this= $('thead th[axis='+v.name+']', hdv);
+		                var editable = $(th_this).attr('editable');
+		                var isSelected = $(th_this).attr('isSelected');
+		                var disabled = $(th_this).attr('disabled');
+		                var isnum = $(th_this).attr('isnum');
+		                var isDateTime = $(th_this).attr('isDateTime');
+		                var isFloat= $(th_this).attr('isFloat');
+		                var isrequest = $(th_this).attr('isrequest');
+		                var formatter = $(th_this).attr('formatter');
+		                var tdx = v.name;
+
+		                if(tdx=='checkbox'){
+		                    var check = $('<input type="checkbox" style="margin-top:8px;" />');
+		                     check.attr('axis','id');
+		                     check.attr('name',obj.attr("id")+"_chx");
+		                     check.attr('value',row['id']);                    
+		                     check.data('data',row);                   
+		                     td.append(check);
+		                     // 此处添加onchange事件代码
+		                     check.change(function(){
+		                         if (!check.attr("checked")) {
+		                             check.attr("checked","checked");
+		                         }else if(check.attr("checked")){
+		                             check.removeAttr("checked");
+		                         }; 
+		                     });
+		                 }else if(tdx=='rownumbers'){
+		                 	var tdwidth = $(th_this).css('width');
+		                     td.css('width',tdwidth);
+		                     var num =$('tr', tbl).length;
+		                 	 //var num = i+1;
+		                 	 var dv = $('<div></div>');
+			                 dv.css('width',tdwidth);
+			                 dv.css('padding-top','5px');
+			                 dv.css('line-height','16px');
+			                 dv.append(num);
+		                 	td.append(dv);              	
+		                 }else if(tdx=='saveOperate'){//操作，保存按钮
+			                 	var tdwidth = $(th_this).css('width');
+			                     td.css('width',tdwidth);
+			                     //var num =$('tr', tbl).length+1;
+			                 	 var num = i+1;
+			                 	 var dv = $('<div class="submit"></div>');
+				                 dv.css('width',tdwidth);
+				                 dv.css('padding-top','5px');
+				                 dv.css('line-height','16px');
+				                 var btn=$('<button type="submit" style="width:64px;">保存</button>');
+				                 dv.append(btn);
+				                 btn.on('click',function(){
+				                		 $('#form_stock').unbind('submit');
+				                		 var trSave= $(this).parents('tr');
+				                		 $('#form_stock').on('submit',function(){
+				                			 $(document).sgConfirm({text: '确定保存吗?',cfn:function(r){ 
+		    		     						if(r){
+						                		try{
+						                			var id=$('input[type=checkbox]:first',trSave).attr('value');
+						                			var whsId=$('select[name=whsId]',trSave).val();
+						                			var whsName=$('select[name=whsId]',trSave).find('option:selected').text();
+						                			var productId=$('input[name=productId]',trSave).val();
+							                		var num=$('input[name=num]',trSave).val();//num
+							                		var productName=$('input[name=productName]',trSave).val();
+							                		var remark=$('input[name=remark]',trSave).val();
+							                		var param={
+							                				id:id,
+							                				whsId:whsId,
+							                				whsName:whsName,
+							                				productId:productId,
+							                				productName:productName,
+							                				num:num,
+							                				remark:remark
+							                		};
+							                		
+							                		//alert(JSON.stringify(param));
+							                		 $.ajax({
+									            		  type : 'post', 
+									            		  async: false,   
+									            		  contentType : 'application/json',     
+									            		  dataType : 'json',     
+									            		  url : '../../stock/saveStock',   
+									            		  data:JSON.stringify(param),
+									            		  success : function(data) {
+									            			  if(data){
+									            				 if(data.success){
+									    	          		 		 $('#aquery').trigger('click');
+									            				 }
+									            				$(document).sgPup({message:'message_info',text: data.msg});
+									            			  }
+									            		  } ,     
+									            		  error : function(res,error) { 
+									            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+									            		  }    
+									            		}); 
+						                		}catch(e){
+						                			$(document).sgPup({message:'message_info',text: e});
+						                		}
+				                			 }
+				                			}});
+				                			 return false;
+				                		 });
+				                		
+				                 });
+				                 
+				                 //取消
+				                 var btn2=$('<button type="button" style="width:64px;">取消</button>');
+				                 dv.append(btn2);
+				                 btn2.on('click',function(){
+				                	 	var trSave= $(this).parents('tr');
+				                		var id=$('input[type=checkbox]:first',trSave).attr('value');
+				                		if(id){//编辑
+				                			   //设置可编辑的外框border 为0
+							            	   $('input',trSave).attr('readonly',true);
+							            	   $('input',trSave).css('border','0px');
+							            	   $('input',trSave).css('background','transparent');
+							            	   $('select',trSave).attr('readonly',true);
+							            	   $('select',trSave).attr('disabled',true);
+							            	   $('select',trSave).css('border','0px');
+							            	   $('select',trSave).css('background','transparent');
+							            	
+							            	   //隐藏保存按钮
+							            	   $('td:last div',trSave).hide();
+							      
+				                		}else{
+				                			$(this).parents('tr').remove();
+				                		}
+				                 });
+			                 	 td.append(dv);              	
+			              }else{
+		                	 var tdwidth = $(th_this).css('width');
+		                     td.css('width',tdwidth);
+		                     var dv = $('<div></div>');
+		                     dv.css('width',tdwidth);
+		                     //padding-top: 5px; line-height: 16px;
+		                     dv.css('padding-top','5px');
+		                     dv.css('line-height','16px');
+		                	 if(editable){
+		                		 td.css('margin',0);
+		                		 td.css('padding',2);
+		                     	 var editinput = $("<input type='text' />");
+		                     	 editinput.attr('name',tdx);
+		                     	 editinput.width(tdwidth);
+		                     	 editinput.css('margin',0);
+		                    	 editinput.css('padding',0);
+		     
+		                     	 if(disabled){
+		                     		 editinput.attr('disabled','disabled');
+		                     	 }
+		                     	 if(isnum){
+		                     		editinput.attr('type','number');
+		                     	 }
+		                     	 if(isDateTime){
+			                     	//editinput.attr('type','datetime');
+			                     	editinput.attr('pattern','^((((1[6-9]|[2-9]\\d)\\d{2})-(0?[13578]|1[02])-(0?[1-9]|[12]\\d|3[01]))|(((1[6-9]|[2-9]\\d)\\d{2})-(0?[13456789]|1[012])-(0?[1-9]|[12]\\d|30))|(((1[6-9]|[2-9]\\d)\\d{2})-0?2-(0?[1-9]|1\\d|2[0-8]))|(((1[6-9]|[2-9]\\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))-0?2-29-))(\\s(([01]\\d{1})|(2[0123])):([0-5]\\d):([0-5]\\d))?$');
+			                     }
+		                     	 if(isFloat){
+			                        editinput.attr('pattern','^(-?\\d+)(\\.\\d+)?$');
+				                 }
+		                     	 if(isrequest){
+		                     		editinput.attr('required',true);
+		                     	 }
+		                     	 editinput.val(row[tdx]);
+		                     	 dv.append(editinput);
+		                     	if(tdx=='productName'){//商品名称
+			                     		var hiddenId=$("<input type='hidden' name='productId'/>");
+			                     		hiddenId.val(row['productId']);	
+			                     	   dv.append(hiddenId);
+			                     		//加上事件自动搜索的事件
+			                     		editinput.attr('list','productDataList');
+			                     		editinput.on('keyup',checkProduct);
+			                     		editinput.on('change',function(){
+			                     			var strs = this.value.split(" ");
+			                     			$(this).val(strs[strs.length-3]);
+			                     			if($(this).val()){
+			                     				//设置productId
+			                     				hiddenId.val(productDataList[strs[strs.length-2]]);
+			                     				//设置商品编码
+			                     	        	$(this).parents('td').nextAll('td:eq(0)').find('div').html(strs[strs.length-2]);
+			                     				//设置商品规格
+			                     	        	$(this).parents('td').nextAll('td:eq(1)').find('div').html(strs[strs.length-1]);
+			                     			}else{
+			                     				//设置productId
+			                     				hiddenId.val('');
+			                     				//设置商品编码
+			                     	        	$(this).parents('td').nextAll('td:eq(0)').find('div').html('');
+			                     				//设置商品规格
+			                     	        	$(this).parents('td').nextAll('td:eq(1)').find('div').html('');
+			                     			}
+			   							});
+			                     	 }
+		                     }else if(isSelected){
+		                		 td.css('margin',0);
+		                		 td.css('padding',2);
+		                     	 var editinput = $("<select />");
+		                     	 editinput.attr('name',tdx);
+		                     	 editinput.width(tdwidth);
+		                     	 editinput.css('margin',0);
+		                    	 editinput.css('padding',0);
+		                     	 
+		                     	if(tdx=='whsId'){//仓库id
+		                     		//填充营业处仓库
+		                		    $.ajax( {
+		                			  type : 'post', 
+		                			  async: false,   
+		                			  contentType : 'application/json',     
+		                			  dataType : 'json',     
+		                			  url : './../../stock/findWarehouses',   
+		                			  data:JSON.stringify({}),
+		                			  success : function(data) {
+		                				  if(data){
+		                					  var whsId=editinput;
+		                					  whsId.empty();
+		                					  if(whsId.get(0)){
+		                						  $.each(data,function(k,v){
+		                							  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+		                						  }); 
+		                					  }
+		                					 
+		                				  }else{
+		                					  $(document).sgPup({message:'message_info',text: data});
+		                				  }
+		                			  } ,     
+		                			  error : function(res,error) { 
+		                			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		                			  }    
+		                			});	
+		                     	}
+		                     	 editinput.val(row[tdx]);
+		                     	 dv.append(editinput);
+	                     }else{                         
+								if(formatter){
+									 dv.html((formatter)(row[tdx],row));
+								}else{
+									 dv.html(row[tdx]);
+								}
+		                     }
+		                	 td.append(dv);
+		                     
+		                 }
+		           
+		                tr.append(td);
+		                td = null;
+	            	});
+		            tby.append(tr);
+		        });
+		        $('tbody tr:odd',tbl).addClass('normalRow');
+
+		        tby = null;
+		        hdv = null;
+		        tbl = null;
+		        tbl_id = null;
+		        json = null;
+			}; 	
+    	
+    		 
+    })(jQuery)
+</script>
+</html>

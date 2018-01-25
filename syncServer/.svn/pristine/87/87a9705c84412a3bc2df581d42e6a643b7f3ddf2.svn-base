@@ -1,0 +1,17 @@
+
+# Production Environment
+jdbc.driverClassName=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://90.0.13.111:3306/gboss?useUnicode=true&amp;characterEncoding=UTF-8
+jdbc.username=gboss
+jdbc.password=123456
+jdbc.alias=gboss_db
+jdbc.maximum.connection.count=300
+jdbc.minimum.connection.count=5
+jdbc.statistics=1m,15m,1h,1d
+jdbc.simultaneous.build.throttle=20
+jdbc.houseKeepingSleepTime=300000
+jdbc.houseKeepingTestSql=select sysdate()
+jdbc.prototypeCount=5
+jdbc.trace=true
+jdbc.verbose=true
+jdbc.maximumActiveTime=9000000

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>电工工作量统计--维护</title>
+</head>
+<body>
+	<div class='datagrid' id="elect_evaluation" style="overflow:auto;">
+    </div>
+</body>
+<script type="text/javascript">
+(function($){
+	
+	var defaults = {
+	        width:  '100%',
+	        height: 410,
+	     	url:'',
+	        isNotCheckall:true,
+	        rownumbers:true,
+	        colModel : [
+				{display: '姓名', name : 'type', width : 140, sortable : false},
+	         	{display: '安装量', name : 'channelName', width : 120, sortable : false},
+	         	{display: '维修量', name : 'channelName', width : 120, sortable : false},
+	         	{display: '备注', name : 'channelName', width : 300, sortable : false}
+	        ]
+	    };
+	$('#elect_evaluation').sgDatagrid(defaults);
+})(jQuery)
+</script>
+</html>

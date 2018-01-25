@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>电工工作量统计</title>
+</head>
+<body>
+	<form id='writeOff_add_form' method='post' class="form" style="width:100%" >
+	<div class="title">电工工作量统计</div>
+		<fieldset style="width:850px;">
+			<div class='submit' style="text-align:left;">
+	            	<span style="width:30px;">年月:</span>
+	                <input type="month" id="stamp" name='stamp' style="width:165px;" />
+	                <button id="stockin_detail_submit" type="submit" style="width:80px;height:26px;" >查询</button>
+	                <button id="stockin_detail_submit" type="submit" style="width:80px;height:26px;" >导出Excel</button>
+	                <button id="stockin_detail_submit" type="submit" style="width:80px;height:26px;" >打印</button>
+	        </div>
+		</fieldset>
+	</form>
+	<div id="tabContainer" class="tab_container f12">
+    <ul class="tabs">
+        <li><a href="#tab1">维护</a></li>
+        <li><a href="#tab2">安装</a></li>        
+        <li><a href="#tab3">加班</a></li>
+        <li><a href="#tab4">考评</a></li>
+    </ul>
+    <div class="tab_div_container">
+        <div id="tab1" class="tab_content" src="web/rp/elect_repair.html"></div>
+        <div id="tab2" class="tab_content" src="web/rp/elect_install.html"></div>
+        <div id="tab3" class="tab_content" src="web/rp/elect_overtime.html"></div>
+        <div id="tab4" class="tab_content" src="web/rp/elect_evaluation.html"></div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    (function($) {
+        var defaults = {
+            width: 865,
+            height: 458
+        };
+
+        $('#tabContainer').sgTab(defaults);
+    })(jQuery);
+</script>
+</html>

@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>新装</title>
+<style>
+
+</style>
+</head>
+<body>
+	<div style="overflow-y:hidden;overflow-x:hidden;width:100%;height: 100%; ">
+		<aside id="bm_left" class="bsp_left">
+			<form id='newclothes' method='post' class="form" style="width:870px;">
+				<div class='title'>新装工单></div>
+				<fieldset style="width:850px;">
+					<div class="panel">
+		                <span>工单号:</span>
+		                <input type='text' id="billnum" name='billnum'  style="width:200px;" disabled="disabled" />
+		            </div>
+		            <div class="panel">
+		                <span>销售经理:</span>
+		                <input type='text' id="managerName" name='managerName' required="true" list="userDataList"  style="width:200px;" />
+		           	    <input type="hidden" name="managerId" id="managerId" required="true" value="" />
+		           	    <datalist id='userDataList'></datalist>
+		            </div>
+		            <div class="panel">    
+		                <span>客户姓名:</span>
+		                <input type='text' id="customerName" name='customerName' required="true"  list="customerList"  style="width:200px;" />
+		                <input type="hidden" name="customerId" id="customerId" required="true" value="" />
+		                <datalist id='customerList'></datalist>
+		                
+		                <span style="padding-left:50px;">联系电话:</span>
+		                <input type='text' id="phone" name='phone'  style="width:200px;" />
+		            </div>
+		            <div class="panel">    
+		                <span>商品名称:</span>
+		                <input type='text' id="product_name" name='product_name' placeholder="请输入商品名称" list="productDataList" style="width:200px;" />
+		                <input type="hidden" id="productId" name="productId" />
+		                <datalist id='productDataList'></datalist>
+		                
+		                  <span style="padding-left:50px;">车型:</span>
+		                <input type='text' id="cartype_name" name='cartype_name'   list="carTypeList" style="width:200px;" />
+		                <input type="hidden" name="cartype_id" id="cartype_id" required="true" value="" />
+		                   <datalist id='carTypeList'></datalist>
+		            </div>
+		            <div class="panel">    
+		                <span>安装地点:</span>
+		                <input type='text' id="place" name='place'  style="width:400px;" />
+		                
+		                <span style="padding-left:40px;">营业处:</span>
+		                <input type='checkbox'  id ="is_busines" style='vertical-align:middle;' />
+		            </div>
+		            <div class="panel">
+		            	<span style="vertical-align:top;">要求:</span>
+		                <textarea id="requirements" name="requirements" style="width:555px;" rows="2"></textarea>
+		            </div>
+		        </fieldset>
+		        
+		        <fieldset style="width:850px;">
+		        	<div class="panel">
+		                <span>直接派工:</span>
+		                <input type='checkbox' style='vertical-align:middle;' id="dispatching" name="dispatching" />
+		            </div>
+		            <div class="panel" id="divObj1" style="display:none">
+		                <span>电工:</span>
+		                <input type='text' id="electrician" name='electrician'  style="width:200px;" />
+		                 <input type='hidden' id="electricianIds" name='electricianIds'  style="width:200px;" />
+		                
+		                <span style="padding-left:50px;">电工电话:</span>
+		                <input type='text' id="electrician_phone" name='electrician_phone'  style="width:200px;" />
+		            </div>
+		            <div class="panel" id="divObj2" style="display:none">    
+		                <span>开始时间:</span>
+		                <input type='time' id="start_time" name='start_time'  style="width:200px;" />
+		                
+		                <span style="padding-left:50px;">预计时长:</span>
+		                <input type='time' id="duration" name='duration'  style="width:200px;" />
+		            </div>
+		        </fieldset>
+		        <div class='title'>工单调度分配</div>
+    			<div id='role_user' style="background:#e2e5ec;padding-left:30px;"></div>
+		
+		        <fieldset style="width:850px;border-top:0px;">	
+			        <div class='submit'>
+			            <button id="newclothes_save" type="submit" >保存</button> 
+			            <button id="newclothes_sendmsg" type="button" >发送短信</button> 
+			            <button id="btn_print" type="button" >打印</button>
+			        </div>
+		        </fieldset>
+		
+			</form>
+		</aside>
+		<article id="bm_main" class="bsp_main accordion" ></article>
+	</div>
+</body>
+<script type="text/javascript">
+	
+	var winClose = function() {
+		$(document).sgWindow('close', {
+			id : 'selectelect'
+		});
+	}
+	
+	
+	$("#newclothes #electrician").on('click',function(){
+		var defaults = {
+				title : '选择电工',
+				id : 'selectelect',
+				form : 'selectelect_form',
+				url : 'web/bsp/selectelect.html',
+				width : 600,
+				height : 280,
+				buttons : [ {
+					name : '确定',
+					onpress : comfire
+					
+				}, {
+					name : '取消',
+					onpress : winClose
+				} ]
+			};
+			$(document).sgWindow(defaults);
+	});
+
+	
+	
+	
+	   var comfire = function(){
+		   
+		   //拼电工的Id,姓名 电话
+	        var obj = $('#ba_select_electrician');
+	        var bDiv = $('.bDiv',obj);
+	        var namevalue='';
+	        var ids='';
+	        var phones='';
+	         $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){    
+	                	editId=this.value;
+	                	alert(JSON.stringify($(this).data('data')));
+	                	editobj = $(this).data('data');
+	                	if(namevalue.length==0){
+	                		namevalue = editobj.name;
+	                		ids = editobj.id;
+	                		if(editobj.phone==null || editobj.phone.length==0){
+	                			phones =  "暂无";
+	                		}else{
+	                			phones =  editobj.phone;
+	                		}
+	                	}else{
+	                		namevalue = namevalue + "," + editobj.name
+	                		ids = ids + "," + editobj.id;
+	                		if(editobj.phone==null || editobj.phone.length==0){
+	                			phones = phones + ",暂无";
+	                		}else{
+	                			phones = phones + "," + editobj.phone;
+	                		}
+	                	}
+	                }
+	                
+	            });
+		   
+	        $("#electrician","#newclothes").val(namevalue);
+	        $("#electrician_phone","#newclothes").val(phones);
+	        $("#electricianIds","#newclothes").val(ids);
+	         $(document).sgWindow('close',{id:'selectelect'}); 
+	 		
+	 	   };
+	
+	
+
+	$(function () {
+		var myclick = function(treenode){
+	        alert(treenode.value+treenode.content+treenode.url);
+	    }
+	    var defaults = {
+	        url:"web/bsp/bsp_left.json",
+	        onclick: myclick,
+	        width:200,
+	        div_height: 495,
+	        isexpend:false
+	    };
+	    $('#bm_main').sgAccordion(defaults);
+	    
+	    var defaults2 = {
+	       		isexpend: true,
+	           // url: 'web/bsp/tree.json',
+	            url: 'company/users',
+	            root: '指派调度人员',
+	            hasbox : true
+        };
+        $('#role_user').sgTree(defaults2);
+	    
+	    $.ajax( {
+			  type : 'POST', 
+			  async: false,   
+			  url : "task/getTaskNo",   
+			  data:{},
+			  success : function(data) {
+				  if(data){
+					  $("#billnum").val(data);
+				  }
+			  } 
+		});
+	    
+	    //销售经理
+	    var checkUser = function(){
+			var text=this.value;
+			text = text.replace(/\s/g,'');
+			if(text!=this.value){
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			}
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.opname = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : 'getCompanySaleManager',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#managerName");
+						  if(manager){
+							  if(data.items.length>0){
+								  userDataList = {};
+								  $("#userDataList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.opname);
+								  $("#userDataList").append(op);
+								  userDataList[v.opname] = v.opid;
+		 				  	 }); 
+							}
+					  }else{
+					  	alert(data);
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	 alert(res.responseText);     
+				  }    
+				});
+		};
+	    
+		
+		
+		
+		
+		$("#newclothes #managerName").on('click',function(){
+			 //填充经理
+		    $.ajax( {
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : 'getCompanySaleManager',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#managerName");
+					  if(manager){
+						  if(data.items.length>0){
+							  userDataList = {};
+							  $("#userDataList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(v.opname);
+							  $("#userDataList").append(op);
+							  
+							  userDataList[v.opname] = v.opid;
+						  	 }); 
+						  manager.on('keyup',checkUser);
+						  manager.on('change',function(){
+							  var strs = this.value.split(" ");
+							    if(userDataList[strs[strs.length-1]]){
+									$(this).val(strs[strs.length-1]);
+									$("#managerId","#newclothes").val(userDataList[strs[strs.length-1]]);
+									if($("#managerId","#newclothes").val().length==0){
+										$("#managerName","#newclothes").val("");
+									}
+							    }else{
+							    	$(this).val('');
+							    	$("#managerId","#newclothes").val("");
+							    }	
+							});
+	
+						}
+				  }else{
+				  	alert(data);
+				  }
+			  },     
+			  error : function(res,error) { 
+			  	 alert(res.responseText);     
+			  }    
+			});
+		    
+	});
+		
+	    var checkCustomer = function(){
+			var text=this.value;
+			text = text.replace(/\s/g,'');
+			if(text!=this.value){
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			}
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.customer_name = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : 'getCustomers',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#customerName");
+						  if(manager){
+							  if(data.items.length>0){
+								  customerList = {};
+								  $("#customerList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.customer_name);
+								  $("#customerList").append(op);
+								  
+								  customerList[v.customer_name] = v.id;
+		 				  	 }); 
+							}
+					  }else{
+					  	alert(data);
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	 alert(res.responseText);     
+				  }    
+				});
+		};
+	    
+		
+		$("#newclothes #customerName").on('click',function(){
+		    //填充客户
+		    $.ajax( {
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : 'getCustomers',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#customerName");
+					  if(manager){
+						  if(data.items.length>0){
+							  customerList = {};
+							  $("#customerList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(v.customer_name);
+							  $("#customerList").append(op);
+							  
+							  customerList[v.customer_name] = v.id;
+						  	 }); 
+						  manager.on('keyup',checkCustomer);
+						  manager.on('change',function(){
+							  var strs = this.value.split(" ");
+							    if(customerList[strs[strs.length-1]]){
+									$(this).val(strs[strs.length-1]);
+									$("#customerId","#newclothes").val(customerList[strs[strs.length-1]]);
+									 $("#phone","#newclothes").val("");
+									 $("#cartype_name","#newclothes").val("");
+									 $("#cartype_id","#newclothes").val("");
+									
+									  $.ajax( {
+										  type : 'POST', 
+										  async: false,  
+										  url : "customer/getDetailMsg",   
+										  data:{id:$("#customerId","#newclothes").val()},
+										  success : function(data) {
+											  if(data){
+												  $("#phone","#newclothes").val(data.phone);
+												  $("#cartype_name","#newclothes").val(data.cartypeName);
+												  $("#cartype_id","#newclothes").val(data.cartypeId);
+											  }
+										  } 
+									});
+								    
+									if($("#customerId","#newclothes").val().length==0){
+										$("#customerName","#newclothes").val("");
+									}
+							    }else{
+							    	$(this).val('');
+							    	$("#customerId","#newclothes").val("");
+							    }	
+							});
+	
+						}
+				  }else{
+				  	alert(data);
+				  }
+			  },     
+			  error : function(res,error) { 
+			  	 alert(res.responseText);     
+			  }    
+			});
+		});
+	    
+		
+	    
+		
+		//查询商品
+			var checkProduct = function(){
+				var params = {};
+				params.pageNo = 1;
+				params.pageSize = 10;
+				params.filter = {};
+				params.filter.nameOrCode = this.value;
+				var obj = $(this);
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : 'product/findProducts',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  var products = data.items;
+							  if(products.length>0){
+								  $("#productDataList").empty();
+							      productDataList={};
+							  }
+							 // var key=null;
+							  $.each( products, function(key,value){
+								  
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+								  $("#productDataList").append(op);
+								  productDataList[value.code] = value.id;
+							 });
+						  }else{
+							  alert(data);
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	 alert(res.responseText);     
+					  }    
+					});
+			};
+			
+		
+		
+		//$("#newclothes #product_name").on('click',function(){
+			    //填充商品
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : 'product/findProducts',   
+					  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+					  success : function(data) {
+						  if(data){
+							  var products = data.items;
+							  $("#productDataList").empty();
+							  // var key=null;
+							  productDataList={};
+							  $.each( products, function(key,value){
+								  
+								  var op = $("<option></option>");
+								  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+								  $("#productDataList").append(op);
+								  
+								  productDataList[value.code] = value.id;
+							 });
+							//var product_nameCondn=$('input[name=product_name]',$('#newclothes'));
+							//product_nameCondn.on('keyup',checkProduct);
+							
+							  $("#newclothes input[list=productDataList]").on('keyup',checkProduct);
+							  $("#newclothes input[name=product_name]").on('change',function(){
+									var strs = this.value.split(" ");
+									$(this).val(strs[strs.length-3]);
+									$("#newclothes input[name=productId]").val(productDataList[strs[strs.length-2]]);
+								});
+	
+						  }else{
+							  alert(data);
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	 alert(res.responseText);     
+					  }    
+					});
+		//});
+	    
+		
+		
+		   $("#newclothes").on('submit',function(e){
+    			//做表单提交
+                var params = {};
+                var url='task/add';
+                var chk_bu = document.getElementById("is_busines");
+            	if(chk_bu.checked){
+            		params.isoffice="1";
+    	    	}else{
+    	    		params.isoffice="0";
+    	    	}
+                   
+       		 	params.billno=$('#billnum','#newclothes').val();
+       		 	params.managerId=$('#managerId','#newclothes').val();
+       			params.manager_name=$('#managerName','#newclothes').val();
+       		    params.billtype="1";
+    			params.phone=$('#phone','#newclothes').val();
+    			params.requirements=$('#requirements','#newclothes').val();
+    			params.place=$('#place','#newclothes').val();
+    			params.cartype_id=$('#cartype_id','#newclothes').val();
+    			params.product_name=$('#product_name','#newclothes').val();
+       			params.customerId=$('#customerId','#newclothes').val();
+       			
+       			params.electricianNames=$('#electrician','#newclothes').val();
+       			params.electricianIds=$('#electricianIds','#newclothes').val();
+       			params.electrician_phone=$('#electrician_phone','#newclothes').val();
+       			
+       			params.start_time=$('#start_time','#newclothes').val();
+       			params.duration=$('#duration','#newclothes').val();
+       		    params.type="0";
+       		   
+       		    
+       			var objs = document.getElementsByName("treeCheckbox");
+    			var ids = [];
+    			var names = '';
+    			var tids  = '';
+    			var a = 0;
+    			for(var i=0;i<objs.length;i++){
+    				if(objs[i].checked == true){
+    					for(var j=0; j<ids.length; j++){
+    						if(objs[i].id == ids[j])
+    							a=1;
+    					}
+    					if(a == 0){
+    					ids.push(objs[i].id);
+    					tids += objs[i].id + ',';
+     	        		names += objs[i].value + ',';
+    					}
+    				}
+    				a=0;
+    			}
+    			if(ids.length == 0){
+     				alert("请选择至少一个角色！");
+     				return;
+     			}else{
+     				names = names.substring(0, names.length-1);
+     				tids = tids.substring(0, tids.length-1);
+     			}
+    			 params.dispatcher=tids;
+    			params.charger=names;   
+    			
+       		 	alert(JSON.stringify(params));
+       		 	if(window.confirm('确定保存接单吗?')){
+       		 		
+       		 	 if(!params.managerId){
+  	         	   alert('请选择销售经理！');
+  	         	   return false;
+  	            }
+       		 	 
+       		 	if(!params.product_name){
+   	         	   alert('请选择商品！');
+   	         	   return false;
+   	            }
+       		 
+       		 	if(!params.customerId){
+   	         	   alert('请选择客户！');
+   	         	   return false;
+   	            } 
+       		 		
+                      $.ajax( {
+   	           		  type : 'post', 
+   	           		  async: false,   
+   	           		  contentType : 'application/json',     
+   	           		  dataType : 'json',     
+   	           		  url : url,   
+   	           		  data:JSON.stringify(params),
+   	           		  success : function(data) {
+   	           			  if(data){
+   	           				 if(data.success){
+   	           					// $(document).sgWindow('close',{id:'win_managers'}); 
+   	   	          		 		 $('#newclothes').sgDatagrid('reload','sgDatagrid');
+   	   	          		 		
+   	           				 }
+   	           				 alert(data.msg);
+   	           			  }
+   	           		  } ,     
+   	           		  error : function(res,error) { 
+   	           		  	 alert(res.responseText);     
+   	           		  }    
+   	           		}); 
+       		 	}
+   	        $('#newclothes').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+   			e.stopPropagation();
+   	    	return false;
+   	  
+   	 	   });
+		   
+		
+	    $("[name = dispatching]:checkbox").bind("click", function () {
+	    	var chk = document.getElementById("dispatching");
+	    	if(chk.checked){
+	    		$("#divObj1").show();
+	    		$("#divObj2").show();
+	    	}else{
+	    		$("#divObj1").hide();
+	    		$("#divObj2").hide();
+	    	}
+	    })
+	});
+	
+	 //打印
+	$("#btn_print").on('click',function(){
+		alert("AAAAAA");
+		
+		//$('#ifm_print').attr('src','web/whs/stock_print2.html');
+		window.open('web/bsp/print.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+		 $("#task",subWinBody).show();
+		//新增遮罩层
+		var mask=$('<div id="print_mask"></div>');
+		mask.addClass('window-mask');
+		mask.css('z-index',$('div.window').css('z-index')+1);//如果有弹出窗口，则将遮罩层置为最上层
+        var span=$('<span></span');
+        var span=$('<span></span');
+        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+        span.text('正在打印中...');
+        mask.append(span);
+	    $(document.body).append(mask);
+	});
+
+	
+	
+	//打印页面元素设置
+	   var callback=function(subWinBody,subWin){
+	  	$.ajax( {
+	  		  type : 'post', 
+	  		  async: false,   
+	  		  contentType : 'application/json',     
+	  		  dataType : 'json',     
+	  		  url : 'getCurrentCompany',   
+	  		  data:JSON.stringify({}),
+	  		  success : function(data) {
+	  			  if(data){
+	  				  var total = 0;
+	  				  var rowtotal = 0;
+	  				  //公司中文名字
+	  				  $("#cname",subWinBody).empty();
+	  				  $("#cname",subWinBody).append(data.cnfullname);
+	  				  //公司英文名字
+	  				  $("#ename",subWinBody).empty();
+	  				  $("#ename",subWinBody).append(data.enfullname);
+	  				  //表单名字
+	  				  $("#taskTitle",subWinBody).empty();
+	  				  $("#taskTitle",subWinBody).append("新装工单");
+	  				  
+
+	  				  
+	  				    //表单日期
+	  				  $("#taskDate",subWinBody).empty();
+	  				  $("#taskDate",subWinBody).append(new Date().format('yyyy-MM-dd'));
+	  				
+	  				/*   //表单单号
+	  				  $("#taskNo",subWinBody).empty();
+	  				  $("#taskNo",subWinBody).append($('#billnum','#newclothes').val()); */
+	  				
+	  				  
+
+	  				  var billnum = '<span>工单号：</span><div>'+$('#billnum','#newclothes').val()+'</div>';
+	  				  $("#headInput",subWinBody).append(billnum);
+	  				
+	  				  var manager = '<span>销售经理：</span><div>'+$('#managerName','#newclothes').val()+'</div>';
+	  				  $("#headInput",subWinBody).append(manager);
+	  				  
+	  				  
+	  				  var customerName = '<span>客户姓名：</span><div>'+$("#customerName").val()+'</div>';
+	  				  $("#headInput",subWinBody).append(customerName);
+	  				  
+	  				  var customerPhone = '<span>联系电话：</span><div>'+$("#phone").val()+'</div>';
+	  				  $("#headInput",subWinBody).append(customerPhone);
+	  				  
+	  				  
+	  				  var productName = '<span>商品名称：</span><div>'+$("#product_name").val()+'</div>';
+	  				  $("#headInput",subWinBody).append(productName);
+	  				  
+	  				  var place = '<span>安装地点：</span><div>'+$("#place").val()+'</div>';
+	  				  $("#headInput",subWinBody).append(place);
+	  				  
+	  				 var carType = '<span>车型：</span><div>'+$("#cartype_name").val()+'</div>';
+	  				  $("#headInput",subWinBody).append(carType);
+	  				  
+	  				  
+	  				 var requirements = '<span>要求：</span><div>'+$("#requirements").val()+'</div>';
+	  				  $("#headInput",subWinBody).append(requirements);
+	  				  
+	  				var electricianIds =  $("#electricianIds").val();
+	  		     	if(electricianIds){
+	  		     	  
+		  				  var electrician = '<span>电工姓名：</span><div>'+$("#electrician").val()+'</div>';
+		  				  $("#headInput",subWinBody).append(electrician);
+		  				  
+		  				  var electrician_phone = '<span>电工电话：</span><div>'+$("#electrician_phone").val()+'</div>';
+		  				  $("#headInput",subWinBody).append(electrician_phone);
+		  				  
+		  				 var start_time = '<span>开始时间：</span><div>'+$("#start_time").val()+'</div>';
+		  				  $("#headInput",subWinBody).append(start_time);
+		  				  
+		  				 var duration = '<span>预计时长：</span><div>'+$("#duration").val()+'</div>';
+		  				  $("#headInput",subWinBody).append(duration);
+		  				  
+	  		     	
+	  		     	}
+	  				   
+	  				
+					 /*  var tbfoot = '<tr>';
+					  tbfoot=tbfoot+'<td colspan="4"><div style="text-align:right">小计:</div></td>';
+					  tbfoot=tbfoot+'<td colspan="1"><div style="text-align:right">'+total+'</div></td>';
+					  tbfoot=tbfoot+'<td colspan="1"></td>';
+					  tbfoot=tbfoot+'</tr>';
+					  $("#tbBody",subWinBody).append(tbfoot);
+					  reset();
+					  */
+	  				  
+	  			
+	  				
+	  				  
+	  			  }else{
+	  				  $(document).sgPup({message:'message_info',text: data});
+	  			  }
+	  		  } ,     
+	  		  error : function(res,error) { 
+	  		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  		  }    
+	  		});
+	  	
+	      if (navigator.appName == 'Microsoft Internet Explorer'){
+	      	subWin.print();  
+	      }else{ 
+	      	subWin.focus();
+	      	subWin.print();  
+	      }
+	      
+	      
+	  }
+
+</script>
+</html>

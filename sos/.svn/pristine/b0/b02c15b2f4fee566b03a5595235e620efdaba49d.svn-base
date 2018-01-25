@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+<form id="bind_combo" method="post" class="form" name="bind_combo" >
+		<input type="hidden" id="sim_id" name="sim_id">
+		<div id="comborecord" class="datagrid"></div>
+</form>
+
+</body>
+<script type="text/javascript">
+(function($) {
+	
+ 	var height = 280;
+ 	//初始化表格
+ 	var defaults = {
+		        title: "",
+		        width:  '100%',
+ 		        height: height,
+ 		     	isNotCheckall: true,
+ 		        rownumbers:true,
+ 		        url:'', 
+ 		        colid:'id',
+		        colModel : [
+					{display: '套餐名', name : 'combo_name', width : '18%', sortable : false},
+					{display: '套餐类型', name : 'sim_type', width : '17%', sortable : true,formatter:function(value,row){
+ 	  	                if(value==1){
+ 	  	                    value = '语音';
+ 	  	                }else if(value==2){
+ 	  	                    value = '流量';
+ 	  	                }
+ 	  	                return value;
+ 	  	            }},
+					{display: '通话时长', name : 'voice_time', width : '18%', sortable : false},
+					{display: '总流量', name : 'data', width : '18%', sortable : false},
+					{display: '套餐费用', name : 'month_fee', width : '17%', sortable : false}
+		        ]
+		    };
+ 	
+ 		    $('#comborecord').sgDatagrid(defaults);
+ 		    
+	
+})(jQuery);
+</script>
+</html>

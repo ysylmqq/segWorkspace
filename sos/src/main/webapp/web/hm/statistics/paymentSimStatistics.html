@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SIM卡缴费对账报表</title>
+<link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../../css/gbossIframe.css">
+</head>
+<body>
+	<div class='datagrid' id="monitoring">
+    </div>
+</body>
+
+<script type="text/javascript" src="../../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../../jscript/index.js"></script>
+<script type="text/javascript" src="../../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../../jscript/window.js"></script>
+<script type="text/javascript" src="../../../jscript/pup.js" ></script>
+<script type="text/javascript" src="../../../jscript/form.js"></script>
+<script type="text/javascript">
+
+
+
+
+
+    (function($) {
+    	
+    	var now =new Date().format('yyyy-MM-dd');
+    	var today=new Date().format('yyyy-MM');
+    	var twoDayBefore = GetDateStr(-30);
+    	var height = 476;
+    	//初始化表格
+    	var defaults = {
+    		        title: "SIM卡缴费对账报表",
+    		        width:  '100%',
+    		        height: height,
+    		        rownumbers:true,
+    		        usepager: true,
+    		        url:'../../../paymentSim/findPaymentSimPage',
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '呼号', name : 'call_letter', width : 110},
+						{display: '车架号', name : 'vin', width : 120},
+						{display: '缴费金额', name : 'ac_amount', width : 100},
+						{display: '缴费月份', name : 's_months', width : 100},
+						{display: '缴费天数', name : 's_days', width : 100},
+						{display: '服务开始时间', name : 's_date', width : 100},
+						{display: '服务截止时间', name : 'e_date', width : 100},
+						{display: '缴费时间', name : 'stamp', width : 100}
+    		        ],
+    		        searchitems :[
+    		                   {display:'呼号',name:'startDate',type:'text',width:120},
+    		  				  {
+    		  						display : '开始日期',
+    		  						name : 'startDate',
+    		  						html:'<input type="date" name="startDate" id="startDate" style="width:120px"  class="form-control schInput">'
+    		  				    },
+    		  				    {
+    		  						display : '结束日期',
+    		  						name : 'endDate',
+    		  						html:'<input type="date" name="endDate" id="endDate" style="width:120px"  class="form-control schInput">'
+    		  				    } 
+    		  		            
+    		    		        ],
+    		    		        //exporturl:'../../../policy/exportExcelPolicysNew'
+    		      		     
+    		    };
+    		    $('#monitoring').sgDatagrid(defaults);
+    })(jQuery);
+    
+    
+    
+    
+    function GetDateStr(AddDayCount) {
+	    var dd = new Date();
+	    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+	    return dd.format('yyyy-MM-dd');
+	}
+</script>
+</html>

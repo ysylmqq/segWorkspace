@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>出库查询</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css"><link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+ <style type="text/css">
+ .ui-icon-ellipsis{
+    background:url(images/icon-select.gif) no-repeat scroll 55% 55% transparent;
+    right: 0;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+	cursor: pointer;
+    overflow: hidden;
+    position: absolute;
+}
+ 
+ </style>
+</head>
+<body>
+<div id="nw_document_all">
+    <div id="dgd_stockout" class="datagrid"></div>
+	<datalist id="userDataList"></datalist>
+	<datalist id="channelDataList"></datalist>
+	<datalist id="customerDataList"></datalist>
+	</div>
+	<!-- 打印iframe -->
+	<iframe id="ifm_print_wsomain" name="ifm_print_wsomain" style="display: none"></iframe>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+	var selectedObj=null;//选择行的值
+	(function($){
+ 
+	   var channelDataList={};//代理商
+	   var customerDataList={};//最终客户
+ 	   var userDataList = {};//销售经理 key:name,value:id
+ 	   var begeinDate =new Date();
+	   begeinDate.setDate(1);
+	   begeinDate=begeinDate.format('yyyy-MM-dd');
+	   
+	   var now =new Date().format('yyyy-MM-dd');
+	   
+	   var editId=null;//编辑时选中行ID
+	   
+	   var loadSuccess4Details = function(){
+		   $('#code','#form_stockout_details').val(selectedObj['code']);
+		   $('#managersName','#form_stockout_details').val(selectedObj['managersName']);
+		   $("#channelName",'#form_stockout_details').val(selectedObj['channelName']);
+		   $('#inWhsName','#form_stockout_details').val(selectedObj['inWhsName']);
+		   $('#stamp','#form_stockout_details').val(selectedObj['stamp']);
+		   $('#remark','#form_stockout_details').val(selectedObj['remark']);
+		   
+		   //如果是调拨,显示入库仓库
+		   if(selectedObj.type==4){
+			   $('#spn_in_whs','#form_stockout_details').show();
+			   $('#inWhsName','#form_stockout_details').show();
+		   }else  if(selectedObj.type==1 || selectedObj.type==2){//直销、升级
+			   $('#spn_in_whs','#form_stockout_details').html('收据票号');
+			   $('#inWhsName','#form_stockout_details').val(selectedObj.receiptNo);
+			   $('#spn_in_whs','#form_stockout_details').show();
+			   $('#inWhsName','#form_stockout_details').show();
+			   
+			   //将原来的备注删除
+			   $('#remark','#form_stockout_details').prev().remove();
+			   $('#remark','#form_stockout_details').remove();
+			   //第二行 新增 费用
+			   var fieldset1=$('fieldset:first','#form_stockout_details');
+			   var div2=$('div:eq(1)',fieldset1);
+			   div2.append('<span>费用:</span>');
+			   var money=$('<input type="text" id="money"  style="width:155px;vertical-align:top;" disabled="disabled"/>');
+			   money.val(selectedObj['money']);
+			   div2.append(money);
+			   
+			   //第三行 新增一个div，放备注
+			   var div3=$('<div class="panel"></div>');
+			   div3.append('<span style="vertical-align:top;">备注:</span>');
+			   var remark=$('<textarea id="remark" name="remark" style="width:418px;" rows="2" disabled="disabled" ></textarea>')
+			   remark.val(selectedObj['remark']);
+			   div3.append(remark);
+			   fieldset1.append(div3);
+			   
+			   
+		   }
+		   if($('#dgd_product').get(0)){
+	        	var params={stockoutId:selectedObj.id};
+	        	
+	       		 $.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../stock/findStockOutDetails',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  selectedObj.details=data;
+							  $('#dgd_product').sgDatagrid('appendData',data);
+							  //如果是调拨,显示已调拨数量
+							   if(selectedObj.type==4){
+								   $('#dgd_product table tr th:nth-child(7),td:nth-child(7)','#form_stockout_details').show();
+								   $('#dgd_product table tr th:nth-child(8),td:nth-child(8)','#form_stockout_details').hide();
+							   }else  if(selectedObj.type==1 || selectedObj.type==2 ){//直销、升级
+								   $('#dgd_product table tr th:nth-child(7),td:nth-child(7)','#form_stockout_details').hide();
+								   $('#dgd_product table tr th:nth-child(8),td:nth-child(8)','#form_stockout_details').show();
+							   }else{
+								   $('#dgd_product table tr th:nth-child(7),td:nth-child(7)','#form_stockout_details').hide();
+								   $('#dgd_product table tr th:nth-child(8),td:nth-child(8)','#form_stockout_details').hide();
+							   }
+							   //表格的宽度=表头表格的宽度
+					     	    $('#dgd_product .bDiv table','#form_stockout_details').width($('#dgd_product .hDiv table','#form_stockout_details').width());
+					     		
+						  }else{
+						  	$(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					});
+	    	}
+	   }
+	   //打印
+		var detailPrint=function(){
+			 //$('#ifm_print_wsomain').attr('src','stock_print2.html');
+			var	sName='winPrint';
+			var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+			if (isChrome){
+			  sName='ifm_print_wsomain';
+			}
+			window.open('print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+			if (!isChrome){
+				//新增遮罩层
+  				var mask=$('<div id="print_mask"></div>');
+  				mask.addClass('window-mask');
+  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+  		        var span=$('<span></span');
+  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+  		        span.text('正在打印中...');
+  		        mask.append(span);
+  			    $(window.document.body).append(mask);
+			}
+		}
+	    var getDetailsItem = function(){
+	        var obj = $('#dgd_stockout');
+	        var bDiv = $('.bDiv',obj);
+	        //alert($('input[type=checkbox][checked=checked]',bDiv).length) ;
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){    
+	                	editId=this.value;
+	                	selectedObj = $(this).data('data');
+	                		//打开窗口
+			                var defaults = {
+			    	                title:'出库明细',
+			    	                id:'win_stockout_details',
+			    	                form:'form_stockout_details',
+			    	                url:'stockout_details.html',
+			    	                success: loadSuccess4Details,
+			    	                width: 816,
+			 		                height:520,
+			    	                buttons : [
+										{name: '打印', onpress : detailPrint},
+										{name: '关闭', type: 'button', onpress : winClose4Details}
+										]
+			    	            };
+			    	        $(document).sgWindow(defaults);
+	                	
+	                }
+	            });
+	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }
+	    }
+	       var winClose4Details = function (){
+	           $(document).sgWindow('close',{id:'win_stockout_details'});
+	        }
+	       
+	    var defaults = {
+	        title: "出库查询",
+	        width:  '100%',
+	        height: 388,
+	        url: '../../stock/findStockOutsPage',
+	        usepager: true,
+	        rownumbers:true,
+	        useRp: true,
+	        query:{startDate:begeinDate,endDate:now},
+	        colid:'id',  //主键
+	        colModel : [
+	            {display: '出库单号', name : 'code', width : 150, sortable : false},
+	            {display: '类型', name : 'type', width : 80,formatter:function(value,row){
+	                if(value==0){
+	                    value = '代理销售';
+	                }else if(value==1){
+	                    value = '直销';
+	                }else if(value==2){
+	                    value = '升级';
+	                }else if(value==3){
+	                    value = '借用';
+	                }else if(value==4){
+	                    value = '调拨';
+	                }else if(value==5){
+	                    value = '其他';
+	                }else if(value==9){
+	                    value = '调账';
+	                }else{
+	                	value ="";
+	                }
+	                return value;
+	            }},
+	            {display: '出库仓库', name : 'whsName', width : 90, sortable : false},
+	            {display: '经办人', name : 'managersName', width : 90, sortable : false},
+	            {display: '客户', name : 'channelName', width : 100, sortable : false},
+	            {display: '入库仓库', name : 'inWhsName', width : 90, sortable : false},
+	            {display: '出库日期', name : 'stamp', width : 120, sortable : true},
+	            {display: '调拨是否完成', name : 'isCompleted', width : 80,formatter:function(value,row){
+	            	if(value==1){
+	                    value = '是';
+	                }else {
+	                	if(row.type==4){
+	                		value='否';
+	                	}else{
+	                		value='';
+	                	}
+	                }
+	                return value;
+	            }},
+	            {display: '费用', name : 'money', width : 60, sortable : true},
+	            {display: '收据票号', name : 'receiptNo', width : 100, sortable : true},
+	            {display: '备注', name : 'remark', width : 120, sortable : true}
+	        ],
+	        buttons : [
+	            {name: '查看', bclass: 'view', onpress : getDetailsItem}
+	        ],
+	        searchitems :[
+                {display:'出库单号',name:'code',type:'text',width:150},
+                {display:'代理商',html:'<input type="text" name="channelName" id="channelName" list="channelDataList"/><input type="hidden" name="channelId" id="channelId"/> <span class="ui-icon-ellipsis" style="width:16px;"/>'},
+                {display:'最终客户',html:'<input type="text" name="customerName" id="customerName" list="customerDataList" /><input type="hidden" name="customerId" id="customerId"/> <span class="ui-icon-ellipsis" style="width:16px;"/>'},
+ 		        {display:'经办人',html:'<input type="text" name="managersName" id="managersName" style="width:150px;" list="userDataList"/><input type="hidden" name="managersId" id="managersId" />'},
+	            {display:'类型',name:'type',html:'<select name="type" style="width:153px;"><option value="" selected>请选择...</option><option value="0">代理销售</option><option value="1">直销'
+	            +'</option><option value="2">升级</option><option value="4">调拨</option><option value="5">其他</option><option value="9">调账</option></select>'},
+	            {display:'开始日期',name:'startDate',type:'date',value:begeinDate},
+		      	{display:'结束日期',name:'endDate',type:'date',value:now}
+	        ],
+	        exporturl:'../../stock/exportExcel4Stockout',
+	        sortorname: "stamp",
+	        sortorder: "desc"
+	    };
+	    $('#dgd_stockout').sgDatagrid(defaults); 
+	    
+	    //类型文字宽度调整
+	    $('select[name=type]').prev('span').width(52);
+	    //代理商查询
+	    $('#channelId').parent('div').css('position','relative');
+	  //自动查询代理商
+		var checkChannel = function(){
+			/* var text=this.value;
+			text = text.replace(/\s/g,''); //去除空格
+			if(text!=this.value){//有空格
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			} */
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.name = this.value;
+			params.filter.exceptDicId='5';
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../sell/findChannels',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var channels = data.items;
+						  if(channels.length>0){
+							     $("#channelDataList").empty();
+						  		channelDataList = {};
+						   }
+						  $.each( channels, function(key,value){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+value.name);
+							  $("#channelDataList").append(op);
+							  
+							  channelDataList[value.name]=value;
+							});
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		};
+		//填充代理商
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../sell/findChannels',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{exceptDicId:'5'}}),
+			  success : function(data) {
+				  if(data){
+					  var channels = data.items;
+					  if(channels.length>0){
+						     $("#channelDataList").empty();
+					  		channelDataList = {};
+						  }
+					  $.each( channels, function(key,value){
+						  var op = $("<option></option>");
+						  op.val(value.name);
+						  $("#channelDataList").append(op);
+						  channelDataList[value.name]=value;
+						});
+					  
+					  $("#channelName").on('keyup',checkChannel);
+					  $("#channelName").on('change',function(){
+						    var strs = this.value.split(" ");
+						    
+						    if(channelDataList[strs[strs.length-1]]){
+						    	$(this).val(strs[strs.length-1]);
+								
+								$("#channelId").val(channelDataList[strs[strs.length-1]].id);
+								
+								if($("#channelId").val().length==0){
+									$("#channelName").val("");
+								}
+						    }else{
+						    	$(this).val('');
+						    	$("#channelId").val("");
+						   }
+						    
+						});
+					  
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+	    $('#channelId').siblings('span').on('click',function(){
+	    	var isSure=false;
+ 	    	var getCusomer=function(){
+ 	    		var obj = $('#dgd_channel','#win_channel');
+ 		        var bDiv = $('.bDiv',obj);
+ 	 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+ 	 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+ 	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+ 	 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+ 	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+ 	 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	 	 	                if($(this).attr("checked")){
+ 	 	 	                	isSure=true;
+ 	 	 	                	$(document).sgWindow('close',{id:'win_channel',beforeClose:winBefClose});
+ 	 	 	                }
+ 	 	        	  });
+ 	 	        }
+ 		   };
+ 	    	 var winBefClose=function(){
+ 	    	    	//重新查询所属集团
+ 	    	    	//$("#groupName").trigger('keyup');
+ 	    	    	var isClose=true;
+ 	    	    	if(isSure){
+ 	    	    		var obj = $('#dgd_channel','#win_channel');
+ 	    		        var bDiv = $('.bDiv',obj);
+ 	    	 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+ 	    	 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+ 	    	 	            isClose=false;
+ 	    	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+ 	    	 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+ 	    	 	            isClose=false;
+ 	    	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+ 	    	 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	    	 	 	                if($(this).attr("checked")){ 
+ 	    	 	 	                   var rowData=$(this).data('data');
+ 	    	 	 	                    $('#channelName').val(rowData.name);
+ 	    	 	 	                    $('#channelId').val(rowData.id);
+ 	    	 	 	                }
+ 	    	 	        	  });
+ 	    	 	        }
+ 	    	    	}
+ 	    	    	return isClose;
+ 	    	  };
+ 	    	  var winClose = function (){
+ 	              $(document).sgWindow('close',{id:'win_channel'});
+ 	           }
+ 	           
+ 	    	 var defaults = {
+ 		                title:'代理商信息',
+ 		                id:'win_channel',
+ 		                form:'win_channel',
+ 		                url:'channel_form.html',
+ 		                width: 788,
+ 		                height: 452,
+ 	           	    	beforeClose:winBefClose,
+ 	           	    	buttons : [
+ 		                           {name: '确定', type: 'button', onpress : getCusomer},
+ 		                           {name: '关闭', onpress : winClose}
+ 		                       ]
+ 		            };
+ 		        $(document).sgWindow(defaults);
+	    });
+	    
+	    //最终客户查询
+	    $('#customerId').parent('div').css('position','relative');
+	  //自动查询最终客户
+		var checkCustomer = function(){
+		/* 	var text=this.value;
+			text = text.replace(/\s/g,''); //去除空格
+			if(text!=this.value){//有空格
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			} */
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.customer_name = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../customer/list',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var customers = data.items;
+						  if(customers.length>0){
+							     $("#customerDataList").empty();
+							     customerDataList = {};
+						   }
+						  $.each( customers, function(key,value){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+value.customer_name);
+							  $("#customerDataList").append(op);
+							  
+							  customerDataList[value.customer_name]=value;
+							});
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		};
+		//填充最终客户
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../customer/list',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+			  success : function(data) {
+				  if(data){
+					  var customers = data.items;
+					  if(customers.length>0){
+						     $("#customerDataList").empty();
+						     customerDataList = {};
+						  }
+					  $.each( customers, function(key,value){
+						  var op = $("<option></option>");
+						  op.val(value.customer_name);
+						  $("#customerDataList").append(op);
+						  
+						  customerDataList[value.customer_name]=value;
+						});
+					  
+					  $("#customerName").on('keyup',checkCustomer);
+					  $("#customerName").on('change',function(){
+						    var strs = this.value.split(" ");
+						    
+						    if(customerDataList[strs[strs.length-1]]){
+						    	$(this).val(strs[strs.length-1]);
+								
+								$("#customerId").val(customerDataList[strs[strs.length-1]].id);
+								
+								if($("#customerId").val().length==0){
+									$("#customerName").val("");
+								}
+						    }else{
+						    	$(this).val('');
+						    	$("#customerId").val("");
+						   }
+						    
+						});
+					  
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+	    $('#customerId').siblings('span').on('click',function(){
+	    	var isSure=false;
+ 	    	var getCusomer=function(){
+ 	    		var obj = $('#dgd_customer','#win_customer');
+ 		        var bDiv = $('.bDiv',obj);
+ 	 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+ 	 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+ 	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+ 	 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+ 	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+ 	 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	 	 	                if($(this).attr("checked")){
+ 	 	 	                	isSure=true;
+ 	 	 	                	$(document).sgWindow('close',{id:'win_customer',beforeClose:winBefClose});
+ 	 	 	                }
+ 	 	        	  });
+ 	 	        }
+ 		   };
+ 	    	 var winBefClose=function(){
+ 	    	    	//重新查询所属集团
+ 	    	    	//$("#groupName").trigger('keyup');
+ 	    	    	var isClose=true;
+ 	    	    	if(isSure){
+ 	    	    		var obj = $('#dgd_customer','#win_customer');
+ 	    		        var bDiv = $('.bDiv',obj);
+ 	    	 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+ 	    	 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+ 	    	 	            isClose=false;
+ 	    	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+ 	    	 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+ 	    	 	            isClose=false;
+ 	    	 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+ 	    	 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	    	 	 	                if($(this).attr("checked")){ 
+ 	    	 	 	                   var rowData=$(this).data('data');
+ 	    	 	 	                    $('#customerName').val(rowData.customer_name);
+ 	    	 	 	                    $('#customerId').val(rowData.id);
+ 	    	 	 	                }
+ 	    	 	        	  });
+ 	    	 	        }
+ 	    	    	}
+ 	    	    	return isClose;
+ 	    	  };
+ 	    	  var winClose = function (){
+ 	              $(document).sgWindow('close',{id:'win_customer'});
+ 	           }
+ 	           
+ 	    	 var defaults = {
+ 		                title:'客户信息',
+ 		                id:'win_customer',
+ 		                form:'win_customer',
+ 		                url:'customer_form.html',
+ 		                width: 788,
+ 		                height: 452,
+ 	           	    	beforeClose:winBefClose,
+ 	           	    	buttons : [
+ 		                           {name: '确定', type: 'button', onpress : getCusomer},
+ 		                           {name: '关闭', onpress : winClose}
+ 		                       ]
+ 		            };
+ 		        $(document).sgWindow(defaults);
+	    });
+	  //自动查询经办人
+		var writeoffsUser = function(){
+		/* 	var text=this.value;
+			text = text.replace(/\s/g,''); //去除空格
+			if(text!=this.value){//有空格
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			} */
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.opname = this.value;
+			params.filter.isCompany = true;//查询机构下的的所有操作人
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getOrgOperators',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#managersName","#dgd_stockout");
+						  						  
+						  if(manager){
+							  if(data.items.length>0){
+						  		  userDataList = {};
+								  $("#userDataList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.opname);
+								  $("#userDataList").append(op);
+								  
+								  userDataList[v.opname] = v.opid;
+		 				  	 }); 
+							}
+					  }else{
+					  	$(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		}
+		
+	  //填充经办人
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getOrgOperators',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#managersName","#dgd_stockout");
+				  if(manager){
+					  if(data.items.length>0){
+				  		  userDataList = {};
+						  $("#userDataList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userDataList").append(op);
+						  
+						  userDataList[v.opname] = v.opid;
+					  	 }); 
+					  manager.on('keyup',writeoffsUser);
+					  manager.on('change',function(){
+						  	var strs = this.value.split(" ");
+							 if(userDataList[strs[strs.length-1]]){
+									$(this).val(strs[strs.length-1]);
+									$("#managersId","#dgd_stockout").val(userDataList[strs[strs.length-1]]);
+									if($("#managersId","#dgd_stockout").val().length==0){
+										$("#managersName","#dgd_stockout").val("");
+									}
+							    }else{
+							    	$(this).val('');
+							    	$("#managersId","#dgd_stockout").val("");
+							    }
+							
+						});
+
+					};
+			  }else{
+			  	$(document).sgPup({message:'message_info',text: data});
+			  }
+		  },     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+   })(jQuery);
+    
+
+	//打印页面元素设置
+  var callback=function(subWinBody,subWin){
+	$.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCurrentCompany',   
+		  data:JSON.stringify({}),
+		  success : function(data) {
+			  if(data){
+				  var total = 0;
+				  var money = 0;
+				  //表格拉长，左边的空白内容设置长一点
+				  try{
+				  $('article.space',subWinBody).width(250);
+				  //公司中文名字
+				  $("#cname",subWinBody).empty();
+				  $("#cname",subWinBody).append(data.cnfullname);
+				  //公司英文名字
+				  $("#ename",subWinBody).empty();
+				  $("#ename",subWinBody).append(data.enfullname);
+				  //表单名字
+				  $("#orderTitle",subWinBody).empty();
+				  var otype=selectedObj.type;
+				  if(otype==0){
+					  otype = '代理销售';
+	                }else if(otype==1){
+	                	otype = '直销';
+	                }else if(otype==2){
+	                	otype = '升级';
+	                }else if(otype==3){
+	                	otype = '借用';
+	                }else if(otype==4){
+	                	otype = '调拨';
+	                }else if(otype==5){
+	                	otype = '其他';
+	                }else if(otype==9){
+	                	otype = '调账';
+	                }else{
+	                	otype ="";
+	                }
+				  $("#orderTitle",subWinBody).append(otype+"出库");
+				  //表单日期
+				  $("#orderDate",subWinBody).empty();
+				  $("#orderDate",subWinBody).append(selectedObj.stamp);
+				  //表单单号
+				  $("#orderNo",subWinBody).empty();
+				  $("#orderNo",subWinBody).append(selectedObj.code);
+				  
+				 /*  //表前输入单
+				  $("#headInput",subWinBody).append('<span style="width:10%;">核销仓库：</span>');
+				  $("#headInput",subWinBody).append('<div style="width:15%;">'+wareHouseName+'</div>');
+				   */
+				  $("#headInput",subWinBody).append('<span style="width:10%;">出库仓库：</span>');
+				  $("#headInput",subWinBody).append('<div style="width:23%;">'+selectedObj.whsName+'</div>');
+				  var allocatedNumTd='';
+				  if(selectedObj.type==4){//调拨
+					  $("#headInput",subWinBody).append('<span style="width:10%;">入库仓库：</span>');
+					  var inWhsName=selectedObj.inWhsName;
+					  if(!inWhsName){
+						  inWhsName='&nbsp;';
+					  }
+					  $("#headInput",subWinBody).append('<div style="width:23%;">'+inWhsName+'</div>');
+					  allocatedNumTd='<td style="width: 15%;" axis="allocatedNum">已调拨数量</td>';
+				  }else if(selectedObj.type==1 || selectedObj.type==2){//直销、升级，有费用、收据票号
+					  $("#headInput",subWinBody).append('<span style="width:10%;">收据票号：</span>');
+					  var receiptNo=selectedObj.receiptNo;
+					  if(!receiptNo){
+						  receiptNo='&nbsp;';
+					  }
+					  $("#headInput",subWinBody).append('<div style="width:23%;">'+receiptNo+'</div>');
+					  
+					  $("#headInput",subWinBody).append('<span style="width:10%;">费用：</span>');
+					  var money=selectedObj.money;
+					  if(!money){
+						  money='&nbsp;';
+					  }
+					  $("#headInput",subWinBody).append('<div style="width:23%;">'+money+'</div>');
+					  
+					  allocatedNumTd='<td style="width: 15%;" axis="money">费用</td>';
+				  }
+				  $("#headInput",subWinBody).append('<span style="width:10%;">客户：</span>');
+				  var customerName=selectedObj.channelName;
+				  if(!customerName){
+					  customerName='&nbsp;';
+				  }
+				  $("#headInput",subWinBody).append('<div style="width:23%;">'+customerName+'</div>');
+				  
+				  $("#headInput",subWinBody).append('<span style="width:10%;">经办人：</span>');
+				  var managersName=selectedObj.managersName;
+				  if(!managersName){
+					  managersName='&nbsp;';
+				  }
+				  $("#headInput",subWinBody).append('<div style="width:23%;">'+managersName+'</div>');
+				  
+				  //表头
+				  $("#tbHead",subWinBody).append('<td style="width: 5%;" axis="rownumbers">序号</td>'+
+						 								  '<td style="width: 10%;" axis="productCode">商品编码</td>'+
+														  '<td style="width: 15%;" axis="productName">商品名称</td>'+
+														  '<td style="width: 20%;" axis="norm">商品规格</td>'+
+														  '<td style="width: 10%;" axis="curNum">原库存数量</td>'+
+														  '<td style="width: 10%;" axis="outNum">本次出库数量</td>'+
+														  allocatedNumTd+
+														  '<td style="width: 5%;" axis="remark">备注</td>');
+				  
+				  if(selectedObj.details){
+						//列头
+			           		var colModel=[];
+			           		colModel.push({name:'rownumbers'});
+			           		colModel.push({name:'productCode'});
+			           		colModel.push({name:'productName'});
+			           		colModel.push({name:'norm'});
+			           		colModel.push({name:'curNum'});
+			           		colModel.push({name:'outNum'});
+			           		if(selectedObj.type==4){//调拨
+			           			colModel.push({name:'allocatedNum'});
+			           		}else if(selectedObj.type==1 || selectedObj.type==2){//直销、升级，有费用
+			           			colModel.push({name:'money'});
+			           		}
+			           		//colModel.push({name:'price'});
+			           		colModel.push({name:'remark'});
+			           		
+			           	   var tr=null;
+			    	        var td=null;
+			    	      var wnum=0;//合计本次出库数量
+			    	        $.each(selectedObj.details,function(i,row){
+			    	            tr = '<tr>';
+			                	$.each(colModel,function(k,v){
+			                		td ='<td>';
+			    	                var tdx = v.name;
+
+			    	            	if(tdx=='rownumbers'){
+			    	                 	var num = i+1;
+			    	                 	td=td+num+'</td>';              	
+			    	                 }else{
+			    	                	 if(row[tdx]=='null' || row[tdx]==null){
+			    	                		 row[tdx]='';
+			    	                	 }
+			    	                	 td=td+row[tdx];
+			    	                	 td=td+'</td>';
+			    	                	 
+			    	                	 if(tdx=='outNum'){
+			    	                		 wnum=Number(wnum)+Number(row[tdx]);
+			    	                	 }
+			    	                 }
+			    	           
+			    	            	tr=tr+td;
+			                	});
+			                	tr=tr+'</tr>';
+			                	$("#tbBody",subWinBody).append(tr);
+			    	        });
+			    	      
+			    	        if(selectedObj.details.length>0){
+			    	        	 //表合计
+			  				  var tbfoot = '<tr>';
+			  				  tbfoot=tbfoot+'<td colspan="5"><div style="text-align:right">小计:</div></td>';
+			  				  tbfoot=tbfoot+'<td colspan="1">'+wnum+'</td>';
+			  				  if(selectedObj.type==4||selectedObj.type==1||selectedObj.type==2){//调拨、直销、升级
+			  					  tbfoot=tbfoot+'<td colspan="2"></td>';
+			  				  }else{
+			  				  	  tbfoot=tbfoot+'<td colspan="1"></td>';
+			  				  }
+			  				  tbfoot=tbfoot+'</tr>';
+			  				  $("#tbBody",subWinBody).append(tbfoot);
+			    	        }
+					  }
+	               
+				  //表尾输入单
+				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+													  '<span>复核人：</span><div>&nbsp;</div>'+
+													  '<span>仓管员：</span><div>&nbsp;</div>'+
+													  '<span>制单：</span><div>&nbsp;</div>');
+				  }catch(e){
+					 $(document).sgPup({message:'message_info',text: e});
+				  }
+				  
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+	
+    if (navigator.appName == 'Microsoft Internet Explorer'){
+    	subWin.print();  
+    }else{ 
+    	subWin.focus();
+    	subWin.print();  
+    }
+}
+</script>
+</html>

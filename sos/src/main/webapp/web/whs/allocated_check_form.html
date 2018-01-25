@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>调拨审核</title>
+<style>
+.fieldset {
+	background:#f2f2e6; 
+	padding:10px; 
+	border:1px solid #fff; 
+	border-color:#666661 #666661 #666661 #666661; 
+	margin-bottom:3px; 
+	width:600px;
+}
+
+.fieldset legend {
+	background:#bfbf30; 
+	color:#fff; 
+	font:17px/21px Calibri, Arial, Helvetica, sans-serif; 
+	padding:0 10px; 
+	font-weight:bold; 
+	border:1px solid #fff; 
+	border-color:#e5e5c3 #505014 #505014 #e5e5c3;
+}
+</style>
+</head>
+<body>
+	<form id='whs_allocated_check_form' method='post' >
+		<div class="form">
+			<fieldset>
+	            <legend>调拨数据</legend>
+	            <div>    
+	                <label>调拨名称:</label>
+	                <input type='text' id="allocatedName" name='allocatedName' required="true"  />
+	            </div>
+	            <div>    
+	                <label>入库仓库:</label>
+	                <select size="1" name="allocatedInWhsId" id="allocatedInWhsId"  required="true"  autocomplete="on">
+	                    <option value="">--请选择--</option>
+	                </select>
+	            </div>
+	            <div>    
+	                <label>出库仓库:</label>
+	                <select size="1" name="allocatedOutWhsId" id="allocatedOutWhsId"  required="true"  autocomplete="on">
+	                    <option value="">--请选择--</option>
+	                </select>
+	            </div>
+	            <div>
+	                <label>经办人:</label>
+	                <select size="1" name="allocatedManagersId" id="allocatedManagersId" required="true"  autocomplete="on">
+	                    <option value="">--请选择--</option>
+	                </select>
+	            </div>
+	        </fieldset>
+		</div>
+
+		<fieldset class='fieldset'>
+			<legend>调拨明细</legend>
+			<div id="whs_allocated_check_grid" class="datagird"></div>
+		</fieldset>
+	</form>
+</body>
+<script type="text/javascript">	
+	//填充入库仓库
+    $.ajax( {
+ 		  type : 'post', 
+ 		  async: false,   
+ 		  contentType : 'application/json',     
+ 		  dataType : 'json',     
+ 		  url : '../../stock/findWareHouses',   
+ 		  data:JSON.stringify({}),
+ 		  success : function(data) {
+ 			  if(data){
+ 				  //$(document).sgPup({message:'message_info',text: JSON.stringify(data)});
+ 				  var inWhsId=$("#allocatedInWhsId");
+ 				  if(inWhsId){
+ 					  $.each(data,function(k,v){
+ 						  inWhsId.append("<option value='" +v.id+"'>" + v.name+"</option>");
+     				  }); 
+ 				  }
+ 				 
+ 			  }else{
+ 				  $(document).sgPup({message:'message_info',text: data});
+ 			  }
+ 		  } ,     
+ 		  error : function(res,error) { 
+ 		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+ 		  }    
+ 		});
+	
+    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../stock/findOtherOrgWareHouses',   
+		  data:JSON.stringify({'type':0}),
+		  success : function(data) {
+			  if(data){
+				  //$(document).sgPup({message:'message_info',text: JSON.stringify(data)});
+				  var outWhsId=$("#allocatedOutWhsId");
+				  if(outWhsId){
+					  $.each(data,function(k,v){
+						  if(v.id==editObj.whsId)
+						  	  outWhsId.append("<option value='" +v.id+"' selected='true'>" + v.name+"</option>");
+						  else
+							  outWhsId.append("<option value='" +v.id+"'>" + v.name+"</option>");
+  				  }); 
+				  }
+				 
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+    
+  //填充员工
+	$.ajax( {
+	  type : 'post', 
+	  async: false,   
+	  contentType : 'application/json',     
+	  dataType : 'json',     
+	  url : '../../getOrgOperators',   
+	  data:JSON.stringify({}),
+	  success : function(data) {
+		  if(data){
+			  //$(document).sgPup({message:'message_info',text: JSON.stringify(data)});
+			  var managersId=$("#allocatedManagersId");
+			  if(managersId ){
+				  $.each(data,function(k,v){
+					  managersId.append("<option value='" +v.opid+"'>" + v.opname+"</option>");
+				  }); 
+			  }
+			 
+		  }else{
+			  $(document).sgPup({message:'message_info',text: data});
+		  }
+	  } ,     
+	  error : function(res,error) { 
+	  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  }    
+	});
+</script>
+</html>

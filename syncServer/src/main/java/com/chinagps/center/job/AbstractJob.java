@@ -1,0 +1,392 @@
+package com.chinagps.center.job;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.exception.LockTimeoutException;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.chinagps.center.common.SystemCache;
+import com.chinagps.center.common.SystemConfig;
+import com.chinagps.center.common.SystemException;
+import com.chinagps.center.pojo.SynHistory;
+import com.chinagps.center.pojo.SynUrl;
+import com.chinagps.center.service.impl.DataService;
+import com.chinagps.center.utils.DateUtil;
+import com.chinagps.center.utils.HibernateUtil;
+import com.chinagps.center.utils.SpringContext;
+import com.chinagps.center.utils.StringUtils;
+import com.chinagps.center.utils.URLAvailability;
+import com.chinagps.center.utils.Utils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+public abstract class AbstractJob {
+
+	private static Logger logger = Logger.getLogger(AbstractJob.class);
+
+	@Autowired
+	private DataService dataService;
+
+	String startTime = "2000-01-01 00:00:00";
+
+	@Autowired
+	private SystemConfig systemConfig;
+
+	public SystemConfig getSystemConfig() {
+		if(systemConfig == null){
+			systemConfig = (SystemConfig) SpringContext.getBean("SystemConfig");
+		}
+		return systemConfig;
+	}
+
+	public DataService getDataService() {
+		if(dataService == null){
+			dataService = (DataService) SpringContext.getBean("DataService");
+		}
+		return dataService;
+	}
+
+	public void synData(long subco_no) {
+		logger.info("<<<<<<<<<<<<同步任务开始"+subco_no+">>>>>>>>>>>>>>");
+		Session session = null;
+		HibernateUtil hibernateUtil = null;
+
+		hibernateUtil = (HibernateUtil) SpringContext.getBean("HibernateUtil");
+		session = hibernateUtil.getSession();
+
+		try {
+			List<SynUrl> urlList = getDataService().listByCompanyId(subco_no);   // 
+			if (urlList == null || urlList.size() == 0)
+				return;
+			session.beginTransaction(); // 开启事物
+
+			long ll = System.currentTimeMillis();
+			SynUrl su = urlList.get(0);
+			String url = su.getSyn_url();
+			logger.info("[" + url + "]" + " sync begin>>>> ");
+			HashMap<String, Object> params = new HashMap<String, Object>();
+			// 获取数据库时间
+			String syn_time = getSingleFromClient(url + "/getTime", params);
+			if(syn_time == null){
+				return;
+			}
+			logger.info("[" + url + "]" + " getTime is :" + syn_time);
+			// 获取上次同步时间
+			SynHistory syHis = getDataService().getFromSession(session, subco_no, 1);// 
+			String lastTime = null;
+			if (syHis == null) {// 没有历史记录则设置默认开始时间
+				lastTime = startTime;
+			} else {
+				if (Utils.isNotNullOrEmpty(syHis.getSyn_time())) {
+					lastTime = DateUtil.format(syHis.getSyn_time(), DateUtil.YMD_DASH_WITH_FULLTIME24);
+				} else {
+					lastTime = startTime;
+				}
+			}
+
+			logger.info("[" + url + "]" + " lastTime is :" + lastTime);
+
+			params.put("startTime", lastTime); // 数据开始时间
+			params.put("endTime", syn_time); // 数据结束时间
+			// 删除/换号车台列表
+			// 根据上次同步的开始和结束时间查询这个需要同步的数据
+			List<Map<String, Object>> unitDelList = getListFromClient(url + "/getUnitDel", params);
+			if(unitDelList!=null){
+				logger.info("[" + url + "]" + " unitDelList size is :" + unitDelList.size());
+
+				if (unitDelList != null && !unitDelList.isEmpty() && Utils.isNotNullOrEmpty(syHis)) {// 第一次同步不更新unit表:已删除终端不出来
+					//getDataService().doUnitStop(unitDelList); // 这个方法现在没有去操作
+				}
+			}
+			
+			// 车辆数据量查询
+			String total_str = getSingleFromClient(url + "/getViewCount", params);
+			//获取的total_str为null，可以断定发生异常或者链接超时等，与total_str为0区别，不能够更新数据库
+			if(total_str == null)
+				return;
+			
+			logger.info("[" + url + "]" + " getViewCount is :" + total_str);
+
+			Long total = Long.valueOf(StringUtils.isBlank(total_str) ? "0" : total_str);
+			Long index = Long.valueOf(getSystemConfig().getStartPage() == null ? "1" : getSystemConfig().getStartPage());
+			Long pageSize = Long.valueOf(getSystemConfig().getPageSize() == null ? "1000" : getSystemConfig().getPageSize());
+			Long maxPage = 1l;
+			Map<String, Object> hisMap = new HashMap<String, Object>();
+			hisMap.put("start_time", DateUtil.formatNowTime());
+			hisMap.put("syn_time", syn_time);
+			hisMap.put("type", 1);
+			if (total == 0l) {
+				if (syHis == null) {
+					syHis = new SynHistory();
+				}
+				syHis.setSubco_no(subco_no);
+				syHis.setSyn_time(DateUtil.parse(hisMap.get("syn_time").toString(), DateUtil.YMD_DASH_WITH_FULLTIME24));// 同步时间
+				syHis.setStart_time(
+						DateUtil.parse(hisMap.get("start_time").toString(), DateUtil.YMD_DASH_WITH_FULLTIME24));// 开始运行时间
+				syHis.setEnd_time(new Date()); // 结束时间
+				syHis.setType(1);
+				syHis.setUnit_id(0l);
+				session.saveOrUpdate(syHis);
+				session.flush();
+				session.clear();
+				session.getTransaction().commit();// 提交事物
+				session.beginTransaction();
+				return;
+			} else if (total % pageSize == 0) {
+				maxPage = total / pageSize;
+			} else if (total % pageSize != 0) {
+				maxPage = total / pageSize + 1;
+			}
+		    //session.getTransaction().commit();// 提交事物
+			params.put("limit", pageSize);
+			boolean flag = false;
+			String unit_id = getSystemConfig().getUnit_id();
+			if (syHis == null) {
+				unit_id = "0";
+			} else {
+				unit_id = syHis.getUnit_id().toString();
+			}
+			params.put("unit_id", unit_id);
+			logger.info("[" + url + "]" + " getViewDetail params  :" + params);
+			for (; index <= maxPage;) {
+				List<Map<String, Object>> detailList = null;
+				try {
+					if (index.compareTo(maxPage) == 0) {
+						flag = true;
+					}
+					params.put("page", index);
+					logger.info("----开始查询第" + index + "分页,终端id[" + params.get("unit_id") + "]----");
+					detailList = getListFromClient(url + "/getViewDetail", params);
+					if (detailList == null) {// 查询不到结果继续
+						logger.info("getViewDetail list is null....");
+						continue;
+					}
+					logger.info("[" + url + "]" + " getViewDetail page " + index + " total record count: "
+							+ detailList.size());
+					if (!detailList.isEmpty()) {
+						/**
+						 * 总结：UnexpectedRollBackException 不知道这个事物是回滚还是提交
+						 *  synDataDetail方法和这个方法用的是同一个事物，当中synDataDetail出现异常时，进行了抛出throws LockTimeoutException, SystemException
+						 *  ，标示spring的tarnscation要回滚，如果该方法没有抛出异常，也不会标示spring的tarnscation要进行回滚。
+						 *  如果在synData方法当中捕获处理了synDataDetail当中抛出的异常时，synData会认为这个事物提交，如果没有捕获，而是
+						 *  抛出了，则会标示spring的tarnscation进行回滚。 所以spring的transcation一定的回滚的，
+						 *   但是synDataDetail 方法里面也包含用户的手动控制事物，事物的嵌套，不同的session。问题出在这里
+						 *   spring的transcation包含用户创建的事物，现在spring的事物要回滚，而用户在synData方法当中手动创建的事物要提交，因为这个
+						 *   方法里面没有抛出异常，所以就抛出了UnexpectedRollBackException异常
+						 *   
+						 * 解决方案：A: synDataDetail NOT_SUPPORTED 不支持事物，这样以来synData方法当中包含的spring的事物就不会出现回滚的情况了。
+						 * 		  B:synData 当中的不要进行手动控制事物，即： session.beginTranscation
+						 *       C:synData 和synDataDetail 当中不要spring的事物。
+						 */
+						getDataService().synDataDetail(detailList, flag, subco_no, su.getSubco_name(), hisMap, SystemCache.utMap,
+								SystemCache.mdMap);
+						logger.info("-----执行完第" + index + "分页,终端id[" + params.get("unit_id") + "]-----");
+						unit_id = detailList.get(detailList.size() - 1).get("UNIT_ID").toString();
+						params.put("unit_id", unit_id);
+					} else {// 结果集为{},表示以及按照unit_id取到末尾了，中断循环
+						syHis = getDataService().getFromSession(session, subco_no, 1);
+
+						if (syHis == null) {
+							syHis = new SynHistory();
+						}
+						syHis.setSubco_no(subco_no);
+						syHis.setSyn_time(
+								DateUtil.parse(hisMap.get("syn_time").toString(), DateUtil.YMD_DASH_WITH_FULLTIME24));// 同步时间
+						syHis.setStart_time(
+								DateUtil.parse(hisMap.get("start_time").toString(), DateUtil.YMD_DASH_WITH_FULLTIME24));// 开始运行时间
+						syHis.setEnd_time(new Date()); // 结束时间
+						syHis.setType(1);
+						syHis.setUnit_id(0l);
+						session.saveOrUpdate(syHis);
+						//就一个还要手动开启事物？
+						session.flush();
+						session.clear();
+						session.getTransaction().commit();// 提交事物
+						session.beginTransaction();
+						logger.info("----------结束本次同步----------");
+						break;
+					}
+				} catch (LockTimeoutException le) {
+					logger.error("[" + url + "]" + " getViewDetail page " + index + " occur a error..", le);
+					continue;
+				} catch (Exception e) {
+					// 存储异常，或者处理数据时异常，则继续params中unit_id不改变，继续操作
+					e.printStackTrace();
+					logger.error("[" + url + "]" + " getViewDetail page " + index + " occur a error..", e);
+					continue;
+				}
+				index++;
+			}
+			long lt = System.currentTimeMillis();
+			logger.info("[" + url + "] sync cost time(ms):" + (lt - ll));
+			logger.info("[" + url + "]" + " sync end>>>> ");
+			Thread.sleep(1000);
+
+			session.flush();
+			session.clear();
+			session.getTransaction().commit();
+			hibernateUtil.closeSession(session);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		logger.info("<<<<<<<<<<<<同步任务结束"+subco_no+">>>>>>>>>>>>>>");
+	}
+
+	public List<Map<String, Object>> getListFromClient(String url, HashMap<String, Object> param) throws Exception {
+		logger.info("request url:" + url);
+		try {
+			if (StringUtils.isBlank(url)) {
+				return null;
+			}
+			JSONObject obj = getResponseStr(url, param);
+			if (obj == null) {
+				return null;
+			}
+			boolean success = Boolean.parseBoolean(obj.get("success").toString());
+			if (success) {
+				String msg = obj.get("msg").toString();
+				JSONArray ja = JSONArray.fromObject(msg);
+				List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+				for (int i = 0; i < ja.size(); i++) {
+					JSONObject jo = ja.getJSONObject(i);
+					Map<String, Object> map = (Map<String, Object>) JSONObject.toBean(jo, Map.class);
+					// System.out.println(map.toString());
+					list.add(map);
+				}
+				return list;
+			} else {
+				logger.info("请求url：" + url + "异常,参数：" + param.toString());
+				return null;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			logger.error(e, e);
+
+		}
+		logger.info("<<<<<<<<<<<<同步任务结束>>>>>>>>>>>>>>");
+		return null;
+	}
+
+	/**
+	 * 返回内容为单个(数据库时间和视图数据数量)
+	 * 
+	 * @param url
+	 * @param param
+	 * @return
+	 * @throws Exception
+	 */
+	public String getSingleFromClient(String url, HashMap<String, Object> param) throws Exception {
+		if (StringUtils.isBlank(url)) {
+			logger.info("getSingleFromClient url is blank>>>>>>>>");
+			return null;
+		}
+		JSONObject obj = getResponseStr(url, param);
+		if (obj == null) {
+			logger.info("getSingleFromClient obj is null>>>>>>>>");
+			return null;
+		}
+		boolean success = Boolean.parseBoolean(obj.get("success").toString());
+		if (success) {
+			return obj.get("msg").toString();
+		} else {
+			logger.info("请求url：" + url + "异常,参数：" + param.toString());
+			return DateUtil.formatNowTime();
+		}
+	}
+	
+	public JSONObject getResponseStr(String path, HashMap<String, Object> params) {
+		CloseableHttpClient httpClient = null;
+		String timeOut = getSystemConfig().getHttpTimeOut(); // 30S
+		int httpTimeOut = 30000;
+		if(!org.apache.commons.lang.StringUtils.isBlank(timeOut))
+			httpTimeOut = Integer.valueOf(timeOut)*1000;
+		try {
+			httpClient = HttpClients.createDefault();
+			HttpPost method = new HttpPost(path);
+			RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(httpTimeOut).setConnectTimeout(httpTimeOut)
+					.setConnectionRequestTimeout(httpTimeOut).build();// 设置请求和传输超时时间
+			method.setConfig(requestConfig);
+
+			ObjectMapper mapper = new ObjectMapper();
+			String jsonStr;
+			jsonStr = mapper.writeValueAsString(params);
+			StringEntity entity = new StringEntity(jsonStr, "utf-8");// 解决中文乱码问题
+			entity.setContentEncoding("UTF-8");
+			entity.setContentType("application/json");
+			method.setEntity(entity);
+
+			HttpResponse result = httpClient.execute(method);
+
+			// 请求结束，返回结果
+			String resData = EntityUtils.toString(result.getEntity());
+			logger.info("getResponseStr url:"+path+";resData:"+resData);
+			JSONObject resJson = JSONObject.fromObject(resData);
+			return resJson;
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			logger.error(e, e);
+			e.printStackTrace();
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			logger.error(e, e);
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			logger.error(e, e);
+			e.printStackTrace();
+		} catch (ConnectTimeoutException e) {
+			logger.error(e, e);
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			logger.error(e, e);
+			e.printStackTrace();
+		} finally {
+			try {
+				if (httpClient != null)
+					httpClient.close();
+			} catch (IOException e) {
+				logger.error(e);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * 验证url是否能使用
+	 * 
+	 * @param url
+	 * @return
+	 */
+	public String validateUrl(String url) {
+		URLAvailability u = new URLAvailability();
+		u.isConnect(url);
+		URL ustr = u.getUrl();
+		if (ustr == null) {
+			return null;
+		}
+		return ustr.toString();
+	}
+
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>安装回单</title>
+<style>
+
+</style>
+</head>
+<body>
+	<form id='newclothes' method='post' class="form" style="width:690px;">
+		<fieldset style="width:670px;">
+			<div class="panel">
+                <span>安装单号:</span>
+                <input type='text' id="billnum" name='billnum'  style="width:200px;" disabled="disabled" value="NJ201112191518"/>
+            	
+            	<span style="padding-left:50px;">安装日期:</span>
+                <input type='date' id="sales_manager" name='sales_manager'  style="width:200px;" />
+            </div>
+            <div class="panel">
+                <span>电工:</span>
+                <input type='text' id="sales_manager" name='sales_manager'  style="width:200px;" />
+                
+                <span style="padding-left:50px;">产品型号:</span>
+                <input type='text' id="call_letter" name='call_letter'  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>客户:</span>
+                <input type='text' id="customer_name" name='customer_name'  style="width:200px;" />
+                
+                <span style="padding-left:50px;">联系电话:</span>
+                <input type='text' id="call_letter" name='call_letter'  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>车牌号:</span>
+                <input type='text' id="product_name" name='product_name'  style="width:200px;" />
+                
+                <span style="padding-left:50px;">车载电话:</span>
+                <input type='text' id="vehicle_type" name='vehicle_type'  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>车型:</span>
+                <input type='text' id="model" name='model'  style="width:200px;" />
+                
+                <span style="padding-left:50px;">车架号:</span>
+                <input type='text' id="vehicle_type" name='vehicle_type'  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>电工里程:</span>
+                <input type='text' id="mileage" name='mileage'  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>安装地点:</span>
+                <input type='text' id="install_location" name='install_location'  style="width:553px;" />
+            </div>
+            <div class="panel">
+            	<span style="vertical-align:top;">备注:</span>
+                <textarea id="claim" name="claim" style="width:555px;" rows="2"></textarea>
+            </div>
+        </fieldset>
+
+	</form>
+</body>
+<script type="text/javascript">
+
+</script>
+</html>

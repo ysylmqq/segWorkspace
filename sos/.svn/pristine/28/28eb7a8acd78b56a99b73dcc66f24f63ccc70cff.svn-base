@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>新增工单</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/layout.css" />
+<link rel="stylesheet" type="text/css" href="../../css/menu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/accordion.css" />
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css" />
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/tree.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+
+<style>
+</style>
+</head>
+<body>
+	<form id='bill_add_cl' method='post' class="form" style="width:680px;">
+		<fieldset style="width:660px;">
+			<div class="panel">
+				<span>工单号:</span>
+                <input type='text' id="billnum" name='billnum' disabled="disabled"  style="width:200px;" />
+                 <input type='hidden' id="vehicleId" name='vehicleId'  style="width:200px;" />
+                 <input type='hidden' id="subco_no" name='subco_no' />
+			
+                <span style="padding-left:50px;">工单类型:</span>
+		                <select size="1" name="type" id="type" style="width:204px;" onchange="changeType();">
+		                    <option value="1">新装</option>
+		                    <option value="2">维修</option>
+		                    <option value="3">出警</option>
+		                    <option value="4">其他</option>
+		                </select>
+            </div>
+            <div class="panel">    
+                <span>客户:</span>
+               <input type='text' id="customerName" name="customerName" required="true"   style="width:200px;" />
+		                <input type="hidden" name="customerId" id="customerId" required="true" value="" />
+                
+                <span style="padding-left:50px;">联系电话:</span>
+                <input type='text' id="mobile_phone" name='mobile_phone'  list="phoneList" style="width:200px;" />
+		                <input type="hidden" name="phone" id="phone" required="true" value="" />
+		                <datalist id='phoneList'></datalist>
+                
+                
+                
+            </div>
+            <div class="panel">    
+                <span>车牌号:</span>
+                <input type='text' id="car_num" name='car_num'  style="width:200px;" />
+                
+                <span style="padding-left:50px;">产品型号:</span>
+                <input type='text' id="code" name='code'   style="width:200px;" />
+            </div>
+            
+            <div class="panel" id="car">    
+		                <span>车型:</span>
+		                <input type='text' id="cartype_name" name='cartype_name'   style="width:200px;" />
+		                 <input type="hidden" name="cartype_id" id="cartype_id" required="true" value="" />
+		                <span style="padding-left:50px;">车辆颜色:</span>
+		                <input type='text' id="color" name='color'  style="width:200px;" />
+		            </div>
+            
+            
+             <div class="panel" id="new">
+               			<span>商品名称:</span>
+		                <input type='text' id="product_name" name='product_name' placeholder="请输入商品名称" list="productDataList" style="width:200px;" />
+		                <input type="hidden" id="productId" name="productId" />
+		                <datalist id='productDataList'></datalist>
+		                
+		                <span style="padding-left:50px;">销售经理:</span>
+		                <input type='text' id="managerName" name='managerName' required="true" list="userDataList"  style="width:200px;" />
+		           	    <input type="hidden" name="managerId" id="managerId" required="true" value="" />
+		           	    <datalist id='userDataList'></datalist>
+		     </div>
+            
+           <div class="panel">    
+		                <span>地点:</span>
+		                <input type='text' id="place" name='place'  style="width:400px;" />
+		                
+		                <span style="padding-left:40px;">营业处:</span>
+		                <input type='checkbox' id ="is_busines" style='vertical-align:middle;' />
+		            </div>
+		            
+		            
+             <div class="panel" id="sm">    
+		                <span style="vertical-align:top;">故障现象:</span>
+		                <textarea id="symptom" name="symptom" style="width:555px;" rows="2"></textarea>
+		     </div>   
+            <div class="panel" id="rk">
+            	<span style="vertical-align:top;">注意事项:</span>
+                <textarea id="note" name="note" style="width:555px;" rows="2"></textarea>
+            </div>
+            <div class="panel" id="rt">
+		            	<span style="vertical-align:top;">要求:</span>
+		                <textarea id="requirements" name="requirements" style="width:555px;" rows="2"></textarea>
+		    </div>
+            
+        </fieldset>
+
+	</form>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/index.js"></script>
+<script type="text/javascript" src="../../jscript/accordion.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/tab.js"></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/tree.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script><script type="text/javascript">
+function changeType(){
+	var text = $("#type option:selected").text();
+	if(text == '新装'){
+		$("#sm").hide();
+		$("#rk").hide();
+		$("#rt").show();
+		$("#new").show();
+	}else if(text == '维修'){
+		$("#sm").show();
+		$("#rk").show();
+		$("#rt").hide();
+		$("#new").hide();
+	}else{
+		$("#sm").hide();
+		$("#rt").hide();
+		$("#rk").show();
+		$("#new").hide();
+	}
+}
+
+var winClose = function() {
+	$(document).sgWindow('close', {
+		id : 'selectelect'
+	});
+}
+
+
+$("#bill_add_cl #electrician").on('click',function(){
+	var defaults = {
+			title : '选择电工',
+			id : 'selectelect',
+			form : 'selectelect_form',
+			url : 'web/bsp/selectelect.html',
+			width : 600,
+			height : 280,
+			buttons : [ {
+				name : '确定',
+				onpress : comfire
+				
+			}, {
+				name : '取消',
+				onpress : winClose
+			} ]
+		};
+		$(document).sgWindow(defaults);
+});
+
+
+
+
+   var comfire = function(){
+	   
+	   //拼电工的Id,姓名 电话
+        var obj = $('#ba_select_electrician');
+        var bDiv = $('.bDiv',obj);
+        var namevalue='';
+        var ids='';
+        var phones='';
+         $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+                if($(this).attr("checked")){    
+                	editId=this.value;
+                	//alert(JSON.stringify($(this).data('data')));
+                	editobj = $(this).data('data');
+                	if(namevalue.length==0){
+                		namevalue = editobj.name;
+                		ids = editobj.id;
+                		if(editobj.phone==null || editobj.phone.length==0){
+                			phones =  "暂无";
+                		}else{
+                			phones =  editobj.phone;
+                		}
+                	}else{
+                		namevalue = namevalue + "," + editobj.name
+                		ids = ids + "," + editobj.id;
+                		if(editobj.phone==null || editobj.phone.length==0){
+                			phones = phones + ",暂无";
+                		}else{
+                			phones = phones + "," + editobj.phone;
+                		}
+                	}
+                }
+                
+            });
+	   
+        $("#electrician","#bill_add_cl").val(namevalue);
+        $("#electrician_phone","#bill_add_cl").val(phones);
+        $("#electricianIds","#bill_add_cl").val(ids);
+         $(document).sgWindow('close',{id:'selectelect'}); 
+ 		
+ 	   };
+
+
+
+$(function () {
+	var myclick = function(treenode){
+        alert(treenode.value+treenode.content+treenode.url);
+    }
+    var defaults = {
+        url:"bsp_left.json",
+        onclick: myclick,
+        width:200,
+        div_height: 495,
+        isexpend:false
+    };
+    $('#bm_main').sgAccordion(defaults);
+    
+    var defaults2 = {
+       		isexpend: true,
+           // url: 'web/bsp/tree.json',
+            url: 'company/users',
+            root: '指派调度人员',
+            hasbox : true
+    };
+    $('#role_user').sgTree(defaults2);
+    
+    $.ajax( {
+		  type : 'POST', 
+		  async: false,   
+		  url : "/sos/task/getTaskNo",   
+		  data:{},
+		  success : function(data) {
+			  if(data){
+				  $("#billnum").val(data);
+			  }
+		  } 
+	});
+    
+    
+	$("#bill_add_cl #mobile_phone").on('click',function(){
+	 
+									$.ajax({
+										  type : 'post', 
+										  async: true,   
+										  url : '/sos/getLinkMan',   
+										  data:{customer_id:$("#customerId","#bill_add_cl").val()},
+										  success : function(data) {
+											  if(data){
+												  var manager = $("#mobile_phone");
+													  phoneList = {};
+													  if(data.length>0){
+														  $("#phoneList").empty();
+													  }
+													  $.each(data,function(k,v){
+														  var op = "<option value='"+v.phone+"'>"+v.linkman+"</option>"
+														  $("#phoneList").append(op); 
+														  
+								 				  	 }); 
+											  }else{
+											  	alert(data);
+											  }
+										  } ,     
+										  error : function(res,error) { 
+										  	 alert("responseText="+res.responseText+";error="+error);     
+										  }    
+										});
+								 
+								
+			
+	});
+    
+    
+    //销售经理
+    var checkUser = function(){
+		var text=this.value;
+		text = text.replace(/\s/g,'');
+		if(text!=this.value){
+			this.value=text;
+			$(this).trigger('change');
+			return false;
+		}
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {};
+		params.filter.opname = this.value;
+		params.filter.companyno = $("#subco_no","#bill_add_cl").val();
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '/sos/getCompanySaleManager_cl',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#managerName");
+					  if(manager){
+						  if(data.items.length>0){
+							  userDataList = {};
+							  $("#userDataList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.opname);
+							  $("#userDataList").append(op);
+							  userDataList[v.opname] = v.opid;
+	 				  	 }); 
+						}
+				  }else{
+				  	alert(data);
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	 alert(res.responseText);     
+			  }    
+			});
+	};
+    
+	
+	
+	
+	
+	$("#bill_add_cl #managerName").on('click',function(){
+		
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {};
+		params.filter.opname = this.value;
+		params.filter.companyno = $("#subco_no","#bill_add_cl").val();
+		debugger;
+		 //填充经理
+	    $.ajax( {
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '/sos/getCompanySaleManager_cl',   
+		  data:JSON.stringify(params),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#managerName");
+				  if(manager){
+					  if(data.items.length>0){
+						  userDataList = {};
+						  $("#userDataList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userDataList").append(op);
+						  
+						  userDataList[v.opname] = v.opid;
+					  	 }); 
+					  manager.on('keyup',checkUser);
+					  manager.on('change',function(){
+						  var strs = this.value.split(" ");
+						    if(userDataList[strs[strs.length-1]]){
+								$(this).val(strs[strs.length-1]);
+								$("#managerId","#bill_add_cl").val(userDataList[strs[strs.length-1]]);
+								if($("#managerId","#bill_add_cl").val().length==0){
+									$("#managerName","#bill_add_cl").val("");
+								}
+						    }else{
+						    	$(this).val('');
+						    	$("#managerId","#bill_add_cl").val("");
+						    }	
+						});
+
+					}
+			  }else{
+			  	alert(data);
+			  }
+		  },     
+		  error : function(res,error) { 
+		  	 alert(res.responseText);     
+		  }    
+		});
+	    
+});
+	
+
+    
+	
+    
+	
+	//查询商品
+		var checkProduct = function(){
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.nameOrCode = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '/sos/product/findProducts',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var products = data.items;
+						  if(products.length>0){
+							  $("#productDataList").empty();
+						      productDataList={};
+						  }
+						 // var key=null;
+						  $.each( products, function(key,value){
+							  
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+							  $("#productDataList").append(op);
+							  productDataList[value.code] = value.id;
+						 });
+					  }else{
+						  alert(data);
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	 alert(res.responseText);     
+				  }    
+				});
+		};
+		
+	
+	
+	//$("#bill_add_cl #product_name").on('click',function(){
+		    //填充商品
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '/sos/product/findProducts',   
+				  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+				  success : function(data) {
+					  if(data){
+						  var products = data.items;
+						  $("#productDataList").empty();
+						  // var key=null;
+						  productDataList={};
+						  $.each( products, function(key,value){
+							  
+							  var op = $("<option></option>");
+							  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+							  $("#productDataList").append(op);
+							  
+							  productDataList[value.code] = value.id;
+						 });
+						//var product_nameCondn=$('input[name=product_name]',$('#bill_add_cl'));
+						//product_nameCondn.on('keyup',checkProduct);
+						
+						  $("#bill_add_cl input[list=productDataList]").on('keyup',checkProduct);
+						  $("#bill_add_cl input[name=product_name]").on('change',function(){
+								var strs = this.value.split(" ");
+								$(this).val(strs[strs.length-3]);
+								$("#bill_add_cl input[name=productId]").val(productDataList[strs[strs.length-2]]);
+							});
+
+					  }else{
+						  alert(data);
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	 alert(res.responseText);     
+				  }    
+				});
+	//});
+    
+	
+	
+	
+    $("[name = dispatching]:checkbox").bind("click", function () {
+    	var chk = document.getElementById("dispatching");
+    	if(chk.checked){
+    		$("#divObj1").show();
+    		$("#divObj2").show();
+    	}else{
+    		$("#divObj1").hide();
+    		$("#divObj2").hide();
+    	}
+    })
+});
+
+
+	
+</script>
+</html>

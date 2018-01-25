@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>常用商品设置</title>
+</head>
+
+<body style="padding: 0px;margin: 0px;">
+ <div id="dgd_product_often" class="datagrid"></div>
+</body>
+<script type="text/javascript">
+    (function($){
+    	//初始化表格
+   	 	var defaults = {
+   		        width:  '100%',
+   		        height: 348,
+   		        //url: '../../product/findParts',
+   		        url:'',
+   		        colid:'id',  //主键
+		        rownumbers:true,//序号
+   		        colModel : [
+   		            {display: '编码', name : 'code', width : 140, sortable : false},
+    		            {display: '名称', name : 'name', width : 140, sortable : false},
+    		            {display: '规格', name : 'norm', width : 200, sortable : false},
+    		            {display: '排序号', name : 'orderNo', width : 50, sortable : false,editable:true},
+    		            {display: '备注', name : 'remark', width : 100, sortable : false,editable:true}
+   		        ],
+   		        buttons : [
+   		        ],
+   		        searchitems :[
+						{display:'编码',name:'code',type:'text'},
+   		            	{display:'名称',name:'name',type:'text'},
+   		             	{display:'规格',name:'norm',type:'text'}
+   		        ]
+   		    };
+   		    $('#dgd_product_often').sgDatagrid(defaults);
+   		    $('div.sDiv','#dgd_product_often').hide();
+    })(jQuery)
+    
+</script>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>代理商新增、编辑表单</title>
+<style type="text/css">
+#dgd_channelcontacts .bDiv{
+ overflow-y:auto;
+}
+</style>
+</head>
+
+<body>
+<form id="form_channel" method="post"  class="form" name="form_channel" >
+		<input type="hidden" id="id" name="id"/>
+		<div class='title' style="width:780px;">代理商基本信息></div>
+		<fieldset style="width:780px;">
+	         <div class="panel">
+	         	<div class="row">
+	         		<span class="col-xs-4">
+		         		<span class="col-xs-4">类型:</span>
+		         		<span class="col-xs-8">
+			            	<select size="1" id="dictId" name="dictId" style="width:100%" ></select>
+			            </span>
+		         	</span>
+		         	<span class="col-xs-4">
+			            <span class="col-xs-4">名称:</span>
+			            <span class="col-xs-8">
+				            <input type="text" id="name" name="name" class="form-control" required="true" autofocus="true"   autocomplete="on" />
+				            <input type="hidden" id="orgId" name="orgId"  />
+				            <input type="hidden" id="orgName" name="orgName"  />
+				            <datalist id="orgDataList"></datalist>
+				        </span>
+			        </span>
+			        <span class="col-xs-4">
+			            <span class="col-xs-4">月销售量:</span>
+			            <span class="col-xs-8">
+			            	<input type="number" id="monthSell" name="monthSell" class="form-control" autocomplete="on" />
+			            </span>
+		        	</span>
+	         	</div>
+	        </div>
+	        <div class="panel">
+	        	<div class="row">
+	         		<span class="col-xs-4">
+			            <span class="col-xs-4">所属集团:</span>
+			            <span class="col-xs-7">
+				            <input type="text" id="groupName" name="groupName" list="groupDataList" class="form-control"   autocomplete="on" />
+				            <input type="hidden" id="groupId" name="groupId" autocomplete="on" />
+				            <datalist id="groupDataList"></datalist>
+			            </span>
+			            <span class="col-xs-1">
+			            	<a id="agroup" href="javascript:void(0);" style="margin:0px;padding:0px;padding-left:0px;padding-top:5px;"><img alt="增加明细" src="../../images/form_add.png" title="增加明细" style="vertical-align:middle"></a>
+			            </span>
+			        </span>
+			        <span class="col-xs-8">
+			            <span class="col-xs-2">地址:</span>
+			            <span class="col-xs-10">
+			            	<input type="text" id="address" name="address" class="form-control" required="true"  autocomplete="on" />
+			            </span>
+			        </span>
+			    </div>
+	        </div>
+	        <div class="panel">
+	        	<div class="row">
+	         		<span class="col-xs-4">
+			         	<span class="col-xs-4">销售经理:</span>
+			         	<span class="col-xs-8">
+			                <input name="managerName" id="managerName" required="true" list="userDataList" class="form-control" autocomplete="on" style="line-height:24px;padding:0 4px;font-size:12px;" />
+			                <input type="hidden" name="managerId" id="managerId" required="true" />
+			                <datalist id="userDataList"></datalist>
+		                </span>
+		   			</span>
+		   			<span class="col-xs-8">
+			            <span class="col-xs-2">备注:</span>
+			            <span class="col-xs-10">
+			            	<textarea rows="2" class="form-control" id="remark" name="remark" style="line-height:16px;height:42px;padding:5px;"></textarea>
+			            </span>
+			        </span>
+			    </div>
+	        </div>
+        </fieldset>
+        
+        <div class='title' style="width:780px;">联系人></div>
+		<fieldset style="width:780px;">
+		   <div id="dgd_channelcontacts" class="datagrid"></div>
+		</fieldset>
+		
+		<div class='title' style="width:780px;">销售经理历史></div>
+		<fieldset style="width:780px;">
+		   <div id="dgd_channelmanagers" class="datagrid"></div>
+		</fieldset>
+</form>
+
+</body>
+<script type="text/javascript">
+(function($){
+	var editId=null;//编辑时选中行ID
+	var editObj=null;//编辑时选中行对象
+	var userDataList = {};//销售经理 key:name,value:id
+	var groupDataList = {};//所属集团 key:cnName,value:id
+	var orgDataList = {};//营业处 key:name,value:id
+	 //填充类型下拉框
+    $.ajax( {
+ 		  type : 'post', 
+ 		  async: false,   
+ 		  contentType : 'application/json',     
+ 		  dataType : 'json',     
+ 		  url : '../../sys/findSysValue',   
+ 		  data:JSON.stringify({stype:1000,sname:''}),
+ 		  success : function(data) {
+ 			  if(data){
+ 				  //alert(JSON.stringify(data)});
+ 				  var dictId=$('#dictId');
+ 				  if(dictId){
+ 					  $.each(data,function(k,v){
+ 						 dictId.append("<option value='" +v.svalue+"'>" + v.sname+"</option>");
+     				  }); 
+ 				  }
+ 				 
+ 			  }else{
+ 				  $(document).sgPup({message:'message_info',text: data});
+ 			  }
+ 		  } ,     
+ 		  error : function(res,error) { 
+ 		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+ 		  }    
+ 		});
+  //自动查询营业处
+	var checkOrg = function(){
+		/* var text=this.value;
+		text = text.replace(/\s/g,''); //去除空格
+		if(text!=this.value){//有空格
+			this.value=text;
+			$(this).trigger('change');
+			return false;
+		} */
+		var params = {companyname:text};
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : 'getSalesOffices',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var name = $("#name");
+					  						  
+					  if(name){
+						  if(data.length>0){
+							  orgDataList = {};
+							  $("#orgDataList").empty();
+						  }
+						  $.each(data,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.companyname);
+							  $("#orgDataList").append(op);
+							  
+							  orgDataList[v.companyname] = v.companyno;
+	 				  	 }); 
+						}
+				  }else{
+				  	$(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+	};
+	//类型改变
+	$('#dictId').on('change',function(){
+		var type=this.value;
+		var name = $("#name");
+		if(type=='5'){//营业处
+		 	name.val('');
+			//填充代理商名称
+		    $.ajax( {
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : 'getSalesOffices',   
+			  data:JSON.stringify({}),
+			  success : function(data) {
+				  if(data){
+					  if(name){
+						  if(data.length>0){
+							  orgDataList = {};
+							  $("#orgDataList").empty();
+						  }
+						  $.each(data,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(v.companyname);
+							  $("#orgDataList").append(op);
+							  
+							  orgDataList[v.companyname] = v.companyno;
+						  	 }); 
+						  name.on('keyup',checkOrg);
+						  name.on('change',function(){
+							  var strs = this.value.split(" ");
+							    if(orgDataList[strs[strs.length-1]]){
+									$(this).val(strs[strs.length-1]);
+									$("#orgId","#form_channel").val(orgDataList[strs[strs.length-1]]);
+									$("#orgName","#form_channel").val(strs[strs.length-1]);
+									if($("#orgId","#form_channel").val().length==0){
+										$("#name","#form_channel").val("");
+										$("#orgName","#form_channel").val("");
+									}
+							    }else{
+							    	$(this).val('');
+							    	$("#orgId","#form_channel").val("");
+							    	$("#orgName","#form_channel").val("");
+							    }	
+							});
+						  if(!name.attr('list')){
+							  name.attr('list','orgDataList');
+						  }
+						}
+				  }else{
+				  	$(document).sgPup({message:'message_info',text: data});
+				  }
+			  },     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+		}else{
+			$("#name").unbind();
+			$("#name").removeAttr('list');
+		}
+	});
+	
+  //自动查询销售经理
+	var checkUser = function(){
+		/* var text=this.value;
+		text = text.replace(/\s/g,''); //去除空格
+		if(text!=this.value){//有空格
+			this.value=text;
+			$(this).trigger('change');
+			return false;
+		} */
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {};
+		params.filter.opname = this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../getCompanySaleManager',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#managerName");
+					  						  
+					  if(manager){
+						  if(data.items.length>0){
+							  userDataList = {};
+							  $("#userDataList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.opname);
+							  $("#userDataList").append(op);
+							  
+							  userDataList[v.opname] = v.opid;
+	 				  	 }); 
+						}
+				  }else{
+				  	$(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+	};
+	
+  //填充销售经理
+     $.ajax( {
+	  type : 'post', 
+	  async: true,   
+	  contentType : 'application/json',     
+	  dataType : 'json',     
+	  url : '../../getCompanySaleManager',   
+	  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+	  success : function(data) {
+		  if(data){
+			  var manager = $("#managerName");
+			  if(manager){
+				  if(data.items.length>0){
+					  userDataList = {};
+					  $("#userDataList").empty();
+				  }
+				  $.each(data.items,function(k,v){
+					  var op = $("<option></option>");
+					  op.val(v.opname);
+					  $("#userDataList").append(op);
+					  
+					  userDataList[v.opname] = v.opid;
+				  	 }); 
+				  manager.on('keyup',checkUser);
+				  manager.on('change',function(){
+					  var strs = this.value.split(" ");
+					    if(userDataList[strs[strs.length-1]]){
+							$(this).val(strs[strs.length-1]);
+							$("#managerId","#form_channel").val(userDataList[strs[strs.length-1]]);
+							
+							if($("#managerId","#form_channel").val().length==0){
+								$("#managerName","#form_channel").val("");
+							}
+					    }else{
+					    	$(this).val('');
+					    	$("#managerId","#form_channel").val("");
+					    }	
+					});
+
+				}
+		  }else{
+		  	$(document).sgPup({message:'message_info',text: data});
+		  }
+	  },     
+	  error : function(res,error) { 
+	  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  }    
+	}); 
+   /*  var managerName = $("#managerName");
+	managerName.on('keyup',checkUser);
+	managerName.on('change',function(){
+		  var strs = this.value.split(" ");
+		    if(userDataList[strs[strs.length-1]]){
+				$(this).val(strs[strs.length-1]);
+				$("#managerId","#form_channel").val(userDataList[strs[strs.length-1]]);
+				
+				if($("#managerId","#form_channel").val().length==0){
+					$("#managerName","#form_channel").val("");
+				}
+		    }else{
+		    	$(this).val('');
+		    	$("#managerId","#form_channel").val("");
+		    }	
+		});  */
+  //自动查询所属集团
+	var checkGroup = function(){
+		/* var text=this.value;
+		text = text.replace(/\s/g,''); //去除空格
+		if(text!=this.value){//有空格
+			this.value=text;
+			$(this).trigger('change');
+			return false;
+		} */
+		var params = {};
+		//params.pageNo = 1;
+		//params.pageSize = 10;
+		//params.filter = {};
+		//params.filter.opname = this.value;
+		params.cnName=this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../sell/findAllChannelGroups',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var groupName = $("#groupName");
+					  						  
+					  if(groupName){
+						  if(data.length>0){
+							  groupDataList = {};
+							  $("#groupDataList").empty();
+						  }
+						  $.each(data,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.cnName);
+							  $("#groupDataList").append(op);
+							  
+							  groupDataList[v.cnName] = v.id;
+	 				  	 }); 
+						}
+				  }else{
+				  	$(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+	};
+  //填充所属集团
+    $.ajax( {
+	  type : 'post', 
+	  async: true,   
+	  contentType : 'application/json',     
+	  dataType : 'json',     
+	  url : '../../sell/findAllChannelGroups',   
+	  data:JSON.stringify({}),
+	  success : function(data) {
+		  if(data){
+			  var groupName = $("#groupName");
+			  if(groupName){
+				  if(data.length>0){
+					  groupDataList = {};
+					  $("#groupDataList").empty();
+				  }
+				  $.each(data,function(k,v){
+					  var op = $("<option></option>");
+					  op.val(v.cnName);
+					  $("#groupDataList").append(op);
+					  
+					  groupDataList[v.cnName] = v.id;
+				  	 }); 
+				  groupName.on('keyup',checkGroup);
+				  groupName.on('change',function(){
+					  var strs = this.value.split(" ");
+					    if(groupDataList[strs[strs.length-1]]){
+							$(this).val(strs[strs.length-1]);
+							$("#groupId","#form_channel").val(groupDataList[strs[strs.length-1]]);
+							
+							if($("#groupId","#form_channel").val().length==0){
+								$("#groupId","#form_channel").val("");
+							}
+					    }else{
+					    	$(this).val('');
+					    	$("#groupId","#form_channel").val("");
+					    }	
+					});
+
+				}
+		  }else{
+		  	$(document).sgPup({message:'message_info',text: data});
+		  }
+	  },     
+	  error : function(res,error) { 
+	  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  }    
+	});
+    var winBefClose=function(){
+    	//重新查询所属集团
+    	$("#groupName").trigger('keyup');
+    	return true;
+    };
+    //添加、查询所属集团
+    $('#agroup').on('click',function(){
+    	 var defaults = {
+	                title:'代理商所属集团管理',
+	                id:'win_channel_group',
+	                form:'form_channel_group',
+	                url:'channel_group_form.html',
+	           		width: 620,
+           	    	height:420,
+           	    	beforeClose:winBefClose,
+	                buttons : [
+	                       ]
+	            };
+	        $(document).sgWindow(defaults);
+    });
+  
+	 var addItem = function(){
+		    editId=null;
+	     	editObj=null;
+	     	var rowDatas=[];
+	     	rowDatas.push({name:'',dept:'',postion:'',phone:'',email:'',qq:'',remark:''});
+	     	$('#dgd_channelcontacts').sgDatagrid('appendData',rowDatas);
+	  }
+	  
+	  var delItem = function(){
+		  	  var obj = $('#dgd_channelcontacts');
+		      var bDiv = $('.bDiv',obj);
+		      if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+		          $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		      }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+		          $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		              if($(this).attr("checked")){    
+		              	editId=this.value;
+		              	$(this).parent().parent().empty();
+		              }
+		          });
+		      }else{
+		          $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		      }  
+		  }
+	//初始化联系人表格
+	 var defaults = {
+		        //title: "代理商管理",
+		        width:  780,
+		        height: 110,
+		        url: '',
+		        colid:'id',  //主键
+		        colModel : [
+					{display: '姓名', name : 'name', width : 85, sortable : false,editable:true,formatter:function(value,row){
+						return '<input name="name" required="true"  style="width:88px;height:24px;margin:-4px;" value="'+value+'" />';
+					}} ,
+		            {display: '部门', name : 'dept', width : 85, sortable : false,editable:true},
+		            {display: '职位', name : 'postion', width : 85, sortable : false,editable:true},
+		            {display: '联系电话', name : 'phone', width : 100, sortable : false,formatter:function(value,row){
+						return '<input name="phone" required="true"  style="width:103px;height:24px;margin:-4px;"  pattern="^(1[3,5,8,7]{1}[\\d]{9})|(((400)-(\\d{3})-(\\d{4}))|^((\\d{7,8})|(\\d{4}|\\d{3})-(\\d{7,8})|(\\d{4}|\\d{3})-(\\d{3,7,8})-(\\d{4}|\\d{3}|\\d{2}|\\d{1})|(\\d{7,8})-(\\d{4}|\\d{3}|\\d{2}|\\d{1}))$)$" value="'+value+'" />';
+					}},
+		            {display: '邮箱', name : 'email', width : 110, sortable : false,formatter:function(value,row){
+						return '<input name="email" type="text" style="width:113px;height:24px;margin:-4px;" value="'+value+'"  oninvalid="setCustomValidity(\'请输入正确的邮箱地址\')"/>';
+					}},
+		            {display: 'QQ', name : 'qq', width : 100, sortable : false,formatter:function(value,row){
+						return '<input name="qq" type="text" style="width:103px;height:24px;margin:-4px;" value="'+value+'" pattern="^[1-9]*[1-9][0-9]*$"/>';
+					}},
+		            {display: '备注', name : 'remark', width : 120, sortable : false,editable:true} 
+		        ],
+		        buttons : [
+		            {name: '增加', bclass: 'add', onpress : addItem},
+		            {separator: true},
+		            {name: '删除', bclass: 'delete', onpress : delItem},
+		            {separator: true}
+		        ]
+		    };
+		    $('#dgd_channelcontacts').sgDatagrid(defaults); 
+		    
+		    $('#dgd_channelcontacts div.tDiv span').width(30);
+		    
+		    
+		  //初始化销售经理表格
+	   	    var defaults = {
+	   		        width:  780,
+	   		    	height:110,
+	   		        //url: '../../sell/findAllChannelManagers',
+	   		        url:'',
+	   		        rownumbers:true,
+	   		        colid:'id',  //主键
+	   		        colModel : [
+							{display: '销售经理', name : 'managerName', width : 140, sortable : false},
+		   		            {display: '代理商名称', name : 'channelName', width : 140, sortable : false},
+		   		            {display: '是否过时', name : 'isdel', width : 100, sortable : false,formatter:function(value,row){
+		   		                if(value==0){
+		   		                    value = '<font color="green">否</font>';
+		   		                }else if(value==1){
+		   		                    value = '<font color="red">是</font>';
+		   		                }
+		   		                return value;
+		   		            }},
+		   		         	{display: '时间', name : 'stamp', width : 140, sortable : false},
+		   		            {display: '备注', name : 'remark', width : 140, sortable : false}
+	   		        ],
+	   		        order:true,
+     		        sortname: "stamp",
+     		        sortorder: "desc"
+	   		    };
+	   		    $('#dgd_channelmanagers').sgDatagrid(defaults); 
+	   			$('#dgd_channelmanagers div.tDiv span').width(30);
+
+})(jQuery)
+</script>
+</html>

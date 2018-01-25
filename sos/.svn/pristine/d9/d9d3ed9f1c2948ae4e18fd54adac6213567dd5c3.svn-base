@@ -1,0 +1,333 @@
+@charset "UTF-8";
+
+.datagrid {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;/*11*/
+    line-height: normal;
+    border: 0px solid #cbcbd5;
+    overflow: hidden;
+    color: #000;
+}
+
+/* 标题 */
+.mDiv {
+	border: 1px solid #ccc;
+	/*border-bottom: 0px;*/
+	border-top: 1px;
+	font-weight: bold;
+	padding: 6px;
+    background-color: #fff;
+    font-size: 20px;
+    border: 0;
+}
+
+/* 搜索栏 */
+.sDiv {
+    background-color: #e2e5ec;
+    border: 1px solid #ccc;
+    overflow: hidden;
+    padding: 4px;
+    /*border-bottom: 0px;*/
+    border-left: 0;
+    border-right: 0;
+}
+
+.sDiv .pGroup {
+    float: left;
+    background: none;
+    height: 24px;
+    line-height: 24px;
+    margin: 2px 5px;
+}
+
+.sDiv .pGroup span.label{
+    width: 6em;
+    font-weight: normal;
+    line-height: 22px;
+}
+
+.sDiv a.button {
+    /*background: transparent url('../images/bg_button_a.gif') no-repeat scroll top right;
+    display: block;
+    width: 65px;
+    height: 24px;
+    margin-right: 6px;
+    padding-right: 18px; /* sliding doors padding */
+    color: #fff;
+    font: normal 12px arial, sans-serif;
+    text-decoration: none;
+    background-color: #4791d2;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+.sDiv a.button .button_span {
+    /*background: transparent url('../images/bg_button_span.gif') no-repeat;
+    display: block;
+    width: 55px;
+    line-height: 14px;
+    padding: 5px 0 5px 18px;*/
+    cursor:pointer;
+}
+
+/*input[type=text]*/
+.sDiv input[type=text]{
+	height:24px;
+    width: 150px;
+}
+
+/*select 单选*/
+.sDiv select{
+	height:24px;
+    width: 150px;
+    padding: 0;
+    font-size: 12px;
+}
+
+.sDiv .label{
+	text-align: right;
+	padding-right: 4px;
+	display:inline-block;
+    font-size: 12px;/*添加*/
+    float: left;
+}
+.sDiv span.ltext{
+    float: left;
+    width: 150px;
+}
+/* 工具栏 */
+.tDiv {
+    background-color: #fff;/*#e2e5ec*/
+    border: 1px solid #ccc;
+    border-bottom: 0px;
+    overflow: hidden;
+    padding: 2px;
+    padding-top: 4px;
+}
+
+.tDiv .fbutton {
+    float: left;
+    display: block;
+    cursor: pointer;
+    padding: 1px;
+}
+
+.tDiv div.fbutton span {
+    padding-left: 20px;
+}
+
+.tDiv div.fbutton .add {
+    background: url(../images/add.png) no-repeat center left;
+}
+
+.tDiv div.fbutton .pay {
+    background: url(../images/pay.png) no-repeat center left;
+}
+
+.tDiv div.fbutton .download {
+    background: url(../images/download3.png) no-repeat center left;
+}
+
+.tDiv div.fbutton .import {
+    background: url(../images/import3.png) no-repeat center left;
+}
+
+.tDiv div.fbutton .jihuo {
+    background: url(../images/jihuo1.png) no-repeat center left;
+}
+
+.tDiv div.fbutton .editCard {
+    background: url(../images/editCard.png) no-repeat center left;
+}
+
+.tDiv div.fbutton .shengxiao {
+    background: url(../images/accept.png) no-repeat center left;
+}
+
+.tDiv div.fbutton .bind {
+    background: url(../images/bind1.png) no-repeat center left;
+}
+
+
+.tDiv div.fbutton .register {
+    background: url(../images/register1.png) no-repeat center left;
+}
+
+.tDiv div.fbutton .open {
+    background: url(../images/open1.png) no-repeat center left;
+}
+
+
+.tDiv div.fbutton .lock {
+    background: url(../images/lock.png) no-repeat center left;
+}
+
+
+.tDiv div.fbutton .delete {
+    background: url(../images/close.png) no-repeat center left;
+}
+.tDiv div.fbutton .check {
+    background: url(../images/accept.png) no-repeat center left;
+}
+.tDiv div.fbutton .edit {
+    background: url(../images/edit.png) no-repeat center left;
+}
+.tDiv div.fbutton .view {
+    background: url(../images/view.png) no-repeat center left;
+}
+.tDiv div.fbutton .recycle {
+    background: url(../images/recycle_bin.ico) no-repeat center left;
+}
+.tDiv div.fbutton .restore {
+    background: url(../images/restore.ico) no-repeat center left;
+}
+.tDiv div.btnseparator {
+    float: left;
+    height: 20px;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #fff;
+    margin: 1px;
+}
+
+/* 表头 */
+.hDiv{
+    background-color:#f7f8fc;
+    border: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    overflow: hidden;
+}
+/*加了滚动条后，去掉此样式
+.hDiv table {
+    border-right: 1px solid #fff;
+}*/
+.hDiv-header-inner {
+    float: left;
+    width: 100%;
+    /*width: 10000px;*/
+}
+.hDiv th,.bDiv td {
+    text-align: left;
+    border-right: 1px solid #ddd;
+    border-left: 1px solid #fff;
+    overflow: hidden;
+    padding-left: 4px;
+    padding-right: 4px;
+    line-height: 28px;
+    vertical-align:middle;
+    word-break:break-all;
+}
+.hDiv .sdesc {
+    background: url(../images/dn.png) no-repeat center top;
+}
+
+.hDiv .sasc {
+    background: url(../images/up.png) no-repeat center top;
+}
+
+.hDiv th.sorted {
+    background-color:#f7f8fc;
+}
+
+.datagrid .thOver {
+
+}
+
+/* 表格主体 */
+.bDiv {
+    border: 1px solid #cbcbd5;
+    border-top: 0px;
+    overflow: auto;
+    border-bottom: 1px solid #ccc;
+    background-color: #fff;
+}
+
+.bDiv table {
+    border-bottom: 1px solid #ccc;
+    table-layout:fixed;
+}
+
+.bDiv table tr.normalRow {
+    background-color: #dfe6ef;
+}
+
+.bDiv table tr:hover {
+    background: #4791d2;
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4791d2), to(#4791d2), color-stop(.6,#4791d2));
+    background: -moz-linear-gradient(0% 65% 90deg,#4791d2, #4791d2, #4791d2 100%);
+    color: #fff;
+}
+
+/* 分页 */
+.pDiv {
+    background-color:#fff;
+    border: 1px solid #ccc;
+    /*border-top: 0px;*/
+    overflow: hidden;
+    padding: 4px;
+    margin-top: 10px;
+}
+
+.pDiv .pGroup {
+    float: left;
+    background: none;
+    height: 24px;
+    line-height: 24px;
+    margin: 0px 5px;
+}
+
+.pDiv .pGroup .p_box{
+    width: 45px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.pDiv .pGroup select,.pDiv .pGroup input{
+    height: 24px;
+    font-size: 12px;
+    padding: 0;
+    line-height: 24px;
+}
+
+.pDiv .button {
+    float: left;
+    width: 22px;
+    height: 22px;
+    border: 0px;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.pDiv .pFirst {
+    background: url(../images/first.gif) no-repeat center;
+    width:22px;
+}
+
+.pDiv .pPrev {
+    background: url(../images/prev.gif) no-repeat center;
+    width:22px;
+}
+
+.pDiv .pNext {
+    background: url(../images/next.gif) no-repeat center;
+    width:22px;
+}
+
+.pDiv .pLast {
+    background: url(../images/last.gif) no-repeat center;
+    width:22px;
+}
+
+.pDiv .pReload {
+    background: url(../images/load.png) no-repeat center;
+}
+
+.pDiv .pReload.loading {
+    background: url(../images/load.gif) no-repeat center;
+}
+
+.sDiv .pSearch {
+    /*padding-left: 13px;*/
+    padding: 0 15px;
+}
+
+

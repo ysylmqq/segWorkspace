@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+	 <!--
+	<http pattern="/login.jsp" security="none"/>
+	<http pattern="/index.jsp" security="none"/> -->
+	
+	<http security="none" pattern="/css/**" />
+    <http security="none" pattern="/js/**" />
+    <http security="none" pattern="/jscript/**" />
+    <http security="none" pattern="/images/**" />
+
+    <http entry-point-ref="casEntryPoint"  
+        access-denied-page="/accessDenied.jsp" auto-config="true">
+        <intercept-url pattern="/logout.jsp*"  access="IS_AUTHENTICATED_ANONYMOUSLY" />  
+        <intercept-url pattern="/index.jsp*"  access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <intercept-url pattern="/jscript/**"  access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <intercept-url pattern="/css/**"  access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <intercept-url pattern="/images/**"  access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <intercept-url pattern="/controller/**"  access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <custom-filter position="CAS_FILTER" ref="casFilter" />  
+        <custom-filter ref="securityFilter" before="FILTER_SECURITY_INTERCEPTOR"/>
+        <custom-filter ref="requestSingleLogoutFilter" before="LOGOUT_FILTER" />  
+        <custom-filter ref="singleLogoutFilter" before="CAS_FILTER" />  
+    </http>
+    
+    <!-- cas 认证过滤器 -->  
+    <beans:bean id="casFilter"  
+        class="org.springframework.security.cas.web.CasAuthenticationFilter">  
+        <beans:property name="authenticationManager" ref="authenticationManager" />  
+        <beans:property name="authenticationFailureHandler"  
+            ref="authenticationFailureHandler" />
+        <beans:property name="authenticationSuccessHandler"  
+            ref="authenticationSuccessHandler" />
+        <beans:property name="filterProcessesUrl" value="/j_spring_cas_security_check" />  
+    </beans:bean>
+    <!-- cas 认证失败控制器 -->  
+    <beans:bean id="authenticationFailureHandler"  
+        class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">  
+        <beans:property name="defaultFailureUrl" value="/accessDenied.jsp" />  
+    </beans:bean>
+    <!-- cas 认证成功控制器 -->  
+    <beans:bean id="authenticationSuccessHandler"  
+        class="org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler">  
+        <beans:property name="alwaysUseDefaultTargetUrl" value="true" />  
+        <beans:property name="defaultTargetUrl" value="/MyIndex.jsp" />  
+    </beans:bean>
+    <!-- 注销客户端 -->  
+    <beans:bean id="singleLogoutFilter"  
+        class="org.jasig.cas.client.session.SingleSignOutFilter" />  
+    <!-- 注销服务器端 -->  
+    <beans:bean id="requestSingleLogoutFilter"  
+        class="org.springframework.security.web.authentication.logout.LogoutFilter">  
+        <beans:constructor-arg  
+            value="http://90.0.12.31:7777/cas/logout" />  
+        <beans:constructor-arg>  
+            <beans:bean  
+                class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler" />  
+        </beans:constructor-arg>  
+        <beans:property name="filterProcessesUrl" value="/j_spring_cas_security_logout" />  
+    </beans:bean>  
+      
+    <!-- 登录成功后的返回地址 -->  
+    <beans:bean id="serviceProperties"  
+        class="org.springframework.security.cas.ServiceProperties">  
+        <beans:property name="service"  
+            value="http://localhost:8080/sos/j_spring_cas_security_check" />  
+        <beans:property name="sendRenew" value="false" />  
+    </beans:bean>  
+    
+    <!-- CAS认证切入点，声明cas服务器端登录的地址 -->  
+    <beans:bean id="casEntryPoint"  
+        class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">  
+        <beans:property name="loginUrl"  
+            value="http://90.0.12.31:7777/cas/login" />  
+        <beans:property name="serviceProperties" ref="serviceProperties" />  
+    </beans:bean>  
+  
+    <!-- cas认证提供器，定义客户端的验证方式 -->  
+    <beans:bean id="casAuthenticationProvider"  
+        class="org.springframework.security.cas.authentication.CasAuthenticationProvider">  
+        <!-- 客户端只验证用户名是否合法  
+        <beans:property name="userDetailsService" ref="myUserDetailServiceImpl"/> --> 
+        <!-- -->
+        <beans:property name="authenticationUserDetailsService">  
+            <beans:bean class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">  
+            <beans:constructor-arg ref="myUserDetailServiceImpl" />  
+            </beans:bean>  
+        </beans:property> 
+  
+        <beans:property name="serviceProperties" ref="serviceProperties" />  
+        <beans:property name="ticketValidator">  
+            <beans:bean  
+                class="com.gboss.cas.Cas20ServiceTicketValidator">  
+                <beans:constructor-arg index="0"  
+                    value="http://90.0.12.31:7777/cas" />  
+            </beans:bean>  
+        </beans:property>  
+        <beans:property name="key"  
+            value="an_id_for_this_auth_provider_only" />  
+    </beans:bean>  
+      
+    <!-- 在认证管理器中注册cas认证提供器 -->  
+    <authentication-manager alias="authenticationManager">  
+        <authentication-provider ref="casAuthenticationProvider" />  
+    </authentication-manager>  
+  
+    <!-- 事件日志 -->  
+    <beans:bean id="loggerListener"  
+        class="org.springframework.security.authentication.event.LoggerListener" />  
+	
+    <!-- 认证过滤器 -->
+    <beans:bean id="securityFilter" class="com.gboss.security.MySecurityFilter">
+    	<!-- 用户拥有的权限 -->
+    	<beans:property name="authenticationManager" ref="myAuthenticationManager" />
+    	<!-- 用户是否拥有所请求资源的权限 -->
+    	<beans:property name="accessDecisionManager" ref="myAccessDecisionManager" />
+    	<!-- 资源与权限对应关系 -->
+    	<beans:property name="securityMetadataSource" ref="mySecurityMetadataSource" />
+    </beans:bean>
+    <!-- 实现了UserDetailsService的Bean -->
+    <authentication-manager alias="myAuthenticationManager">
+        <authentication-provider user-service-ref="myUserDetailServiceImpl" />
+    </authentication-manager> 
+    
+    <beans:bean id="myAccessDecisionManager" class="com.gboss.security.MyAccessDecisionManager">
+    	<beans:property name="usersDao" ref="usersDao"></beans:property>
+    	<beans:property name="myUserDetailServiceImpl" ref="myUserDetailServiceImpl"></beans:property>
+    </beans:bean>
+	<beans:bean id="mySecurityMetadataSource" class="com.gboss.security.MySecurityMetadataSource">
+		<beans:constructor-arg name="resourcesDao" ref="resourcesDao"></beans:constructor-arg>
+		<beans:property name="myAccessDecisionManager" ref="myAccessDecisionManager"></beans:property>
+	</beans:bean>
+	<beans:bean id="myUserDetailServiceImpl" class="com.gboss.security.MyUserDetailServiceImpl">
+		<beans:property name="usersDao" ref="usersDao"></beans:property>
+	</beans:bean>
+	
+	<beans:bean id="usersDao" class="com.gboss.dao.impl.UsersDaoImpl"></beans:bean>
+	
+	<beans:bean id="resourcesDao" class="com.gboss.dao.impl.ResourcesDaoImpl"></beans:bean>
+</beans:beans>

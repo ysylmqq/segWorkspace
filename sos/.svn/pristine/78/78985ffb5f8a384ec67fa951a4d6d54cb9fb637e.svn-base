@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>调拨管理页面</title>
+</head>
+<body>
+	<div id="whs_allocated_main_grid" class="datagird"></div>
+
+</body>
+<script type="text/javascript">
+	(function($){
+	var editId = null;
+	var editOjb= null;
+	
+	var loadSuccess = function(){
+		$('#allocatedName','#whs_allocated_check_form').val(editObj.name);
+		$('#allocatedManagersId','#whs_allocated_check_form').val(editObj.managersId);
+		$('#allocatedInWhsId','#whs_allocated_check_form').val(editObj.inWhsId);
+		$('#allocatedOutWhsId','#whs_allocated_check_form').val(editObj.outWhsId);
+		//初始化表格
+	   	 var defaults = {
+	   				id: 'whs_allocated_check_grid',
+	   		        width:  600,
+	   		        height: 100,
+	   		        url: '../../stock/getAllocatedDetailById',
+	   		        query:{allocatedId:editObj['id']},
+	   		        rownumbers:true,//序号
+	   		        colModel : [
+	   		            {display: '商品名称', name : 'productName', width : 200, sortable : false},
+	   		            {display: '调拨数量', name : 'num', width : 80, sortable : false},
+	   		         	{display: '备注', name : 'remark', width : 180, sortable : false}
+	   		        ]
+	   		    };
+	   $('#whs_allocated_check_grid').sgDatagrid(defaults);
+	}
+	
+	var tosubmit = function(){
+		//做表单提交
+        var params = new Array();
+		params.push(editObj['id']);
+		$.ajax( {
+     		  type : 'post', 
+     		  async: false,   
+     		  contentType : 'application/json',     
+     		  dataType : 'json',     
+     		  url : '../../stock/updateAllocatedCheck',   
+     		  data:JSON.stringify(params),
+     		  success : function(data) {
+     			  if(data){
+     				  if(data.success){
+     					  $(document).sgPup({message:'message_info',text: "审核成功！"})
+     				  }else{
+     					  $(document).sgPup({message:'message_info',text: "审核失败！"})
+     				  }
+     				 
+     			  }else{
+     				  $(document).sgPup({message:'message_info',text: data});
+     			  }
+     		  } ,     
+     		  error : function(res,error) { 
+     		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+     		  }    
+     		}); 
+ 		$(document).sgWindow('close',{id:'whs_allocated_window'}); 
+		$('#whs_allocated_main_grid').sgDatagrid('reload','sgDatagrid');
+
+ 		return false;
+	}
+		
+	var editItem = function(){
+		var obj = $('#whs_allocated_main_grid');
+        var bDiv = $('.bDiv',obj);
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+                if($(this).attr("checked")){    
+                	editId=this.value;
+                	//$(document).sgPup({message:'message_info',text: JSON.stringify($(this).data('data'))})
+                	editObj = $(this).data('data');
+                	//打开窗口
+	                var defaults = {
+	    	                title:'审核调拨单',
+	    	                id:'whs_allocated_window',
+	    	                form:'allocated_check_form',
+	    	                url:'allocated_check_form.html',
+	    	                success: loadSuccess,
+	    	                width: 640,
+	    	                height: 400,
+	    	                buttons : [
+	    	                           {name: '审核通过', type: 'submit', onpress : tosubmit}
+	    	                       ]
+	    	            };
+	    	        $(document).sgWindow(defaults);
+                }
+            });
+        }else{
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }
+	}
+		//初始化表格
+   	 var defaults = {
+   		        title: "调拨列表",
+   		        width:  1000,
+   		        height: 440,
+   		        url: '../../stock/findAllocatedsByPage',
+	   		    usepager: true,
+	 	        rownumbers:true,
+	 	        useRp: true,
+   		        colid:"id",
+   		        query:{type:'2'},
+   		        colModel : [
+   		            {display: '调拨名称', name : 'name', width : 160, sortable : false},
+   		            {display: '入库仓库', name : 'inWhsName', width : 160, sortable : false},
+   		            {display: '出库仓库', name : 'outWhsName', width : 160, sortable : false},
+   		        	{display: '经办人', name : 'managersName', width : 80, sortable : false},
+   		        	{display: '状态', name : 'status', width : 40, sortable : true,formatter:function(value,row){
+   		                if(value==0){
+   		                    value = '未批准';
+   		                }else if(value==1){
+   		                    value = '已批准';
+   		                }else if(value==2){
+   		                    value = '已完成';
+   		                }
+   		                return value;
+   		            }},
+   		        	{display: '审核人', name : 'checkName', width : 80, sortable : false},
+   		        	{display: '审核时间', name : 'checkTime', width : 140, sortable : false}
+   		        ],
+   		     	buttons : [
+   			            {name: '审核', bclass: 'edit', onpress : editItem},
+   			        ],
+   		        searchitems :[
+   		            {display:'调拨名称',name:'name',type:'text'},
+   		            {display:'状态',name:'status',html:"<select id='status' name='status' style='width:100px;'><option value='' selected='true'>请选择...</option><option value='0'>未批准</option><option value='1'>已批准</option><option value='2'>已完成</option></select>"}
+   		        ],
+   		        sortname: "name",
+   		        sortorder: "asc"
+   		    };
+   		    $('#whs_allocated_main_grid').sgDatagrid(defaults); 
+	})(jQuery)
+</script>
+</html>

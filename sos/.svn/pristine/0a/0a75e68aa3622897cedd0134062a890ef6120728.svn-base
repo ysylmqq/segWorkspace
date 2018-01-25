@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<form id='whs_stockin_allocated_form' method='post' class="form" style="width:840px;">        
+		<fieldset style="width:835px;">
+			<div class="panel">
+	            	<span style="width:120px;">托收明细文件:</span>
+	                <input type="file">
+	                
+					<span style="width:120px;">托收总结文件:</span>
+	                <input type="file">
+	        </div>
+	    </fieldset>
+	    <fieldset style="width:835px;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="stockin_detail_submit" type="submit" >开始上传</button> <button id="mycancel" type="button" style="width:90px;">解除数据锁</button>
+	        </div>
+        </fieldset>
+	</form>
+</body>
+</html>

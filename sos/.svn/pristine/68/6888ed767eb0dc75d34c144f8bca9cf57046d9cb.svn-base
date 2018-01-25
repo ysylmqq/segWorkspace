@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>挂账查询</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+	<div id="nw_document_all">
+		<div id="whs_borrow_query" class="datagird"></div>
+		<datalist id="userlist"></datalist>
+		 <datalist id="productDataList">
+	            </datalist>
+    </div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+(function($){
+	var editId=null;//编辑时选中行ID
+	var editObj = null; //编辑时选中的对象
+	var productDataList=[];//商品数组 key:商品名称,value code:productId
+	
+	var borrowerList = null;
+	
+	var loadSuccess = function(){
+		var now =new Date();
+		var begeinDate =new Date();
+		begeinDate.setDate(1);
+		begeinDate=begeinDate.format('yyyy-MM-dd');
+		now=now.format('yyyy-MM-dd');
+		var squery = {};
+		squery['productId']=editObj.productId;
+		squery['managersId']=editObj.borrowerId;
+		squery['whsId']=editObj.whsId;
+		squery['startDate']=begeinDate;
+		squery['endDate']=now;
+	   	$('#whs_detail_query_grid').sgDatagrid('reload',{url:'../../stock/findOperates',query:squery});
+	   	
+	   	$('#hide_productName',$('#whs_borrow_window')).val(editObj.productName);
+	   	$('#hide_managersId',$('#whs_borrow_window')).val(editObj.borrowerId);
+	   	$('#hide_productId',$('#whs_borrow_window')).val(editObj.productId);
+	   	$('#hide_whsId',$('#whs_borrow_window')).val(editObj.whsId);
+	   	//设置商品名称
+	   $('#whs_detail_query_grid table tr td:nth-child(2) div').text(editObj.productName);
+	 }
+
+	var addItem = function(){
+		var obj = $('#whs_borrow_query');
+        var bDiv = $('.bDiv',obj);
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+                if($(this).attr("checked")){    
+                	editId=this.value;
+                	//alert(JSON.stringify($(this).data('data')))
+                	editObj = $(this).data('data');
+                	//打开窗口
+	                var defaults = {
+	    	                title:'操作明细',
+	    	                id:'whs_borrow_window',
+	    	                //form:'whs_allocated_form',
+	    	                url:'borrow_detail_list.html',
+	    	                success: loadSuccess,
+	    	                width: 902,
+	    	                height: 485 ,
+	    	                buttons : [
+	     	                           {name: '关闭', onpress : function (){
+	     	                              $(document).sgWindow('close',{id:'whs_borrow_window'});
+	     	                             }
+	     	                           }
+	     	                       ] 
+	    	            };
+	    	        $(document).sgWindow(defaults);
+                }
+            });
+        }else{
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }             
+    }
+
+	//初始化表格
+   	 var defaults = {
+				title:'挂账查询',
+   		        width:  '100%',
+   		        height: 454,
+   		        url: '../../stock/findBorrows',
+   		        rownumbers:true,//序号
+   		     	colid:'id',  //主键
+   		        colModel : [
+					{display: '商品编码', name : 'productCode', width : 100, sortable : false},
+   		            {display: '商品名称', name : 'productName', width : 120, sortable : false},   		            
+   		            {display: '商品规格', name : 'norm', width : 140, sortable : false},   		            
+   		            {display: '数量', name : 'num', width : 120, sortable : false,isAdd:true},
+   		         	{display: '经办人名称', name : 'borrowerName', width : 120, sortable : false},
+   		         	{display: '仓库', name : 'whsName', width : 80, sortable : false}
+   		        ],
+   		        buttons : [
+   		  	            {name: '操作明细', bclass: 'add', onpress : addItem}
+   			        ],
+   		        searchitems :[
+   		            {display:'营业处仓库',html:'<span class="ltext"><select size="1" name="whsId" id="whsId" class="form-control"><option value="">--请选择--</option></select></span>'},
+					{display:'商品名称',html:'<span class="ltext"><input type="text" name="productNameCondn" list="productDataList" class="form-control" /><input type="hidden" id="productId" name="productId" /></span>'},
+   		            {display:'员工',name:'borrowerId',html:'<span class="ltext"><input type="hidden" id="borrowerId" name="borrowerId" required="true" /><input type="text" class="form-control" id="remark" name="remark" list="userlist" /></span>'}
+   		        ],
+   		        exporturl:'../../stock/exportExcel4Borrow',
+   		        query:{writeoffsStatus:0},
+   		        isCount:true
+   		    };
+     $('#whs_borrow_query').sgDatagrid(defaults); 
+     
+   //自动查询商品
+		var checkProduct = function(){
+			/* var text=this.value;
+			text = text.replace(/\s/g,''); //去除空格
+			if(text!=this.value){//有空格
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			} */
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 15;
+			params.filter = {};
+			params.filter.nameOrCode = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../product/findProducts',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var products = data.items;
+						  if(products.length>0){
+							  $("#productDataList").empty();
+						      productDataList=[];
+						  }
+						  var key=null;
+						  $.each( products, function(key,value){
+							  var op = $("<option></option>");
+							  key=value.code;
+							  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+								 
+							  $("#productDataList").append(op);
+							  productDataList[key]=value.id;
+						 });
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		};
+		
+	  //填充商品
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../product/findProducts',   
+			  data:JSON.stringify({pageNo:1,pageSize:15,filter:{type:0}}),
+			  success : function(data) {
+				  if(data){
+					  var products = data.items;
+					  $("#productDataList").empty();
+					  var key=null;
+					  productDataList=[];
+					  $.each( products, function(key,value){
+						  var op = $("<option></option>");
+						  key=value.code;
+						  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+						  
+						  $("#productDataList").append(op);
+						  productDataList[key]=value.id;
+					 });
+					var productNameCondn=$('input[name=productNameCondn]',$('#whs_borrow_query'));
+					productNameCondn.on('keyup',checkProduct);
+					
+					productNameCondn.on('change',function(){
+						var strs = this.value.split(" ");
+						$(this).val(strs[strs.length-3]);
+						if($(this).val()){
+							$("#productId",$('#whs_borrow_query')).val(productDataList[strs[strs.length-2]]);
+							if($("#productId",$('#whs_borrow_query')).val().length==0){
+								$("#productNameCondn",$('#whs_borrow_query')).val("");
+							}
+					    }else{
+					    	$(this).val('');
+					    	$("#productId",$('#whs_borrow_query')).val("");
+					    }
+					
+						});
+
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			}); 
+	  
+ 	var checkBorrower = function(){
+ 		//debugger;
+ 		var params = {};
+ 		params.pageNo = 1;
+ 		params.pageSize = 10;
+ 		params.filter = {};
+ 		params.filter.opname = this.value;
+ 		params.filter.isCompany = true;//查询机构下的的所有操作人
+ 		var obj = $(this);
+ 		$.ajax({
+ 			  type : 'post', 
+ 			  async: true,   
+ 			  contentType : 'application/json',     
+ 			  dataType : 'json',     
+ 			  url : '../../getOrgOperators',   
+ 			  data:JSON.stringify(params),
+ 			  success : function(data) {
+ 				  if(data){
+ 					  var borrower = $("#remark");
+ 					  $("#userlist").empty();
+ 					  borrowerList = {};
+ 					  if(borrower){
+ 						  $.each(data.items,function(k,v){
+ 							  var op = $("<option></option>");
+ 							  op.val(obj.val()+" "+v.opname);
+ 							  $("#userlist").append(op);
+ 							  
+ 							  borrowerList[v.opname] = v.opid;
+ 	 				  	 }); 
+ 						}
+ 				  }else{
+ 				  	$(document).sgPup({message:'message_info',text: data});
+ 				  }
+ 			  } ,     
+ 			  error : function(res,error) { 
+ 			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+ 			  }    
+ 			});
+ 		}
+     
+   //填充员工
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getOrgOperators',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+		  success : function(data) {
+			  if(data){
+				  var borrower = $("#remark");
+				  $("#userlist").empty();
+				  borrowerList = {};
+				  if(borrower){
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userlist").append(op);
+						  
+						  borrowerList[v.opname] = v.opid;
+				  	 }); 
+				};
+				borrower.on('keyup',checkBorrower);
+				borrower.on('change',function(){
+					  	var strs = this.value.split(" ");
+						$(this).val(strs[strs.length-1]);
+						$("#borrowerId").val(borrowerList[strs[strs.length-1]]);
+						if($("#borrowerId").val().length==0){
+							borrower.val("");
+							$(document).sgPup({message:'message_info',text: "请选择有效的数据！"})
+						}
+					});
+			  }else{
+			  	$(document).sgPup({message:'message_info',text: data});
+			  }
+		  },     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+   
+	  //填充营业处仓库
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : './../../stock/findWarehouses',   
+		  data:JSON.stringify({}),
+		  success : function(data) {
+			  if(data){
+				  var whsId=$("#whsId",$('#whs_borrow_query'));
+				  if(whsId.get(0)){
+					  $.each(data,function(k,v){
+						  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+					  }); 
+				  }
+				 
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});	
+})(jQuery)
+</script>
+</html>

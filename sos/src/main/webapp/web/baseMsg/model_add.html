@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>添加车型</title>
+</head>
+
+<body>
+<form id="model_add_form" name="model_add_form" method="post" class="form"  action="../../model/add" enctype="multipart/form-data"  target="uploadmodelframe" style="width:100%" >
+	<div class="title" style="width: 610px;">车辆基本信息 </div>
+	<fieldset style="width: 610px;">
+		<div class="panel">
+			<div class="row">
+				<span class="col-xs-6">
+					<span class="col-xs-4">车系名称:</span>
+					<span class="col-xs-8">
+		                <input type='text' id='series_name' name='series_name' class="form-control" />
+		                <input type='hidden' id='series_id' name='series_id' />
+	                </span>
+				</span>
+				<span class="col-xs-6">
+					<span class="col-xs-4">车型名称:</span>
+					<span class="col-xs-8">
+	                	<input type='text' id='model_name' name='model_name' required="true" class="form-control" />
+	                </span>
+				</span>
+			</div>
+        </div>
+        
+        <div class="panel">
+        	<div class="row">
+				<span class="col-xs-6">
+	                <span class="col-xs-4">标准油耗:</span>
+	                <span class="col-xs-8">
+	                	<input type='text' id='standart_oil' name='standart_oil' onblur="checkNum(this)" class="form-control" />
+	                </span>
+	            </span>
+	            <span class="col-xs-6">
+	                <span class="col-xs-4">车型排量:</span>
+	                <span class="col-xs-8">
+	                	<input type='text' id='displacement' name='displacement' onblur="checkNum(this)" class="form-control" />
+	                </span>
+	            </span>
+	        </div>
+        </div>
+        
+        <div class="panel">
+        	<div class="row">
+				<span class="col-xs-6">
+	                <span class="col-xs-4">车型年份:</span>
+	                <span class="col-xs-8">
+	                	<input type='text' id=car_type_year name='car_type_year' class="form-control" />
+	                </span>
+	            </span>
+	            <span class="col-xs-6">
+	                <span class="col-xs-4">车型图片:</span>
+	                <span class="col-xs-8">
+	                	<input type="file" id='img' name='img'accept="image/*" style="width:100%;" />
+	                </span>
+	            </span>
+	        </div>
+        </div>
+        
+        <div class="panel">
+        	<div class="row">
+        		<span class="col-xs-6">
+                	<span class="col-xs-4">首保里程:</span>
+                	<span class="col-xs-8">
+						<select id="first_service_mileage" name="first_service_mileage" style="width:100%;">
+							<option value="1000">1000公里</option>
+							<option value="1500">1500公里</option>
+							<option value="2000">2000公里</option>
+							<option value="2500">2500公里</option>
+							<option value="3000">3000公里</option>
+							<option value="3500">3500公里</option>
+							<option value="4000">4000公里</option>
+							<option value="4500">4500公里</option>
+							<option value="5000">5000公里</option>
+							<option value="5500">5500公里</option>
+							<option value="6000">6000公里</option>
+							<option value="6500">6500公里</option>
+							<option value="7000">7000公里</option>
+							<option value="7500">7500公里</option>
+							<option value="8000">8000公里</option>
+							<option value="8500">8500公里</option>
+							<option value="9000">9000公里</option>
+							<option value="9500">9500公里</option>
+							<option value="10000">10000公里</option>
+							<option value="10500">10500公里</option>
+							<option value="11000">11000公里</option>
+							<option value="11500">11500公里</option>
+							<option value="12000">12000公里</option>
+							<option value="12500">12500公里</option>
+							<option value="13000">13000公里</option>
+							<option value="13500">13500公里</option>
+							<option value="14000">14000公里</option>
+							<option value="14500">14500公里</option>
+							<option value="15000">15000公里</option>
+						</select>
+					</span>
+				</span>
+             	<span class="col-xs-6">
+	                <span class="col-xs-4">首保时间:</span>
+	                <span class="col-xs-8">
+		                <select id="first_service_time" name="first_service_time" style="width:100%;">
+		                	<option value="1">1个月</option>
+		                	<option value="2">2个月</option>
+		                	<option value="3">3个月</option>
+		                	<option value="4">4个月</option>
+		                	<option value="5">5个月</option>
+		                	<option value="6">6个月</option>
+		                	<option value="7">7个月</option>
+		                	<option value="8">8个月</option>
+		                	<option value="9">9个月</option>
+		                	<option value="10">10个月</option>
+		                	<option value="11">11个月</option>
+		                	<option value="12">12个月</option>
+				        </select>
+				    </span>
+				</span>
+            </div>
+        </div>
+        <div class="panel">
+        	<div class="row">
+        		<span class="col-xs-6">
+	                <span class="col-xs-4">二保里程:</span>
+	                <span class="col-xs-8">
+		                <select id="second_service_mileage" name="second_service_mileage" style="width:100%;">
+		                	<option value="3000">3000公里</option>
+		                	<option value="3500">3500公里</option>
+		                	<option value="4000">4000公里</option>
+		                	<option value="4500">4500公里</option>
+		                	<option value="5000">5000公里</option>
+		                	<option value="5500">5500公里</option>
+		                	<option value="6000">6000公里</option>
+		                	<option value="6500">6500公里</option>
+		                	<option value="7000">7000公里</option>
+		                	<option value="7500">7500公里</option>
+		                	<option value="8000">8000公里</option>
+		                	<option value="8500">8500公里</option>
+		                	<option value="9000">9000公里</option>
+		                	<option value="9500">9500公里</option>
+		                	<option value="10000">10000公里</option>
+		                	<option value="10500">10500公里</option>
+		                	<option value="11000">11000公里</option>
+		                	<option value="11500">11500公里</option>
+		                	<option value="12000">12000公里</option>
+		                	<option value="12500">12500公里</option>
+		                	<option value="13000">13000公里</option>
+		                	<option value="13500">13500公里</option>
+		                	<option value="14000">14000公里</option>
+		                	<option value="14500">14500公里</option>
+		                	<option value="15000">15000公里</option>
+		                	<option value="15500">15500公里</option>
+		                	<option value="16000">16000公里</option>
+		                	<option value="16500">16500公里</option>
+		                	<option value="17000">17000公里</option>
+		                	<option value="17500">17500公里</option>
+		                	<option value="18000">18000公里</option>
+		                	<option value="18500">18500公里</option>
+		                	<option value="19000">19000公里</option>
+		                	<option value="19500">19500公里</option>
+		                	<option value="20000">20000公里</option>
+		                	<option value="20500">20500公里</option>
+		                	<option value="21000">21000公里</option>
+		                	<option value="21500">21500公里</option>
+		                	<option value="22000">22000公里</option>
+		                	<option value="22500">22500公里</option>
+		                	<option value="23000">23000公里</option>
+		                	<option value="23500">23500公里</option>
+		                	<option value="24000">24000公里</option>
+		                	<option value="24500">24500公里</option>
+		                	<option value="25000">25000公里</option>
+			            </select>
+			        </span>
+			    </span>
+             	<span class="col-xs-6">
+                    <span class="col-xs-4">二保时间:</span>
+                    <span class="col-xs-8">
+                		<select id="second_service_time" name="second_service_time" style="width:100%;">
+		                	<option value="1">1个月</option>
+		                	<option value="2">2个月</option>
+		                	<option value="3">3个月</option>
+		                	<option value="4">4个月</option>
+		                	<option value="5">5个月</option>
+		                	<option value="6">6个月</option>
+		                	<option value="7">7个月</option>
+		                	<option value="8">8个月</option>
+		                	<option value="9">9个月</option>
+		                	<option value="10">10个月</option>
+		                	<option value="11">11个月</option>
+		                	<option value="12">12个月</option>
+		                	<option value="13">13个月</option>
+		                	<option value="14">14个月</option>
+		                	<option value="15">15个月</option>
+		                	<option value="16">16个月</option>
+		                	<option value="17">17个月</option>
+		                	<option value="18">18个月</option>
+		                	<option value="19">19个月</option>
+		                	<option value="20">20个月</option>
+		                	<option value="21">21个月</option>
+		                	<option value="22">22个月</option>
+		                	<option value="23">23个月</option>
+		                	<option value="24">24个月</option>
+		           		</select>
+		            </span>
+		        </span>
+		    </div>
+        </div>
+        
+        <div class="panel">
+        	<div class="row">
+        		<span class="col-xs-6">
+	                <span class="col-xs-4">保养里程间隔:</span>
+	                <span class="col-xs-8">
+	                    <select id="interval_mileage" name="interval_mileage" style="width:100%;">
+		                	<option value="3000">3000公里</option>
+		                	<option value="5000">5000公里</option>
+		                	<option value="7500">7500公里</option>
+		                	<option value="8000">8000公里</option>
+		                	<option value="9000">9000公里</option>
+		                	<option value="10000">10000公里</option>
+		                	<option value="10500">10500公里</option>
+		                	<option value="11000">11000公里</option>
+		                	<option value="11500">11500公里</option>
+		                	<option value="12000">12000公里</option>
+		                	<option value="12500">12500公里</option>
+		                	<option value="13000">13000公里</option>
+		                	<option value="13500">13500公里</option>
+		                	<option value="14000">14000公里</option>
+		                	<option value="14500">14500公里</option>
+		                	<option value="15000">15000公里</option>
+			            </select>
+			        </span>
+			    </span>
+             	<span class="col-xs-6">
+					<span class="col-xs-4">保养时间间隔:</span>
+					<span class="col-xs-8">
+						<select id="interval_time" name="interval_time" style="width:100%;">
+							<option value="3">3个月</option>
+							<option value="4">4个月</option>
+							<option value="5">5个月</option>
+							<option value="6">6个月</option>
+							<option value="7">7个月</option>
+							<option value="8">8个月</option>
+							<option value="9">9个月</option>
+							<option value="10">10个月</option>
+							<option value="11">11个月</option>
+							<option value="12">12个月</option>
+						</select>
+					</span>
+				</span>
+			</div>
+        </div>
+        
+        <div class="panel">
+        	<div class="row">
+        		<span class="col-xs-6">
+        			<span class="col-xs-4">油箱容量(L):</span>
+        			<span class="col-xs-8">
+	                	<input type='number' id='oil_volume' name='oil_volume' value="50" class="form-control" />
+	                </span>
+        		</span>
+        	</div>
+        </div>
+	</fieldset>
+	
+	<div class="title" style="width: 610px;">远程车身控制部分</div>
+	<fieldset style="width: 610px;">
+	    <div class="panel">
+	    	<div class="row">
+	    		<span class="col-xs-6">
+					<span class="col-xs-4">中控:</span>
+					<span class="col-xs-8">
+						<select id="center_control" name="center_control" style="width:100%;">
+							<option value="5">不支持</option>
+							<option value="4">支持</option>
+						</select>
+					</span>
+	    		</span>
+	    		<span class="col-xs-6">
+	    			<span class="col-xs-4">喇叭:</span>
+	    			<span class="col-xs-8">
+						<select id="horn_control" name="horn_control" style="width:100%;">
+							<option value="5">不支持</option>
+							<option value="4">支持</option>
+						</select>
+					</span>
+	    		</span>
+	    	</div>
+        </div>
+        
+        <div class="panel">
+        	<div class="row">
+	    		<span class="col-xs-6">
+					<span class="col-xs-4">车窗:</span>
+					<span class="col-xs-8">
+						<select id="window_control" name="window_control" style="width:100%;">
+							<option value="5">不支持</option>
+							<option value="4">支持</option>
+						</select>
+					</span>
+				</span>
+			</div>
+		</div>
+	</fieldset> 
+
+</form>
+		 <iframe id="uploadmodelframe" name="uploadmodelframe" style="display:none;"></iframe>
+
+</body>
+<script type="text/javascript">
+
+
+function checkNum(obj)
+{
+var re = /^-?[1-9]+(\.\d+)?$|^-?0(\.\d+)?$|^-?[1-9]+[0-9]*(\.\d+)?$/;
+     if (!re.test(obj.value))
+    {
+    	 $(document).sgPup({message:'message_info',text: "非法数字，请检查后再提交！"});
+  		obj.value="";
+        return false;
+     }
+}  
+
+function callback(flag){
+	if(flag){
+		 $(document).sgPup({message:'message_info',text: "操作成功！"});
+		 $(document).sgWindow('close',{id:'model_add_window'});
+			 $("#search_btn").trigger("click");//触发按钮
+	}else{
+		$(document).sgPup({message:'message_info',text: "操作失败，请检查数据名称是否重复或异常！"});
+	}
+}
+</script>
+
+</html>

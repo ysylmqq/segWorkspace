@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>新增或修改维修记录</title>
+</head>
+
+<body>
+	<form id='repair_content' name='repair_content' method='post' class="form">
+		<input type='hidden' id='repair_id' name='repair_id' >
+		<input type='hidden' id='subco_no' name='subco_no' >
+		<div class='title' style='width: 380px;'>维修记录</div>
+		<fieldset style="width: 365px;">
+			<div class="panel">
+				<span>车牌号码:</span> 
+				<input type='text' id="plateno" name='plateno' disabled="disabled" style="width: 200px;" />
+			</div>
+			<div class="panel">
+				<span>维护单号:</span> 
+				<input type='text' id="repair_no" name='repair_no' required="true" style="width: 200px;" />
+			</div>
+			<div class="panel">
+				<span>故障现象:</span> 
+				<input type='text' id="symptom" name='symptom' style="width: 200px;" />
+			</div>
+			<div class="panel">
+				<span>故障排除:</span> 
+				<input type='text' id="exclude" name='exclude' style="width: 200px;" />
+			</div>
+			<div class="panel">
+				<span>维护电工:</span> 
+				<input type='text' id="worker" name='worker' style="width: 200px;" />
+			</div>
+			<div class="panel">
+				<span>维护地点:</span> 
+				<input type='text' id="place" name='place' style="width: 200px;" />
+			</div>
+			<div class="panel">
+				<span>接待员:</span> 
+				<input type='text' id="receptionist" name='receptionist' style="width: 200px;" />
+			</div>
+			<div class="panel">
+				<span>配件金额:</span> 
+				<input type='number' id="amount" name='amount' style="width: 200px;" />
+			</div>
+			<div class="panel">
+				<span>升级费用:</span> 
+				<input type='number' id="upgrade_fee" name='upgrade_fee' style="width: 200px;" />
+			</div>
+			<div class="panel">
+				<span>票号:</span> 
+				<input type='text' id="ticket_no" name='ticket_no' style="width: 200px;" />
+			</div>
+			<div class="panel">
+				<span>维修日期:</span> 
+				<input type='date' id="repair_date" name='repair_date' style="width: 200px;" />
+			</div>
+			<div class="panel">
+				<span>备注:</span> 
+				<input type='text' id="remark" name='remark' style="width: 200px;" />
+			</div>
+		</fieldset>
+
+	</form>
+</body>
+</html>

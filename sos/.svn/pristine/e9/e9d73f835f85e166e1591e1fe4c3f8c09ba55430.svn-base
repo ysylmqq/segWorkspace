@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link href="../../bslib/css/bootstrap.min.css" rel="stylesheet" />
+<link href="css/TrafficControl_min.css" rel="stylesheet" type="text/css" />
+<link href="css/vehicle_monitor.css" rel="stylesheet" />
+<link href="../../bslib/css/bootstrap-datetimepicker.css" rel="stylesheet" />
+<link href="../../bslib/css/base.css" rel="stylesheet" />
+<script src="../../bslib/js/jquery-1.11.1.min.js" type="text/javascript"></script>
+<script src="../../bslib/js/bootstrap.min.js" type="text/javascript"></script>
+<title>车辆监控</title>
+</head>
+<body>
+ <!-- 右键菜单 -->
+ <div id="contextmenu-searchResultPanel" class="dropdown" style="position: absolute; z-index: 99;">
+  <a id="searchResultPanel-link" href="javascript:" class="dropdown-toggle hidden" data-toggle="dropdown"></a>
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+   <li role="presentation"><a role="menuitem" href="javascript:Position(getSelectRow('#carList-tabPanel>.active table','call_letter'),getSelectRow('#carList-tabPanel>.active table','plate_no'));">查车</a></li>
+   <li role="presentation"><a role="menuitem" href="javascript:" data-toggle="modal" data-target="#trailModal" data-backdrop="static">跟踪</a></li>
+   <li role="presentation"><a role="menuitem" href="javascript:GetLastPosition(getSelectRow('#carList-tabPanel>.active table','call_letter'),getSelectRow('#carList-tabPanel>.active table','plate_no'));">最后位置</a></li>
+   <li role="presentation"><a role="menuitem" href="javascript:" data-toggle="modal" data-target="#historyModal" data-backdrop="static">历史回放</a></li>
+   <li role="presentation"><a role="menuitem" href="javascript:" data-toggle="modal" data-target="#rebackModal" data-backdrop="static">车台复位</a></li>
+   <li role="presentation" class="divider"></li>
+   <li role="presentation"><a role="menuitem" href="javascript:addToWatchList();">加入监控列表</a></li>
+   <li role="presentation"><a role="menuitem" href="javascript:fixTable($('#searchResultPanel table'), true);">清空结果</a></li>
+  </ul>
+ </div>
+ <div id="contextmenu-watchListPanel" class="dropdown" style="position: absolute; z-index: 99;">
+  <a id="watchListPanel-link" href="javascript:" class="dropdown-toggle hidden" data-toggle="dropdown"></a>
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+   <li role="presentation"><a role="menuitem" href="javascript:Position(getSelectRow('#carList-tabPanel>.active table','call_letter'),getSelectRow('#carList-tabPanel>.active table','plate_no'));">查车</a></li>
+   <li role="presentation"><a role="menuitem" href="javascript:" data-toggle="modal" data-target="#trailModal" data-backdrop="static">跟踪</a></li>
+   <li role="presentation"><a role="menuitem" href="javascript:GetLastPosition(getSelectRow('#carList-tabPanel>.active table','call_letter'),getSelectRow('#carList-tabPanel>.active table','plate_no'));">最后位置</a></li>
+   <li role="presentation"><a role="menuitem" href="javascript:" data-toggle="modal" data-target="#historyModal" data-backdrop="static">历史回放</a></li>
+   <li role="presentation"><a role="menuitem" href="javascript:" data-toggle="modal" data-target="#rebackModal" data-backdrop="static">车台复位</a></li>
+   <li role="presentation" class="divider"></li>
+   <!--    <li role="presentation"><a role="menuitem" href="javascript:" title="仅显示GPS车辆列表"><input type="checkbox" style="vertical-align: middle; margin-top: 0;"><span style="vertical-align: middle;" onclick="$(this).prev().click();"> GPS过滤</span>
+        </a></li>
+ -->
+   <li role="presentation"><a role="menuitem" href="javascript:removeFromWatchList();">从监控列表删除</a></li>
+   <li role="presentation"><a role="menuitem" href="javascript:removeFromWatchList('all');">清空监控列表</a></li>
+  </ul>
+ </div>
+ <div id="contextmenu-GPSMsgPanel" class="dropdown" style="position: absolute; z-index: 99;">
+  <a id="GPSMsgPanel-link" href="javascript:" class="dropdown-toggle hidden" data-toggle="dropdown"></a>
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+   <li role="presentation"><a role="menuitem" href="javascript:" id="GPSMsgPanelDeleteBtn" onclick="pageConfig.deleteFlag.remove();">从列表删除</a></li>
+   <li role="presentation"><a role="menuitem" href="javascript:fixTable('#GPSMsgPanel table',true);">清空列表</a></li>
+  </ul>
+ </div>
+ <!-- 实时跟踪模态框 -->
+ <div class="modal fade" id="trailModal" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="max-width:350px;">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+     <h5 class="modal-title">跟踪</h5>
+    </div>
+    <div class="modal-body" style="padding-bottom: 0;">
+     <div class="panel panel-default nogap">
+      <div class="panel-body" style="padding-top: 0;">
+       <h6>选择的车辆：</h6>
+       <div id="trail-cars" style="width: 80%; margin-left: 10px;"></div>
+       <div class="input-group input-group-sm" style="margin-top: 8px;">
+        <span class="input-group-addon noborder">跟踪次数：</span><input id="trail-times" class="form-control" value="3"><span
+         class="input-group-addon noborder nobgcolor"></span><span class="input-group-addon noborder">时间间隔(秒)：</span><input id="trail-interval"
+         class="form-control" value="10">
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="modal-footer noborder">
+     <button id="trail-start" type="button" class="btn btn-primary" data-dismiss="modal">开始跟踪</button>
+     <button id="trail-stop" type="button" class="btn btn-primary" data-dismiss="modal">停止跟踪</button>
+     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+    </div>
+   </div>
+  </div>
+ </div>
+ <!-- 历史查询模态框  -->
+ <div class="modal fade" id="historyModal" aria-hidden="true">
+  <div class="modal-dialog" style="max-width:350px;">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+     <h5 class="modal-title">
+      历史回放 [ <span id="history-car"></span> ]
+     </h5>
+    </div>
+    <div class="modal-body" style="padding-bottom: 0;">
+     <form class="form-horizontal" role="form">
+      <div class="form-group">
+       <label for="play_history_start_time" class="col-sm-4 control-label">开始时间</label>
+       <div class="col-sm-7">
+        <input type="text" class="form-control form_datetime" id="play_history_start_time" placeholder="请输入开始时间">
+       </div>
+      </div>
+      <div class="form-group">
+       <label for="play_history_end_time" class="col-sm-4 control-label">结束时间</label>
+       <div class="col-sm-7">
+        <input type="text" class="form-control form_datetime" id="play_history_end_time" placeholder="请输入结束时间">
+       </div>
+      </div>
+      <div class="row text-center" style="margin-top: 15px">
+       <div id="play_history_dlg_search_result" style="display: block; color: rgb(71, 164, 71);"></div>
+      </div>
+     </form>
+    </div>
+    <div class="modal-footer noborder" style="padding-right: 50px;">
+     <button id="history-start" type="button" class="btn btn-primary">查询</button>
+     <button id="play_history_dlg_play_btn" type="button" data-dismiss="modal" class="btn btn-primary disabled">播放</button>
+     <button id="play_history_dlg_list_btn" type="button" data-dismiss="modal" class="btn btn-primary disabled">列点</button>
+    </div>
+   </div>
+  </div>
+ </div>
+ <!-- 车台复位模态框 -->
+ <div class="modal fade" id="rebackModal" aria-hidden="true">
+  <div class="modal-dialog" style="max-width:280px;">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+     <h5 class="modal-title">车台复位</h5>
+    </div>
+    <div class="modal-body">
+     您确定要对以下车台下发复位指令吗？
+     <div id="reback-cars" style="width: 80%; resize: none; margin: 10px;"></div>
+    </div>
+    <div class="modal-footer noborder" style="padding-right: 50px;">
+     <button id="history-start" type="button" class="btn btn-primary" data-dismiss="modal"
+      onclick="Reback(getSelectRow('#carList-tabPanel>.active table','call_letter'),getSelectRow('#carList-tabPanel>.active table','plate_no'));">是</button>
+     <button type="button" class="btn btn-default" data-dismiss="modal">否</button>
+    </div>
+   </div>
+  </div>
+ </div>
+ <!-- 地图模态框 -->
+ <div class="modal fade" id="add_static_marker_config_dlg" aria-hidden="true">
+  <div class="modal-dialog">
+   <div class="modal-content">
+    <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+     <h5 class="modal-title">增加标注</h5>
+    </div>
+    <div class="modal-body" style="padding-bottom: 0;">
+     <form class="form-horizontal" role="form">
+      <div class="form-group">
+       <label for="play_history_start_time" class="col-sm-3 control-label">名称:</label>
+       <div class="col-sm-7">
+        <input id="add_static_marker_name" type="text" class="form-control" placeholder="标注名称">
+       </div>
+      </div>
+      <div class="form-group">
+       <label for="play_history_start_time" class="col-sm-3 control-label">经度:</label>
+       <div class="col-sm-7">
+        <input id="add_static_marker_lon" type="text" class="form-control" placeholder="标注经度">
+       </div>
+      </div>
+      <div class="form-group">
+       <label for="play_history_start_time" class="col-sm-3 control-label">纬度:</label>
+       <div class="col-sm-7">
+        <input id="add_static_marker_lat" type="text" class="form-control" placeholder="标注纬度">
+       </div>
+      </div>
+     </form>
+     <div class="modal-footer noborder">
+      <button type="button" class="btn btn-default" id="add_static_marker_ok_btn">确定</button>
+      <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+ <!-- 主体 -->
+ <div id="body_panel" class="body-panel">
+  <!-- 左侧 -->
+  <div id="left_panel" class="left-panel">
+   <ul class="hidden">
+    <li><a href="#menuPanel" data-toggle="tab" id="menu_link">#</a></li>
+    <li><a href="#mapPanel" data-toggle="tab" id="map_link">#</a></li>
+   </ul>
+   <div class="tab-content">
+    <!-- 菜单 -->
+    <div id="menuPanel" class="tab-pane fade active in">
+     <div class="panel panel-default">
+      <div class="panel-heading noborder">车辆监控</div>
+      <div class="panel-body" style="padding-bottom: 0; margin-bottom: 0;">
+       <!-- 查询框 -->
+       <div class="input-group" style="padding: 10px 5px 10px 5px;">
+        <input type="text" id="search-input" class="form-control" placeholder="请输入要查询的车辆或呼号"><span class="input-group-btn"><button
+          class="btn btn-default" type="button" id="search-btn">查询</button></span>
+       </div>
+       <!-- 页签-->
+       <div class="panel panel-default">
+        <ul class="nav nav-tabs">
+         <li class="active"><a href="#searchResultPanel" data-toggle="tab" id="search-panel">查询结果</a></li>
+         <li><a href="#watchListPanel" data-toggle="tab" id="watch-panel">监控列表</a></li>
+         <li><a href="#orderMsgPanel" data-toggle="tab" id="orderMsg-panel">指令信息</a></li>
+        </ul>
+        <div class="tab-content" id="carList-tabPanel">
+         <div class="tab-pane fade active in" id="searchResultPanel">
+          <div class="panel panel-default noborder">
+           <div id="_searchResultPanel">
+            <table class="table table-hover">
+             <thead>
+              <tr>
+               <th><input type="checkbox"></th>
+               <th>车牌号码</th>
+               <th>车载电话</th>
+              </tr>
+             </thead>
+             <tbody></tbody>
+            </table>
+           </div>
+          </div>
+         </div>
+         <div class="tab-pane fade" id="watchListPanel">
+          <div class="panel panel-default noborder">
+           <div id="_watchListPanel">
+            <table class="table table-hover">
+             <thead>
+              <tr>
+               <th><input type="checkbox"></th>
+               <th>车牌号码</th>
+               <th>车载电话</th>
+              </tr>
+             </thead>
+             <tbody></tbody>
+            </table>
+           </div>
+          </div>
+         </div>
+         <div class="tab-pane fade" id="orderMsgPanel">
+          <div class="panel panel-default noborder">
+           <div id="_orderMsgPanel">
+      <ul class="list-group"></ul>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+    <!-- 地图搜索结果 -->
+    <div id="mapPanel" class="tab-pane fade">
+     <div class="panel panel-default">
+      <div class="panel-heading noborder">
+       地图搜索
+       <button type="button" class="close closeit" onclick="$('#menu_link').tab('show');">&times;</button>
+      </div>
+      <div class="panel-body">
+       <div class="input-group input-group-sm" style="padding: 5px 0;">
+        <span class="input-group-addon noborder">城 市</span><input type="text" id="position_search_city_txt" class="form-control" placeholder="请输入城市">
+        <span class="input-group-addon noborder nobgcolor"></span><span class="input-group-addon noborder">数据源</span><input type="text"
+         id="position_search_maptype_sel" class="form-control" placeholder="请输入数据源">
+       </div>
+       <div class="input-group input-group-sm" style="padding: 5px 0;">
+        <span class="input-group-addon noborder">搜索名称</span><input type="text" id="position_search_name_txt" class="form-control"
+         placeholder="请输入搜索名称"><span class="input-group-addon noborder nobgcolor"></span><span class="input-group-btn noborder"><span
+         class="btn-group btn-group-sm"><button class="btn btn-default" id="position_search_btn" type="button">
+           <b class="glyphicon glyphicon-search"></b> 搜索
+          </button></span></span>
+       </div>
+       <!-- 列表 -->
+       <div id="_position_search_result_table">
+        <table class="table table-hover table-condensed" id="position_search_result_table">
+         <tbody>
+         </tbody>
+        </table>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <!-- 左侧end -->
+  <!-- 地图 -->
+  <div id="map_panel" class="panel panel-default right-panel">
+   <div class="panel-heading noborder" id="map_toolbar">
+    &nbsp;
+    <div class="dropdown pull-left" id="sel-city">
+     <a href="javascript:" data-toggle="dropdown" class="dropdown-toggle"><span id="sel-city-link" mapvalue="121.45934,31.230141,2">北京</span><span
+      class="caret"></span> </a>
+     <div class="dropdown-menu panel panel-default" style="margin: 0; padding: 0; width: 450px;">
+      <div class="panel-heading" style="height: 25px; padding: 3px 5px 3px 5px;">
+       <small>城市列表</small><a class="close" aria-hidden="true">&times;</a>
+      </div>
+      <div class="panel-body" style="padding: 3px 0 3px 5px;">
+       <div class="map_toolbar-city-sel-body">
+        <div style="margin-bottom: 10px">
+         <a href="javascript:void(0)" mapvalue="116.368,39.931427,2">北京</a><a href="javascript:void(0)" mapvalue="121.45934,31.230141,2">上海</a><a
+          href="javascript:void(0)" mapvalue="113.256069,23.134624,2">广州</a><a href="javascript:void(0)" mapvalue="114.110901,22.553102,2">深圳</a><a
+          href="javascript:void(0)" mapvalue="104.078,30.650385,2">成都</a><a href="javascript:void(0)" mapvalue="117.18782,39.13697,2">天津</a><a
+          href="javascript:void(0)" mapvalue="118.76899,32.052563,2">南京</a><a href="javascript:void(0)" mapvalue="120.16862,30.294125,2">杭州</a><a
+          href="javascript:void(0)" mapvalue="114.27442,30.585051,2">武汉</a><a href="javascript:void(0)" mapvalue="106.444950,29.590403,2">重庆</a>
+        </div>
+        <div class="btn-group btn-group-xs map_toolbar-city-sel-btn" data-toggle="buttons">
+         <label class="btn btn-default active" id="map_toolbar-city-sel-by-province"><input type="radio" name="options" autocomplete="off"
+          checked>按省份 </label><label class="btn btn-default" id="map_toolbar-city-sel-by-city"><input type="radio" name="options"
+          autocomplete="off">按城市 </label>
+        </div>
+        <div style="margin-top: 10px">
+         <div id="sel-province-div">
+          <a href="#sel-province-a" notoggle="">A</a><a href="#sel-province-f" notoggle="">F</a><a href="#sel-province-g" notoggle="">G</a><a
+           href="#sel-province-h" notoggle="">H</a><a href="#sel-province-j" notoggle="">J</a><a href="#sel-province-l" notoggle="">L</a><a
+           href="#sel-province-n" notoggle="">N</a><a href="#sel-province-q" notoggle="">Q</a><a href="#sel-province-s" notoggle="">S</a><a
+           href="#sel-province-x" notoggle="">X</a><a href="#sel-province-y" notoggle="">Y</a><a href="#sel-province-z" notoggle="">Z</a><a
+           href="#sel-province-others" notoggle="">其他</a>
+          <div>
+           <hr size="1" style="margin: 2px 0; width: 100%">
+          </div>
+          <div style="height: 240px; overflow-y: auto">
+           <table cellpadding="8px" cellspacing="0" border="0">
+            <tbody>
+             <tr>
+              <td id="sel-province-a" style="width: 30px" class="sel-letter">A</td>
+              <td style="width: 65px"><a href="javascript:void(0)" mapvalue="117.276459,31.864455,1"><b>安徽</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="117.276459,31.864456,2">合肥</a><a href="javascript:void(0)"
+               mapvalue="117.034679,30.512295,2">安庆</a><a href="javascript:void(0)" mapvalue="117.362629,32.941235,2">蚌埠</a><a
+               href="javascript:void(0)" mapvalue="115.7709,33.879292,2">亳州</a><a href="javascript:void(0)" mapvalue="117.87,31.6,2">巢湖</a><a
+               href="javascript:void(0)" mapvalue="117.48,30.67,2">池州</a><a href="javascript:void(0)" mapvalue="118.324848,32.276625,2">滁州</a><a
+               href="javascript:void(0)" mapvalue="115.859604,32.926536,2">阜阳</a><a href="javascript:void(0)" mapvalue="116.78957,33.971248,2">淮北</a>
+               <a href="javascript:void(0)" mapvalue="117.021739,32.618739,2">淮南</a><a href="javascript:void(0)" mapvalue="118.3091,29.715678,2">黄山</a>
+               <a href="javascript:void(0)" mapvalue="116.49412,31.754594,2">六安</a><a href="javascript:void(0)" mapvalue="118.482669,31.725258,2">马鞍山</a>
+               <a href="javascript:void(0)" mapvalue="116.971399,33.642367,2">宿州</a><a href="javascript:void(0)" mapvalue="117.81351,30.923402,2">铜陵</a>
+               <a href="javascript:void(0)" mapvalue="118.362619,31.334949,2">芜湖</a><a href="javascript:void(0)" mapvalue="118.75,30.95,2">宣城</a></td>
+             </tr>
+             <tr>
+              <td id="sel-province-f" class="sel-letter">F</td>
+              <td><a href="javascript:void(0)" mapvalue="119.317119,26.036573,1"><b>福建</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="119.317119,26.036572,2">福州</a><a href="javascript:void(0)" mapvalue="117.03,25.1,2">龙岩</a>
+               <a href="javascript:void(0)" mapvalue="118.116299,26.644587,2">南平</a><a href="javascript:void(0)" mapvalue="119.52,26.67,2">宁德</a><a
+               href="javascript:void(0)" mapvalue="119.011099,25.433953,2">莆田</a><a href="javascript:void(0)" mapvalue="118.589899,24.90964,2">泉州</a>
+               <a href="javascript:void(0)" mapvalue="117.603119,26.220051,2">三明</a><a href="javascript:void(0)" mapvalue="118.085979,24.450398,2">厦门</a>
+               <a href="javascript:void(0)" mapvalue="117.65305,24.511744,2">漳州</a></td>
+             </tr>
+             <tr>
+              <td id="sel-province-g" class="sel-letter">G</td>
+              <td><a href="javascript:void(0)" mapvalue="113.256069,23.134623,1"><b>广东</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="113.256069,23.134624,2">广州</a><a href="javascript:void(0)"
+               mapvalue="116.636657,23.667705,2">潮州</a><a href="javascript:void(0)" mapvalue="113.749825,23.046622,2">东莞</a><a
+               href="javascript:void(0)" mapvalue="113.115784,23.034785,2">佛山</a><a href="javascript:void(0)" mapvalue="114.691467,23.736833,2">河源</a>
+               <a href="javascript:void(0)" mapvalue="114.389435,23.09031,2">惠州</a><a href="javascript:void(0)" mapvalue="113.086143,22.58942,2">江门</a>
+               <a href="javascript:void(0)" mapvalue="116.35144,23.547111,2">揭阳</a><a href="javascript:void(0)" mapvalue="110.892997,21.673069,2">茂名</a>
+               <a href="javascript:void(0)" mapvalue="116.110504,24.315781,2">梅州</a><a href="javascript:void(0)" mapvalue="113.022132,23.720727,2">清远</a>
+               <a href="javascript:void(0)" mapvalue="116.682876,23.363955,2">汕头</a><a href="javascript:void(0)" mapvalue="115.359489,22.771485,2">汕尾</a>
+               <a href="javascript:void(0)" mapvalue="113.603415,24.810208,2">韶关</a><a href="javascript:void(0)" mapvalue="114.110901,22.553102,2">深圳</a>
+               <a href="javascript:void(0)" mapvalue="111.958945,21.845418,2">阳江</a><a href="javascript:void(0)" mapvalue="112.035781,22.935692,2">云浮</a>
+               <a href="javascript:void(0)" mapvalue="110.35,21.27,2">湛江</a><a href="javascript:void(0)" mapvalue="112.469228,23.079308,2">肇庆</a><a
+               href="javascript:void(0)" mapvalue="113.373595,22.52581,2">中山</a><a href="javascript:void(0)" mapvalue="113.571411,22.272696,2">珠海</a>
+              </td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="108.312069,22.806145,1"><b>广西</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="108.312069,22.806144,2">南宁</a><a href="javascript:void(0)"
+               mapvalue="106.647182,23.922645,2">百色</a><a href="javascript:void(0)" mapvalue="109.121789,21.479256,2">北海</a><a
+               href="javascript:void(0)" mapvalue="107.37,22.4,2">崇左</a><a href="javascript:void(0)" mapvalue="108.35,21.7,2">防城港</a><a
+               href="javascript:void(0)" mapvalue="110.286259,25.280059,2">桂林</a><a href="javascript:void(0)" mapvalue="109.608439,23.099091,2">贵港</a>
+               <a href="javascript:void(0)" mapvalue="108.07,24.7,2">河池</a><a href="javascript:void(0)" mapvalue="111.53455,24.417259,2">贺州</a><a
+               href="javascript:void(0)" mapvalue="109.23,23.73,2">来宾</a><a href="javascript:void(0)" mapvalue="109.4044,24.309988,2">柳州</a><a
+               href="javascript:void(0)" mapvalue="108.62,21.95,2">钦州</a><a href="javascript:void(0)" mapvalue="111.308569,23.486898,2">梧州</a><a
+               href="javascript:void(0)" mapvalue="110.192766,22.653662,2">玉林</a></td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="106.709110,26.580778,1"><b>贵州</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="106.709109,26.580778,2">贵阳</a><a href="javascript:void(0)"
+               mapvalue="105.976217,26.298688,2">安顺</a><a href="javascript:void(0)" mapvalue="105.28,27.3,2">毕节地区</a><a href="javascript:void(0)"
+               mapvalue="104.873389,26.577568,2">六盘水</a><a href="javascript:void(0)" mapvalue="109.18,27.72,2">铜仁地区</a><a href="javascript:void(0)"
+               mapvalue="106.92,27.73,2">遵义</a><a href="javascript:void(0)" mapvalue="104.9,25.08,2">黔西南州</a><a href="javascript:void(0)"
+               mapvalue="107.97,26.58,2">黔东南州</a><a href="javascript:void(0)" mapvalue="107.52,26.27,2">黔南州</a></td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="103.847140,36.047030,1"><b>甘肃</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="103.847139,36.047031,2">兰州</a><a href="javascript:void(0)"
+               mapvalue="104.174189,36.546264,2">白银</a><a href="javascript:void(0)" mapvalue="104.62,35.58,2">定西</a><a href="javascript:void(0)"
+               mapvalue="102.92,34.98,2">甘南州</a><a href="javascript:void(0)" mapvalue="98.272919,39.802452,2">嘉峪关</a><a href="javascript:void(0)"
+               mapvalue="102.16544,38.491837,2">金昌</a><a href="javascript:void(0)" mapvalue="98.510209,39.763647,2">酒泉</a><a href="javascript:void(0)"
+               mapvalue="103.22,35.6,2">临夏州</a><a href="javascript:void(0)" mapvalue="104.92,33.4,2">陇南</a><a href="javascript:void(0)"
+               mapvalue="106.67,35.55,2">平凉</a><a href="javascript:void(0)" mapvalue="107.63,35.73,2">庆阳</a><a href="javascript:void(0)"
+               mapvalue="105.716959,34.585471,2">天水</a><a href="javascript:void(0)" mapvalue="102.63,37.93,2">武威</a><a href="javascript:void(0)"
+               mapvalue="100.45,38.93,2">张掖</a></td>
+             </tr>
+             <tr>
+              <td id="sel-province-h" class="sel-letter">H</td>
+              <td><a href="javascript:void(0)" mapvalue="110.339679,20.033790,1"><b>海南</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="110.339679,20.03379,2">海口</a><a href="javascript:void(0)" mapvalue="109.45,19.23,2">白沙</a>
+               <a href="javascript:void(0)" mapvalue="109.7,18.63,2">保亭</a><a href="javascript:void(0)" mapvalue="109.05,19.25,2">昌江</a><a
+               href="javascript:void(0)" mapvalue="109.57,19.52,2">儋州</a><a href="javascript:void(0)" mapvalue="109.989294,19.7134595,2">澄迈</a><a
+               href="javascript:void(0)" mapvalue="108.63,19.1,2">东方</a><a href="javascript:void(0)" mapvalue="110.3340535,19.471428,2">定安</a><a
+               href="javascript:void(0)" mapvalue="110.416507,19.225931,2">琼海</a><a href="javascript:void(0)" mapvalue="109.837047,19.0756175,2">琼中</a>
+               <a href="javascript:void(0)" mapvalue="109.17,18.75,2">乐东</a><a href="javascript:void(0)" mapvalue="109.68,19.92,2">临高</a><a
+               href="javascript:void(0)" mapvalue="109.9883305,18.5435,2">陵水</a><a href="javascript:void(0)" mapvalue="109.51326,18.237918,2">三亚</a> <a
+               href="javascript:void(0)" mapvalue="110.033129,19.363348,2">屯昌</a><a href="javascript:void(0)" mapvalue="110.4,18.8,2">万宁</a><a
+               href="javascript:void(0)" mapvalue="110.8,19.55,2">文昌</a><a href="javascript:void(0)" mapvalue="109.523872,18.831182,2">五指山</a></td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="113.641310,34.758075,1"><b>河南</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="113.641309,34.758075,2">郑州</a><a href="javascript:void(0)"
+               mapvalue="114.345499,36.098343,2">安阳</a><a href="javascript:void(0)" mapvalue="114.28,35.75,2">鹤壁</a><a href="javascript:void(0)"
+               mapvalue="113.222429,35.251132,2">焦作</a><a href="javascript:void(0)" mapvalue="114.343329,34.785477,2">开封</a><a
+               href="javascript:void(0)" mapvalue="112.45,34.62,2">洛阳</a><a href="javascript:void(0)" mapvalue="114.040249,33.57347,2">漯河</a><a
+               href="javascript:void(0)" mapvalue="112.53547,33.001677,2">南阳</a><a href="javascript:void(0)" mapvalue="113.18,33.77,2">平顶山</a><a
+               href="javascript:void(0)" mapvalue="115.005929,35.754283,2">濮阳</a><a href="javascript:void(0)" mapvalue="111.194969,34.7817,2">三门峡</a>
+               <a href="javascript:void(0)" mapvalue="115.65,34.45,2">商丘</a><a href="javascript:void(0)" mapvalue="113.86825,35.30994,2">新乡</a><a
+               href="javascript:void(0)" mapvalue="114.07,32.13,2">信阳</a><a href="javascript:void(0)" mapvalue="113.81975,34.031391,2">许昌</a><a
+               href="javascript:void(0)" mapvalue="114.65,33.62,2">周口</a><a href="javascript:void(0)" mapvalue="114.02,32.98,2">驻马店</a></td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="126.64548,45.742335,1"><b>黑龙江</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="126.53,45.8,2">哈尔滨</a><a href="javascript:void(0)" mapvalue="125.03,46.58,2">大庆</a><a
+               href="javascript:void(0)" mapvalue="124.12,50.42,2">大兴安岭地区</a><a href="javascript:void(0)" mapvalue="130.292339,47.345695,2">鹤岗</a><a
+               href="javascript:void(0)" mapvalue="127.48344,50.241885,2">黑河</a><a href="javascript:void(0)" mapvalue="130.95071,45.296001,2">鸡西</a> <a
+               href="javascript:void(0)" mapvalue="130.36461,46.809196,2">佳木斯</a><a href="javascript:void(0)" mapvalue="129.595809,44.580642,2">牡丹江</a>
+               <a href="javascript:void(0)" mapvalue="130.95,45.78,2">七台河</a><a href="javascript:void(0)" mapvalue="123.963839,47.344996,2">齐齐哈尔</a> <a
+               href="javascript:void(0)" mapvalue="131.1559,46.637431,2">双鸭山</a><a href="javascript:void(0)" mapvalue="127.023856,46.641093,2">绥化</a>
+               <a href="javascript:void(0)" mapvalue="128.903869,47.722518,2">伊春</a></td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="114.27442,30.585052,1"><b>湖北</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="114.27442,30.585051,2">武汉</a><a href="javascript:void(0)"
+               mapvalue="114.87991,30.402717,2">鄂州</a><a href="javascript:void(0)" mapvalue="109.47,30.3,2">恩施</a><a href="javascript:void(0)"
+               mapvalue="114.86549,30.446987,2">黄冈</a><a href="javascript:void(0)" mapvalue="115.07666,30.212401,2">黄石</a><a href="javascript:void(0)"
+               mapvalue="112.198419,31.028728,2">荆门</a><a href="javascript:void(0)" mapvalue="112.23,30.33,2">荆州</a><a href="javascript:void(0)"
+               mapvalue="112.88,30.42,2">潜江</a><a href="javascript:void(0)" mapvalue="110.67,31.75,2">神农架林区</a><a href="javascript:void(0)"
+               mapvalue="110.784539,32.656711,2">十堰</a><a href="javascript:void(0)" mapvalue="113.369819,31.715105,2">随州</a> <a
+               href="javascript:void(0)" mapvalue="113.17,30.67,2">天门</a><a href="javascript:void(0)" mapvalue="113.45,30.37,2">仙桃</a><a
+               href="javascript:void(0)" mapvalue="114.32,29.85,2">咸宁</a><a href="javascript:void(0)" mapvalue="112.2,32.08,2">襄阳</a><a
+               href="javascript:void(0)" mapvalue="113.92,30.93,2">孝感</a><a href="javascript:void(0)" mapvalue="111.287119,30.704226,2">宜昌</a></td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="112.978129,28.198198,1"><b>湖南</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="112.978129,28.198198,2">长沙</a><a href="javascript:void(0)"
+               mapvalue="111.691299,29.034807,2">常德</a><a href="javascript:void(0)" mapvalue="113.025139,25.802718,2">郴州</a><a
+               href="javascript:void(0)" mapvalue="112.597039,26.901616,2">衡阳</a><a href="javascript:void(0)" mapvalue="110.0,27.57,2">怀化</a><a
+               href="javascript:void(0)" mapvalue="111.992279,27.741852,2">娄底</a><a href="javascript:void(0)" mapvalue="111.47494,27.249314,2">邵阳</a>
+               <a href="javascript:void(0)" mapvalue="112.91126,27.872697,2">湘潭</a><a href="javascript:void(0)" mapvalue="109.73,28.32,2">湘西州</a><a
+               href="javascript:void(0)" mapvalue="112.431766,28.52233,2">益阳</a><a href="javascript:void(0)" mapvalue="111.62,26.43,2">永州</a><a
+               href="javascript:void(0)" mapvalue="113.09766,29.37126,2">岳阳</a><a href="javascript:void(0)" mapvalue="110.48471,29.127953,2">张家界</a> <a
+               href="javascript:void(0)" mapvalue="113.150009,27.852556,2">株洲</a></td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="114.492729,38.043445,1"><b>河北</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="114.49273,38.043445,2">石家庄</a><a href="javascript:void(0)"
+               mapvalue="115.447001,38.87334,2">保定</a><a href="javascript:void(0)" mapvalue="116.855905,38.328141,2">沧州</a><a
+               href="javascript:void(0)" mapvalue="117.919849,40.965793,2">承德</a><a href="javascript:void(0)" mapvalue="114.48,36.62,2">邯郸</a><a
+               href="javascript:void(0)" mapvalue="115.695277,37.741602,2">衡水</a><a href="javascript:void(0)" mapvalue="116.692119,39.518974,2">廊坊</a>
+               <a href="javascript:void(0)" mapvalue="119.595639,39.925837,2">秦皇岛</a><a href="javascript:void(0)" mapvalue="118.192379,39.620635,2">唐山</a>
+               <a href="javascript:void(0)" mapvalue="114.483332,37.052453,2">邢台</a><a href="javascript:void(0)" mapvalue="114.885939,40.791256,2">张家口</a>
+              </td>
+             </tr>
+             <tr>
+              <td id="sel-province-j" class="sel-letter">J</td>
+              <td><a href="javascript:void(0)" mapvalue="118.76899,32.052563,1"><b>江苏</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="118.76899,32.052563,2">南京</a><a href="javascript:void(0)"
+               mapvalue="119.952299,31.782784,2">常州</a><a href="javascript:void(0)" mapvalue="119.02,33.62,2">淮安</a><a href="javascript:void(0)"
+               mapvalue="119.170959,34.604651,2">连云港</a><a href="javascript:void(0)" mapvalue="120.85464,32.010471,2">南通</a><a
+               href="javascript:void(0)" mapvalue="120.618619,31.312709,2">苏州</a><a href="javascript:void(0)" mapvalue="118.29706,33.958302,2">宿迁</a>
+               <a href="javascript:void(0)" mapvalue="119.91124,32.495872,2">泰州</a><a href="javascript:void(0)" mapvalue="120.3,31.57,2">无锡</a><a
+               href="javascript:void(0)" mapvalue="117.18,34.27,2">徐州</a><a href="javascript:void(0)" mapvalue="120.13372,33.385162,2">盐城</a><a
+               href="javascript:void(0)" mapvalue="119.43719,32.39127,2">扬州</a><a href="javascript:void(0)" mapvalue="119.444289,32.206489,2">镇江</a></td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="115.89772,28.674895,1"><b>江西</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="115.89772,28.674895,2">南昌</a><a href="javascript:void(0)" mapvalue="116.35,28,2">抚州</a>
+               <a href="javascript:void(0)" mapvalue="114.891604,25.811973,2">赣州</a><a href="javascript:void(0)" mapvalue="115.006624,27.080519,2">吉安</a>
+               <a href="javascript:void(0)" mapvalue="117.210289,29.290641,2">景德镇</a><a href="javascript:void(0)" mapvalue="115.98568,29.722364,2">九江</a>
+               <a href="javascript:void(0)" mapvalue="113.83864,27.631423,2">萍乡</a><a href="javascript:void(0)" mapvalue="117.955715,28.41109,2">上饶</a>
+               <a href="javascript:void(0)" mapvalue="114.93114,27.804075,2">新余</a><a href="javascript:void(0)" mapvalue="114.38,27.8,2">宜春</a><a
+               href="javascript:void(0)" mapvalue="117.03255,28.241118,2">鹰潭</a></td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="125.30933,43.884425,1"><b>吉林</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="125.30933,43.884425,2">长春</a><a href="javascript:void(0)" mapvalue="122.83,45.62,2">白城</a>
+               <a href="javascript:void(0)" mapvalue="126.420649,41.926346,2">白山</a><a href="javascript:void(0)" mapvalue="126.55,43.83,2">吉林市</a><a
+               href="javascript:void(0)" mapvalue="125.136929,42.910521,2">辽源</a><a href="javascript:void(0)" mapvalue="124.37541,43.167071,2">四平</a>
+               <a href="javascript:void(0)" mapvalue="124.82,45.13,2">松原</a><a href="javascript:void(0)" mapvalue="125.921129,41.723529,2">通化</a><a
+               href="javascript:void(0)" mapvalue="129.5,42.88,2">延边</a></td>
+             </tr>
+             <tr>
+              <td id="sel-province-l" class="sel-letter">L</td>
+              <td><a href="javascript:void(0)" mapvalue="123.419879,41.788249,1"><b>辽宁</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="123.419879,41.78825,2">沈阳</a><a href="javascript:void(0)" mapvalue="122.98,41.1,2">鞍山</a>
+               <a href="javascript:void(0)" mapvalue="123.763659,41.290111,2">本溪</a><a href="javascript:void(0)" mapvalue="120.460628,41.556997,2">朝阳</a>
+               <a href="javascript:void(0)" mapvalue="121.590319,38.912185,2">大连</a><a href="javascript:void(0)" mapvalue="124.38,40.13,2">丹东</a><a
+               href="javascript:void(0)" mapvalue="123.98,41.88,2">抚顺</a><a href="javascript:void(0)" mapvalue="121.64812,42.009284,2">阜新</a><a
+               href="javascript:void(0)" mapvalue="120.944881,40.710858,2">葫芦岛</a><a href="javascript:void(0)" mapvalue="121.13531,41.112858,2">锦州</a>
+               <a href="javascript:void(0)" mapvalue="123.167979,41.26585,2">辽阳</a><a href="javascript:void(0)" mapvalue="122.07,41.12,2">盘锦</a><a
+               href="javascript:void(0)" mapvalue="123.84785,42.295508,2">铁岭</a><a href="javascript:void(0)" mapvalue="122.22766,40.668735,2">营口</a></td>
+             </tr>
+             <tr>
+              <td id="sel-province-n" class="sel-letter">N</td>
+              <td><a href="javascript:void(0)" mapvalue="106.273969,38.466971,1"><b>宁夏</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="106.27397,38.466971,2">银川</a><a href="javascript:void(0)" mapvalue="106.28,36,2">固原</a>
+               <a href="javascript:void(0)" mapvalue="106.37968,39.021664,2">石嘴山</a><a href="javascript:void(0)" mapvalue="106.19549,37.986171,2">吴忠</a>
+               <a href="javascript:void(0)" mapvalue="105.18,37.52,2">中卫</a></td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="111.66416,40.815482,1"><b>内蒙古</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="111.73,40.83,2">呼和浩特</a><a href="javascript:void(0)" mapvalue="105.67,38.83,2">阿拉善盟</a>
+               <a href="javascript:void(0)" mapvalue="109.83,40.65,2">包头</a><a href="javascript:void(0)" mapvalue="107.42,40.75,2">巴彦淖尔</a><a
+               href="javascript:void(0)" mapvalue="118.95245,42.268989,2">赤峰</a><a href="javascript:void(0)" mapvalue="109.8,39.62,2">鄂尔多斯</a><a
+               href="javascript:void(0)" mapvalue="119.77,49.22,2">呼伦贝尔</a><a href="javascript:void(0)" mapvalue="122.27,43.62,2">通辽</a><a
+               href="javascript:void(0)" mapvalue="106.818019,39.671715,2">乌海</a><a href="javascript:void(0)" mapvalue="113.12,40.98,2">乌兰察布</a><a
+               href="javascript:void(0)" mapvalue="116.07,43.95,2">锡林郭勒盟</a><a href="javascript:void(0)" mapvalue="122.05,46.08,2">兴安盟</a></td>
+             </tr>
+             <tr>
+              <td id="sel-province-q" class="sel-letter">Q</td>
+              <td><a href="javascript:void(0)" mapvalue="101.783939,36.608855,1"><b>青海</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="101.78394,36.608855,2">西宁</a><a href="javascript:void(0)" mapvalue="100.23,34.48,2">果洛州</a>
+               <a href="javascript:void(0)" mapvalue="102.12,36.5,2">海东地区</a><a href="javascript:void(0)" mapvalue="100.9,36.97,2">海北州</a><a
+               href="javascript:void(0)" mapvalue="100.62,36.28,2">海南州</a><a href="javascript:void(0)" mapvalue="97.37,37.37,2">海西州</a><a
+               href="javascript:void(0)" mapvalue="102.02,35.52,2">黄南州</a><a href="javascript:void(0)" mapvalue="97.02,33,2">玉树州</a></td>
+             </tr>
+             <tr>
+              <td id="sel-province-s" class="sel-letter">S</td>
+              <td><a href="javascript:void(0)" mapvalue="117.00149,36.65013,1"><b>山东</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="117.00149,36.65013,2">济南</a><a href="javascript:void(0)" mapvalue="118.02375,37.36813,2">滨州</a><a
+               href="javascript:void(0)" mapvalue="118.67,37.43,2">东营</a><a href="javascript:void(0)" mapvalue="116.3,37.45,2">德州</a><a
+               href="javascript:void(0)" mapvalue="115.433,35.233,2">菏泽</a><a href="javascript:void(0)" mapvalue="116.577869,35.41043,2">济宁</a><a
+               href="javascript:void(0)" mapvalue="117.661729,36.205116,2">莱芜</a><a href="javascript:void(0)" mapvalue="115.964141,36.485614,2">聊城</a><a
+               href="javascript:void(0)" mapvalue="118.381581,35.142311,2">临沂</a> <a href="javascript:void(0)" mapvalue="120.346739,36.078593,2">青岛</a><a
+               href="javascript:void(0)" mapvalue="119.54641,35.39318,2">日照</a> <a href="javascript:void(0)" mapvalue="117.127189,36.188998,2">泰安</a><a
+               href="javascript:void(0)" mapvalue="122.108259,37.500918,2">威海</a> <a href="javascript:void(0)" mapvalue="119.106499,36.702705,2">潍坊</a><a
+               href="javascript:void(0)" mapvalue="121.43,37.45,2">烟台</a><a href="javascript:void(0)" mapvalue="117.32,34.82,2">枣庄</a><a
+               href="javascript:void(0)" mapvalue="118.058379,36.792046,2">淄博</a></td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="112.56483,37.873752,1"><b>山西</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="112.56483,37.873753,2">太原</a><a href="javascript:void(0)"
+               mapvalue="113.103489,36.183536,2">长治</a><a href="javascript:void(0)" mapvalue="113.296389,40.092837,2">大同</a><a
+               href="javascript:void(0)" mapvalue="112.83916,35.504318,2">晋城</a><a href="javascript:void(0)" mapvalue="112.75,37.68,2">晋中</a><a
+               href="javascript:void(0)" mapvalue="111.52,36.08,2">临汾</a><a href="javascript:void(0)" mapvalue="111.13,37.52,2">吕梁</a><a
+               href="javascript:void(0)" mapvalue="112.42152,39.308066,2">朔州</a><a href="javascript:void(0)" mapvalue="112.717098,38.378694,2">忻州</a>
+               <a href="javascript:void(0)" mapvalue="113.57285,37.861087,2">阳泉</a><a href="javascript:void(0)" mapvalue="110.974853,35.062846,2">运城</a>
+              </td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="108.94421,34.266604,1"><b>陕西</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="108.94421,34.266604,2">西安</a><a href="javascript:void(0)" mapvalue="109.02,32.68,2">安康</a>
+               <a href="javascript:void(0)" mapvalue="107.140379,34.381869,2">宝鸡</a><a href="javascript:void(0)" mapvalue="107.005953,33.103312,2">汉中</a>
+               <a href="javascript:void(0)" mapvalue="109.93,33.87,2">商洛</a><a href="javascript:void(0)" mapvalue="108.93,34.9,2">铜川</a><a
+               href="javascript:void(0)" mapvalue="109.431971,34.49743,2">渭南</a><a href="javascript:void(0)" mapvalue="108.70995,34.339053,2">咸阳</a> <a
+               href="javascript:void(0)" mapvalue="109.48,36.6,2">延安</a><a href="javascript:void(0)" mapvalue="109.819758,38.294313,2">榆林</a></td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="104.077999,30.650385,1"><b>四川</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="104.078,30.650385,2">成都</a><a href="javascript:void(0)" mapvalue="102.22,31.9,2">阿坝州</a>
+               <a href="javascript:void(0)" mapvalue="106.754759,31.849014,2">巴中</a><a href="javascript:void(0)" mapvalue="107.5,31.22,2">达州</a><a
+               href="javascript:void(0)" mapvalue="104.39101,31.132371,2">德阳</a><a href="javascript:void(0)" mapvalue="101.97,30.05,2">甘孜州</a><a
+               href="javascript:void(0)" mapvalue="106.631749,30.474428,2">广安</a><a href="javascript:void(0)" mapvalue="105.83299,32.44389,2">广元</a> <a
+               href="javascript:void(0)" mapvalue="103.751559,29.570685,2">乐山</a><a href="javascript:void(0)" mapvalue="102.27,27.9,2">凉山州</a><a
+               href="javascript:void(0)" mapvalue="105.437,28.884363,2">泸州</a><a href="javascript:void(0)" mapvalue="106.11032,30.771527,2">南充</a><a
+               href="javascript:void(0)" mapvalue="103.83,30.05,2">眉山</a><a href="javascript:void(0)" mapvalue="104.749299,31.459007,2">绵阳</a><a
+               href="javascript:void(0)" mapvalue="105.05389,29.580755,2">内江</a><a href="javascript:void(0)" mapvalue="101.698139,26.554482,2">攀枝花</a>
+               <a href="javascript:void(0)" mapvalue="105.570209,30.503918,2">遂宁</a><a href="javascript:void(0)" mapvalue="103,29.98,2">雅安</a><a
+               href="javascript:void(0)" mapvalue="104.612489,28.719103,2">宜宾</a><a href="javascript:void(0)" mapvalue="104.650189,30.122671,2">资阳</a>
+               <a href="javascript:void(0)" mapvalue="104.77599,29.370322,2">自贡</a></td>
+             </tr>
+             <tr>
+              <td id="sel-province-x" class="sel-letter">X</td>
+              <td><a href="javascript:void(0)" mapvalue="91.134468,29.652351,1"><b>西藏</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="91.134468,29.652351,2">拉萨</a><a href="javascript:void(0)" mapvalue="80.1,32.5,2">阿里地区</a>
+               <a href="javascript:void(0)" mapvalue="97.18,31.13,2">昌都地区</a><a href="javascript:void(0)" mapvalue="94.37,29.68,2">林芝地区</a><a
+               href="javascript:void(0)" mapvalue="92.07,31.48,2">那曲地区</a><a href="javascript:void(0)" mapvalue="88.88,29.27,2">日喀则地区</a><a
+               href="javascript:void(0)" mapvalue="91.77,29.23,2">山南地区</a></td>
+             </tr>
+             <tr>
+              <td></td>
+              <td><a href="javascript:void(0)" mapvalue="87.604064,43.790721,1"><b>新疆</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="87.604065,43.790721,2">乌鲁木齐</a><a href="javascript:void(0)" mapvalue="81.28,40.55,2">阿拉尔</a>
+               <a href="javascript:void(0)" mapvalue="80.27,41.17,2">阿克苏地区</a><a href="javascript:void(0)" mapvalue="88.13,47.85,2">阿勒泰地区</a><a
+               href="javascript:void(0)" mapvalue="86.15,41.77,2">巴音郭楞</a><a href="javascript:void(0)" mapvalue="82.07,44.9,2">博尔塔拉州</a><a
+               href="javascript:void(0)" mapvalue="87.3,44.02,2">昌吉州</a><a href="javascript:void(0)" mapvalue="93.52,42.83,2">哈密地区</a><a
+               href="javascript:void(0)" mapvalue="79.92,37.12 ,2">和田地区</a><a href="javascript:void(0)" mapvalue="75.98,39.47,2">喀什地区</a><a
+               href="javascript:void(0)" mapvalue="84.864708,45.590927,2">克拉玛依</a><a href="javascript:void(0)" mapvalue="76.17,39.72,2">克孜勒苏州</a><a
+               href="javascript:void(0)" mapvalue="86.0214235,44.2867225,2">石河子</a><a href="javascript:void(0)" mapvalue="82.98,46.75,2">塔城地区</a><a
+               href="javascript:void(0)" mapvalue="79.127558,39.872246,2">图木舒克</a><a href="javascript:void(0)" mapvalue="89.17,42.95,2">吐鲁番地区</a><a
+               href="javascript:void(0)" mapvalue="87.53,44.17,2">五家渠</a><a href="javascript:void(0)" mapvalue="81.32,43.92,2">伊犁州</a></td>
+             </tr>
+             <tr>
+              <td id="sel-province-y" class="sel-letter">Y</td>
+              <td><a href="javascript:void(0)" mapvalue="102.71035,25.045914,1"><b>云南</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="102.71035,25.045914,2">昆明</a><a href="javascript:void(0)"
+               mapvalue="99.203718,25.044813,2">保山</a><a href="javascript:void(0)" mapvalue="101.55,25.03,2">楚雄州</a><a href="javascript:void(0)"
+               mapvalue="100.23,25.6,2">大理州</a><a href="javascript:void(0)" mapvalue="98.58,24.43,2">德宏州</a><a href="javascript:void(0)"
+               mapvalue="99.7,27.83,2">迪庆州</a><a href="javascript:void(0)" mapvalue="103.4,23.37,2">红河州</a><a href="javascript:void(0)"
+               mapvalue="100.23,26.88,2">丽江</a><a href="javascript:void(0)" mapvalue="100.08,23.88,2">临沧</a><a href="javascript:void(0)"
+               mapvalue="98.85,25.85,2">怒江州</a><a href="javascript:void(0)" mapvalue="100.967,22.8,2">普洱</a><a href="javascript:void(0)"
+               mapvalue="103.749866,25.521684,2">曲靖</a><a href="javascript:void(0)" mapvalue="103.72,27.33,2">昭通</a><a href="javascript:void(0)"
+               mapvalue="104.25,23.37,2">文山</a><a href="javascript:void(0)" mapvalue="100.8,22.02,2">西双版纳</a><a href="javascript:void(0)"
+               mapvalue="102.50777,24.38443,2">玉溪</a></td>
+             </tr>
+             <tr>
+              <td id="sel-province-z" class="sel-letter">Z</td>
+              <td><a href="javascript:void(0)" mapvalue="120.16862,30.294125,1"><b>浙江</b> </a></td>
+              <td><a href="javascript:void(0)" mapvalue="120.16862,30.294125,2">杭州</a><a href="javascript:void(0)"
+               mapvalue="120.099309,30.864963,2">湖州</a><a href="javascript:void(0)" mapvalue="120.7532,30.767469,2">嘉兴</a><a href="javascript:void(0)"
+               mapvalue="119.64992,29.104711,2">金华</a><a href="javascript:void(0)" mapvalue="119.936146,28.445994,2">丽水</a> <a
+               href="javascript:void(0)" mapvalue="121.54266,29.866315,2">宁波</a><a href="javascript:void(0)" mapvalue="118.867649,28.956821,2">衢州</a>
+               <a href="javascript:void(0)" mapvalue="120.57826,30.004514,2">绍兴</a><a href="javascript:void(0)" mapvalue="121.472808,28.689617,2">台州</a>
+               <a href="javascript:void(0)" mapvalue="120.65322,28.018291,2">温州</a><a href="javascript:void(0)" mapvalue="122.2,30,2">舟山</a></td>
+             </tr>
+             <tr>
+              <td></td>
+              <td id="sel-province-others">
+               <div style="color: gray; margin-left: 8px">
+                <b>其他</b>
+               </div>
+              </td>
+              <td><a href="javascript:void(0)" mapvalue="114.137074,22.3571185,2">香港</a><a href="javascript:void(0)"
+               mapvalue="113.54543,22.195747,2">澳门</a><a href="javascript:void(0)" mapvalue="121.515270,25.050467,1">台湾</a></td>
+             </tr>
+            </tbody>
+           </table>
+          </div>
+         </div>
+         <div id="sel-city-div" style="display: none">
+          <a href="#sel-city-a" notoggle="">A</a><a href="#sel-city-b" notoggle="">B</a><a href="#sel-city-c" notoggle="">C</a><a href="#sel-city-d"
+           notoggle="">D</a><a href="#sel-city-e" notoggle="">E</a><a href="#sel-city-f" notoggle="">F</a><a href="#sel-city-g" notoggle="">G</a><a
+           href="#sel-city-h" notoggle="">H</a><a href="#sel-city-j" notoggle="">J</a><a href="#sel-city-k" notoggle="">K</a><a href="#sel-city-l"
+           notoggle="">L</a><a href="#sel-city-m" notoggle="">M</a><a href="#sel-city-n" notoggle="">N</a><a href="#sel-city-p" notoggle="">P</a><a
+           href="#sel-city-q" notoggle="">Q</a><a href="#sel-city-r" notoggle="">R</a><a href="#sel-city-s" notoggle="">S</a><a href="#sel-city-t"
+           notoggle="">T</a><a href="#sel-city-w" notoggle="">W</a><a href="#sel-city-x" notoggle="">X</a><a href="#sel-city-y" notoggle="">Y</a><a
+           href="#sel-city-z" notoggle="">Z</a>
+          <div>
+           <hr size="1" style="margin: 2px 0; width: 100%">
+          </div>
+          <div style="height: 240px; overflow-y: auto">
+           <table cellpadding="8px" cellspacing="0" border="0">
+            <tbody>
+             <tr>
+              <td id="sel-city-a" style="width: 30px" class="sel-letter">A</td>
+              <td><a href="javascript:void(0)" mapvalue="80.27,41.17,2">阿克苏地区</a><a href="javascript:void(0)" mapvalue="105.976217,26.298688,2">安顺</a>
+               <a href="javascript:void(0)" mapvalue="114.345499,36.098343,2">安阳</a><a href="javascript:void(0)" mapvalue="117.034679,30.512295,2">安庆</a>
+               <a href="javascript:void(0)" mapvalue="88.13,47.85,2">阿勒泰地区</a><a href="javascript:void(0)" mapvalue="113.54543,22.195747,2">澳门</a><a
+               href="javascript:void(0)" mapvalue="81.28,40.55,2">阿拉尔</a><a href="javascript:void(0)" mapvalue="80.1,32.5,2">阿里地区</a><a
+               href="javascript:void(0)" mapvalue="122.98,41.1,2">鞍山</a><a href="javascript:void(0)" mapvalue="109.02,32.68,2">安康</a><a
+               href="javascript:void(0)" mapvalue="105.67,38.83,2">阿拉善盟</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-b" style="width: 30px" class="sel-letter">B</td>
+              <td><a href="javascript:void(0)" mapvalue="99.203718,25.044813,2">保山</a><a href="javascript:void(0)" mapvalue="82.07,44.9,2">博尔塔拉州</a>
+               <a href="javascript:void(0)" mapvalue="86.15,41.77,2">巴音郭楞</a><a href="javascript:void(0)" mapvalue="115.447001,38.87334,2">保定</a><a
+               href="javascript:void(0)" mapvalue="122.83,45.62,2">白城</a><a href="javascript:void(0)" mapvalue="115.7709,33.879292,2">亳州</a><a
+               href="javascript:void(0)" mapvalue="104.174189,36.546264,2">白银</a><a href="javascript:void(0)" mapvalue="123.763659,41.290111,2">本溪</a>
+               <a href="javascript:void(0)" mapvalue="106.754759,31.849014,2">巴中</a><a href="javascript:void(0)" mapvalue="107.140379,34.381869,2">宝鸡</a>
+               <a href="javascript:void(0)" mapvalue="106.647182,23.922645,2">百色</a><a href="javascript:void(0)" mapvalue="109.7,18.63,2">保亭</a><a
+               href="javascript:void(0)" mapvalue="118.02375,37.36813,2">滨州</a><a href="javascript:void(0)" mapvalue="117.362629,32.941235,2">蚌埠</a> <a
+               href="javascript:void(0)" mapvalue="109.121789,21.479256,2">北海</a><a href="javascript:void(0)" mapvalue="109.45,19.23,2">白沙</a><a
+               href="javascript:void(0)" mapvalue="116.368,39.931427,2">北京</a><a href="javascript:void(0)" mapvalue="109.83,40.65,2">包头</a><a
+               href="javascript:void(0)" mapvalue="107.42,40.75,2">巴彦淖尔</a><a href="javascript:void(0)" mapvalue="105.28,27.3,2">毕节地区</a><a
+               href="javascript:void(0)" mapvalue="126.420649,41.926346,2">白山</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-c" style="width: 30px" class="sel-letter">C</td>
+              <td><a href="javascript:void(0)" mapvalue="116.636657,23.667705,2">潮州</a><a href="javascript:void(0)" mapvalue="117.87,31.6,2">巢湖</a>
+               <a href="javascript:void(0)" mapvalue="120.460628,41.556997,2">朝阳</a><a href="javascript:void(0)" mapvalue="111.691299,29.034807,2">常德</a>
+               <a href="javascript:void(0)" mapvalue="102.22,31.9,2">阿坝州</a><a href="javascript:void(0)" mapvalue="104.078,30.650385,2">成都</a><a
+               href="javascript:void(0)" mapvalue="117.919849,40.965793,2">承德</a><a href="javascript:void(0)" mapvalue="117.48,30.67,2">池州</a><a
+               href="javascript:void(0)" mapvalue="109.989294,19.7134595,2">澄迈</a><a href="javascript:void(0)" mapvalue="113.103489,36.183536,2">长治</a>
+               <a href="javascript:void(0)" mapvalue="109.05,19.25,2">昌江</a><a href="javascript:void(0)" mapvalue="113.025139,25.802718,2">郴州</a><a
+               href="javascript:void(0)" mapvalue="119.952299,31.782784,2">常州</a><a href="javascript:void(0)" mapvalue="97.18,31.13,2">昌都地区</a><a
+               href="javascript:void(0)" mapvalue="101.55,25.03,2">楚雄州</a><a href="javascript:void(0)" mapvalue="107.37,22.4,2">崇左</a><a
+               href="javascript:void(0)" mapvalue="116.855905,38.328141,2">沧州</a><a href="javascript:void(0)" mapvalue="118.324848,32.276625,2">滁州</a>
+               <a href="javascript:void(0)" mapvalue="125.30933,43.884425,2">长春</a><a href="javascript:void(0)" mapvalue="87.3,44.02,2">昌吉州</a><a
+               href="javascript:void(0)" mapvalue="112.978129,28.198198,2">长沙</a><a href="javascript:void(0)" mapvalue="106.444950,29.590403,2">重庆</a>
+               <a href="javascript:void(0)" mapvalue="118.95245,42.268989,2">赤峰</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-d" style="width: 30px" class="sel-letter">D</td>
+              <td><a href="javascript:void(0)" mapvalue="113.749825,23.046622,2">东莞</a><a href="javascript:void(0)" mapvalue="125.03,46.58,2">大庆</a>
+               <a href="javascript:void(0)" mapvalue="124.12,50.42,2">大兴安岭地区</a><a href="javascript:void(0)" mapvalue="99.7,27.83,2">迪庆州</a><a
+               href="javascript:void(0)" mapvalue="98.58,24.43,2">德宏州</a><a href="javascript:void(0)" mapvalue="100.23,25.6,2">大理州</a><a
+               href="javascript:void(0)" mapvalue="104.62,35.58,2">定西</a><a href="javascript:void(0)" mapvalue="104.39101,31.132371,2">德阳</a><a
+               href="javascript:void(0)" mapvalue="118.67,37.43,2">东营</a><a href="javascript:void(0)" mapvalue="116.3,37.45,2">德州</a><a
+               href="javascript:void(0)" mapvalue="109.57,19.52,2">儋州</a><a href="javascript:void(0)" mapvalue="113.296389,40.092837,2">大同</a><a
+               href="javascript:void(0)" mapvalue="108.63,19.1,2">东方</a><a href="javascript:void(0)" mapvalue="110.3340535,19.471428,2">定安</a><a
+               href="javascript:void(0)" mapvalue="107.5,31.22,2">达州</a><a href="javascript:void(0)" mapvalue="124.38,40.13,2">丹东</a><a
+               href="javascript:void(0)" mapvalue="121.590319,38.912185,2">大连</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-e" style="width: 30px" class="sel-letter">E</td>
+              <td><a href="javascript:void(0)" mapvalue="109.8,39.62,2">鄂尔多斯</a><a href="javascript:void(0)" mapvalue="114.87991,30.402717,2">鄂州</a>
+              </td>
+             </tr>
+             <tr>
+              <td id="sel-city-f" style="width: 30px" class="sel-letter">F</td>
+              <td><a href="javascript:void(0)" mapvalue="113.115784,23.034785,2">佛山</a><a href="javascript:void(0)" mapvalue="123.98,41.88,2">抚顺</a>
+               <a href="javascript:void(0)" mapvalue="108.35,21.7,2">防城港</a><a href="javascript:void(0)" mapvalue="121.64812,42.009284,2">阜新</a><a
+               href="javascript:void(0)" mapvalue="119.317119,26.036572,2">福州</a><a href="javascript:void(0)" mapvalue="115.859604,32.926536,2">阜阳</a>
+              </td>
+             </tr>
+             <tr>
+              <td id="sel-city-g" style="width: 30px" class="sel-letter">G</td>
+              <td><a href="javascript:void(0)" mapvalue="105.83299,32.44389,2">广元</a><a href="javascript:void(0)"
+               mapvalue="106.709109,26.580778,2">贵阳</a><a href="javascript:void(0)" mapvalue="113.256069,23.134624,2">广州</a><a
+               href="javascript:void(0)" mapvalue="110.286259,25.280059,2">桂林</a><a href="javascript:void(0)" mapvalue="109.608439,23.099091,2">贵港</a>
+               <a href="javascript:void(0)" mapvalue="101.97,30.05,2">甘孜州</a><a href="javascript:void(0)" mapvalue="100.23,34.48,2">果洛州</a><a
+               href="javascript:void(0)" mapvalue="114.891604,25.811973,2">赣州</a><a href="javascript:void(0)" mapvalue="106.631749,30.474428,2">广安</a>
+               <a href="javascript:void(0)" mapvalue="106.28,36,2">固原</a><a href="javascript:void(0)" mapvalue="102.92,34.98,2">甘南州</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-h" style="width: 30px" class="sel-letter">H</td>
+              <td><a href="javascript:void(0)" mapvalue="108.07,24.7,2">河池</a><a href="javascript:void(0)" mapvalue="111.53455,24.417259,2">贺州</a>
+               <a href="javascript:void(0)" mapvalue="120.16862,30.294125,2">杭州</a><a href="javascript:void(0)" mapvalue="79.92,37.12 ,2">和田地区</a><a
+               href="javascript:void(0)" mapvalue="109.68,19.92,2">临高</a><a href="javascript:void(0)" mapvalue="119.77,49.22,2">呼伦贝尔</a><a
+               href="javascript:void(0)" mapvalue="93.52,42.83,2">哈密地区</a><a href="javascript:void(0)" mapvalue="115.393099,35.315331,2">菏泽</a><a
+               href="javascript:void(0)" mapvalue="103.4,23.37,2">红河州</a><a href="javascript:void(0)" mapvalue="117.021739,32.618739,2">淮南</a><a
+               href="javascript:void(0)" mapvalue="114.691467,23.736833,2">河源</a><a href="javascript:void(0)" mapvalue="102.02,35.52,2">黄南州</a><a
+               href="javascript:void(0)" mapvalue="97.37,37.37,2">海西州</a><a href="javascript:void(0)" mapvalue="100.62,36.28,2">海南州</a><a
+               href="javascript:void(0)" mapvalue="111.73,40.83,2">呼和浩特</a><a href="javascript:void(0)" mapvalue="114.48,36.62,2">邯郸</a><a
+               href="javascript:void(0)" mapvalue="115.695277,37.741602,2">衡水</a><a href="javascript:void(0)" mapvalue="120.944881,40.710858,2">葫芦岛</a>
+               <a href="javascript:void(0)" mapvalue="119.02,33.62,2">淮安</a><a href="javascript:void(0)" mapvalue="100.9,36.97,2">海北州</a><a
+               href="javascript:void(0)" mapvalue="110.0,27.57,2">怀化</a><a href="javascript:void(0)" mapvalue="112.597039,26.901616,2">衡阳</a><a
+               href="javascript:void(0)" mapvalue="110.339679,20.03379,2">海口</a><a href="javascript:void(0)" mapvalue="114.389435,23.09031,2">惠州</a> <a
+               href="javascript:void(0)" mapvalue="114.28,35.75,2">鹤壁</a><a href="javascript:void(0)" mapvalue="118.3091,29.715678,2">黄山</a><a
+               href="javascript:void(0)" mapvalue="117.276459,31.864456,2">合肥</a><a href="javascript:void(0)" mapvalue="115.07666,30.212401,2">黄石</a>
+               <a href="javascript:void(0)" mapvalue="114.86549,30.446987,2">黄冈</a><a href="javascript:void(0)" mapvalue="116.78957,33.971248,2">淮北</a>
+               <a href="javascript:void(0)" mapvalue="127.48344,50.241885,2">黑河</a><a href="javascript:void(0)" mapvalue="130.292339,47.345695,2">鹤岗</a>
+               <a href="javascript:void(0)" mapvalue="107.005953,33.103312,2">汉中</a><a href="javascript:void(0)" mapvalue="120.099309,30.864963,2">湖州</a>
+               <a href="javascript:void(0)" mapvalue="126.53,45.8,2">哈尔滨</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-j" style="width: 30px" class="sel-letter">J</td>
+              <td><a href="javascript:void(0)" mapvalue="113.222429,35.251132,2">焦作</a><a href="javascript:void(0)"
+               mapvalue="121.13531,41.112858,2">锦州</a><a href="javascript:void(0)" mapvalue="130.36461,46.809196,2">佳木斯</a><a
+               href="javascript:void(0)" mapvalue="126.55,43.83,2">吉林市</a><a href="javascript:void(0)" mapvalue="113.086143,22.58942,2">江门</a><a
+               href="javascript:void(0)" mapvalue="116.35144,23.547111,2">揭阳</a><a href="javascript:void(0)" mapvalue="98.272919,39.802452,2">嘉峪关</a>
+               <a href="javascript:void(0)" mapvalue="112.198419,31.028728,2">荆门</a><a href="javascript:void(0)" mapvalue="112.23,30.33,2">荆州</a><a
+               href="javascript:void(0)" mapvalue="112.75,37.68,2">晋中</a><a href="javascript:void(0)" mapvalue="112.83916,35.504318,2">晋城</a><a
+               href="javascript:void(0)" mapvalue="115.98568,29.722364,2">九江</a><a href="javascript:void(0)" mapvalue="117.210289,29.290641,2">景德镇</a>
+               <a href="javascript:void(0)" mapvalue="130.95071,45.296001,2">鸡西</a><a href="javascript:void(0)" mapvalue="115.006624,27.080519,2">吉安</a>
+               <a href="javascript:void(0)" mapvalue="102.16544,38.491837,2">金昌</a><a href="javascript:void(0)" mapvalue="98.510209,39.763647,2">酒泉</a>
+               <a href="javascript:void(0)" mapvalue="116.577869,35.41043,2">济宁</a><a href="javascript:void(0)" mapvalue="117.00149,36.65013,2">济南</a>
+               <a href="javascript:void(0)" mapvalue="119.64992,29.104711,2">金华</a><a href="javascript:void(0)" mapvalue="120.7532,30.767469,2">嘉兴</a>
+              </td>
+             </tr>
+             <tr>
+              <td id="sel-city-k" style="width: 30px" class="sel-letter">K</td>
+              <td><a href="javascript:void(0)" mapvalue="75.98,39.47,2">喀什地区</a><a href="javascript:void(0)" mapvalue="84.864708,45.590927,2">克拉玛依</a>
+               <a href="javascript:void(0)" mapvalue="114.343329,34.785477,2">开封</a><a href="javascript:void(0)" mapvalue="102.71035,25.045914,2">昆明</a>
+               <a href="javascript:void(0)" mapvalue="76.17,39.72,2">克孜勒苏州</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-l" style="width: 30px" class="sel-letter">L</td>
+              <td><a href="javascript:void(0)" mapvalue="115.964141,36.485614,2">聊城</a><a href="javascript:void(0)"
+               mapvalue="105.437,28.884363,2">泸州</a><a href="javascript:void(0)" mapvalue="117.661729,36.205116,2">莱芜</a><a href="javascript:void(0)"
+               mapvalue="116.49412,31.754594,2">六安</a><a href="javascript:void(0)" mapvalue="119.170959,34.604651,2">连云港</a> <a
+               href="javascript:void(0)" mapvalue="117.03,25.1,2">龙岩</a><a href="javascript:void(0)" mapvalue="103.751559,29.570685,2">乐山</a><a
+               href="javascript:void(0)" mapvalue="100.23,26.88,2">丽江</a><a href="javascript:void(0)" mapvalue="116.692119,39.518974,2">廊坊</a><a
+               href="javascript:void(0)" mapvalue="119.936146,28.445994,2">丽水</a><a href="javascript:void(0)" mapvalue="111.13,37.52,2">吕梁</a><a
+               href="javascript:void(0)" mapvalue="114.040249,33.57347,2">漯河</a><a href="javascript:void(0)" mapvalue="109.23,23.73,2">来宾</a><a
+               href="javascript:void(0)" mapvalue="112.45,34.62,2">洛阳</a><a href="javascript:void(0)" mapvalue="100.08,23.88,2">临沧</a><a
+               href="javascript:void(0)" mapvalue="111.992279,27.741852,2">娄底</a><a href="javascript:void(0)" mapvalue="103.847139,36.047031,2">兰州</a>
+               <a href="javascript:void(0)" mapvalue="102.27,27.9,2">凉山州</a><a href="javascript:void(0)" mapvalue="109.4044,24.309988,2">柳州</a><a
+               href="javascript:void(0)" mapvalue="91.134468,29.652351,2">拉萨</a><a href="javascript:void(0)" mapvalue="104.92,33.4,2">陇南</a><a
+               href="javascript:void(0)" mapvalue="103.22,35.6,2">临夏州</a><a href="javascript:void(0)" mapvalue="104.873389,26.577568,2">六盘水</a><a
+               href="javascript:void(0)" mapvalue="94.37,29.68,2">林芝地区</a><a href="javascript:void(0)" mapvalue="111.52,36.08,2">临汾</a><a
+               href="javascript:void(0)" mapvalue="125.136929,42.910521,2">辽源</a><a href="javascript:void(0)" mapvalue="123.167979,41.26585,2">辽阳</a>
+               <a href="javascript:void(0)" mapvalue="118.381581,35.142311,2">临沂</a><a href="javascript:void(0)" mapvalue="109.17,18.75,2">乐东</a><a
+               href="javascript:void(0)" mapvalue="109.9883305,18.5435,2">陵水</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-m" style="width: 30px" class="sel-letter">M</td>
+              <td><a href="javascript:void(0)" mapvalue="118.482669,31.725258,2">马鞍山</a><a href="javascript:void(0)"
+               mapvalue="116.110504,24.315781,2">梅州</a><a href="javascript:void(0)" mapvalue="129.595809,44.580642,2">牡丹江</a><a
+               href="javascript:void(0)" mapvalue="110.892997,21.673069,2">茂名</a><a href="javascript:void(0)" mapvalue="103.83,30.05,2">眉山</a><a
+               href="javascript:void(0)" mapvalue="104.749299,31.459007,2">绵阳</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-n" style="width: 30px" class="sel-letter">N</td>
+              <td><a href="javascript:void(0)" mapvalue="121.54266,29.866315,2">宁波</a><a href="javascript:void(0)"
+               mapvalue="118.76899,32.052563,2">南京</a><a href="javascript:void(0)" mapvalue="119.52,26.67,2">宁德</a><a href="javascript:void(0)"
+               mapvalue="118.116299,26.644587,2">南平</a><a href="javascript:void(0)" mapvalue="120.85464,32.010471,2">南通</a><a
+               href="javascript:void(0)" mapvalue="109.47,30.3,2">恩施</a><a href="javascript:void(0)" mapvalue="92.07,31.48,2">那曲地区</a><a
+               href="javascript:void(0)" mapvalue="108.312069,22.806144,2">南宁</a><a href="javascript:void(0)" mapvalue="105.05389,29.580755,2">内江</a>
+               <a href="javascript:void(0)" mapvalue="98.85,25.85,2">怒江州</a><a href="javascript:void(0)" mapvalue="106.11032,30.771527,2">南充</a><a
+               href="javascript:void(0)" mapvalue="115.89772,28.674895,2">南昌</a><a href="javascript:void(0)" mapvalue="112.53547,33.001677,2">南阳</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-p" style="width: 30px" class="sel-letter">P</td>
+              <td><a href="javascript:void(0)" mapvalue="101.698139,26.554482,2">攀枝花</a><a href="javascript:void(0)" mapvalue="100.967,22.8,2">普洱</a>
+               <a href="javascript:void(0)" mapvalue="122.07,41.12,2">盘锦</a><a href="javascript:void(0)" mapvalue="106.67,35.55,2">平凉</a><a
+               href="javascript:void(0)" mapvalue="113.18,33.77,2">平顶山</a><a href="javascript:void(0)" mapvalue="115.005929,35.754283,2">濮阳</a><a
+               href="javascript:void(0)" mapvalue="119.011099,25.433953,2">莆田</a><a href="javascript:void(0)" mapvalue="113.83864,27.631423,2">萍乡</a>
+              </td>
+             </tr>
+             <tr>
+              <td id="sel-city-q" style="width: 30px" class="sel-letter">Q</td>
+              <td><a href="javascript:void(0)" mapvalue="104.9,25.08,2">黔西南州</a><a href="javascript:void(0)" mapvalue="103.749866,25.521684,2">曲靖</a>
+               <a href="javascript:void(0)" mapvalue="113.022132,23.720727,2">清远</a><a href="javascript:void(0)" mapvalue="107.63,35.73,2">庆阳</a><a
+               href="javascript:void(0)" mapvalue="109.837047,19.0756175,2">琼中</a><a href="javascript:void(0)" mapvalue="110.416507,19.225931,2">琼海</a>
+               <a href="javascript:void(0)" mapvalue="118.589899,24.90964,2">泉州</a><a href="javascript:void(0)" mapvalue="112.88,30.42,2">潜江</a><a
+               href="javascript:void(0)" mapvalue="108.62,21.95,2">钦州</a><a href="javascript:void(0)" mapvalue="130.95,45.78,2">七台河</a><a
+               href="javascript:void(0)" mapvalue="123.963839,47.344996,2">齐齐哈尔</a><a href="javascript:void(0)" mapvalue="107.52,26.27,2">黔南州</a><a
+               href="javascript:void(0)" mapvalue="119.595639,39.925837,2">秦皇岛</a><a href="javascript:void(0)" mapvalue="107.97,26.58,2">黔东南州</a><a
+               href="javascript:void(0)" mapvalue="118.867649,28.956821,2">衢州</a><a href="javascript:void(0)" mapvalue="120.346739,36.078593,2">青岛</a>
+              </td>
+             </tr>
+             <tr>
+              <td id="sel-city-r" style="width: 30px" class="sel-letter">R</td>
+              <td><a href="javascript:void(0)" mapvalue="119.54641,35.39318,2">日照</a><a href="javascript:void(0)" mapvalue="88.88,29.27,2">日喀则地区</a>
+              </td>
+             </tr>
+             <tr>
+              <td id="sel-city-s" style="width: 30px" class="sel-letter">S</td>
+              <td><a href="javascript:void(0)" mapvalue="111.47494,27.249314,2">邵阳</a><a href="javascript:void(0)"
+               mapvalue="114.110901,22.553102,2">深圳</a><a href="javascript:void(0)" mapvalue="113.369819,31.715105,2">随州</a><a
+               href="javascript:void(0)" mapvalue="105.570209,30.503918,2">遂宁</a><a href="javascript:void(0)" mapvalue="113.603415,24.810208,2">韶关</a>
+               <a href="javascript:void(0)" mapvalue="115.359489,22.771485,2">汕尾</a><a href="javascript:void(0)" mapvalue="110.784539,32.656711,2">十堰</a>
+               <a href="javascript:void(0)" mapvalue="110.67,31.75,2">神农架林区</a><a href="javascript:void(0)" mapvalue="120.618619,31.312709,2">苏州</a> <a
+               href="javascript:void(0)" mapvalue="118.29706,33.958302,2">宿迁</a><a href="javascript:void(0)" mapvalue="112.42152,39.308066,2">朔州</a> <a
+               href="javascript:void(0)" mapvalue="116.682876,23.363955,2">汕头</a><a href="javascript:void(0)" mapvalue="114.49273,38.043445,2">石家庄</a>
+               <a href="javascript:void(0)" mapvalue="117.603119,26.220051,2">三明</a><a href="javascript:void(0)" mapvalue="120.57826,30.004514,2">绍兴</a>
+               <a href="javascript:void(0)" mapvalue="106.37968,39.021664,2">石嘴山</a><a href="javascript:void(0)" mapvalue="86.0214235,44.2867225,2">石河子</a>
+               <a href="javascript:void(0)" mapvalue="127.023856,46.641093,2">绥化</a><a href="javascript:void(0)" mapvalue="131.1559,46.637431,2">双鸭山</a>
+               <a href="javascript:void(0)" mapvalue="117.955715,28.41109,2">上饶</a><a href="javascript:void(0)" mapvalue="116.971399,33.642367,2">宿州</a>
+               <a href="javascript:void(0)" mapvalue="91.77,29.23,2">山南地区</a><a href="javascript:void(0)" mapvalue="109.51326,18.237918,2">三亚</a><a
+               href="javascript:void(0)" mapvalue="124.37541,43.167071,2">四平</a><a href="javascript:void(0)" mapvalue="124.82,45.13,2">松原</a><a
+               href="javascript:void(0)" mapvalue="121.45934,31.230141,2">上海</a><a href="javascript:void(0)" mapvalue="111.194969,34.7817,2">三门峡</a> <a
+               href="javascript:void(0)" mapvalue="123.419879,41.78825,2">沈阳</a><a href="javascript:void(0)" mapvalue="115.65,34.45,2">商丘</a><a
+               href="javascript:void(0)" mapvalue="109.93,33.87,2">商洛</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-t" style="width: 30px" class="sel-letter">T</td>
+              <td><a href="javascript:void(0)" mapvalue="110.033129,19.363348,2">屯昌</a><a href="javascript:void(0)" mapvalue="108.93,34.9,2">铜川</a>
+               <a href="javascript:void(0)" mapvalue="121.515270,25.050467,1">台湾</a><a href="javascript:void(0)" mapvalue="82.98,46.75,2">塔城地区</a><a
+               href="javascript:void(0)" mapvalue="123.84785,42.295508,2">铁岭</a><a href="javascript:void(0)" mapvalue="112.56483,37.873753,2">太原</a> <a
+               href="javascript:void(0)" mapvalue="121.472808,28.689617,2">台州</a><a href="javascript:void(0)" mapvalue="118.192379,39.620635,2">唐山</a>
+               <a href="javascript:void(0)" mapvalue="119.91124,32.495872,2">泰州</a><a href="javascript:void(0)" mapvalue="117.18782,39.13697,2">天津</a>
+               <a href="javascript:void(0)" mapvalue="105.716959,34.585471,2">天水</a><a href="javascript:void(0)" mapvalue="113.17,30.67,2">天门</a><a
+               href="javascript:void(0)" mapvalue="117.81351,30.923402,2">铜陵</a><a href="javascript:void(0)" mapvalue="125.921129,41.723529,2">通化</a>
+               <a href="javascript:void(0)" mapvalue="89.17,42.95,2">吐鲁番地区</a><a href="javascript:void(0)" mapvalue="79.127558,39.872246,2">图木舒克</a> <a
+               href="javascript:void(0)" mapvalue="117.127189,36.188998,2">泰安</a><a href="javascript:void(0)" mapvalue="109.18,27.72,2">铜仁地区</a><a
+               href="javascript:void(0)" mapvalue="122.27,43.62,2">通辽</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-w" style="width: 30px" class="sel-letter">W</td>
+              <td><a href="javascript:void(0)" mapvalue="111.308569,23.486898,2">梧州</a><a href="javascript:void(0)" mapvalue="102.63,37.93,2">武威</a>
+               <a href="javascript:void(0)" mapvalue="87.53,44.17,2">五家渠</a><a href="javascript:void(0)" mapvalue="119.106499,36.702705,2">潍坊</a><a
+               href="javascript:void(0)" mapvalue="122.108259,37.500918,2">威海</a><a href="javascript:void(0)" mapvalue="118.362619,31.334949,2">芜湖</a>
+               <a href="javascript:void(0)" mapvalue="106.19549,37.986171,2">吴忠</a><a href="javascript:void(0)" mapvalue="113.12,40.98,2">乌兰察布</a><a
+               href="javascript:void(0)" mapvalue="106.818019,39.671715,2">乌海</a><a href="javascript:void(0)" mapvalue="109.431971,34.49743,2">渭南</a>
+               <a href="javascript:void(0)" mapvalue="104.25,23.37,2">文山</a><a href="javascript:void(0)" mapvalue="110.4,18.8,2">万宁</a><a
+               href="javascript:void(0)" mapvalue="110.8,19.55,2">文昌</a><a href="javascript:void(0)" mapvalue="109.523872,18.831182,2">五指山</a><a
+               href="javascript:void(0)" mapvalue="87.604065,43.790721,2">乌鲁木齐</a><a href="javascript:void(0)" mapvalue="116.35,28,2">抚州</a><a
+               href="javascript:void(0)" mapvalue="120.65322,28.018291,2">温州</a><a href="javascript:void(0)" mapvalue="114.27442,30.585051,2">武汉</a> <a
+               href="javascript:void(0)" mapvalue="120.3,31.57,2">无锡</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-x" style="width: 30px" class="sel-letter">X</td>
+              <td><a href="javascript:void(0)" mapvalue="100.8,22.02,2">西双版纳</a><a href="javascript:void(0)" mapvalue="108.94421,34.266604,2">西安</a>
+               <a href="javascript:void(0)" mapvalue="117.18,34.27,2">徐州</a><a href="javascript:void(0)" mapvalue="114.93114,27.804075,2">新余</a><a
+               href="javascript:void(0)" mapvalue="114.32,29.85,2">咸宁</a><a href="javascript:void(0)" mapvalue="101.78394,36.608855,2">西宁</a><a
+               href="javascript:void(0)" mapvalue="114.483332,37.052453,2">邢台</a><a href="javascript:void(0)" mapvalue="102.12,36.5,2">海东地区</a><a
+               href="javascript:void(0)" mapvalue="108.70995,34.339053,2">咸阳</a><a href="javascript:void(0)" mapvalue="112.2,32.08,2">襄阳</a><a
+               href="javascript:void(0)" mapvalue="113.92,30.93,2">孝感</a><a href="javascript:void(0)" mapvalue="112.91126,27.872697,2">湘潭</a><a
+               href="javascript:void(0)" mapvalue="118.75,30.95,2">宣城</a><a href="javascript:void(0)" mapvalue="113.81975,34.031391,2">许昌</a><a
+               href="javascript:void(0)" mapvalue="109.73,28.32,2">湘西州</a><a href="javascript:void(0)" mapvalue="114.07,32.13,2">信阳</a><a
+               href="javascript:void(0)" mapvalue="113.86825,35.30994,2">新乡</a><a href="javascript:void(0)" mapvalue="113.45,30.37,2">仙桃</a><a
+               href="javascript:void(0)" mapvalue="116.07,43.95,2">锡林郭勒盟</a><a href="javascript:void(0)" mapvalue="122.05,46.08,2">兴安盟</a><a
+               href="javascript:void(0)" mapvalue="112.717098,38.378694,2">忻州</a><a href="javascript:void(0)" mapvalue="114.137074,22.3571185,2">香港</a>
+               <a href="javascript:void(0)" mapvalue="118.085979,24.450398,2">厦门</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-y" style="width: 30px" class="sel-letter">Y</td>
+              <td><a href="javascript:void(0)" mapvalue="110.192766,22.653662,2">玉林</a><a href="javascript:void(0)" mapvalue="97.02,33,2">玉树州</a>
+               <a href="javascript:void(0)" mapvalue="103,29.98,2">雅安</a><a href="javascript:void(0)" mapvalue="109.819758,38.294313,2">榆林</a><a
+               href="javascript:void(0)" mapvalue="109.48,36.6,2">延安</a><a href="javascript:void(0)" mapvalue="110.974853,35.062846,2">运城</a><a
+               href="javascript:void(0)" mapvalue="113.57285,37.861087,2">阳泉</a><a href="javascript:void(0)" mapvalue="81.32,43.92,2">伊犁州</a><a
+               href="javascript:void(0)" mapvalue="121.43,37.45,2">烟台</a><a href="javascript:void(0)" mapvalue="111.958945,21.845418,2">阳江</a><a
+               href="javascript:void(0)" mapvalue="112.035781,22.935692,2">云浮</a><a href="javascript:void(0)" mapvalue="106.27397,38.466971,2">银川</a>
+               <a href="javascript:void(0)" mapvalue="104.612489,28.719103,2">宜宾</a><a href="javascript:void(0)" mapvalue="122.22766,40.668735,2">营口</a>
+               <a href="javascript:void(0)" mapvalue="129.5,42.88,2">延边</a><a href="javascript:void(0)" mapvalue="102.50777,24.38443,2">玉溪</a><a
+               href="javascript:void(0)" mapvalue="117.03255,28.241118,2">鹰潭</a><a href="javascript:void(0)" mapvalue="114.38,27.8,2">宜春</a><a
+               href="javascript:void(0)" mapvalue="119.43719,32.39127,2">扬州</a><a href="javascript:void(0)" mapvalue="120.13372,33.385162,2">盐城</a><a
+               href="javascript:void(0)" mapvalue="113.09766,29.37126,2">岳阳</a><a href="javascript:void(0)" mapvalue="111.62,26.43,2">永州</a><a
+               href="javascript:void(0)" mapvalue="112.431766,28.52233,2">益阳</a><a href="javascript:void(0)" mapvalue="111.287119,30.704226,2">宜昌</a>
+               <a href="javascript:void(0)" mapvalue="128.903869,47.722518,2">伊春</a></td>
+             </tr>
+             <tr>
+              <td id="sel-city-z" style="width: 30px" class="sel-letter">Z</td>
+              <td><a href="javascript:void(0)" mapvalue="100.45,38.93,2">张掖</a><a href="javascript:void(0)" mapvalue="117.65305,24.511744,2">漳州</a>
+               <a href="javascript:void(0)" mapvalue="118.058379,36.792046,2">淄博</a><a href="javascript:void(0)" mapvalue="110.35,21.27,2">湛江</a><a
+               href="javascript:void(0)" mapvalue="112.469228,23.079308,2">肇庆</a><a href="javascript:void(0)" mapvalue="119.444289,32.206489,2">镇江</a>
+               <a href="javascript:void(0)" mapvalue="113.373595,22.52581,2">中山</a><a href="javascript:void(0)" mapvalue="113.571411,22.272696,2">珠海</a>
+               <a href="javascript:void(0)" mapvalue="113.150009,27.852556,2">株洲</a><a href="javascript:void(0)" mapvalue="110.48471,29.127953,2">张家界</a>
+               <a href="javascript:void(0)" mapvalue="105.18,37.52,2">中卫</a><a href="javascript:void(0)" mapvalue="104.650189,30.122671,2">资阳</a><a
+               href="javascript:void(0)" mapvalue="117.32,34.82,2">枣庄</a><a href="javascript:void(0)" mapvalue="122.2,30,2">舟山</a><a
+               href="javascript:void(0)" mapvalue="114.885939,40.791256,2">张家口</a><a href="javascript:void(0)" mapvalue="113.641309,34.758075,2">郑州</a>
+               <a href="javascript:void(0)" mapvalue="104.77599,29.370322,2">自贡</a><a href="javascript:void(0)" mapvalue="103.72,27.33,2">昭通</a><a
+               href="javascript:void(0)" mapvalue="114.02,32.98,2">驻马店</a><a href="javascript:void(0)" mapvalue="114.65,33.62,2">周口</a><a
+               href="javascript:void(0)" mapvalue="106.92,27.73,2">遵义</a></td>
+             </tr>
+            </tbody>
+           </table>
+          </div>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="dropdown pull-right">
+     <a href="javascript:" id="mapbar_fullscreen" title="全屏"><b class="glyphicon glyphicon-fullscreen"></b></a>
+    </div>
+    <div class="dropdown pull-right">
+     <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" title="工具"><b class="glyphicon glyphicon-wrench"></b><b class="caret"></b>
+     </a>
+     <ul class="dropdown-menu" role="menu">
+      <li role="presentation"><a role="menuitem" href="javascript:" id="cul_distance_btn">测距</a></li>
+      <li role="presentation"><a role="menuitem" href="javascript:" id="show_coord_btn">显示经纬度</a></li>
+      <li role="presentation"><a role="menuitem" href="javascript:" id="add_marker_btn">标注</a></li>
+      <li role="presentation"><a role="menuitem" href="javascript:" id="print_map_btn">打印</a></li>
+      <li role="presentation" class="divider"></li>
+      <li role="presentation"><a role="menuitem" href="javascript:" id="test_map_circle">圆形</a></li>
+      <li role="presentation"><a role="menuitem" href="javascript:" id="test_map_rect">矩形</a></li>
+      <li role="presentation"><a role="menuitem" href="javascript:" id="test_map_polygon">多边形</a></li>
+      <li role="presentation"><a role="menuitem" href="javascript:" id="test_map_polyline">折线</a></li>
+     </ul>
+    </div>
+    <div class="dropdown pull-right">
+     <a href="javascript:" title="历史回放" id="cmd_play_history" data-toggle="modal" data-target="#historyModal" data-backdrop="static"><b
+      class="glyphicon glyphicon-stats"></b></a>
+    </div>
+    <div class="dropdown pull-right">
+     <a href="javascript:" title="周边" id="nearby_point_btn"><b class="glyphicon glyphicon-map-marker"></b></a>
+    </div>
+    <div class="dropdown pull-right">
+     <a href="javascript:" title="清除标注" id="clear_markers_btn"><b class="glyphicon glyphicon-trash"></b></a>
+    </div>
+    <div class="dropdown pull-right">
+     <a href="javascript:" title="地图居中" id="map_center_btn"><b class="glyphicon glyphicon-screenshot"></b></a>
+    </div>
+    <div class="dropdown pull-right">
+     <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" title="地图切换"><b class="glyphicon glyphicon-sort"></b><b class="caret"></b>
+     </a>
+     <ul class="dropdown-menu" role="menu">
+      <li role="presentation"><a role="menuitem" href="javascript:" name="switch_map_btn" mtype="baidu">百度</a></li>
+      <li role="presentation"><a role="menuitem" href="javascript:" name="switch_map_btn" mtype="google">google</a></li>
+      <li role="presentation"><a role="menuitem" href="javascript:" name="switch_map_btn" mtype="mapbar">图吧</a></li>
+      <li role="presentation"><a role="menuitem" href="javascript:" name="switch_map_btn" mtype="qq">腾讯</a></li>
+     </ul>
+    </div>
+    <div class="dropdown pull-right">
+     <a href="javascript:" onclick="if($('#mapPanel').hasClass('active')){$('#menu_link').tab('show');}else{$('#map_link').tab('show');}" title="查找"><b
+      class="glyphicon glyphicon-search"></b> </a>
+    </div>
+   </div>
+   <div class="panel-body nogap" id="map" unselectable="on" style="-moz-user-select: none; -webkit-user-select: none;" onselectstart="return false;">
+   </div>
+  </div>
+  <!-- 脚部信息区 -->
+  <div id="foot_panel" class="panel panel-default right-panel">
+   <div class="panel-heading noborder">GPS信息<button type="button" class="close closeit btn btn-default" style="font-size: 12px;opacity:0.8;" aria-hidden="true" onclick="$('#_GPSMsgPanel tbody').empty();">清空</button></div>
+   <div class="panel-body" style="padding-bottom: 0; margin-bottom: 0;" id="_GPSMsgPanel">
+    <table class="table table-hover table-condensed">
+     <thead>
+      <tr>
+       <th class="nobreak">车牌号码</th>
+       <th class="nobreak">车载电话</th>
+       <th class="nobreak">是否定位</th>
+       <th class="nobreak">状态信息</th>
+       <th class="nobreak">速度</th>
+       <th class="nobreak">定位时间</th>
+       <th class="nobreak">方向</th>
+       <th class="nobreak">接收时间</th>
+      </tr>
+     </thead>
+     <tbody></tbody>
+    </table>
+   </div>
+  </div>
+ </div>
+</body>
+<script type="text/javascript" src="../../bslib/js/util.js"></script>
+<script type="text/javascript">
+ // 兼容代码
+ if (!console) {
+  window.console = {
+   log: function(msg){},
+   error: function(msg){}
+  };
+ }
+ function compatibleArray(array){
+   if (!array) {array = [];}
+   array.value = {
+    split : function() {
+     return array;
+    }
+   };
+   return array;
+ }
+
+ var left_width = Util.getCookie("left_width");
+ var map_height = Util.getCookie("map_height");
+ if (left_width) {
+  $("#left_panel").width(left_width);
+  $(".right-panel").css("margin-left", parseInt(left_width) + 5 + "px");
+ }
+ if (map_height) {
+  $("#map").height(map_height);
+ }
+ // 调整高度
+ window.onresize = function() {
+  var height = $(window).height();
+  // 设置最大高度
+  $("#_searchResultPanel").height(height - 207);
+  $("#_watchListPanel").height(height - 207);
+  $("#_orderMsgPanel").height(height - 207);
+  $("#_position_search_result_table").height(height - 161);
+  var _height = height - $("#map").height() - $("#_GPSMsgPanel").height() - 97;
+  if (_height>0){$("#map").height($("#map").height()+_height);} else {
+   var gps_height = $("#_GPSMsgPanel").height()+_height;
+   if (gps_height<145){
+    $("#map").height($("#map").height()+_height+$("#_GPSMsgPanel").height()-145);
+    $("#_GPSMsgPanel").height(145);
+   } else {
+    $("#_GPSMsgPanel").height(gps_height);
+   }
+  }
+ };
+ window.onresize();
+
+$(window).unload(function(){
+ Util.setCookie("left_width",  $("#left_panel").width(), new Date(new Date().getTime() + 31536000000));
+ Util.setCookie("map_height",  $("#map").height(), new Date(new Date().getTime() + 31536000000));
+ watchListCookie = "";
+ $("#watchListPanel table>tbody>tr").each(function(index,ele){
+  watchListCookie += (ele.getAttribute("call_letter") + "||" + ele.getAttribute("plate_no")) + "||";
+ });
+ Util.setCookie("watch_list", watchListCookie, new Date(new Date().getTime() + 31536000000));
+});
+</script>
+<!-- websocket -->
+<script src="websocket/Math.uuid.js"></script>
+<!-- 随机序列号 -->
+<script src="websocket/Long.js"></script>
+<!-- protobuf需要 -->
+<script src="websocket/ByteBuffer.js"></script>
+<!-- protobuf需要 -->
+<script src="websocket/ProtoBuf.js"></script>
+<!-- protobuf需要 -->
+<script src="websocket/comcenterprotobuf.js"></script>
+<script src="websocket/zlib.min.js"></script>
+<script src="websocket/segutil.js"></script>
+<script src="websocket/segseatlib.js"></script>
+<script src="websocket/my_cmd_request.js"></script>
+<!-- 坐席协议  -->
+<script src="websocket/my_cmd_response.js"></script>
+<!-- 坐席接收到通信中心的事件  -->
+<!-- 地图lib -->
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=CFc17969f0cc5f894f15ec69a2be4344"></script>
+<script type="text/javascript" src="js/mapbarapi31.2.js"></script>
+<script type="text/javascript" src="http://map.qq.com/api/js?v=2.exp&key=XZEBZ-E332F-4CYJO-JAAAS-UJ4F5-RIFH4"></script>
+<script type="text/javascript" src="http://ditu.google.cn/maps/api/js?libraries=places&sensor=false"></script>
+<script type="text/javascript" src="js/map/util/point.js"></script>
+<script type="text/javascript" src="js/map/util/converter.js"></script>
+<script type="text/javascript" src="js/map/util/baiduConverter.js"></script>
+<script type="text/javascript" src="js/map/util/deconverter.js"></script>
+<script type="text/javascript" src="js/map/TrafficControl_min.js"></script>
+<script type="text/javascript" src="js/map/qqMapProxy.js"></script>
+<script type="text/javascript" src="js/map/googleMapProxy.js"></script>
+<script type="text/javascript" src="js/map/baiduMapProxy.js"></script>
+<script type="text/javascript" src="js/map/baiduMapNavigation.js"></script>
+<script type="text/javascript" src="js/map/baiduMapSearchNearby.js"></script>
+<script type="text/javascript" src="js/map/mapbarMapProxy.js"></script>
+<script type="text/javascript" src="js/map/segMap.js"></script>
+<script type="text/javascript" src="js/cmd.js" charset="UTF-8"></script>
+<script type="text/javascript" src="js/vehicle_monitor.js" charset="UTF-8"></script>
+<script type="text/javascript" src="js/map/util/map_control.js" charset="UTF-8"></script>
+<!-- datepicker -->
+<script type="text/javascript" src="../../bslib/js/bootstrap-datetimepicker.js"></script>
+<script type="text/javascript">
+ $.fn.datetimepicker.dates['zh'] = {
+  days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+  daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+  daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+  months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+  monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+  meridiem : [ "上午", "下午" ],
+  today : "今天"
+ };
+ $(".form_datetime").datetimepicker({
+  language : "zh",
+  autoclose : 1,
+  format : 'yyyy-mm-dd hh:ii:ss'
+ });
+</script>
+</html>

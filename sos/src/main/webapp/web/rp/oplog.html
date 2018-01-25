@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>操作日志查询</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap-datetimepicker.css" /><!-- +++++ -->
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+</head>
+<body>
+	<div id="monitoring"><!-- nw_document_all -->
+		<div class='datagrid' id="oplog">
+    	</div>
+    </div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../bslib/js/bootstrap-datetimepicker.js"></script><!-- ++++ -->
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/index.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+    (function($) {
+    	var lastMonthDay=new Date();//上个月的今天
+    	//lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+		lastMonthDay.setDate(1);
+    	lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+		var today=new Date().format('yyyy-MM-dd');
+    	
+    	//初始化表格
+    	var defaults = {
+    		        title: "操作日志查询",
+    		        width:  '100%',
+    		        height: 446,
+    		        url:'',
+    		        datatype:"json",
+    		        isNotCheckall:true,
+    		        usepager: true,
+    			    rownumbers:true,
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '操作人', name : 'user_name', width : 100},
+						{display: '模块名称', name : 'sname', width : 100},
+						{display: '操作类型', name : 'op_type', width : 100,formatter:function(value,row){
+	   		                if(value==1){
+	   		                    value = '查询';
+	   		                }else if(value==2){
+	   		                    value = '增加';
+	   		                }else if(value==3){
+	   		                	value ="修改";
+	   		                }else if(value==4){
+	   		                	value ="删除";
+	   		                }
+	   		                return value;
+	   		            }},
+						{display: '具体操作内容', name : 'remark', width : 380},
+    		            {display: '时间', name : 'stamp', width : 150}
+    		            
+    		        ],
+    		        buttons : [
+    		        ],
+    		        searchitems :[
+				      	{display:'开始时间',html:'<span class="ltext"><input type="text" name="startDate" class="form-control form_datetime" /></span>'},
+				      	{display:'结束时间',html:'<span class="ltext"><input type="text" name="endDate" class="form-control form_datetime" /></span>'},
+				      	{display:'操作人',html:'<span class="ltext"><input type="text" name="userName" class="form-control" /></span>'},
+				      	{display: '模块名称',html:'<span class="ltext"><select name="modelId" class="form-control"><option value="">请选择---</option></select></span>'},
+						    {display: '操作类型',html:'<span class="ltext"><select name="opType" class="form-control"><option value="">请选择---</option><option value="1">查询</option><option value="2">增加</option><option value="3">修改</option><option value="4">删除</option></select></span>'}
+				      	],
+    		        exporturl:'../../sys/exportExcel4Operatelog'//导出excel
+    		    };
+    		    $('#oplog').sgDatagrid(defaults);
+    		    $('input[name=startDate]').val(today);
+	   		    $('input[name=endDate]').val(today);
+	   		    
+	   			//重新赋值url
+      		    var settings =  $('#oplog').data('sgDatagrid');
+    		    settings.url='../../sys/findOperatelogPage';
+    		    $('#oplog').data('sgDatagrid',settings);
+	   		    
+	   		    $("input,select").keyup(function(event){
+	            if(event.keyCode == 13){
+	            	 $("#search").trigger('click');
+	            }});
+		  
+    		    $.ajax( {
+  	   			  type : 'post', 
+  	   			  async: false,   
+  	   			  contentType : 'application/json',     
+  	   			  dataType : 'json',     
+  	   			  url : '../../sys/findSysValue',   
+  	   			  data:JSON.stringify({stype:998}),
+  	   			  success : function(data) {
+  	   				 if(data){
+  		 				  var type=$('#oplog .sDiv select[name=modelId]');
+  		 				  if(type){
+  		 					  $.each(data,function(k,v){
+  		 						 type.append("<option value='" +v.svalue+"'>" + v.sname+"</option>");
+  		     				  }); 
+  		 				  }
+  		 				 
+  		 			  }else{
+  		 				  $(document).sgPup({message:'message_info',text: data});
+  		 			  }
+  	   			  },     
+  	   			  error : function(res,error) { 
+  	   			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+  	   			  }    
+  	   			});
+    })(jQuery);
+    
+</script>
+<script type="text/javascript">
+$.fn.datetimepicker.dates['zh'] = {
+    days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+    daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+    daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+    months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+    monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+    meridiem : [ "上午", "下午" ],
+    today : "今天"
+};
+$(document).ready(function(){
+    $(".form_datetime").datetimepicker({
+        language : "zh",
+        autoclose: true,
+        minView: "month",
+        format : 'yyyy-mm-dd'
+    });
+});
+</script>
+</html>

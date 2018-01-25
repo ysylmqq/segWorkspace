@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>库存预警</title>
+</head>
+<body>
+	<div id="whs_alarm_grid" class="datagird"></div>
+  <datalist id="productDataList">
+            </datalist>
+</body>
+<script type="text/javascript">
+	(function($){
+		var productDataList=[];//商品数组 key:商品名称,value code:productId
+		//初始化表格
+   	 var defaults = {
+   		        title: "库存预警",
+   		        width:  '100%',
+   		        height: 433,
+   		        //url: 'stock/findStockLtSetup',
+   		        url:'',
+   		        rownumbers:true,//序号
+   		        //colid:'id',  //主键
+   		        colModel : [
+		         	{display: '商品编码', name : 'productCode', width : 100, sortable : false},
+   		            {display: '商品名称', name : 'productName', width : 100, sortable : false},
+   		         	{display: '商品规格', name : 'norm', width : 160, sortable : false},
+   		         	{display: '库存数量', name : 'num', width : 60, sortable : false},   		            
+   		            {display: '最低库存', name : 'minStock', width : 60, sortable : false},
+   		         	{display: '最长积压时间(月)', name : 'overstockTime', width : 100, sortable : false},
+   		         	{display: '最后出库时间', name : 'stamp', width : 100, sortable : false},
+   		         	{display: '仓库', name : 'whsName', width : 80, sortable : false}
+   		        ],
+   		        searchitems :[
+   		                {display:'营业处仓库',html:'<span class="ltext"><select size="1" name="whsId" id="whsId" class="form-control"><option value="">--请选择--</option></select></span>'},
+   		                   {display:'商品名称',html:'<span class="ltext"><input type="text" name="productNameCondn" list="productDataList" class="form-control" /> <input type="hidden" id="productId" name="productId" /></span>'}
+   		        ],
+   		        exporturl:'../../stock/exportExcel4StockAlarm',
+   		        order: true,
+   		        sortname: "productName",
+   		        sortorder: "asc"
+   		    };
+   		    $('#whs_alarm_grid').sgDatagrid(defaults); 
+   			
+   		    //由于预警信息没有分页，一次性查出来比较多，会加载比较慢，所有第一次进来不查询，点击查询按钮的时候才查询出来
+   		    //复制一个查询,再把它插入到原来查询的后面
+			$("#whs_alarm_grid .sDiv>.pGroup:first").clone().insertAfter($("#whs_alarm_grid .sDiv>.pGroup:first"));
+		
+   			//重写查询点击事件
+			$('#whs_alarm_grid .sDiv>.pGroup:eq(1) a.button:first').on('click',function(){
+				var sourceset = $('#whs_alarm_grid').data('sgDatagrid');
+            	var query = {};
+
+            	query = sourceset.query;
+                // if(settings.query) query = settings.query;
+                var queryArray  =$("form",$('#whs_alarm_grid .sDiv')).serializeArray();
+                $.each(queryArray, function(k, v){
+                    if(v.value!=null&& v.value.trim().length>0&& v.value!='null')
+                    	query[v.name] = v.value;
+                    else
+                    	query[v.name]= null;
+                });
+            	$('#whs_alarm_grid').sgDatagrid('reload',{url:'../../stock/findStockLtSetup',query:query});
+				
+			});
+   			
+			//隐藏之前的查询
+			$('#whs_alarm_grid a.button:first').hide();
+			
+   		//自动查询商品
+   			var checkProduct = function(){
+   				/* var text=this.value;
+   				text = text.replace(/\s/g,''); //去除空格
+   				if(text!=this.value){//有空格
+   					this.value=text;
+   					$(this).trigger('change');
+   					return false;
+   				} */
+   				var params = {};
+   				params.pageNo = 1;
+   				params.pageSize = 15;
+   				params.filter = {};
+   				params.filter.nameOrCode = this.value;
+   				var obj = $(this);
+   				$.ajax({
+   					  type : 'post', 
+   					  async: true,   
+   					  contentType : 'application/json',     
+   					  dataType : 'json',     
+   					  url : '../../product/findProducts',   
+   					  data:JSON.stringify(params),
+   					  success : function(data) {
+   						  if(data){
+   							  var products = data.items;
+   							  if(products.length>0){
+   								  $("#productDataList").empty();
+   							      productDataList=[];
+   							  }
+   							  var key=null;
+   							  $.each( products, function(key,value){
+   								  var op = $("<option></option>");
+   								  key=value.code;
+   								  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+   									 
+   								  $("#productDataList").append(op);
+   								  productDataList[key]=value.id;
+   							 });
+   						  }else{
+   							  $(document).sgPup({message:'message_info',text: data});
+   						  }
+   					  } ,     
+   					  error : function(res,error) { 
+   					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+   					  }    
+   					});
+   			};
+   			
+   		  //填充商品
+   			$.ajax({
+   				  type : 'post', 
+   				  async: true,   
+   				  contentType : 'application/json',     
+   				  dataType : 'json',     
+   				  url : '../../product/findProducts',   
+   				  data:JSON.stringify({pageNo:1,pageSize:15,filter:{type:0}}),
+   				  success : function(data) {
+   					  if(data){
+   						  var products = data.items;
+   						  $("#productDataList").empty();
+   						  var key=null;
+   						  productDataList=[];
+   						  $.each( products, function(key,value){
+   							  var op = $("<option></option>");
+   							  key=value.code;
+   							  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+   							  
+   							  $("#productDataList").append(op);
+   							  productDataList[key]=value.id;
+   						 });
+   						var productNameCondn=$('input[name=productNameCondn]',$('#whs_alarm_grid'));
+   						productNameCondn.on('keyup',checkProduct);
+   						
+   						productNameCondn.on('change',function(){
+   							var strs = this.value.split(" ");
+   							$(this).val(strs[strs.length-3]);
+   							if($(this).val()){
+								$("#productId",$('#whs_alarm_grid')).val(productDataList[strs[strs.length-2]]);
+								if($("#productId",$('#whs_alarm_grid')).val().length==0){
+									$("#productNameCondn",$('#whs_alarm_grid')).val("");
+								}
+						    }else{
+						    	$(this).val('');
+						    	$("#productId",$('#whs_alarm_grid')).val("");
+						    }
+						
+							});
+
+   					  }else{
+   						  $(document).sgPup({message:'message_info',text: data});
+   					  }
+   				  } ,     
+   				  error : function(res,error) { 
+   				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+   				  }    
+   				}); 
+   		  
+   		//填充营业处仓库
+		    $.ajax( {
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../stock/findWarehouses',   
+			  data:JSON.stringify({}),
+			  success : function(data) {
+				  if(data){
+					  var whsId=$("#whsId","#whs_alarm_grid");
+					  if(whsId.get(0)){
+						  $.each(data,function(k,v){
+							  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+						  }); 
+					  }
+					 
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});	
+	})(jQuery)
+</script>
+</html>

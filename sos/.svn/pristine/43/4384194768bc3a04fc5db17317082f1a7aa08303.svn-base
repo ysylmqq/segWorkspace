@@ -1,0 +1,411 @@
+
+<div class="container-fluid">
+	<div class="row">
+		<div id="news_list_saige"></div>
+	</div>
+</div>
+<script type="text/javascript">
+(function($){
+	function GetDateStr(AddDayCount) {
+	    var dd = new Date();
+	    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+	    return dd.format('yyyy-MM-dd');
+	}
+	
+	var winClose = function() {
+		$(document).sgWindow('close', {
+			id : 'add_unitType'
+		});
+	}
+	
+	var winClose3 = function() {
+		$(document).sgWindow('close', {
+			id : 'news_view'
+		});
+	}
+	
+	
+	//关闭弹出框
+	var close_check_window = function(){
+		 $(document).sgWindow('close', {
+	        id : 'news_check_online'
+	    });
+	}
+	//意见反馈窗口
+	var close_check_false_window = function(){
+		 $(document).sgWindow('close', {
+		        id : 'news_check_false'
+		    });
+		 $('#news_check_online_hide').css({
+				'display':'none'
+			    });
+	}
+	 
+	//发布资讯
+	var checkDown =function(){		
+		$(document).sgConfirm({text: '确定发布审核吗?',cfn:function(r){
+            if(r){            	
+            	var id = $('#new_check_id').val();
+        		
+        		var pids=[];
+        		pids.push(editobj.id);
+            	//发布资讯
+            	$.ajax( {
+        			  type : 'post', 
+            		  async: false,   
+            		  dataType : 'json',     
+            		  url : '../../../news/news/newsonline',   
+            		  data:{ids:pids,type:1},
+            		  success : function(data) {
+            			  if(data){
+            				 if(data.success){
+            					 close_check_window();
+            					 $(document).sgPup({message:'message_info',text: "操作成功！"});
+            					 $('#news_list_saige').sgDatagrid('reload','sgDatagrid');
+            				 }else{
+            					 $(document).sgPup({message:'message_info',text: "操作失败！"});
+            				 }
+            			  }
+            		  } ,     
+            		  error : function(res,error) { 
+            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+            		  }    
+            		}); 
+            }
+         }
+		});
+	}
+		//审核失败
+		var checkOut = function() {
+			var defaults = {
+
+					title : '审核意见反馈',
+					id : 'news_check_false',
+					url : 'news_feedback.html',
+					width : 600,
+					height : 238,
+					success:function(){
+						$('#news_check_online_hide').css({
+							'display':'block',
+						    'position':'fixed',
+						    'width':'100%',
+						    'height':'100%',
+						    'background':'#000',
+						    'z-index':'2',
+						    'top':'0',
+						    'left':'0',
+						    'opacity':'0.7'
+						    });
+						
+					},
+					buttons : [
+							{
+								name : '确认',
+								type : 'submit',
+								onpress : checkFalse
+							},
+							{
+								name : '关闭',
+								onpress : close_check_false_window
+							} ]
+				};
+				$(document).sgWindow(defaults);
+
+				//二级弹出框关闭事件，$('<a href="javascript:void(0);"></a>')
+				$('.window-tool-close').each(function(){
+					$(this).on('click',function(){
+						if($('#news_check_online_hide')){
+							$('#news_check_online_hide').css({
+								'display':'none'
+							});
+						}
+					});
+				  });		
+		}
+		//审核失败反馈意见提交
+		function checkFalse(){
+			var id = $('#new_check_id').val();
+			var pids=[];
+			pids.push(parseInt(id));
+			var feedBack = $('#check_false_feedback').val();
+			if(feedBack==null || feedBack==''){
+				$(document).sgPup({message:'message_info',text: '请填写反馈意见!'});
+				return false;
+			}
+			$(document).sgConfirm({
+					text : '审核失败后不能再进行操作,确定提交吗?',
+					cfn : function(r) {
+						if (r) {
+							$.ajax({
+								type : 'post',
+								async : false,
+								dataType : 'json',
+								url : '../../../news/news/checkfalse',
+								data : {
+									ids : pids,
+									type : 2,
+									feedBack:feedBack
+								},
+								success : function(data) {
+									if (data) {
+										if (data.success) {
+											close_check_window();
+											close_check_false_window();
+											$(document).sgPup({
+												message : 'message_info',
+												text : "操作成功！"
+											});
+											$('#news_list_saige').sgDatagrid('reload',
+													'sgDatagrid');
+										} else {
+											$(document).sgPup({
+												message : 'message_info',
+												text : "操作失败！"
+											});
+										}
+									}
+								},
+								error : function(res, error) {
+									if (res && res.responseText) {
+										$(document).sgPup({
+											message : 'message_info',
+											text : res.responseText
+										});
+									}
+								}
+							});
+							
+						}
+					}
+				});
+				
+
+			}
+		//审核界面加载成功
+		var loadSuccess_new_check = function() {
+			if (editId && editobj) {
+				$('#new_check_id').val(editobj.id);
+			}
+			editId = null;
+			editObj = null;
+		}
+
+		var checkItem = function() {
+			var obj = $('#news_list_saige');
+			var bDiv = $('.bDiv', obj);
+			if ($('input[type=checkbox][checked=checked]', bDiv) != null
+					&& $('input[type=checkbox][checked=checked]', bDiv).length > 1) {
+				$(document).sgPup({
+					message : 'message_info',
+					text : "选择多于一个选项！"
+				});
+			} else if ($('input[type=checkbox][checked=checked]', bDiv) != null
+					&& $('input[type=checkbox][checked=checked]', bDiv).length == 0) {
+				$(document).sgPup({
+					message : 'message_info',
+					text : "请选择一个选项！"
+				});
+			} else if ($('input[type=checkbox][checked=checked]', bDiv) != null
+					&& $('input[type=checkbox][checked=checked]', bDiv).length == 1) {
+				$(document)
+						.sgConfirm(
+								{
+									text : '确定审核该资讯吗?',
+									cfn : function(r) {
+										if (r) {
+
+											$('input[type=checkbox][checked=checked]',bDiv).each(
+															function() {
+																if ($(this).attr("checked")) {
+																	editId = this.value;
+																	editobj = $(this).data('data');
+																	if (editobj.checkState != 0) {
+																		alert("已审核的资讯不能重复审核!");
+																		return false;
+																	}
+																	var checkNewId = editobj.id;//审核资讯ID
+																	//window.open('../../../news/news/showNew/'+checkNewId);
+
+																	var defaults = {
+
+																		title : '资讯审核',
+																		id : 'news_check_online',
+																		url : '../../../news/news/showNew/'
+																				+ checkNewId,
+																		width : 900,
+																		height : 420,
+																		success : loadSuccess_new_check,
+																		buttons : [
+																				{
+																					name : '发布',
+																					type : 'submit',
+																					onpress : checkDown
+																				},
+																				{
+																					name : '审核失败',
+																					type : 'submit',
+																					onpress : checkOut
+																				},
+																				{
+																					name : '关闭',
+																					onpress : close_check_window
+																				} ]
+																	};
+																	$(document).sgWindow(defaults);
+																}
+															});
+											$('#news_list_saige').sgDatagrid('reload', 'sgDatagrid');
+													
+										}
+									}
+								});
+
+			}
+		}
+
+		var today = new Date().format('yyyy-MM-dd');
+		var twoDayBefore = GetDateStr(-2);
+
+		var defaults = {
+			title : "资讯审核",
+			width : '100%',
+			height : 395,
+			url : '../../../news/news/findNewsByPageSaige',
+			datatype : "json",
+			usepager : true,
+			rownumbers : true,
+			useRp : true,
+			colid : 'id', //主键
+			colModel : [ {
+				display : '所属机构',
+				name : 'orgName',
+				width : 130,
+				formatter : function(value, row) {
+					if (value != null && value.length > 16) {
+						value = value.substr(0, 10) + "...";
+					} else {
+						value = value;
+
+					}
+					return value;
+				}
+			}, {
+				display : '资讯标题',
+				name : 'title',
+				width : 130,
+				formatter : function(value, row) {
+					if (value.length > 16) {
+						value = value.substr(0, 10) + "...";
+					} else {
+						value = value;
+					}
+					return value;
+				}
+			}, {
+				display : '是否置顶',
+				name : 'isTop',
+				width : 60,
+				formatter : function(value, row) {
+					if (value == true) {
+						value = "是";
+					} else {
+						value = "否";
+					}
+					return value;
+				}
+			},
+		
+			{
+				display : '提交时间',
+				name : 'submitTime',
+				width : 120
+			}, {
+				display : '审核状态',
+				name : 'checkState',
+				width : 100,
+				formatter : function(value, row) {
+					if (value == 1) {
+						value = "审核通过";
+					} else if (value == 2) {
+						value = "审核未通过";
+					} else {
+						value = "未审核";
+					}
+					return value;
+				}
+			}, {
+				display : '发布状态',
+				name : 'isOnline',
+				width : 60,
+				formatter : function(value, row) {
+					if (value == true) {
+						value = "已发布";
+					} else {
+						value = "未发布";
+					}
+					return value;
+				}
+			}, {
+				display : '审核时间',
+				name : 'checkTime',
+				width : 120
+			}, {
+				display : '资讯生效开始时间',
+				name : 'startTime',
+				width : 120
+			}
+
+			],
+
+			buttons : [
+
+			{
+				name : '审核',
+				bclass : 'glyphicon glyphicon-pencil',
+				onpress : checkItem
+			}, {
+				separator : true
+			} 
+
+			],
+			searchitems : [
+					{
+						display : '资讯标题',
+						name : 'title',
+						type : 'text',
+						width : '100'
+					},
+					{
+						display : '资讯提交机构',
+						name : 'orgName',
+						type : 'text',
+						width : '100'
+					},
+					{
+						display : '资讯审核状态',
+						name : 'checkState',
+						html : '<select style="width:120px"  name="checkState"><option value="" selected>请选择...</option><option value="0">未审核</option><option value="1">审核通过</option><option value="2">审核未通过</option></select>'
+					}, {
+						display : '开始时间',
+						name : 'startDate',
+						type : 'date',
+						width : '120px',
+						value : twoDayBefore
+					}, {
+						display : '结束时间',
+						name : 'endDate',
+						type : 'date',
+						width : '140px',
+						value : today
+					} ],
+			sortname : "id",
+			sortorder : "desc"
+		};
+
+		$('#news_list_saige').sgDatagrid(defaults);
+
+	})(jQuery);
+</script>
+<script type="text/javascript">
+
+</script>

@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>采购入库</title>
+<style>
+
+</style>
+</head>
+<body>
+	<form id='whs_stockin_purchase_form' method='post' class="form" style="width:880px;">
+		<div class='title'>采购入库信息></div>
+		<fieldset style="width:860px;">
+            <div class="panel">
+                <span>入库单号:</span>
+                <input type='text' id="purchaseStockInNo" name='purchaseStockInNo' disabled="disabled"  style="width:170px;" />
+                
+                <span>入库日期:</span>
+                <input type='date' id="purchaseStamp" name='purchaseStamp' disabled="disabled" style="width:155px;" />
+                
+                <span id="for_add_span">采购订单号:</span>
+                <input type='text' id="purchaseNO" name='purchaseNO' list="purchaseList" placeholder="请输入采购单号" required="true" style="width:163px;" />
+                <input type="hidden" name="purchaseOrderId" id="purchaseOrderId" required="true" />
+                <datalist id="purchaseList"></datalist>
+
+            </div>
+            <div class="panel">    
+                <span>经办人:</span>
+                <input type="text" name="purchaseManagers" id="purchaseManagers" required="true" list="userList" style="width:170px;" autocomplete="on" />
+                <input type="hidden" name="purchaseManagersId" id="purchaseManagersId" required="true" />
+                <datalist id="userList"></datalist>
+                <span>备注:</span>
+                <input type='text' id="purchaseRemark" name='purchaseRemark' style="width:420px;" />
+            </div>
+        </fieldset>
+
+        <div class='title'>订单明细></div>
+		<fieldset style="width:860px;">
+			<div id="order_detail_grid" class="datagird"></div>
+        </fieldset>
+        
+        <div class="title">采购入库明细></div>
+		<fieldset class='fieldset'  style="width:860px;">
+            <div class='datagrid'>
+            	<div class="hDiv" style="margin:0px;padding:0px;">
+	                <table>
+	                    <thead>
+	                    <tr>
+	                        <th style="width:34px;">序号</th>
+	                        <th style="width:160px;">商品名称</th>
+	                        <th style="width:100px;">商品编码</th>
+	                        <th style="width:160px;">商品规格</th>
+	                        <th style="width:60px;">价格(元)</th>
+	                        <th style="width:60px;">采购数量</th>
+	                        <th style="width:80px;">已入库数量</th>
+	                        <th style="width:80px;">本次入库数量</th>
+	                    </tr>
+	                    </thead>
+	                </table>
+                </div>
+                <div class="bDiv" style="height: 130px;margin:0px;padding:0px;" >
+                	<table id="dgd_writeoffs_details" cellpadding="0" cellspacing="0" border="0">
+                	</table>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset style="width:860px;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="stockin_detail_submit" type="submit" style="width:112px;">提交并打印</button> <button id="mycancel" type="button">重置</button>
+	        <button id="btn_print" type="button" style="display: none;">打印</button>
+	        </div>
+        </fieldset>
+
+	</form>
+	<!-- 打印iframe -->
+	<iframe id="ifm_print_wspform" name="ifm_print_wspform" style="display: none"></iframe>
+</body>
+<script type="text/javascript">
+
+	(function($){
+		var flag = 0;
+		var userList = null;
+		var purchaseList = null
+		
+		$.ajax( {
+			  type : 'POST', 
+			  async: false, 
+			  dataType : 'json',
+			  url : '../../stock/getStockInOutNo',   
+			  data: {isIn:true},
+			  success : function(data) {
+				  if(data.success){
+					  $("#purchaseStockInNo").val(data.code);
+				  }else{
+					  if(data.msg&&data.msg.indexOf('仓库正在盘点')>-1){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						  }
+					  $(document).sgPup({message:'message_info',text: data.msg,cfn:function(){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						}}); 
+					  }
+			  } 
+		});
+
+		var checkPurchase = function(){
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.orderNo = this.value;
+			params.filter.isCompleted = 0;
+			params.filter.status = 1;
+			var obj = $(this);
+		
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../order/findOrdersByPage',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  //var purchase = $("#purchaseNO","#whs_stockin_purchase_form");
+						  $("#purchaseList").empty();
+						  purchaseList = {};
+						  $.each( data.items, function(key,value){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+value.orderNo);
+							  $("#purchaseList").append(op);
+							  
+							  purchaseList[value.orderNo] = value.id;
+							});
+
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		};
+		
+		
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../order/findOrdersByPage',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompleted:0,status:1}}),
+			  success : function(data) {
+				  if(data){
+					  var purchase = $("#purchaseNO","#whs_stockin_purchase_form");
+					  $("#purchaseList").empty();
+					  purchaseList = {};
+					  $.each( data.items, function(key,value){
+						  var op = $("<option></option>");
+						  op.val(value.orderNo);
+						  $("#purchaseList").append(op);
+						  
+						  purchaseList[value.orderNo] = value.id;
+						});
+					  purchase.on('keyup',checkPurchase);
+					  purchase.on('change',function(){
+						  var strs = this.value.split(" ");
+						  $(this).val(strs[strs.length-1]);
+						  $("#purchaseOrderId","#whs_stockin_purchase_form").val(purchaseList[strs[strs.length-1]]);
+							if($("#purchaseOrderId","#whs_stockin_purchase_form").val().length==0){
+								$("#purchaseNO","#whs_stockin_purchase_form").val("");
+							}else{
+								var query={orderId:$("#purchaseOrderId","#whs_stockin_purchase_form").val(),isCompleted:0};
+								  $('#order_detail_grid').sgDatagrid('reload',{query:query,url: '../../order/findOrderDetailsByOrderId'});
+							}
+						  
+						});
+
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+		
+		$("#purchaseStamp").val(new Date().format('yyyy-MM-dd'));
+
+		var checkUser = function(){
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.opname = this.value;
+			params.filter.isCompany = true;//查询机构下的的所有操作人
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getOrgOperators',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#purchaseManagers","#whs_stockin_purchase_form");
+						  $("#userList").empty();
+						  userList = {};
+						  if(manager){
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.opname);
+								  $("#userList").append(op);
+								  
+								  userList[v.opname] = v.opid;
+		 				  	 }); 
+							}
+					  }else{
+					  	$(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		}
+		
+	  //填充员工
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getOrgOperators',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#purchaseManagers","#whs_stockin_purchase_form");
+				  $("#userList").empty();
+				  userList = {};
+				  if(manager){
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userList").append(op);
+						  
+						  userList[v.opname] = v.opid;
+ 				  	 }); 
+					  manager.on('keyup',checkUser);
+					  manager.on('change',function(){
+						  	var strs = this.value.split(" ");
+							$(this).val(strs[strs.length-1]);
+							$("#purchaseManagersId","#whs_stockin_purchase_form").val(userList[strs[strs.length-1]]);
+							if($("#purchaseManagersId","#whs_stockin_purchase_form").val().length==0){
+								$("#purchaseManagers","#whs_stockin_purchase_form").val("");
+							}
+						});
+
+					};
+			  }else{
+			  	$(document).sgPup({message:'message_info',text: data});
+			  }
+		  },     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+	  
+	    var chkChange=function(index,rowData,isChecked){
+			var id=rowData.id;
+			if(isChecked){
+				var pid = rowData.productId;
+			    var code = rowData.productCode;
+			    var norm = rowData.norm;
+				var price = rowData.price;
+				var ptx = rowData.productName;
+				var num = rowData.num;
+				var innum=0;
+				rowData.inNum!=null?innum= rowData.inNum:innum=0;
+				if(pid==null||pid==''){
+					$(document).sgPup({message:'message_info',text: "商品不能为空!"})
+					return false;
+				}
+	
+				if(num<=0){
+					$(document).sgPup({message:'message_info',text: "数量必须大于０!"})
+					return false;
+				}
+				
+				var grid = $('#dgd_writeoffs_details');
+				var tr = $('<tr></tr>');
+				tr.attr('id',id+'_tr');
+				
+				if($('#'+id+'_tr').get(0)){
+					$("#"+id+"_tr",$('#dgd_writeoffs_details')).remove();
+				}
+				
+				var sno = $('<td></td>')
+				sno.width(34);
+				tr.append(sno);
+				
+				var td1 = $('<td></td>');
+				var rowId = $("<input type='hidden' name='orderDetailId' />")
+				rowId.val(id);
+				td1.append(rowId);
+				var sid = $("<input type='hidden' name='commodityId' />")
+				sid.val(pid);
+				td1.append(sid);
+				var sname = $("<input type='hidden' name='commodityName' />")
+				sname.val(ptx);
+				td1.append(sname);
+				td1.append(ptx);
+				td1.width(160);
+				tr.append(td1);
+				
+				var td2 = $('<td></td>');	
+				var productCode = $("<input type='hidden' name='commodityCode' disabled='disabled'/>");
+				productCode.val(code);
+				productCode.width(98);
+				td2.append(productCode);
+				td2.append(code);
+				td2.width(100);
+				tr.append(td2);
+				
+				var td3 = $('<td></td>');
+				var productNorm = $("<input type='hidden' name='commodityNorm' disabled='disabled'/>");
+				productNorm.val(norm);
+				productNorm.width(155);
+				td3.append(productNorm);
+				var dv = $('<div></div>');
+                dv.css('padding-top','5px');
+                dv.css('line-height','16px');
+                dv.css('word-break','break-all');
+                dv.append(norm)
+				td3.append(dv);
+				td3.width(160);
+				tr.append(td3);
+				
+				var td4 = $('<td></td>');
+				var productPrice = $("<input type='number' name='commodityPrice' disabled='disabled' />");
+				productPrice.val(price);
+				productPrice.width(55);
+				td4.append(productPrice);
+				td4.width(60);
+				tr.append(td4);
+				
+				var td5 = $('<td></td>');
+				var total = $("<input type='number' name='quantity' disabled='disabled'/>");
+				total.val(num);
+				total.width(55);
+				td5.width(60);
+				td5.append(total);
+				tr.append(td5);
+				
+				var td6 = $('<td></td>');
+				var inNum = $("<input type='number' name='offQuantity' disabled='disabled' />");
+				inNum.val(innum);
+				inNum.width(75);
+				td6.width(80);
+				td6.append(inNum);
+				tr.append(td6);
+				
+				var td7 = $('<td></td>');
+				var checkInNum = $("<input type='number' name='checkInNum' max='"+(Number(num)-Number(innum))+"' min='1'  />");
+				checkInNum.val(1);
+				checkInNum.width(75);
+				td7.width(80);
+				td7.append(checkInNum);
+				tr.append(td7);
+				
+				
+				grid.append(tr);
+				
+				sno.append(grid.find('tr').length);
+			}else{
+				$("#"+id+"_tr",$('#dgd_writeoffs_details')).remove();
+				$.each($('#dgd_writeoffs_details').find('tr'),function(k,v){
+					$(v).find('td:first').html(k+1);
+				})
+			}
+			
+			$('tr:odd','#dgd_writeoffs_details').addClass('normalRow');
+
+		}
+	  
+	  //初始化表格
+	   	 var defaults = {
+	   		        width:  850,
+	   		        height: 130,
+	   		        //url: '../../order/findOrderDetailsByOrderId',
+	   		        url:"",
+	   		     	chkChange:chkChange,
+	   		        isNotCheckall:true,
+	   		     	colid:'id',  //主键
+	   		        rownumbers:true,//序号
+	   		        colModel : [
+	   		            {display: '商品名称', name : 'productName', width : 140, sortable : false},
+	   		         	{display: '商品编码', name : 'productCode', width : 90, sortable : false},
+	   		         	{display: '商品规格', name : 'norm', width : 140, sortable : false},
+	   		            {display: '价格(元)', name : 'price', width : 60, sortable : false},
+	   		            {display: '采购数量', name : 'num', width : 60, sortable : false},
+	   		         	{display: '已入库数量', name : 'inNum', width : 80, sortable : false,formatter:function(value,row){
+	   		                value!=null?value=value:value=0;
+	   		                return value;
+	   		            }},
+	   		         	{display: '备注', name : 'remark', width : 120, sortable : false}	   		         	
+	   		        ]
+	   		    };
+	   $('#order_detail_grid').sgDatagrid(defaults);
+		 
+	   
+	   $("#whs_stockin_purchase_form").on('submit',function(e){
+		   if(window.confirm('确定进行采购入库吗?')){
+			 //做表单提交
+		   	    var obj = $('#order_detail_grid');
+		        var bDiv = $('.bDiv',obj);
+		        //alert($('input[type=checkbox][checked=checked]',bDiv).length) ;
+		        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length<1){
+		            $(document).sgPup({message:'message_info',text: "请选择一个订单列表选项！"});
+		            return false;
+		        }
+		        
+               var params = {};
+               params.type = 0;
+               params.code = $('#purchaseStockInNo','#whs_stockin_purchase_form').val();
+               params.stamp= $('#purchaseStamp','#whs_stockin_purchase_form').val();
+               params.managersId = $("#purchaseManagersId",'#whs_stockin_purchase_form').val();	
+               params.managersName = $("#purchaseManagers",'#whs_stockin_purchase_form').val();
+        	   params.remark= $('#purchaseRemark','#whs_stockin_purchase_form').val();
+        	   params.orderId = $('#purchaseOrderId','#whs_stockin_purchase_form').val();
+        	   
+        	   var orderDetails = $('input[name=orderDetailId]','#whs_stockin_purchase_form');
+        	   var productIds = $('input[name=commodityId]','#whs_stockin_purchase_form');
+               var productNames=$('input[name=commodityName]','#whs_stockin_purchase_form');
+               var productPrices = $('input[name=commodityPrice]','#whs_stockin_purchase_form');
+               var productNums= $('input[name=checkInNum]','#whs_stockin_purchase_form');
+               var details = new Array();
+               if(productIds.length==0){ 
+            	   $(document).sgPup({message:'message_info',text: '请添加商品！'})
+            	   return false;
+               }
+               //alert(productPrices.length);
+               $.each(productIds,function(k,v){
+               	var obj = {};
+               	obj.productId = v.value;
+               	obj.orderDetailId = orderDetails[k].value;
+               	obj.productName = productNames[k].value;
+               	obj.price = productPrices[k].value;
+               	obj.inNum = productNums[k].value;
+               	details.push(obj);
+               })
+               params.stockinDetails = details;
+
+               //alert(JSON.stringify(params))
+               $.ajax( {
+	       		  type : 'post', 
+	       		  async: false,   
+	       		  contentType : 'application/json',     
+	       		  dataType : 'json',     
+	       		  url : '../../stock/addStockIn',   
+	       		  data:JSON.stringify(params),
+	       		  success : function(data) {
+	       			  if(data){
+	       			  	 $(document).sgPup({message:'message_info',text: data.msg,cfn:function(){
+   	       				
+	       				  if(data.success){
+	       					  
+	       					var	sName='winPrint';
+	       					var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+	       					if (isChrome){
+	       					  sName='ifm_print_wspform';
+	       					}
+	       					window.open('print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+	       					if (!isChrome){
+	       						//新增遮罩层
+	       		  				var mask=$('<div id="print_mask"></div>');
+	       		  				mask.addClass('window-mask');
+	       		  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+	       		  		        var span=$('<span></span');
+	       		  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+	       		  		        span.text('正在打印中...');
+	       		  		        mask.append(span);
+	       		  			    $(window.document.body).append(mask);
+	       					}
+	       				  }
+	       				}});
+	       				//$(document).sgPup({message:'message_info',text: data.msg});
+	       				 
+	       			  }else{
+	       				  $(document).sgPup({message:'message_info',text: data});
+	       			  }
+	       		  } ,     
+	       		  error : function(res,error) { 
+	       		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	       		  }    
+	       		});
+               
+		   }
+           
+   		    //$("#whs_stockin_purchase_form").unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+		    e.stopPropagation();	
+   		    return false;
+        });	 
+
+	 //打印
+		$('#btn_print').on('click',function(){
+			//$('#ifm_print_wspform').attr('src','stock_print2.html');
+			var	sName='winPrint';
+			var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+			if (isChrome){
+			  sName='ifm_print_wspform';
+			}
+			window.open('print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+			if (!isChrome){
+				//新增遮罩层
+  				var mask=$('<div id="print_mask"></div>');
+  				mask.addClass('window-mask');
+  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+  		        var span=$('<span></span');
+  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+  		        span.text('正在打印中...');
+  		        mask.append(span);
+  			    $(window.document.body).append(mask);
+			}
+		});
+	})(jQuery)
+	
+	var reset = function(){
+		var chkChange=function(index,rowData,isChecked){
+			var id=rowData.id;
+			if(isChecked){
+				var pid = rowData.productId;
+			    var code = rowData.productCode;
+			    var norm = rowData.norm;
+				var price = rowData.price;
+				var ptx = rowData.productName;
+				var num = rowData.num;
+				var innum=0;
+				rowData.inNum!=null?innum= rowData.inNum:innum=0;
+				if(pid==null||pid==''){
+					$(document).sgPup({message:'message_info',text: "商品不能为空!"})
+					return false;
+				}
+	
+				if(num<=0){
+					$(document).sgPup({message:'message_info',text: "数量必须大于０!"})
+					return false;
+				}
+				
+				var grid = $('#dgd_writeoffs_details');
+				var tr = $('<tr></tr>');
+				tr.attr('id',id+'_tr');
+				
+				if($('#'+id+'_tr').get(0)){
+					$("#"+id+"_tr",$('#dgd_writeoffs_details')).remove();
+				}
+				
+				var sno = $('<td></td>')
+				sno.width(34);
+				tr.append(sno);
+				
+				var td1 = $('<td></td>');
+				var rowId = $("<input type='hidden' name='orderDetailId' />")
+				rowId.val(id);
+				td1.append(rowId);
+				var sid = $("<input type='hidden' name='commodityId' />")
+				sid.val(pid);
+				td1.append(sid);
+				var sname = $("<input type='hidden' name='commodityName' />")
+				sname.val(ptx);
+				td1.append(sname);
+				td1.append(ptx);
+				td1.width(160);
+				tr.append(td1);
+				
+				var td2 = $('<td></td>');	
+				var productCode = $("<input type='hidden' name='commodityCode' disabled='disabled'/>");
+				productCode.val(code);
+				productCode.width(98);
+				td2.append(productCode);
+				td2.append(code);
+				td2.width(100);
+				tr.append(td2);
+				
+				var td3 = $('<td></td>');
+				var productNorm = $("<input type='hidden' name='commodityNorm' disabled='disabled'/>");
+				productNorm.val(norm);
+				productNorm.width(155);
+				td3.append(productNorm);
+				var dv = $('<div></div>');
+                dv.css('padding-top','5px');
+                dv.css('line-height','16px');
+                dv.append(norm)
+				td3.append(dv);
+				td3.width(160);
+				tr.append(td3);
+				
+				var td4 = $('<td></td>');
+				var productPrice = $("<input type='number' name='commodityPrice' disabled='disabled' />");
+				productPrice.val(price);
+				productPrice.width(55);
+				td4.append(productPrice);
+				td4.width(60);
+				tr.append(td4);
+				
+				var td5 = $('<td></td>');
+				var total = $("<input type='number' name='quantity' disabled='disabled'/>");
+				total.val(num);
+				total.width(55);
+				td5.width(60);
+				td5.append(total);
+				tr.append(td5);
+				
+				var td6 = $('<td></td>');
+				var inNum = $("<input type='number' name='offQuantity' disabled='disabled' />");
+				inNum.val(innum);
+				inNum.width(75);
+				td6.width(80);
+				td6.append(inNum);
+				tr.append(td6);
+				
+				var td7 = $('<td></td>');
+				var checkInNum = $("<input type='number' name='checkInNum' max='"+num+"' min='1'  />");
+				checkInNum.val(0);
+				checkInNum.width(75);
+				td7.width(80);
+				td7.append(checkInNum);
+				tr.append(td7);
+				
+				
+				grid.append(tr);
+				
+				sno.append(grid.find('tr').length);
+			}else{
+				$("#"+id+"_tr",$('#dgd_writeoffs_details')).remove();
+				$.each($('#dgd_writeoffs_details').find('tr'),function(k,v){
+					$(v).find('td:first').html(k+1);
+				})
+			}
+			$('tr:odd','#dgd_writeoffs_details').addClass('normalRow');
+
+		};
+		
+		var defaults = {
+   		        width:  850,
+   		        height: 130,
+   		        //url: '../../order/findOrderDetailsByOrderId',
+   		        url:"",
+   		     	chkChange:chkChange,
+   		        isNotCheckall:true,
+   		     	colid:'id',  //主键
+   		        rownumbers:true,//序号
+   		        colModel : [
+   		            {display: '商品名称', name : 'productName', width : 140, sortable : false},
+   		         	{display: '商品编码', name : 'productCode', width : 90, sortable : false},
+   		         	{display: '商品规格', name : 'norm', width : 140, sortable : false},
+   		            {display: '价格(元)', name : 'price', width : 60, sortable : false},
+   		            {display: '采购数量', name : 'num', width : 60, sortable : false},
+   		         	{display: '已入库数量', name : 'inNum', width : 80, sortable : false,formatter:function(value,row){
+   		                value!=null?value=value:value=0;
+   		                return value;
+   		            }},
+   		         	{display: '备注', name : 'remark', width : 120, sortable : false}	   		         	
+   		        ]
+   		    };
+		
+		    $("#whs_stockin_purchase_form").get(0).reset();
+			$("#dgd_writeoffs_details").empty();
+		    $('#order_detail_grid').sgDatagrid('destroy');
+		    $('#order_detail_grid').sgDatagrid(defaults);
+			$("#purchaseStamp").val(new Date().format('yyyy-MM-dd'));
+			$.ajax( {
+				  type : 'POST', 
+				  async: false, 
+				  dataType : 'json',
+				  url : '../../stock/getStockInOutNo',   
+				  data: {isIn:true},
+				  success : function(data) {
+					  if(data.success){
+						  $("#purchaseStockInNo").val(data.code);
+					  }else{
+						  if(data.msg&&data.msg.indexOf('仓库正在盘点')>-1){
+								$('input,select,textarea,a,button').attr('disabled',true);
+							  }
+						  $(document).sgPup({message:'message_info',text: data.msg,cfn:function(){
+								$('input,select,textarea,a,button').attr('disabled',true);
+							}});  
+						  }
+				  } 
+			});
+			
+			$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../order/findOrdersByPage',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompleted:0,status:1}}),
+			  success : function(data) {
+				  if(data){
+					  $("#purchaseList").empty();
+					  purchaseList = {};
+					  $.each( data.items, function(key,value){
+						  var op = $("<option></option>");
+						  op.val(value.orderNo);
+						  $("#purchaseList").append(op);
+						  
+						  purchaseList[value.orderNo] = value.id;
+						});
+
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+	 };
+	 
+	 $("#mycancel").on('click',function(e){
+		 reset();
+	 })
+	   
+	 //打印页面元素设置
+	    var callback=function(subWinBody,subWin){
+	  	$.ajax( {
+	  		  type : 'post', 
+	  		  async: false,   
+	  		  contentType : 'application/json',     
+	  		  dataType : 'json',     
+	  		  url : '../../getCurrentCompany',   
+	  		  data:JSON.stringify({}),
+	  		  success : function(data) {
+	  			  if(data){
+	  				  var total = 0;
+	  				  var rowtotal = 0;
+	  				  //公司中文名字
+	  				  $("#cname",subWinBody).empty();
+	  				  $("#cname",subWinBody).append(data.cnfullname);
+	  				  //公司英文名字
+	  				  $("#ename",subWinBody).empty();
+	  				  $("#ename",subWinBody).append(data.enfullname);
+	  				  //表单名字
+	  				  $("#orderTitle",subWinBody).empty();
+	  				  $("#orderTitle",subWinBody).append("采购入库单");
+	  				  
+	  				  //表单日期
+	  				  $("#orderDate",subWinBody).empty();
+	  				  $("#orderDate",subWinBody).append($("#purchaseStamp","#whs_stockin_purchase_form").val());
+	  				  //表单单号
+	  				  $("#orderNo",subWinBody).empty();
+	  				  $("#orderNo",subWinBody).append($("#purchaseStockInNo","#whs_stockin_purchase_form").val());
+	  				  
+	  				  //表前输入单
+	  				  //得到仓库名称
+	         	         $.ajax({
+	  	       			  type : 'POST', 
+	  	       			  async: false,   
+	  	       			  url : '../../stock/getWarehouseName', 
+	  	       			  dataType : 'json',  
+	  	       			  data:{},
+	  	       			  success : function(data) {
+	  	       				  if(data){
+	  	       					 var str = '<span>入库仓库：</span><div>'+data.name+'</div>';
+	 	       					 $("#headInput",subWinBody).append(str);
+	  	       				  }else{
+	  	       					 var str = '<span>入库仓库：</span><div>&nbsp;</div>';
+	       					 	 $("#headInput",subWinBody).append(str);
+	  	       				  }
+	  	       			  } ,     
+	  	       			  error : function(res,error) { 
+	  	       			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  	       			  }   
+	  	       			  
+	  	       		    });
+
+	  				  var order = '<span>经办人：</span><div>'+$("#purchaseNO").val()+'</div>';
+	  				  $("#headInput",subWinBody).append(order);
+	  			
+	  				  //表头
+	  				  $("#tbHead",subWinBody).append('<td style="width: 10%;">序号</td>'+
+	  														  '<td style="width: 20%;">商品编码</td>'+
+	  														  '<td style="width: 20%;">商品名称</td>'+
+	  														  '<td style="width: 20%;">商品规格</td>'+
+	  														  '<td style="width: 20%;">采购单价</td>'+
+	  														  '<td style="width: 10%;">数量</td>');
+	  														 // '<td style="width: 120px;">金额</div></td>');
+	  				  
+	  				  //表格主体
+	  				  var productIds = $('input[name=commodityId]','#whs_stockin_purchase_form');
+               		  var productNames=$('input[name=commodityName]','#whs_stockin_purchase_form');
+               		  var productCodes=$('input[name=commodityCode]','#whs_stockin_purchase_form');
+               		  var productNorms=$('input[name=commodityNorm]','#whs_stockin_purchase_form');
+               		  var productPrices = $('input[name=commodityPrice]','#whs_stockin_purchase_form');
+                	  var productNums= $('input[name=checkInNum]','#whs_stockin_purchase_form');
+                	  
+                	  var pnum=0;
+	  	              $.each(productIds,function(k,v){
+	  	            	//rowtotal = Number(productPrices[k].value)*Number(productNums[k].value);
+	  	               	//total = total +rowtotal;
+	  	                pnum=Number(productNums[k].value)+pnum;
+	  	               	var tbbody_tr = '<tr><td>'+(k+1)+'</td>'
+										+'<td>'+productCodes[k].value+'</td>'
+	  	               	                +'<td>'+productNames[k].value+'</td>'
+	  	                                +'<td>'+productNorms[k].value+'</td>'
+	  	                              	+'<td>'+productPrices[k].value+'</td>'
+	  	                                +'<td>'+productNums[k].value+'</td>'
+	  	               					//+'<td style="width:120px;">'+rowtotal+'</td></tr>';	
+
+	  	               	$("#tbBody",subWinBody).append(tbbody_tr);
+	  	              })
+	  				  
+	  				/*   //表合计
+	  				  var tbfoot = '<tr><td style="width:428px;"><div style="text-align:right;">小计:</div></td><td style="width:527px;"><div style="text-align:right;padding-right:113px;">'+total+'</div></td></tr>';
+	  				  			  
+	  				  $("#tbFoot",subWinBody).append(tbfoot); */
+	  				  
+	  				  //表合计
+					  var tbfoot = '<tr>';
+					  tbfoot=tbfoot+'<td colspan="5"><div style="text-align:right">小计:</div></td>';
+					  tbfoot=tbfoot+'<td colspan="1"><div style="text-align:right">'+pnum+'</div></td>';
+					  tbfoot=tbfoot+'</tr>';
+		               
+					  $("#tbBody",subWinBody).append(tbfoot);
+	  				  
+	  				  //表尾输入单
+	  				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+	  													  '<span>采购人：</span><div>&nbsp;</div>'+
+	  													  '<span>仓库：</span><div>&nbsp;</div>'+
+	  													  '<span>制单：</span><div>&nbsp;</div>');
+	  				reset();
+	  				  
+	  			  }else{
+	  				  $(document).sgPup({message:'message_info',text: data});
+	  			  }
+	  		  } ,     
+	  		  error : function(res,error) { 
+	  		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  		  }    
+	  		});
+	  	
+	      if (navigator.appName == 'Microsoft Internet Explorer'){
+	      	subWin.print();  
+	      }else{ 
+	      	subWin.focus();
+	      	subWin.print();  
+	      }
+	      
+	      
+	  }
+</script>
+</html>

@@ -1,0 +1,281 @@
+package com.gboss.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import ldap.objectClasses.CommonCompany;
+import ldap.oper.OpenLdap;
+import ldap.oper.OpenLdapManager;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.gboss.comm.SystemConst;
+import com.gboss.comm.SystemException;
+import com.gboss.pojo.Stop;
+import com.gboss.pojo.web.DoOpen;
+import com.gboss.service.BackupService;
+import com.gboss.service.CollectionService;
+import com.gboss.service.CustomerService;
+import com.gboss.service.DatalockService;
+import com.gboss.service.FeeInfoService;
+import com.gboss.service.PolicyService;
+import com.gboss.service.PreloadService;
+import com.gboss.service.StopService;
+import com.gboss.service.UnitService;
+import com.gboss.service.VehicleService;
+import com.gboss.util.LogOperation;
+import com.gboss.util.PageSelect;
+import com.gboss.util.Utils;
+import com.gboss.util.excel.CreateExcel_PDF_CSV;
+import com.gboss.util.page.Page;
+import com.gboss.util.page.PageUtil;
+
+/**
+ * @Package:com.gboss.controller
+ * @ClassName:StopController
+ * @Description:TODO
+ * @author:xiaoke
+ * @date:2014-7-17 下午3:08:32
+ */
+@Controller
+public class StopController extends BaseController {
+	
+	@Autowired
+	@Qualifier("StopService")
+	private StopService stopService;
+	
+	@Autowired
+	@Qualifier("BackupService")
+	private BackupService backupService;
+	
+	@Autowired
+	@Qualifier("UnitService")
+	private UnitService unitService;
+	
+	@Autowired
+	private FeeInfoService feeInfoService;
+	
+	@Autowired
+	private VehicleService vehicleService;
+	
+	@Autowired
+	private CustomerService customerService;
+	
+	@Autowired
+	private CollectionService collectionService;
+	
+	@Autowired
+	private DatalockService datalockService;
+	
+	@Autowired
+	private PolicyService policyService;
+	
+	@Autowired
+	private PreloadService preloadService;
+	
+	@RequestMapping(value = "/stop/doStop",method = RequestMethod.POST)
+	@LogOperation(description = "办理办停", type = SystemConst.OPERATELOG_UPDATE, model_id = 20020)
+	public @ResponseBody Map<String, Object> doStop(@RequestBody List<Stop> stops, BindingResult bindingResult,HttpServletRequest request) throws SystemException {
+		String userId = (String) request.getSession().getAttribute(SystemConst.ACCOUNT_ID);
+		String companyid = (String) request.getSession().getAttribute(SystemConst.ACCOUNT_COMPANYID);
+		String orgid = (String) request.getSession().getAttribute(SystemConst.ACCOUNT_ORGID);
+		String username = (String) request.getSession().getAttribute(SystemConst.ACCOUNT_USERNAME);
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("userId", userId);
+		params.put("companyid", companyid);
+		params.put("orgid", orgid);
+		params.put("username", username);
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		try{
+			params.put("ip_address", Utils.getIpAddr(request));
+			resultMap = stopService.doStop(params, stops);
+		}catch(Exception e){
+			resultMap.put("success", false);
+			resultMap.put("msg", "办停失败,原因:"+e.getMessage());
+		}
+		return resultMap;
+	}
+	
+	@RequestMapping(value = "/stop/doOpen",method = RequestMethod.POST)
+	@LogOperation(description = "办理开通", type = SystemConst.OPERATELOG_UPDATE, model_id = 20030)
+	public @ResponseBody Map<String, Object> doOpen(@RequestBody DoOpen doOpen, BindingResult bindingResult,HttpServletRequest request) throws SystemException {
+		String userId = (String) request.getSession().getAttribute(SystemConst.ACCOUNT_ID);
+		String companyid = (String) request.getSession().getAttribute(SystemConst.ACCOUNT_COMPANYID);
+		String username = (String) request.getSession().getAttribute(SystemConst.ACCOUNT_USERNAME);
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("userId", userId);
+		params.put("companyid", companyid);
+		params.put("username", username);
+		Map<String, Object> resultMap=new HashMap<String, Object>();
+		try{
+			params.put("ip_address", Utils.getIpAddr(request));
+			resultMap = stopService.doOpen(params, doOpen);
+		}catch(Exception e){
+			resultMap.put("success", false);
+			resultMap.put("msg", "办停失败,原因:"+e.getMessage());
+		}
+		return resultMap;
+	}
+	
+	
+	
+	@RequestMapping(value = "/stop/findStopPage")
+	@LogOperation(description = "离网报表", type = SystemConst.OPERATELOG_SEARCHKEY, model_id =20065)
+	public @ResponseBody Page<HashMap<String, Object>> findStopPage(
+			@RequestBody PageSelect<Map<String, Object>> pageSelect,BindingResult bindingResult,HttpServletRequest request)  {
+		List<HashMap<String, Object>> list = new ArrayList<HashMap<String,Object>>();
+		Page<HashMap<String, Object>> result = null;
+		int total = 0;
+		try {
+			String compannyId = (String) request.getSession().getAttribute(SystemConst.ACCOUNT_COMPANYID);
+			String companyCode = (String) request.getSession().getAttribute(SystemConst.ACCOUNT_COMPANYCODE);
+			Long id = compannyId == null ? null : Long.valueOf(compannyId);
+			Object startDateStr = pageSelect.getFilter().get("startDate");
+			Object endDateStr = pageSelect.getFilter().get("endDate");
+			Object type = pageSelect.getFilter().get("type");
+			String search_type = type == null ?null : type.toString();
+			if (pageSelect != null) {
+				Map map = pageSelect.getFilter();
+				if (map == null) {
+					map = new HashMap<String, Object>();
+				}
+				map.put("subcoNo", compannyId);
+				map.put("companyCode", companyCode);
+			}
+			if(Utils.isNullOrEmpty(startDateStr) || Utils.isNullOrEmpty(endDateStr)){
+				return PageUtil.getPage(0, pageSelect.getPageNo(), list, pageSelect.getPageSize());
+			}
+			result = stopService.findStopsPage(pageSelect);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		return result;
+	}
+	
+	
+	@RequestMapping(value = "/stop/exportStopList")
+	@LogOperation(description = "办停报表导出", type = SystemConst.OPERATELOG_SEARCHKEY, model_id =20065)
+	public @ResponseBody
+	void exportStopList(HttpServletRequest request, HttpServletResponse response)
+			throws SystemException {
+		try {
+			Map returnMap =   request.getParameterMap();
+			//将request.getParameterMap()转换成可操作的普通Map
+			// 返回值Map
+		    Map map = new HashMap();
+		    Iterator entries =returnMap.entrySet().iterator();
+		    Map.Entry entry = null;
+		    String name = "";
+		    String value = "";
+		    while (entries.hasNext()) {
+		        entry = (Map.Entry) entries.next();
+		        name = (String) entry.getKey();
+		        Object valueObj = entry.getValue();
+		        if(null == valueObj){
+		            value = "";
+		        }else if(valueObj instanceof String[]){
+		            String[] values = (String[])valueObj;
+		            for(int i=0;i<values.length;i++){
+		                value = values[i] + ",";
+		            }
+		            value = value.substring(0, value.length()-1);
+		        }else{
+		            value = valueObj.toString();
+		        }
+		        if("null".equals(value)){
+		        	value="";
+		        }
+		        if(StringUtils.isNotBlank(name) && StringUtils.isNotBlank(value)){
+		        	map.put(name, value);
+		        }
+		    }
+			String compannyId = (String) request.getSession().getAttribute(
+					SystemConst.ACCOUNT_COMPANYID);
+			Long id = compannyId == null ? null : Long.valueOf(compannyId);
+			map.put("subcoNo", id);
+		    
+			String[][] title = {
+			{"序号","10"},{"客户名","20"},{"车牌号","20"},{"车载电话","20"},{"销售经理","20"},{"安装日期","20"},{"开通日期","20"}, {"服务截止日期","20"}, {"办停原因","20"}, {"办停日期","20"},{"办停备注","60"}
+			};
+			String date = map.get("date") == null ? null : map.get("date").toString();
+			String type = map.get("type") == null ? null : map.get("type").toString();
+			List<HashMap<String, Object>> list = stopService.findStops(map);
+			List valueList = new ArrayList();
+			HashMap<String, Object> stop = null;
+			String[] values = null;
+			int listLenth=list.size();
+			for(int i=0; i<listLenth; i++){
+				values = new String[11];
+				stop = list.get(i);
+				values[0] = String.valueOf(i+1);
+				values[1] = stop.get("customer_name")==null ?"":stop.get("customer_name").toString();
+				values[2] = stop.get("plate_no")==null ?"":stop.get("plate_no").toString();
+				values[3] = stop.get("call_letter")==null ?"":stop.get("call_letter").toString();
+				values[4] = stop.get("sales")==null ?"":stop.get("sales").toString();
+				values[5] = stop.get("fix_time")==null ?"":stop.get("fix_time").toString().substring(0, 10);
+				values[6] = stop.get("service_date")==null ?"":stop.get("service_date").toString().substring(0, 10);
+				values[7] = stop.get("fee_sedate")==null ?"":stop.get("fee_sedate").toString().substring(0, 10);
+				values[8] = stop.get("type_name")==null ?"":stop.get("type_name").toString();
+				values[9] = stop.get("stamp")==null ?"":stop.get("stamp").toString().substring(0, 10);
+				values[10] = stop.get("remark")==null ?"":stop.get("remark").toString();
+				valueList.add(values);
+			}
+			//获得分公司中英文名称
+			OpenLdap openLdap = OpenLdapManager.getInstance();
+			CommonCompany commonCompany =  openLdap.getCompanyById(compannyId);
+
+			CreateExcel_PDF_CSV.createExcel(valueList, response, "办停汇总", title,commonCompany.getCnfullname(),commonCompany.getEnfullname(),false);
+		} catch (Exception e) {
+			// 打印
+			e.printStackTrace();
+			// 同时把异常抛到前台
+			throw new SystemException();
+		}
+	}
+	
+	
+	
+	
+	@RequestMapping(value = "/stop/stopforPrint")
+	@LogOperation(description = "离网报表数据查询", type = SystemConst.OPERATELOG_SEARCHKEY, model_id =20065)
+	public @ResponseBody
+	List<HashMap<String, Object>> stopforPrint(
+			@RequestBody Map<String, Object> map,
+			HttpServletRequest request) throws SystemException {
+		List<HashMap<String, Object>> results = null;
+		try {
+			String compannyId = (String) request.getSession().getAttribute(
+					SystemConst.ACCOUNT_COMPANYID);
+			Long id = compannyId == null ? null : Long.valueOf(compannyId);
+			map.put("subcoNo", id);
+			String date = map.get("date") == null ? null : map.get("date").toString();
+			String type = map.get("type") == null ? null : map.get("type").toString();
+			results =  stopService.findStops(map);
+		} catch (Exception e) {
+			// 打印日志
+			e.printStackTrace();
+			// 同时把异常抛到前台
+			throw new SystemException();
+		}
+		return results;
+	}
+	
+	
+
+}
+

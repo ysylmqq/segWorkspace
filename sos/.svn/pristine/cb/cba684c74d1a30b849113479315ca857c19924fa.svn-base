@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>挂账转移表单</title>
+    
+<style type="text/css">
+.form_right{
+  float: left;
+  width: 240px;
+  padding-top: 20px;
+}
+.art_center{
+  float: left;
+  width: 530px;
+}
+.form label {
+	width: 70px;
+	float: left;
+	padding-right: 0px;
+}
+</style>
+</head>
+
+<body>
+		<form id="form_borrow_turn" method="post" class="form" name="form_borrow_turn"  >
+			 <input type="hidden" id="id" name="id"/>
+			<fieldset style="overflow-y:auto;width: 95%">
+	         <div class="panel">
+	       		<span style="width: 120px;">转移数量:</span>
+	       		<span id="spn_num" style="width: 120px;text-align: left;"></span>
+	       	 </div>	
+	       	 <div class="panel">
+	            <span  style="width: 120px;">目的经办人:</span>
+	            <input name="managersName" id="managersName" required="true" list="userDataList4form" style="width:150px;" autocomplete="on" />
+                <span id="borrowedNum" style="vertical-align:top;width:10px;color: red"></span>
+                <input type="hidden" name="managersId" id="managersId" required="true" />
+                <datalist id="userDataList4form"></datalist>
+	        </div>
+	        </fieldset>
+	</form>
+
+
+
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+(function($){
+	var userDataList4form = {};//经办人 key:name,value:id
+	//自动查询经办人
+	var checkUser = function(){
+		   /* var text=this.value;
+			text = text.replace(/\s/g,''); //去除空格
+			if(text!=this.value){//有空格
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			}  */
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.opname = this.value;
+			params.filter.isCompany = true;//查询机构下的的所有操作人
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getOrgOperators',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#managersName","#form_borrow_turn");
+						  if(manager){
+							  if(data.items.length>0){
+						  		  userDataList4form = {};
+								  $("#userDataList4form","#form_borrow_turn").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.opname);
+								  $("#userDataList4form","#form_borrow_turn").append(op);
+								  
+								  userDataList4form[v.opname] = v.opid;
+		 				  	 }); 
+							}
+					  }else{
+					  	$(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+	}
+	
+  //填充经办人
+    $.ajax( {
+	  type : 'post', 
+	  async: false,   
+	  contentType : 'application/json',     
+	  dataType : 'json',     
+	  url : '../../getOrgOperators',   
+	  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+	  success : function(data) {
+		  if(data){
+			  var manager = $("#managersName","#form_borrow_turn");
+			  if(manager){
+				  if(data.items.length>0){
+			 		  userDataList4form = {};
+					  $("#userDataList4form").empty();
+				  }
+				  $.each(data.items,function(k,v){
+					  var op = $("<option></option>");
+					  op.val(v.opname);
+					  $("#userDataList4form").append(op);
+					  
+					  userDataList4form[v.opname] = v.opid;
+				  	 }); 
+				  manager.on('keyup',checkUser);
+				  manager.on('change',function(){
+					  	var strs = this.value.split(" ");
+								$(this).val(strs[strs.length-1]);
+								$("#managersId","#form_borrow_turn").val(userDataList4form[strs[strs.length-1]]);
+								if($("#managersId","#form_borrow_turn").val().length==0){
+									$("#managersName","#form_borrow_turn").val("");
+									 $('#borrowedNum',"#form_borrow_turn").text('');
+								}else{
+									//根据经办人，获得他借用的商品总数量
+									$.ajax({
+										  type : 'POST', 
+										  async: false,   
+										  url : '../../stock/getBorrowTotalNum',  
+										  data: {borrowerId:$("#managersId","#form_borrow_turn").val()},
+										  success : function(data) {
+											  if(data){
+												 $('#borrowedNum',"#form_borrow_turn").text("("+data+")");
+											  }else{
+												  $('#borrowedNum',"#form_borrow_turn").text('(0)');
+											  }
+										  } 
+									});
+								}
+						
+					});
+
+				};
+		  }else{
+		  	$(document).sgPup({message:'message_info',text: data});
+		  }
+	  },     
+	  error : function(res,error) { 
+	  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  }    
+	});
+})(jQuery)
+</script>
+</html>

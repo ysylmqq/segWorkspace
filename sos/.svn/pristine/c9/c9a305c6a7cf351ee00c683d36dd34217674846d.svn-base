@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>升级派工单</title>
+<style>
+
+</style>
+</head>
+<body>
+	<form id='repair' method='post' class="form" style="width:690px;">
+		<fieldset style="width:670px;">
+			<div class="panel">
+                <span>工单号:</span>
+                <input type='text' id="billnum" name='billnum'  style="width:200px;" disabled="disabled" value="NJ201112191518"/>
+            </div>
+            <div class="panel">
+                <span>车牌号:</span>
+                <input type='text' id="number_plate" name='number_plate'  style="width:200px;" />
+                
+                <span style="padding-left:50px;">车型:</span>
+                <input type='text' id="call_letter" name='call_letter'  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>旧产品型号:</span>
+                <input type='text' id="customer_name" name='customer_name'  style="width:200px;" />
+                
+                <span style="padding-left:50px;">新产品型号:</span>
+                <input type='text' id="call_letter" name='call_letter'  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>地点:</span>
+                <input type='text' id="product_name" name='product_name'  style="width:400px;" />
+                
+                <span style="padding-left:40px;">网点:</span>
+                <input type='checkbox' style='vertical-align:middle;' />
+            </div>
+            <div class="panel">    
+                <span style="vertical-align:top;">故障现象:</span>
+                <textarea id="claim" name="claim" style="width:555px;" rows="2"></textarea>
+            </div>
+            <div class="panel">
+            	<span style="vertical-align:top;">注意事项:</span>
+                <textarea id="claim" name="claim" style="width:555px;" rows="2"></textarea>
+            </div>
+        </fieldset>
+        
+        <fieldset style="width:670px;">
+            <div class="panel">
+                <span>预约时间:</span>
+                <input type='text' id="time" name='time'  style="width:200px;" />
+            </div>
+        </fieldset>
+        
+        <fieldset style="width:670px;">
+            <div class="panel">
+                <span>电工:</span>
+                <input type='text' id="electrician" name='electrician'  style="width:200px;" onfocus="selectelect();"/>
+                
+                <span style="padding-left:50px;">电工电话:</span>
+                <input type='text' id="electrician_phone" name='electrician_phone'  style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>开始时间:</span>
+                <input type='text' id="start_time" name='start_time'  style="width:200px;" />
+                
+                <span style="padding-left:50px;">预计时长:</span>
+                <input type='text' id="duration" name='duration'  style="width:200px;" />
+            </div>
+        </fieldset>
+
+	</form>
+</body>
+<script type="text/javascript">
+	var winClose = function() {
+		$(document).sgWindow('close', {
+			id : 'selectelect'
+		});
+	}
+	
+	var selectelect = function() {
+		var defaults = {
+			title : '选择电工',
+			id : 'selectelect',
+			form : 'selectelect_form',
+			url : 'web/bsp/selectelect.html',
+			width : 600,
+			height : 280,
+			buttons : [ {
+				name : '确定',
+				onpress : winClose
+			}, {
+				name : '取消',
+				onpress : winClose
+			} ]
+		};
+		$(document).sgWindow(defaults);
+	}
+</script>
+</html>

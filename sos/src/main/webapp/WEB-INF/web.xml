@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+
+  <display-name>Archetype Created Web Application</display-name>
+  <!-- log4j日志配置 -->
+	<context-param>
+		<param-name>log4jConfigLocation</param-name>
+		<param-value>classpath:log4j.properties</param-value>
+	</context-param>
+	<context-param>
+		<param-name>log4jRefreshInterval</param-name>
+		<param-value>60000</param-value>
+	</context-param>
+	<listener>
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	</listener>
+  <!-- 配置文件位置，默认为/WEB-INF/applicationContext.xml -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:applicationContext*.xml</param-value>
+	</context-param>
+
+	<!-- 字符集过滤器 -->
+	<filter>
+		<filter-name>characterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>characterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- 上下文Spring监听器 -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<!-- 填写退出的URL -->
+	<context-param>  
+    	<param-name>casServerLogoutUrl</param-name>  
+    	<param-value>https://cas.952100.com:8443/cas/logout</param-value>  
+    </context-param> 
+    <!-- 填写登录的URL -->
+	<context-param>  
+    	<param-name>loginUrl</param-name>  
+    	<param-value>http://90.0.12.232:8080/sos</param-value>  
+    </context-param>
+	<!-- CAS单点登出 -->
+	<listener>  
+        <listener-class>  
+            org.jasig.cas.client.session.SingleSignOutHttpSessionListener   
+        </listener-class>  
+    </listener>
+	
+	<!-- servlet控制跳转 -->
+	<servlet>
+		<servlet-name>springMVC</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<!-- 配置文件 -->
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:spring-servlet.xml</param-value>
+		</init-param>
+	</servlet>
+	
+	<filter>
+	    <filter-name>OpenSessionInViewFilter</filter-name>
+	    <filter-class>org.springframework.orm.hibernate4.support.OpenSessionInViewFilter</filter-class>
+	          <init-param>
+	             <param-name>sessionFactoryBeanName</param-name>
+	             <param-value>sessionFactory</param-value>
+	         </init-param>
+	    
+	    <init-param>
+	      <param-name>singleSession</param-name>
+	      <param-value>true</param-value>
+	    </init-param>
+	    <init-param>
+	             <param-name>flushMode</param-name>
+	             <param-value>ALWAYS</param-value>
+	    </init-param>
+	 
+	  </filter>
+	  <filter-mapping>
+	    <filter-name>OpenSessionInViewFilter</filter-name>
+	    <url-pattern>/*</url-pattern>
+	  </filter-mapping>
+	  
+	<!-- 浏览器不支持put,delete等method,由该filter将/blog?_method=delete转换为标准的http delete方法 -->
+	<filter>
+        <filter-name>HiddenHttpMethodFilter</filter-name>
+        <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>HiddenHttpMethodFilter</filter-name>
+        <servlet-name>spring</servlet-name>
+    </filter-mapping>
+    
+    <!-- Spring Security控制页面权限 -->
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>
+			org.springframework.web.filter.DelegatingFilterProxy
+		</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<!-- CAS -->
+	<filter>
+		<filter-name>CAS Authentication Filter</filter-name>
+		<!-- <filter-class>
+			org.jasig.cas.client.authentication.AuthenticationFilter
+		</filter-class> -->
+		<filter-class>
+			com.gboss.cas.CASAuthenticationFilter
+		</filter-class>
+		<!-- CAS login 服务地址-->
+		<init-param>
+			<param-name>casServerLoginUrl</param-name>
+			<param-value>https://cas.952100.com:8443/cas/login</param-value>
+		</init-param>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>renew</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>gateway</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<!-- 客户端应用服务地址-->
+		<init-param>
+			<param-name>serverName</param-name>
+			<param-value>http://90.0.12.232:8080</param-value>
+		</init-param>
+		<init-param>
+			<param-name>ExcludeFile</param-name>
+			<param-value>.png,.gif,.js,.css,task_list.html,bill_add_cl.html,task/findTasksBycl,customer/getDetailMsgBycl,task/getTaskNo,getCompanySaleManager_cl,getLinkMan,findProducts,task/save_cl,bill_view_cl.html,task/deleteTasks,task/endTasks,getCurrentCompany_cl,print_bill.html,print_task.html</param-value>
+		</init-param>
+	</filter>
+	<!--负责Ticket校验-->
+	<filter>
+		<filter-name>CAS Validation Filter</filter-name>
+		<filter-class>
+			com.gboss.cas.Cas20ProxyReceivingTicketValidationFilter
+		</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>casServerUrlPrefix</param-name>
+			<param-value>https://cas.952100.com:8443/cas</param-value>
+		</init-param>
+		<init-param>
+			<param-name>serverName</param-name>
+			<param-value>http://90.0.12.232:8080</param-value>
+		</init-param>
+		<init-param>
+			<param-name>useSession</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>redirectAfterValidation</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>ExcludeFile</param-name>
+				<param-value>.png,.gif,.js,.css,task_list.html,bill_add_cl.html,task/findTasksBycl,customer/getDetailMsgBycl,task/getTaskNo,getCompanySaleManager_cl,getLinkMan,findProducts,task/save_cl,bill_view_cl.html,task/deleteTasks,task/endTasks,getCurrentCompany_cl,print_bill.html,print_task.html</param-value>
+		</init-param>
+	</filter> 
+	<filter>
+		<filter-name>CAS HttpServletRequest WrapperFilter</filter-name>
+		<filter-class>
+			com.gboss.cas.HttpServletRequestWrapperFilter
+		</filter-class>
+	</filter>
+	<filter>
+		<filter-name>CAS Assertion Thread Local Filter</filter-name>
+		<filter-class>
+			com.gboss.cas.AssertionThreadLocalFilter
+		</filter-class>
+	</filter>
+	<filter>  
+        <filter-name>CAS Single Sign Out Filter</filter-name>  
+        <filter-class>  
+            org.jasig.cas.client.session.SingleSignOutFilter   
+        </filter-class>  
+    </filter> 
+	
+	<filter-mapping>
+		<filter-name>CAS Authentication Filter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<!-- -->
+	<filter-mapping>
+		<filter-name>CAS Validation Filter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>CAS HttpServletRequest WrapperFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>CAS Assertion Thread Local Filter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>  
+        <filter-name>CAS Single Sign Out Filter</filter-name>  
+        <url-pattern>/*</url-pattern>  
+    </filter-mapping>
+	
+	<!-- END CAS -->
+	
+	<!-- Session -->
+	<filter>  
+        <filter-name>Session Filter</filter-name>  
+        <filter-class>  
+            com.gboss.comm.filter.SessionFilter 
+        </filter-class>  
+    </filter>
+    <filter-mapping>  
+        <filter-name>Session Filter</filter-name>  
+        <url-pattern>/*</url-pattern>  
+    </filter-mapping>
+	<!-- END Session -->
+    
+	<servlet-mapping>
+		<servlet-name>springMVC</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>*.jpg</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>*.png</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>*.js</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>*.css</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>*.htm</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>*.html</url-pattern>
+	</servlet-mapping>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/accessDenied.jsp</location>
+	</error-page>
+	<welcome-file-list>
+	    <welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+	
+	<context-param>
+		<param-name>webAppRootKey</param-name>
+		<param-value>sos.root</param-value>
+	</context-param>
+	
+	<session-config>
+        <session-timeout>1400</session-timeout>
+    </session-config>
+	
+</web-app>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>订单查询(用于总部订单接收人查询)</title>
+</head>
+<body>
+	<div id="dlg_order" class="datagird"></div>
+<!-- 打印iframe -->
+	<iframe id="ifm_print_order_query" name="ifm_print_order_query" style="display: none"></iframe>
+</body>
+<script type="text/javascript">
+	(function($){
+		var lastMonthDay=new Date();//上个月的今天
+    	//lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+		lastMonthDay.setDate(1);
+    	lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+	 var now =new Date().format('yyyy-MM-dd');
+	 
+	 var editId=null;//编辑时选中行ID
+	 var editobj = null; //编辑时选中的对象
+	 
+	 var loadSuccess = function(){
+		 $('#orderId','#order_edit_form').val(editobj['id']);
+		 $('#orderNo','#order_edit_form').val(editobj['orderNo']);
+		 $('#totalPrice','#order_edit_form').val(editobj['totalPrice']);
+		 $('#stamp','#order_edit_form').val(editobj['stamp']);
+		 $("#receiptName",'#order_edit_form').val(editobj['receiptName']);
+		 $("#remark",'#order_edit_form').val(editobj['remark']);		   
+		 //初始化表格
+	   	 var detail_defaults = {
+	   		        width:  840,
+	   		        height: 100,
+	   		        url: '../../order/findOrderDetailsByOrderId ',
+	   		        query:{orderId:editobj['id']},
+	   		        rownumbers:true,//序号
+	   		        colModel : [
+	   		            {display: '商品名称', name : 'productName', width : 160, sortable : false},
+	   		            {display: '商品规格', name : 'norm', width : 160, sortable : false},
+	   		            {display: '价格(元)', name : 'price', width : 70, sortable : false},
+	   		            {display: '采购数量', name : 'num', width : 70, sortable : false},
+	   		         	{display: '已采购数量', name : 'inNum', width : 70, sortable : false},
+	   		         	{display: '备注', name : 'remark', width : 160, sortable : false}	   		         	
+	   		        ]
+	   		    };
+		   $('#order_detail_grid').sgDatagrid(detail_defaults); 
+		   
+		   var customer_defaults = {
+	   		        width:  840,
+	   		        height: 100,
+	   		        url: '../../order/findCustomerAddress',
+	   		        query:{orderId:editobj['id']},
+	   		        rownumbers:true,//序号
+	   		        colModel : [
+	   		            	{display: '收货人', name : 'name', width : 100, sortable : false},
+		   		            {display: '联系电话', name : 'phone', width : 80, sortable : false},
+		   		         	{display: '收货地址', name : 'address', width : 200, sortable : false},
+		   		         	{display: '运输方式', name : 'transportType', width : 80, sortable : false,formatter:function(value,row){
+	    		                if(value==0){
+	    		                    value = '航空';
+	    		                }else if(value==1){
+	    		                    value = '汽运';
+	    		                }else if(value==2){
+	    		                    value = '中铁';
+	    		                }else if(value==3){
+	    		                    value = '快递';
+	    		                }else if(value==4){
+	    		                    value = '指定货运';
+	    		                }else{
+	    		                	value ="";
+	    		                }
+	    		                return value;
+	    		            }},
+		   		         	{display: '指定货运', name : 'specifyFreight', width : 80, sortable : false},
+		   		         	{display: '运费承接方', name : 'payType', width : 80, sortable : false,formatter:function(value,row){
+	    		                if(value==0){
+	    		                    value = '客户提付';
+	    		                }else if(value==1){
+	    		                    value = '赛格支付';
+	    		                }else if(value==2){
+	    		                    value = '赛格垫付';
+	    		                }else if(value==3){
+	    		                    value = '送货上门';
+	    		                }else{
+	    		                	value ="";
+	    		                }
+	    		                return value;
+	    		            }},
+	    		            {display: '备注', name : 'oremark', width : 80, sortable : false}
+	   		        ]
+	   		    };
+		   $('#order_customer_grid').sgDatagrid(customer_defaults);
+	   }
+	 
+	 var toClose = function(){
+		 $(document).sgWindow('close',{id:'win_order'});
+	 }
+	 var exportOrderDetail = function(){
+		 var url="order/exportExcel4OrderDetail?orderId="+$('#orderId','#order_edit_form').val();
+         window.location.href=url;
+	 }
+	 var editItem = function(){
+	        var obj = $('#dlg_order');
+	        var bDiv = $('.bDiv',obj);
+
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){    
+	                	editId=this.value;
+	                	//alert(JSON.stringify($(this).data('data')));
+	                	editobj = $(this).data('data');
+	                	//打开窗口
+		                var defaults = {
+		    	                title:'订单查看',
+		    	                id:'win_order',
+		    	                form:'order_edit_form',
+		    	                url:'web/order/order_detail_form.html',
+		    	                success: loadSuccess,
+		    	                width: 861,
+		    	                height: 530,
+		    	                buttons : [
+		    	                           {name: '关闭', type: 'submit', onpress : toClose },
+		    	                           {name: '导出Excel',  onpress : exportOrderDetail }
+		    	                       ]
+		    	            };
+		    	        $(document).sgWindow(defaults);
+	                }
+	            });
+	        }
+	    }
+	 
+		//初始化表格
+   	 var defaults = {
+   		        title: "订单查询",
+   		     	width:  870,
+		        height: 416,
+   		        url: '../../order/findOrdersByPage',
+	   		    usepager: true,
+	 	        rownumbers:true,
+	 	        useRp: true,
+	 	        colid:'id',  //主键
+	 	        query:{startDate:lastMonthDay,endDate:now,status:1},
+   		        colModel : [
+   		            {display: '订单号', name : 'orderNo', width : 130, sortable : false},
+   		         	{display: '订单接收人', name : 'receiptName', width : 80, sortable : false}, 
+   		            {display: '总金额(元)', name : 'totalPrice', width : 80, sortable : false},   		            
+   		            {display: '订单日期', name : 'stamp', width : 80, sortable : true},
+   		         	{display: '备注', name : 'remark', width : 240, sortable : false},
+   		         	{display: '是否完成', name : 'isCompleted', width : 50, sortable : false,formatter:function(value,row){
+	   		         	if(value==0){
+		                    value = '<font color="red">否</font>';
+		                }else if(value==1){
+		                    value = '<font color="green">是</font>';
+		                }else{
+		                	value ='<font color="red">否</font>';
+		                }
+   		                return value;
+   		            	}
+   		         	}
+   		        ],
+   		     	buttons : [
+   			            {name: '查看', bclass: 'view', onpress : editItem},   			         	
+			            {separator: true}
+   			        ],
+   		        searchitems :[
+   		            {display:'开始日期',name:'startDate',type:'date',value:lastMonthDay},
+			      	{display:'结束日期',name:'endDate',type:'date',value:now},
+			        {display:'是否完成',name:'isCompleted',html:'<select name="isCompleted" ><option value="">请选择...</option><option value="0">否</option><option value="1" >是</option></select>'},
+   		        ],
+   		        exporturl:'../../order/exportOrders',
+   		     	order:true,
+   		        sortname: "stamp",
+   		        sortorder: "asc"
+   		    };
+   		    $('#dlg_order').sgDatagrid(defaults); 
+	})(jQuery)
+</script>
+</html>

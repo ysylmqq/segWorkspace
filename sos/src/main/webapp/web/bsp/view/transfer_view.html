@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>过户</title>
+<style>
+
+</style>
+</head>
+<body>
+	<form id='transfer_view' method='post' class="form" style="width:820px;">
+		<fieldset style="width:800px;">
+			<div class="panel">
+                <span>工单号:</span>
+                <input type='text' id="number_plate" name='number_plate' style="width:150px;" />
+            </div>
+		</fieldset>
+		<div class='title'>基础资料</div>
+		<fieldset style="width:800px;">
+            <div class="panel">
+                <span>注册名:</span>
+                <input type='text' id="register" name='register'  style="width:150px;" />
+                
+                <span>服务密码:</span>
+                <input type='text' id="server_pwd" name='server_pwd'  style="width:150px;" />
+                
+                <span>确认密码:</span>
+                <input type='text' id="confirm_pwd" name='confirm_pwd'  style="width:150px;" />
+            </div>
+            <div class="panel">    
+                <span>姓名:</span>
+                <input type='text' id="customer_name" name='customer_name'  style="width:150px;" />
+                
+                <span>身份证:</span>
+                <input type='text' id="idcard" name='idcard'  style="width:150px;" />
+                
+                <span>生日:</span>
+                <input type='text' id="birthday" name='birthday'  style="width:150px;" />
+            </div>
+            <div class="panel">    
+                <span>性别:</span>
+                <input type='hidden' />
+                <input type='radio' name='sex' style='vertical-align:middle;' />男
+                &nbsp;
+                <input type='radio' name='sex' style='vertical-align:middle;' />女
+                
+                <span style="padding-left:90px;">手机:</span>
+                <input type='text' id="mobile" name='mobile'  style="width:150px;" />
+                
+                <span>邮箱:</span>
+                <input type='text' id="email" name='email'  style="width:150px;" />
+            </div>
+            <div class="panel">    
+                <span>VIP等级:</span>
+                <select size="1" name="vip" id="vip" style="width:154px;" autocomplete="on">
+                    <option value="1">普通卡</option>
+                    <option value="2">银卡</option>
+                    <option value="3">金卡</option>
+                    <option value="4">白金卡</option>
+                </select>
+                
+                <span>联系电话:</span>
+                <input type='text' id="phone" name='phone'  style="width:150px;" />
+                
+                <span>入网状态:</span>
+                <select size="1" name="state" id="state" style="width:154px;" autocomplete="on">
+                    <option value="1">在网</option>
+                    <option value="2">离网</option>
+                    <option value="3">欠费</option>
+                    <option value="4">非入网</option>
+                </select>
+            </div>
+            <div class="panel">    
+                <span>归档合同号:</span>
+                <input type='text' id="mobile" name='mobile'  style="width:150px;" />
+                
+                <span>归档位置:</span>
+                <input type='text' id="phone" name='phone'  style="width:402px;" />
+            </div>
+            <div class="panel">    
+                <span>备注:</span>
+                <input type='text' id="remark" name='remark'  style="width:654px;" />
+            </div>
+        </fieldset>
+        
+        <div class='title'>车辆资料></div>
+		<fieldset style="width:800px;">
+            <div class="panel">
+                <span>车牌号码:</span>
+                <input type='text' id="number_plate" name='number_plate' style="width:150px;" />
+                
+                <span>车牌颜色:</span>
+                <select size="1" name="color" id="color" style="width:154px;" autocomplete="on">
+                    <option value="1">蓝色</option>
+                    <option value="2">黄色</option>
+                    <option value="3">白色</option>
+                    <option value="4">黑色</option>
+                </select>
+                
+                <span>车辆类型:</span>
+                <select size="1" name="vehicle_type" id="vehicle_type" style="width:154px;" autocomplete="on">
+                    <option value="1">小型车</option>
+                    <option value="2">卡车</option>
+                </select>
+            </div>
+            <div class="panel">
+                <span>品牌:</span>
+                <select size="1" name="color" id="color" style="width:154px;" autocomplete="on">
+                    <option value="1">大众</option>
+                    <option value="2">宝马</option>
+                    <option value="3">保时捷</option>
+                    <option value="4">本田</option>
+                </select>
+                
+                <span>车系:</span>
+                <select size="1" name="color" id="color" style="width:154px;" autocomplete="on">
+                    <option value="1">与品牌联动</option>
+                </select>
+                
+                <span>车型:</span>
+                <select size="1" name="color" id="color" style="width:154px;" autocomplete="on">
+                    <option value="1">与车系联动</option>
+                </select>
+            </div>
+            <div class="panel">
+            	<span>车辆识别号:</span>
+                <input type='text' id="code" name='code' style="width:150px;" />
+            
+            	<span>发动机号:</span>
+                <input type='text' id="engine_no" name='engine_no'  style="width:150px;" />
+                
+                <span>生产厂家:</span>
+                <input type='text' id="model" name='model' style="width:150px;" />
+            </div>
+            <div class="panel">
+            	<span>车辆颜色:</span>
+                <input type='text' id="vehicle_color" name='vehicle_color' style="width:150px;" />
+            
+                <span>购车时间:</span>
+                <input type='date' id="buy_time" name='buy_time' style="width:150px;" />
+            </div>
+        </fieldset>
+        
+        <div class='title'>终端资料></div>
+		<fieldset style="width:800px;">
+            <div class="panel">
+                <span>终端型号:</span>
+                <input type='text' id="unittype" name='unittype' style="width:150px;" />
+                
+                <span>销售名称:</span>
+                <input type='text' id="name" name='name' style="width:150px;" />
+                
+                <span>通信模式:</span>
+                <input type='hidden' />
+                <input type='checkbox' name='mode' style='vertical-align:middle;' />数据流量
+                &nbsp;
+                <input type='checkbox' name='mode' style='vertical-align:middle;' />短信
+            </div>
+            <div class="panel" id="barcode_sel">
+            	<span>条形码:</span>
+            	<select size="1" name="vip" id="vip" style="width:100px;" autocomplete="on">
+                    <option value="1">终端条形码</option>
+                    <option value="2">导航条形码</option>
+                </select>
+                <input type='text' id="barcode" name='barcode' style="width:150px;" />
+	            <a href="javascript:void(0);" style="margin:0px;padding:0px;padding-left:30px;padding-top:5px;"><img alt="增加条形码" src="images/form_add.png" title="增加条形码" style="vertical-align:middle"></a>
+            </div>
+            <div class="panel">
+                <span>SIM卡号:</span>
+                <input type='text' id="call_letter" name='call_letter' style="width:150px;" />
+                
+                <span>SIM卡运营商:</span>
+                <input type='radio' id="operators" name="operators" style='vertical-align:middle;'/>移动
+                <input type='radio' id="operators" name="operators" style='vertical-align:middle;'/>联通
+                <input type='radio' id="operators" name="operators" style='vertical-align:middle;'/>电信
+            	<span style="padding-left:29px;">SIM卡类型:</span>
+                <input type='radio' id="simtype" name="simtype" style='vertical-align:middle;'/>自带卡
+                &nbsp;
+                <input type='radio' id="simtype" name="simtype" style='vertical-align:middle;'/>公司卡
+            </div>
+            <div class="panel">
+                <span>SIM卡月租费:</span>
+                <input type='text' id="simfee" name='simfee' style="width:150px;" />
+                <span>截止日期:</span>
+                <input type='date' id="service_end_time" name='service_end_time' style="width:150px;" />
+                <span>缴费方式:</span>
+                <input type='radio' id="payment" name="payment" style='vertical-align:middle;'/>年
+                &nbsp;
+                <input type='radio' id="payment" name="payment" style='vertical-align:middle;'/>月
+                &nbsp;
+                <a>包含在套餐:</a>
+                <input type='checkbox' style='vertical-align:middle;' />
+            </div>
+            <div class="panel">
+                <span>销售经理:</span>
+                <input type='text' id="manager" name='manager' style="width:150px;" />
+                <span>销售网点:</span>
+                <input type='text' id="branch" name='branch' style="width:150px;" />
+                <span>销售套餐:</span>
+                <select size="1" name="pack_id" id="pack_id" style="width:154px;" autocomplete="on">
+                    <option value="1">天威星3080 含三年服务费，不含盗抢险，三年后78元/月，享受盗抢险</option>
+                    <option value="2">天王星3600 按月托收，99元/月</option>
+                    <option value="3">天威星3800 含三年服务费，三年盗抢险。三年以后78元/月</option>
+                </select>
+            </div>
+            <div class="panel">
+            	<span>防拆码:</span>
+                <input type='text' id="tampercode" name='tampercode' style="width:150px;" />
+            	
+                <span>特批单:</span>
+                <input type='text' id="special" name='special' style="width:150px;" />
+            </div>
+        </fieldset>
+        
+        <div class='title'>托收资料></div>
+		<fieldset style="width:800px;">
+            <div class="panel">
+                <span>银行账号:</span>
+                <input type='text' id="account" name='account' style="width:150px;" />
+                
+                <span>确认账号:</span>
+                <input type='text' id="confirm_account" name='confirm_account' style="width:150px;" />
+                
+                <span>账号类型:</span>
+                <select size="1" name="account_type" id="account_type" style="width:154px;" autocomplete="on">
+                    <option value="1">存折</option>
+                    <option value="2">借记卡</option>
+                </select>
+            </div>
+            <div class="panel">
+                <span>托收机构:</span>
+                <select size="1" name="agency" id="agency" style="width:154px;" autocomplete="on">
+                    <option value="1">银联</option>
+                    <option value="2">银盛</option>
+                </select>
+                
+                <span>银行:</span>
+                <input type='text' id="bank" name='bank' style="width:150px;" />
+                
+                <span>账号名称:</span>
+                <input type='text' id="account_name" name='account_name'  style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>是否投递:</span>
+                <input type='radio' id="is_delivery" name="is_delivery" style='vertical-align:middle;'/>是
+                &nbsp;
+                <input type='radio' id="is_delivery" name="is_delivery" style='vertical-align:middle;'/>否
+                &nbsp;
+                <input type='radio' id="is_delivery" name="is_delivery" style='vertical-align:middle;'/>电子账单
+                
+                <span style="padding-left:12px;">发票收件人:</span>
+                <input type='text' id="addressee" name='addressee' style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>投递地址:</span>
+                <select size="1" name="province" id="province" style="width:120px;" autocomplete="on">
+                    <option value="1">广东省</option>
+                    <option value="2">湖南省</option>
+                </select>
+                <select size="1" name="city" id="city" style="width:120px;" autocomplete="on">
+                    <option value="1">深圳市</option>
+                    <option value="2">长沙市</option>
+                </select>
+                <select size="1" name="area" id="area" style="width:120px;" autocomplete="on">
+                    <option value="1">南山区</option>
+                    <option value="2">岳麓区</option>
+                </select>
+                <input type='text' id="address" name='address' style="width:283px;" />
+            </div>
+        </fieldset>
+        
+        <div class='title'>历史资料</div>
+        <fieldset style="width:800px;">
+        	<div id="serverItem1" class="datagrid">
+            	<div class="hDiv" style="margin:0px;padding:0px;width:750px;">
+	                <table>
+	                    <thead>
+	                    <tr>
+	                        <th style="width:40px;">序号</th>
+	                        <th style="width:100px;">注册名</th>
+	                        <th style="width:100px;">客户名称</th>
+	                        <th style="width:100px;">车牌号码</th>
+	                        <th style="width:100px;">车载号码</th>
+	                        <th style="width:100px;">修改人</th>
+	                        <th style="width:100px;">修改时间</th>
+	                        <th style="width:40px;">操作</th>
+	                    </tr>
+	                    <tr><th>1</th><th>XXXX</th><th>XXXX</th><th>137XXXXXX</th><th>xxxxxx</th><th>张小红</th><th>2014-01-27</th><th><a href=''>查看</a></th></tr>
+	                    <tr><th>2</th><th>XXXX</th><th>XXXX</th><th>137XXXXXX</th><th>xxxxxx</th><th>张燕</th><th>2014-01-15</th><th><a href=''>查看</a></th></tr>
+	                    </thead>
+	                </table>
+                </div>
+            </div>
+        </fieldset>
+
+	</form>
+</body>
+<script type="text/javascript">
+$(function () {
+	var flag = 0;
+	$("#barcode_sel a").on('click',function(){
+		var detail_div = $("<div></div>");
+		var detail_id = "barcode_sel"+flag;
+		detail_div.attr('id',detail_id);
+		detail_div.addClass("panel");
+		detail_div.append($("#barcode_sel").html());
+		
+		$("#barcode_sel").before(detail_div);
+		$("#"+detail_id+" img").attr('src','images/form_del.png');
+		$("#"+detail_id+" img").attr('title','删除条形码');
+		
+		$("#"+detail_id+" a").on('click',function(){
+			$("#"+detail_id).remove();
+		})
+		//$("#"+detail_id + " input[list=productList]").on('keyup',checkProduct);
+		flag=flag+1;
+	});
+});
+</script>
+</html>

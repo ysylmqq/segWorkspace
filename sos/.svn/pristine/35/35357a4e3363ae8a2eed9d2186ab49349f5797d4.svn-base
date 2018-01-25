@@ -1,0 +1,6 @@
+excelUploadPath=D:/test/excel/upload/
+obdconnectUrl=http://192.110.10.215:8091/obdexp/
+obdconnectIp=192.110.10.215
+obdconnectPort=8091
+obdlinuxUrl=/usr/local/nginx/html/sos/
+hmServicePwdUrl=http://101.200.228.44/sync/car/resetpassword

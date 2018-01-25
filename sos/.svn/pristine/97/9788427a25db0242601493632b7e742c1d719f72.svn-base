@@ -1,0 +1,134 @@
+/* CSS Document */
+@charset "utf-8";
+
+.pup{
+    display:inline-block;
+    margin: 0 7px 0 0;
+    background-color: #4791d2;
+    border: 1px solid #dedede;
+    border-top: 1px solid #eee;
+    border-left: 1px solid #eee;
+    font-size: 12px;
+    line-height: 130%;
+    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 3px;
+    padding: 5px 10px 6px 7px;
+}
+.pup_window{
+    font-size: 12px;
+position: absolute;
+overflow: hidden;
+background-color: #ecf1f7;
+padding: 5px;
+border: 1px solid #fff;
+border-radius: 5px;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+border-radius: 5px;
+}
+.pup_tool_close{
+    display: inline-block;
+width: 16px;
+height: 16px;
+opacity: 0.6;
+filter: alpha(opacity=60);
+margin-left: 2px;
+background: url('../images/panel_tools.gif') no-repeat -16px 0px;
+}
+.pup_tool{
+    top: 0px;
+right: 10px;
+position: absolute;
+}
+.pup_header{
+    line-height: 15px;
+color: #15428b;
+font-weight: bold;
+font-size: 12px;
+position: relative;
+padding: 2px 0px 4px 0px;
+}
+.pup_body{
+    overflow: hidden;
+    background-color: #fff;
+    padding: 5px 0;
+    font-size: 14px;
+    padding-left: 10px;
+    min-height: 34px;
+}
+.pup_footer{
+    background: #fff;
+    overflow: auto;
+    padding-bottom:5px;
+}
+.pup_footer input{
+    margin: 0 7px 0 0;
+background-color: #4791d2;
+border: 1px solid #dedede;
+border-top: 1px solid #eee;
+border-left: 1px solid #eee;
+font-size: 12px;
+line-height: 100%;
+text-decoration: none;
+text-align: center;
+color: #fff;
+cursor: pointer;
+border-radius: 3px;
+padding: 5px 10px;
+}
+.pup_mask{
+    position: absolute;
+left: 0;
+top: 0;
+width: 100%;
+height: 100%;
+filter: alpha(opacity=40);
+opacity: 0.40;
+background: #999;
+font-size: 1px;
+overflow: hidden;
+}
+.message_error {
+    float:left;
+    width: 47px;
+    height: 35px;
+    background:url('../images/messager_error.gif') no-repeat scroll left top;
+}
+.message_info {
+    float:left;
+    width: 47px;
+    height: 35px;
+    background:url('../images/messager_info.gif') no-repeat scroll left top;
+}
+.message_question {
+    float:left;
+    width: 47px;
+    height: 35px;
+    background:url('../images/messager_question.gif') no-repeat scroll left top;
+}
+.message_warning {
+    float:left;
+    width: 47px;
+    height: 35px;
+    background:url('../images/messager_warning.gif') no-repeat scroll left top;
+}
+.message_confirm {
+    float:left;
+    width: 47px;
+    height: 35px;
+    background:url('../images/messager_confirm.gif') no-repeat scroll left top;
+}
+.pup_content{
+    display:inline;
+    overflow: hidden;
+    font-size: 13px;
+}
+.pup_text {
+    float: left;
+    width: 220px;
+    display: block;
+}

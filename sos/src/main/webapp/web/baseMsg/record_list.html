@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+       
+</head>
+<body>
+    <div id="record_list" class="datagrid"></div>
+</body>
+<script type="text/javascript">
+    (function($) {
+
+    	var winClose = function() {
+    		$(document).sgWindow('close', {
+    			id : 'add_record'
+    		});
+    	}
+    	
+    	var winClose3 = function() {
+    		$(document).sgWindow('close', {
+    			id : 'news_view'
+    		});
+    	}
+    	
+    	var winClose_edit = function() {
+    		$(document).sgWindow('close', {
+    			id : 'record_edit'
+    		});
+    	}
+    	
+    	
+    	
+    	var loadSuccess_edit = function(){
+     		//填充编辑前的值
+     		   if(editId && editObj){
+     				  $("#id",$("#record_add")).val(editObj.id);
+    				  $("#loc_name",$("#record_add")).val(editObj.loc_name);
+    				  $("#b_type",$("#record_add")).val(editObj.b_type);
+    				  $("#location",$("#record_add")).val(editObj.location);
+    				  $("#remark",$("#record_add")).val(editObj.remark);
+     		   }
+     		  editId=null;
+     		 editObj=null; 
+     		  
+     	   }
+
+    	
+        
+        
+        var addItem = function(){
+        	var defaults = {
+       			title : '添加档案',
+       			id : 'add_record',
+       			form : 'record_add_form',
+       			url : 'record_add.html',
+       			width : 350,
+       			height : 200,
+       			buttons : [ {
+       				name : '保存',
+       				type : 'submit',
+       			    onpress : save
+       			}, {
+       				name : '关闭',
+       				onpress : winClose
+       			} ]
+       		};
+       		$(document).sgWindow(defaults);
+        }
+        
+        
+        
+
+        var editItem = function() {
+        	 	var obj = $('#record_list');
+    	        var bDiv = $('.bDiv',obj);
+    	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+    	            $(document).sgPup({message:'message_info',text: "只能选择一条记录！"});
+    	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+    	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+    	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+    	        	 $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+    		                if($(this).attr("checked")){  
+    		                	editId=this.value;
+    		                	editObj=$(this).data('data');
+    			    			var defaults = {
+    			    				title : '编辑',
+    			    				id : 'record_edit',
+    			    				form : 'record_add_form',
+    			    				url : 'record_add.html',
+    			    				success: loadSuccess_edit,
+    			    				width : 350,
+    			    				height : 200,
+    			    				buttons : [ {
+    			    	   				name : '保存',
+    			    	   				type : 'submit',
+    			    	   			    onpress : update
+    			    	   			},{
+    			    					name : '关闭',
+    			    					onpress : winClose_edit
+    			    				} ]
+    			    			};
+    			    			$(document).sgWindow(defaults);
+    		                }
+    		            });
+    	   }else{
+    		   $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+    	    }
+        	
+    	}
+        
+        
+    	 var deleteItem = function(){
+    	        var obj = $('#record_list');
+    	        var bDiv = $('.bDiv',obj);
+    	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+    	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+    	        }else{
+    	        	 $(document).sgConfirm({text: '确定删除吗?',cfn:function(r){ 
+    	    		   if(r){
+    	        		var flag = false;
+    	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+    		                if($(this).attr("checked")){    
+    		                	editId=this.value;
+    		                	editobj = $(this).data('data');
+    		                		var ids=[];
+    		                		ids.push(editId);
+    			                	//打开窗口
+    			                	$.ajax( {
+    				            		  type : 'post', 
+    				            		  async: false,   
+    				            		  contentType : 'application/json',     
+    				            		  dataType : 'json',     
+    				            		  url : '../../record/delete',   
+    				            		  data:JSON.stringify(ids),
+    				            		  success : function(data) {
+    				            			  if(data){
+    				            				 if(data.success){
+    				    	          		 		flag = true; 
+    				            				 }else{
+    				            					flag = false; 
+    				            				 }
+    				            			  }
+    				            		  } ,     
+    				            		  error : function(res,error) { 
+    				            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+    				            		  }    
+    				            		}); 
+    		                	
+    		                }
+    		            });
+    	        		if(flag){
+    	        			$(document).sgPup({message:'message_info',text: "删除成功！"});
+    	        		}else{
+    	        			//$(document).sgPup({message:'message_info',text: "删除不成功！"});
+    	        		}
+    	        		$('#record_list').sgDatagrid('reload','sgDatagrid');
+    	        	}	
+    	        	
+    	        }});
+    	        }
+    	    }
+        
+    	 
+    		function save() {
+    			$.ajax({
+    				type : 'post',
+    				async : false,
+    				contentType : 'application/json',
+    				dataType : 'json',
+    				url : '../../record/add',
+    				data : JSON.stringify({
+    					b_type : $('#b_type', '#add_record').val(),
+    					loc_name : $('#loc_name', '#add_record').val(),
+    					location : $('#location', '#add_record').val(),
+    					remark : $('#remark', '#add_record').val()
+    				}),
+    				success : function(data) {
+    					if (data) {
+    						if (data.success) {
+    							$(document).sgWindow('close', {
+    								id : 'add_record'
+    							});
+    							 $('#record_list').sgDatagrid('reload','sgDatagrid');
+    						}
+    						 $(document).sgPup({message:'message_info',text: data.msg});
+    					}
+    				},
+    				error : function(res, error) {
+    					alert("responseText=" + res.responseText
+    							+ ";error=" + error);
+    				}
+    			});
+    			$('#add_record').unbind();//以下两行可以阻止提交2次
+    			return false;
+    		}
+    		
+    		
+    		function update() {
+    			$.ajax({
+    				type : 'post',
+    				async : false,
+    				contentType : 'application/json',
+    				dataType : 'json',
+    				url : '../../record/update',
+    				data : JSON.stringify({
+    					loc_id : $('#id', '#record_edit').val(),
+    					b_type : $('#b_type', '#record_edit').val(),
+    					loc_name : $('#loc_name', '#record_edit').val(),
+    					location : $('#location', '#record_edit').val(),
+    					remark : $('#remark', '#record_edit').val()
+    				}),
+    				success : function(data) {
+    					if (data) {
+    						if (data.success) {
+    							$(document).sgWindow('close', {
+    								id : 'record_edit'
+    							});
+    							 $('#record_list').sgDatagrid('reload','sgDatagrid');
+    						}
+    						 $(document).sgPup({message:'message_info',text: data.msg});
+    					}
+    				},
+    				error : function(res, error) {
+    					alert("responseText=" + res.responseText
+    							+ ";error=" + error);
+    				}
+    			});
+    			$('#record_edit').unbind();//以下两行可以阻止提交2次
+    			return false;
+    		}
+    		
+    		
+/* 
+        function save() {
+        	 var url = 	'../../record/add';
+        	$.ajax({
+        		type : 'post',
+        		async : false,
+        		contentType : 'application/json',
+        		dataType : 'json',
+        		url : url,
+        		data : JSON.stringify({
+        			id : $('#id', '#news_edit_form').val(),
+        			b_type : $('#title', '#news_edit_form').val(),
+        			content : $('#content', '#news_edit_form').val(),
+        			is_top : $('#is_top', '#news_edit_form').val(),
+        			new_origin : $('#new_origin', '#news_edit_form').val()
+        		}),
+        		success : function(data) {
+        			if (data) {
+        				if (data.success) {
+        					 $(document).sgWindow('close',{id:'news_edit'});
+        					 $('#record_list').sgDatagrid('reload','sgDatagrid');
+        				}
+        				 $(document).sgPup({message:'message_info',text: data.msg});
+        			}
+        		},
+        		error : function(res, error) {
+        			alert("responseText=" + res.responseText
+        					+ ";error=" + error);
+        		}
+        	});
+        	$('#news_edit_form').unbind();//以下两行可以阻止提交2次
+        	return false;
+        }
+         */
+
+    	
+    	
+    	
+    	//初始化表格
+        var today = new Date().format('yyyy-MM-dd');
+        var twoDayBefore = GetDateStr(-2);
+
+        var defaults = {
+            title: "档案管理",
+            width:  970,
+            height: 395,
+            url: '../../record/findRecordByPage',
+            datatype:"json",
+            usepager: true,
+    	    rownumbers:true,
+            useRp: true,
+            colid:'id',  //主键
+            colModel : [
+                {display: '位置编号', name : 'loc_name', width : 100},
+    			{display: '档案类型', name : 'b_type', width : 60, formatter:function(value,row){
+    				if(value==1){
+                        value = "入网档案";
+                    }else{
+                    	value = "业务档案";
+                    }
+                    return value;
+                }},
+                {display: '具体位置', name : 'location', width : 130, formatter:function(value,row){
+    				if(value.length >16){
+    			        value = value.substr(0,10)+"...";
+    			    }else{
+    			    	value = value;
+    			    }
+    			    return value;
+    			}},
+              
+    			{display: '时间', name : 'stamp', width : 120}
+            ],
+            
+            buttons : [
+				{name: '新增', bclass: 'add', onpress : addItem},
+				{separator: true},
+    			{name: '编辑', bclass: 'edit', onpress : editItem},
+    			{separator: true},
+    			{name: '删除', bclass: 'delete', onpress : deleteItem},
+    	        {separator: true}
+    			/*
+    			{name: '转单', bclass: 'add', onpress : shiftItem},
+    			{separator: true},
+              
+                {name: '工单结束', bclass: 'add', onpress : endItem},
+                {separator: true} */
+            ],
+            searchitems :[
+                {display:'编号',name:'loc_name',type:'text',width:'120'},
+                {display:'档案类型',name:'b_type',html:'<select style="width:120px"  name="b_type"><option value="" selected>请选择...</option><option value="1">入网档案</option><option value="2">业务档案</option></select>'}
+            ],
+            sortname: "id",
+            sortorder: "desc"
+        };
+        $('#record_list').sgDatagrid(defaults);
+    })(jQuery);
+    
+    
+    
+    
+    
+    function GetDateStr(AddDayCount) {
+	    var dd = new Date();
+	    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+	    return dd.format('yyyy-MM-dd');
+	}
+</script>
+</html>

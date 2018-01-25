@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>电工借用情况</title>
+</head>
+<body>
+<form id='writeOff_add_form' method='post' class="form" style="width:100%" >
+	<fieldset style="width:840px;">
+        <div id="dgd_borrow_list" class="datagird"></div>
+	</fieldset>
+</form>
+</body>
+<script type="text/javascript">
+(function($){
+	var defaults = {
+	        width:  '100%',
+	        height: 450,
+	     	url:'',
+	        isNotCheckall:true,
+	        rownumbers:true,//序号
+	        colModel : [
+	            {display: '商品名称', name : 'productName', width : 300, sortable : false},
+	         	{display: '商品规格', name : 'norm', width : 300, sortable : false},
+	            {display: '借用数量', name : 'num', width : 100, sortable : false}
+	        ],
+	        query:{writeoffsStatus:0}//未销
+	    };
+	$('#dgd_borrow_list').sgDatagrid(defaults);
+
+})(jQuery)
+
+</script>
+</html>

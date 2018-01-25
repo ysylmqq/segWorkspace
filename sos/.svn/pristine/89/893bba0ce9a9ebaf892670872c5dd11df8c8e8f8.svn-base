@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>商品定义</title>
+   <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+
+<body>
+<div id="nw_document_all">
+ <div id="dgd_product" class="datagrid"></div>
+</div>
+</body>
+ <script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script>
+	<script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+    (function($){
+       var editId=null;//编辑时选中行ID 
+       var selectedObj=null;//选择行的值
+       
+ 	   var loadSuccess4Out = function(){
+ 		  $("#sourceType",$("#form_product4Out")).val(2);
+ 		   //填充编辑前的值
+ 		   if(editId){
+ 		      $("#id",$("#form_product4Out")).val(editId);
+			  $.ajax( {
+	   		  type : 'post', 
+	   		  async: false,   
+	   		  contentType : 'application/json',     
+	   		  dataType : 'json',     
+	   		  url : '../../product/getProduct',   
+	   		  data:JSON.stringify({id:editId}),
+	   		  success : function(data) {
+	   			  if(data){
+	   				  $("#id",$("#form_product4Out")).val(editId);
+	   				  $("#code",$("#form_product4Out")).val(data.code);
+	   				  $("#name",$("#form_product4Out")).val(data.name);
+	   				  $("#norm",$("#form_product4Out")).val(data.norm);
+	   				  //$("#price",$("#form_product4Out")).val(data.price);
+	   				  $("#unit",$("#form_product4Out")).val(data.unit);
+	   				  $("#type",$("#form_product4Out")).val(data.type);
+	   				  $("#status",$("#form_product4Out")).val(data.status);
+	   				  $("#issell",$("#form_product4Out")).val(data.issell);
+	   				  $("#sourceType",$("#form_product4Out")).val(data.sourceType);
+	   				  $("#remark",$("#form_product4Out")).val(data.remark);
+	   			  }else{
+	   				  $(document).sgPup({message:'message_info',text: data});
+	   			  }
+	   		  } ,     
+	   		  error : function(res,error) { 
+	   		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	   		  }    
+	   		}); 
+ 		   
+ 		   }
+ 		  selectedObj=null;
+ 	   }
+ 	  var loadSuccess4Custom= function (){
+		   //填充编辑前的值
+ 		   if(editId){
+ 		      $("#id",$("#form_product4Custom")).val(editId);
+			 try{
+				 $.ajax( {
+			   		  type : 'post', 
+			   		  async: false,   
+			   		  contentType : 'application/json',     
+			   		  dataType : 'json',     
+			   		  url : '../../product/getProduct',   
+			   		  data:JSON.stringify({id:editId}),
+			   		  success : function(data) {
+			   			  if(data){
+			   				  $("#id",$("#form_product4Custom")).val(editId);
+			   				  $("#code",$("#form_product4Custom")).val(data.code);
+			   				  $("#name",$("#form_product4Custom")).val(data.name);
+			   				  $("#norm",$("#form_product4Custom")).val(data.norm);
+			   				  $("#unit",$("#form_product4Custom")).val(data.unit);
+			   				  $("#type",$("#form_product4Custom")).val(data.type);
+			   				  $("#status",$("#form_product4Custom")).val(data.status);
+			   				  $("#issell",$("#form_product4Custom")).val(data.issell);
+			   				  $("#remark",$("#form_product4Custom")).val(data.remark);
+				   			   
+			   				   if(data.type==1){
+				   					$('#fs_part',$("#form_product4Custom")).hide();
+				   				}else{
+				   					$('#fs_part',$("#form_product4Custom")).show();
+				   				}
+			   				  //再查询商品的配件信息
+			   				 var query={productId:editId};//type:1,如果是配件转成了成品，则查询配件时，把type=1的条件去掉 
+			   				  $.ajax( {
+			   		   		  type : 'post', 
+			   		   		  async: false,   
+			   		   		  contentType : 'application/json',     
+			   		   		  dataType : 'json',     
+			   		   		  url : '../../product/findParts',   
+			   		   		  data:JSON.stringify(query),
+			   		   		  success : function(data) {
+			   		   	   			//先删除原有的
+								  $('#div_parts').prevAll('div[id^=div_parts]').find('a').trigger('click');
+			   		   			  //把配件信息添加到配件表格中
+			   		   			   var divId=null;
+			   		   			  var key=0;
+			   		   			  $.each(data,function(k,selectedPartData){
+				   		   			  if(selectedPartData){
+					   					var pid = selectedPartData.id;//配件id
+					   					var pcode = selectedPartData.code;//编号
+					   					var pname = selectedPartData.name;//名称
+					   					var pnorm = selectedPartData.norm;//规格
+					   					var remark = selectedPartData.remark;//备注
+					   					var num = selectedPartData.num;
+					   				    divId='#div_parts';
+										if(k>0){
+											 $("#div_parts a").trigger('click');
+											 key=k-1;
+											 divId=divId+"_"+key;
+										}
+										$('input[name=productId]',divId).val(pid);
+										$('input[name=productCode]',divId).val(pcode);
+										 $('input[name=productName]',divId).val(pname);
+										 $('input[name=norm]',divId).val(pnorm);
+										 $('input[name=num]',divId).val(num);
+										 $('input[name=remark]',divId).val(remark);
+					   		   		  }
+			   					});
+			   		   		
+			   		   		  }
+			   				 });
+			   			  }else{
+			   				  $(document).sgPup({message:'message_info',text: data});
+			   			  }
+			   		  } ,     
+			   		  error : function(res,error) { 
+			   		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			   		  }    
+			   		}); 
+			 }catch(e){
+				$(document).sgPup({message:'message_info',text: e});
+			 }
+ 		   
+ 		   }
+			selectedObj=null;
+ 	  };
+ 	  
+ 	//商品明细窗口加载成功后
+	    var loadSuccess4View = function(){
+ 			if(editId==null){
+ 				return false;
+ 			}
+	    	 $.ajax( {
+		   		  type : 'post', 
+		   		  async: false,   
+		   		  contentType : 'application/json',     
+		   		  dataType : 'json',     
+		   		  url : '../../product/getProduct',   
+		   		  data:JSON.stringify({id:editId}),
+		   		  success : function(data) {
+		   			  if(data){
+		   				  $("#code",$("#form_product4View")).val(data.code);
+		   				  $("#name",$("#form_product4View")).val(data.name);
+		   				  $("#norm",$("#form_product4View")).val(data.norm);
+		   				  $("#unit",$("#form_product4View")).val(data.unit);
+		   				  $("#type",$("#form_product4View")).val(data.type);
+		   				  //$("#status",$("#form_product4View")).html(data.status);
+		   				  $("#issell",$("#form_product4View")).val(data.issell);
+		   				  $("#remark",$("#form_product4View")).val(data.remark);
+			   			   
+		   				   if(data.type==1){
+			   					$('#fs_part',$("#form_product4View")).hide();
+			   				}else{
+			   					$('#fs_part',$("#form_product4View")).show();
+			   				}
+		   				   //查看明细，设置input标签卫disabled
+		   				  var inputs=$("input,textarea,select","#form_product4View");
+			   			  $.each(inputs, function(key,value){
+			   					$(this).attr('disabled',true);
+			   			  });
+		   			 }else{
+		   				  $(document).sgPup({message:'message_info',text: data});
+		   			  }
+		   		  } ,     
+		   		  error : function(res,error) { 
+		   		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		   		  }    
+		   		}); 
+	    	if($('#dgd_part').get(0)){
+	        	var query={productId:editId};//type:1,如果是配件转成了成品，则查询配件时，把type=1的条件去掉 
+	        	
+	        	//初始化表格
+	       	 	var defaults = {
+	       		        width:  760,
+	       		        height: 255,
+	       		        url: '../../product/findParts',
+	       		        //colid:'id',  //主键
+	    		        rownumbers:true,//序号
+	       		        colModel : [
+	       		            {display: '编码', name : 'code', width : 140, sortable : false},
+	        		            {display: '名称', name : 'name', width : 140, sortable : false},
+	        		            {display: '规格', name : 'norm', width : 200, sortable : false},
+	        		            {display: '单位', name : 'unit', width : 50, sortable : false},
+	        		            {display: '数量', name : 'num', width : 50, sortable : false},
+	        		            {display: '备注', name : 'remark', width : 80, sortable : false}
+	       		        ],
+	       		        //exporturl:'',//导出excel
+	       		        query:query//查询默认参数
+	       		    };
+	       		    $('#dgd_part').sgDatagrid(defaults);
+	    	}
+	 	}
+ 	
+       var winClose4Out = function (){
+          $(document).sgWindow('close',{id:'win_product4Out'});
+       }
+       var winClose4Custom = function (){
+           $(document).sgWindow('close',{id:'win_product4Custom'});
+        }
+       
+       var save4Custom = function(){
+    	 //做表单提交
+			 var existProductMap=[];//已选择的商品
+			//做表单提交
+	 		 var params=[];
+			 var code=$('#code',$('#form_product4Custom')).val();
+			 if(code && code.length==13){
+				 $('#code',$('#form_product4Custom')).get(0).setCustomValidity('商品编码长度不能为13位!'); 
+			 }else{
+				 $('#code',$('#form_product4Custom')).get(0).setCustomValidity(''); 
+			 }
+			 var externalProduct={
+					id:$('#id',$('#form_product4Custom')).val(),
+					sourceType:$('#sourceType',$('#form_product4Custom')).val(),
+					code:code,
+					name:$('#name',$('#form_product4Custom')).val(),
+					type:$('#type',$('#form_product4Custom')).val(),
+					norm:$('#norm',$('#form_product4Custom')).val(),
+					unit:$('#unit',$('#form_product4Custom')).val(),
+					issell:$('#issell',$('#form_product4Custom')).val(),
+					status:$('#status',$('#form_product4Custom')).val(),
+					remark:$('#remark',$('#form_product4Custom')).val()};
+			
+			 params.push(externalProduct);
+			 
+			 
+			 var productIds = $('input[name=productId]','#panel_parts');
+		      var productNames=$('input[name=productName]','#panel_parts');
+		       //var productCodes=$('input[name=productCode]','#panel_parts');
+		       var productNorms=$('input[name=norm]','#panel_parts');
+		       var productNums= $('input[name=num]','#panel_parts');
+		       var remarks= $('input[name=remark]','#panel_parts');
+		       var details = new Array();
+		       if(productNames.length==0){ 
+		     	   $(document).sgPup({message:'message_info',text: '请添加商品！'})
+		     	   return false;
+		        }
+		       $.each(productIds,function(k,v){
+		       	var obj = {};
+		       	obj.id =v.value;
+		       	obj.num = productNums[k].value;
+		       	obj.remark = remarks[k].value;
+		       	params.push(obj);
+		    	if(v.value){
+		       		productNames[k].setCustomValidity(''); 
+			       	if(existProductMap[productIds[k].value]){ 
+			        	productNames[k].setCustomValidity('此商品已添加!'); 
+			       	   	return false;
+			          }else{
+			        	  productNames[k].setCustomValidity(''); 
+			          	  existProductMap[productIds[k].value]=productIds[k].value;
+			          }
+			    }else{
+			    	productNames[k].setCustomValidity('请输入商品名称/编码!'); 
+			    }
+		       });
+		    $("#form_product4Custom").unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+				
+			$("#form_product4Custom").on('submit',function(e){
+	             var url='../../product/addFromCustom';
+	 		     if($('#id',$('#form_product4Custom')).val()){
+	 		    	url='../../product/updateProductFromCustom';
+	 		     }
+	             // $(document).sgPup({message:'message_info',text: JSON.stringify(params)});
+	             $(document).sgConfirm({text: '确定保存商品信息吗?',cfn:function(r){ 
+		    		     	if(r){
+	             
+		               $.ajax( {
+		       		  type : 'post', 
+		       		  async: false,   
+		       		  contentType : 'application/json',     
+		       		  dataType : 'json',     
+		       		  url : url,   
+		       		  data:JSON.stringify(params),
+		       		  success : function(data) {
+		       			  if(data){
+		       				  if(data.success){
+		       					  $(document).sgWindow('close',{id:'win_product4Custom'}); 
+		   	          		 	  $('#dgd_product').sgDatagrid('reload','sgDatagrid');
+		       				  }
+		       				 $(document).sgPup({message:'message_info',text: data.msg});
+		       			  }else{
+		       				  $(document).sgPup({message:'message_info',text: data});
+		       			  }
+		       		  } ,     
+		       		  error : function(res,error) { 
+		       		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		       		  }    
+		       		}); 
+	               }
+	           }});
+	              //$('#form_product4Custom').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	            //e.stopPropagation();
+	              return false;
+		   }); 
+ 	   };
+ 	   
+ 	   var save4Out = function(){
+ 		  var code=$('#code',$('#form_product4Out')).val();
+		  if(code && code.length==13){
+			 $('#code',$('#form_product4Out')).get(0).setCustomValidity('商品编码长度不能为13位!'); 
+		  }else{
+			 $('#code',$('#form_product4Out')).get(0).setCustomValidity(''); 
+		  }
+ 		  $("#form_product4Out").unbind('submit');//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+ 		   $("#form_product4Out").on('submit',function(e){
+ 	        		//做表单提交
+   	                    var params = {};
+   	                    $.each($("#form_product4Out").serializeArray(),function(k,v){
+   	                        	params[v.name]= v.value;
+   	                     });
+	  	                 var url='../../product/addFromOut';
+	  	    		     if(editId){
+	  	    		    	url='../../product/updateProduct';
+	  	    		     }
+	  	    		     $(document).sgConfirm({text: '确定保存商品信息吗?',cfn:function(r){ 
+		    		     	if(r){
+	  	    		  
+    	                    $.ajax( {
+    	            		  type : 'post', 
+    	            		  async: false,   
+    	            		  contentType : 'application/json',     
+    	            		  dataType : 'json',     
+    	            		  url : url,   
+    	            		  data:JSON.stringify(params),
+    	            		  success : function(data) {
+    	            			  if(data){
+    	            				 if(data.success){
+    	            					 $(document).sgWindow('close',{id:'win_product4Out'}); 
+    	    	          		 		 $('#dgd_product').sgDatagrid('reload','sgDatagrid');
+    	    	          		 		
+    	            				 }
+    	            				$(document).sgPup({message:'message_info',text: data.msg});
+    	            			  }
+    	            		  } ,     
+    	            		  error : function(res,error) { 
+    	            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+    	            		  }    
+    	            		}); 
+	  	    		   }
+	  	    		}});
+ 	            $('#form_product4Out').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+        		e.stopPropagation();
+ 	        	return false;
+ 	        });
+  
+ 	   };
+ 	  
+ 	 var addItem4Custom = function(){
+		    editId=null;
+	        var defaults = {
+	                title:'商品新增',
+	                id:'win_product4Custom',
+	                form:'form_product4Custom',
+	                url:'product_form4custom.html',
+	                success: loadSuccess4Custom,
+	                width: 850,
+	                height:450,
+	                buttons : [
+	                           {name: '确定', type: 'submit', onpress : save4Custom},
+	                           {name: '关闭', onpress : winClose4Custom},
+	                           {name: '重置', type: 'reset'}
+	                       ]
+	            };
+	        $(document).sgWindow(defaults);
+	    }
+ 	  
+ 	  var addItem4Out = function(){
+ 		    editId=null;
+ 	        var defaults = {
+ 	                title:'商品新增',
+ 	                id:'win_product4Out',
+ 	                form:'form_product4Out',
+ 	                url:'product_form4out.html',
+ 	                success: loadSuccess4Out,
+ 	                width: 520,
+ 	                height:245,
+ 	                buttons : [
+ 	                           {name: '确定', type: 'submit', onpress : save4Out},
+ 	                           {name: '关闭', onpress : winClose4Out},
+ 	                           {name: '重置', type: 'reset'}
+ 	                       ]
+ 	            };
+ 	        $(document).sgWindow(defaults);
+ 	        
+ 	        
+ 	    }
+
+ 	    var delItem = function(){
+ 	    	var obj = $('#dgd_product');
+ 	        var bDiv = $('.bDiv',obj);
+ 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+ 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+ 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+ 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+ 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+ 	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	                if($(this).attr("checked")){    
+ 	                	var ids=[];
+ 	                	ids.push(this.value);
+ 	                	selectedObj=$(this).data('data');
+ 	                	if(selectedObj.sourceType==0){//如果是总部商品,则不能编辑
+ 	                		$(document).sgPup({message:'message_info',text: '不能删除总部商品!'});
+ 	                	    return false;
+ 	                	}
+ 	                	$(document).sgConfirm({text: '此为逻辑删除，确定删除?',cfn:function(r){ 
+		    		     	if(r){
+ 	                
+	 	                	 $.ajax( {
+	 		            		  type : 'get', 
+	 		            		  async: false,   
+	 		            		  contentType : 'application/json',     
+	 		            		  dataType : 'json',     
+	 		            		  url : '../../product/updateStatus20',   
+	 		            		  data:$.param({ids:ids,status:0},true),
+	 		            		  success : function(data) {
+	 		            			  if(data){
+	 		            				 if(data.success){
+	 		    	          		 		 $('#dgd_product').sgDatagrid('reload','sgDatagrid');
+	 		            				 }
+	 		            				$(document).sgPup({message:'message_info',text: data.msg});
+	 		            			  }
+	 		            		  } ,     
+	 		            		  error : function(res,error) { 
+	 		            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	 		            		  }    
+	 		            		});
+ 	                	}
+ 	                }});
+ 	                	
+ 	                }
+ 	            });
+ 	        }else{
+ 	            $(document).sgPup({message:'message_info',text: "请选择要删除的选项！"});
+ 	        }
+ 	    }
+ 	   
+ 	  var cancelOften = function(){
+	    	var obj = $('#dgd_product');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>=1){
+	            var ids=[];
+	            var oftenId=null;
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){ 
+	                	oftenId=$(this).data('data').oftenId;
+	                	if(oftenId){
+	                		ids.push(oftenId);
+	                	}
+	                }
+	                
+	                $(document).sgConfirm({text: '确定取消设置这些商品为常用商品吗?',cfn:function(r){ 
+	    		     	if(r){
+				               $.ajax( {
+					       		  type : 'post', 
+					       		  async: false,   
+					       		  contentType : 'application/json',     
+					       		  dataType : 'json',     
+					       		  url : '../../product/delProductOftens',   
+					       		  data:JSON.stringify(ids),
+					       		  success : function(data) {
+					       			  if(data){
+					       				  if(data.success){
+					       					  $(document).sgWindow('close',{id:'win_product_often'}); 
+					   	          		 	  $('#dgd_product').sgDatagrid('reload','sgDatagrid');
+					       				  }
+					       				 $(document).sgPup({message:'message_info',text: data.msg});
+					       			  }else{
+					       				  $(document).sgPup({message:'message_info',text: data});
+					       			  }
+					       		  } ,     
+					       		  error : function(res,error) { 
+					       		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					       		  }    
+				       		}); 
+			               }
+           }});
+	            });
+	        }else{
+ 	            $(document).sgPup({message:'message_info',text: "请选择要取消设置的选项！"});
+ 	        }
+ 	  }
+ 	   var setOften = function(){
+	    	var obj = $('#dgd_product');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>=1){
+	            var selectedObjs=[];
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){    
+	                	selectedObjs.push($(this).data('data'));
+	                }
+	            });
+	            var winOftenLoadSuccess=function(){
+	            	$('#dgd_product_often').sgDatagrid('appendData',selectedObjs);
+	            	//设置排序号 默认值为序号
+	            	$('input[name=orderNo]',$('#dgd_product_often')).val(1);
+	            }
+	            var save=function(){
+	            	//做表单提交
+	   	 		   var params=[];
+	   	 		   var obj = $('#dgd_product_often');
+	   	           var bDiv = $('.bDiv',obj);
+	   	           var rowObj=null;
+	   	           var ptr=null;
+	   	           $('input[type=checkbox]',bDiv).each(function(i){
+	   	        	    rowObj=$(this).data('data');
+	   	        	    ptr=$(this).parents('tr');
+	   	        	    params.push({
+	   	        	    	productId:rowObj.id,
+	   	        	    	type:rowObj.type,
+	   	        	    	orderNo:ptr.find('input[name=orderNo]').val(),
+	   	        	    	remark:ptr.find('input[name=remark]').val()
+	   	        	    });
+	   	        });
+	   	        	 $(document).sgConfirm({text: '确定添加常用商品信息吗?',cfn:function(r){ 
+		    		     	if(r){
+					               $.ajax( {
+						       		  type : 'post', 
+						       		  async: false,   
+						       		  contentType : 'application/json',     
+						       		  dataType : 'json',     
+						       		  url : '../../product/addProductOftens',   
+						       		  data:JSON.stringify(params),
+						       		  success : function(data) {
+						       			  if(data){
+						       				  if(data.success){
+						       					  $(document).sgWindow('close',{id:'win_product_often'}); 
+						   	          		 	  $('#dgd_product').sgDatagrid('reload','sgDatagrid');
+						       				  }
+						       				 $(document).sgPup({message:'message_info',text: data.msg});
+						       			  }else{
+						       				  $(document).sgPup({message:'message_info',text: data});
+						       			  }
+						       		  } ,     
+						       		  error : function(res,error) { 
+						       		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+						       		  }    
+					       		}); 
+				               }
+	           }});
+	              
+	            }
+	            var defaults = {
+	 	                title:'常用商品设置',
+	 	                id:'win_product_often',
+	 	                form:'form_product_often',
+	 	               url:'product_setoften.html',
+	 	                success: winOftenLoadSuccess,
+	 	               width: 828,
+		                 height: 445,
+	 	                buttons : [
+	 	                           {name: '确定', type: 'submit', onpress : save},
+	 	                           {name: '关闭', onpress : function(){
+	 	                        	  $(document).sgWindow('close',{id:'win_product_often'}); 
+	 	                           }}
+	 	                       ]
+	 	            };
+	 	        $(document).sgWindow(defaults);
+	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择要设置的选项！"});
+	        }
+	    }
+ 	   
+ 	   var recycleItem = function(){
+ 		     //打开窗口
+ 	         var defaults = {
+ 		                title:'商品回收站',
+ 		                id:'win_product_recycle',
+ 		                url:'product_recycle.html',
+ 		                width: 688,
+ 		                 height: 445,
+ 		                buttons : [
+ 		                           {name: '关闭', type: 'button', onpress : function (){
+ 		                               $(document).sgWindow('close',{id:'win_product_recycle'});
+ 		                            }
+ 		                           }
+ 		                       ]
+ 		            };
+ 		        $(document).sgWindow(defaults);
+	    }
+ 	   
+ 	    var editItem = function(){
+ 	        var obj = $('#dgd_product');
+ 	        var bDiv = $('.bDiv',obj);
+ 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+ 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+ 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+ 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+ 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+ 	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	                if($(this).attr("checked")){    
+ 	                	editId=this.value;
+ 	                	selectedObj=$(this).data('data');
+ 	                	if(selectedObj.sourceType==0){//如果是总部商品,则不能编辑
+ 	                		$(document).sgPup({message:'message_info',text: '不能编辑总部商品!'});
+ 	                	    return false;
+ 	                	}
+ 	                	var defaults = {
+ 	        	                title:'商品编辑',
+ 	        	                id:'win_product4Out',
+ 	        	                form:'form_product4Out',
+ 	        	                url:'product_form4out.html',
+ 	        	                success: loadSuccess4Out,
+ 	        	                width: 520,
+ 	       	                    height:245,
+ 	        	                buttons : [
+ 	        	                           {name: '确定', type: 'submit', onpress : save4Out},
+ 	        	                           {name: '关闭', onpress : winClose4Out},
+ 	        	                           {name: '重置', type: 'reset'}
+ 	        	                       ]
+ 	        	            };
+ 	        	            
+ 	                	if(selectedObj.sourceType==2){//如果是自定义
+ 	                		defaults= {
+ 	     	       	                title:'商品编辑',
+ 	     	       	                id:'win_product4Custom',
+ 	     	       	                form:'form_product4Custom',
+ 	     	       	                url:'product_form4custom.html',
+ 	     	       	                success: loadSuccess4Custom,
+ 	     	       	                width: 850,
+ 	     		                    height:450,
+ 	     	       	                buttons : [
+ 	     	       	                           {name: '确定', type: 'submit', onpress : save4Custom},
+ 	     	       	                           {name: '关闭', onpress : winClose4Custom},
+ 	     	       	                           {name: '重置', type: 'reset'}
+ 	     	       	                       ]
+ 	     	       	            };
+ 	                	}
+ 	                	
+ 		    	        $(document).sgWindow(defaults);
+ 	                }
+ 	            });
+ 	        }else{
+ 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+ 	        }
+ 	    }
+ 	 
+ 	   var exportExcel = function(){
+	    	 var url="../../sell/exportExcel4ProductDetail?id="+editId;
+	         window.location.href=url;
+		}; 
+ 	    //查询成品的配件信息
+ 	   	function viewItem(){
+ 	   	 var obj = $('#dgd_product');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){
+                	editId=this.value;
+		 	   		//$(document).sgPup({message:'message_info',text: productId});
+		 	    	//打开窗口
+		 	         var defaults = {
+		 		                title:'商品明细',
+		 		                id:'win_product_detail',
+		 		                url:'product_detail.html',
+		 		                success: loadSuccess4View,
+		 		                width: 810,
+		 		                height:520,
+		 		                buttons : [
+										   {name: '导出Excel', onpress : exportExcel},
+		 		                           {name: '关闭', type: 'button', onpress : function (){
+		 		                               $(document).sgWindow('close',{id:'win_product_detail'});
+		 		                                editId=null;
+		 		                            }
+		 		                           }
+		 		                       ]
+		 		            };
+		 		        $(document).sgWindow(defaults);
+	                }
+	            });
+	        }
+ 	   	}
+ 	   //修改表格的宽度
+        var height =$('#main_bd',window.parent.document).height()-218;
+    	//初始化表格
+    	 var defaults = {
+    		        title: "商品定义",
+    		        width:  '100%',
+    		        height: height,
+    		        url: '../../product/findProducts',
+    		        usepager: true,
+    		        rownumbers:true,
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+    		            {display: '编码', name : 'code', width : 120, sortable : true},
+    		            {display: '名称', name : 'name', width : 140, sortable : true},
+    		            {display: '规格', name : 'norm', width : 160, sortable : true},
+    		            //{display: '单价', name : 'price', width : 50, sortable : true},
+    		            {display: '单位', name : 'unit', width : 40, sortable : true},
+    		            {display: '类别', name : 'type', width : 50, sortable : true,formatter:function(value,row){
+    		                if(value==0){
+    		                    value = '<a href="#" onClick="findParts(\''+row.id+'\')">成品</a>';
+    		                }else if(value==1){
+    		                    value = '配件';
+    		                }
+    		                return value;
+    		            }},
+    		            {display: '是否生效', name : 'status', width : 70,sortable : true,formatter:function(value,row){
+    		                if(value==0){
+    		                    value = '<font color="red">否</font>';
+    		                }else if(value==1){
+    		                    value = '<font color="green">是</font>';
+    		                }
+    		                return value;
+    		            }},
+    		            {display: '是否在销', name : 'issell', width : 70,sortable : true,formatter:function(value,row){
+    		            	if(value==0){
+    		                    value = '<font color="red">否</font>';
+    		                }else if(value==1){
+    		                    value = '<font color="green">是</font>';
+    		                }
+    		                return value;
+    		            }},
+    		            {display: '来源', name : 'sourceType', width : 70,sortable : true,formatter:function(value,row){
+    		                if(value==0){
+    		                    value = '总部';
+    		                }else if(value==1){
+    		                    value = '外部采购';
+    		                }else{
+    		                    value = '自定义';
+    		                }
+    		                return value;
+    		            }},
+    		            {display: '常用排序号', name : 'orderNo', width : 70, sortable : true,formatter:function(value,row){
+    		            	if(row.oftenId){
+    		            		return value;
+    		            	}else{
+    		            		return '';
+    		            	}
+    		            }}
+      		          
+    		        ],
+    		        buttons : [
+    		            {name: '增加(源于外部采购)', bclass: 'add', onpress : addItem4Out},
+    		            {name: '增加(源于自定义)', bclass: 'add', onpress : addItem4Custom},
+    		            {separator: true},
+    		            {name: '编辑', bclass: 'edit', onpress : editItem},
+    		            {separator: true},
+    		            {name: '删除', bclass: 'delete', onpress : delItem},
+    		            {separator: true},
+    		            {name: '设置常用商品', bclass: 'edit', onpress : setOften},
+    		            {separator: true},
+    		            {name: '取消常用设置', bclass: 'edit', onpress : cancelOften},
+    		            {separator: true},
+    		            {name: '查看', bclass: 'view', onpress : viewItem},
+    		            {separator: true}/* ,
+    		            {name: '回收站', bclass: 'recycle', onpress : recycleItem} */
+    		        ],
+    		        searchitems :[
+						{display:'编码',name:'code',type:'text'},
+    		            {display:'名称',name:'name',type:'text'},
+    		            {display:'规格',name:'norm',type:'text'},
+    		            {display:'是否有效',name:'status',html:'<select name="status" ><option value="">请选择...</option><option value="0">否</option><option value="1"  selected>是</option></select>'},
+    		            {display:'是否常用',name:'isOften',html:'<select name="isOften" ><option value="">请选择...</option><option value="0">否</option><option value="1">是</option></select>'},
+    		            {display:'类型',name:'type',html:'<select name="type"><option value="0" selected>成品</option><option value="1">配件</option></select>'},
+    		            {display:'来源',name:'sourceType',html:'<select name="sourceType"><option value="" selected>请选择...</option><option value="0">总部</option><option value="1">外部采购</option><option value="2">自定义</option></select>'}
+    		        ],
+    		        exporturl:'../../product/exportAllProducts',//导出excel
+    		        query:{status:1,type:0},//查询默认参数
+       		     	order:true
+       		        //sortname: "name",
+       		        //sortorder: "asc"
+    		    };
+    		    $('#dgd_product').sgDatagrid(defaults); 
+
+    			 //回车事件代替tab键
+    			$(window.document).keydown(function(event){
+    		        switch(event.keyCode) {
+    		            case 13:
+    		                event.keyCode=9;
+    		                break;
+    		        }
+    		    });
+    })(jQuery)
+    
+    //配件信息窗口加载成功后
+    var partWinLoad = function(){
+    	if($('#dgd_part').get(0)){
+        	var query={productId:editId};//type:1,如果是配件转成了成品，则查询配件时，把type=1的条件去掉 
+       		 $('#dgd_part','#win_product_part').sgDatagrid('reload',{query:query,url:'../../product/findParts'});
+    	}
+ 	}
+    
+    //查询成品的配件信息
+   	function findParts(productId){
+    	editId=productId;
+   		//$(document).sgPup({message:'message_info',text: productId});
+    	//打开窗口
+         var defaults = {
+	                title:'配件信息',
+	                id:'win_product_part',
+	                url:'product_part.html',
+	                success: partWinLoad,
+	                width: 848,
+	                height: 445,
+	                buttons : [
+	                           {name: '关闭', type: 'button', onpress : function (){
+	                               $(document).sgWindow('close',{id:'win_product_part'});
+	                            }
+	                           }
+	                       ]
+	            };
+	        $(document).sgWindow(defaults);
+   	}
+</script>
+</html>

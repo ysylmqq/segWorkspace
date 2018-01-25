@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>核销记录查询</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css"><link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+<div id="nw_document_all">
+	<div id="dgd_writeoffs" class="datagird" ></div>
+	<datalist id="userDataList"></datalist>
+</div>
+	<!-- 打印iframe -->
+	<iframe id="ifm_print_wwm" name="ifm_print_wwm" style="display: none"></iframe>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+	var selectedObj=null;//选择行的值
+	(function($){
+	 
+	 var userDataList = {};//销售经理 key:name,value:id
+	 
+	 var begeinDate =new Date();
+		begeinDate.setDate(1);
+		begeinDate=begeinDate.format('yyyy-MM-dd');
+		
+	 var now =new Date();
+	 //now.setYear(2013);
+	 //now.setMonth(5);
+	 now=now.format('yyyy-MM-dd');
+	
+	//明细窗口加载成功后
+	  var loadSuccess4View = function(){
+			if(selectedObj==null){
+				return false;
+			}
+			$("#id",$("#form_writeoffs4View")).val(selectedObj.id);
+			  $("#managersId",$("#form_writeoffs4View")).val(selectedObj.managersId);
+			  $("#managersName",$("#form_writeoffs4View")).val(selectedObj.managersName);
+			  $("#writeoffsNo",$("#form_writeoffs4View")).val(selectedObj.writeoffsNo);
+			  $("#receiptNo",$("#form_writeoffs4View")).val(selectedObj.receiptNo);
+			  $("#peopleMoney",$("#form_writeoffs4View")).val(selectedObj.peopleMoney);
+			  $("#stamp",$("#form_writeoffs4View")).val(selectedObj.stamp);
+			  $("#remark",$("#form_writeoffs4View")).val(selectedObj.remark);
+	    	  if($('#dgd_product').get(0)){
+	        	var params={writeoffsId:selectedObj.id};
+	        	
+	       		 $.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../stock/findWriteoffsDetails',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  selectedObj.details=data;
+							  $('#dgd_product').sgDatagrid('appendData',data);
+						  }else{
+						  	$(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					});
+	    	}
+	 	}
+	 //打印
+	var detailPrint=function(){
+		 //$('#ifm_print_wwm').attr('src','stock_print2.html');
+		var	sName='winPrint';
+		var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+		if (isChrome){
+		  sName='ifm_print_wwm';
+		}
+		window.open('print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+		if (!isChrome){
+			//新增遮罩层
+				var mask=$('<div id="print_mask"></div>');
+				mask.addClass('window-mask');
+				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+		        var span=$('<span></span');
+		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+		        span.text('正在打印中...');
+		        mask.append(span);
+			    $(window.document.body).append(mask);
+		}
+	}
+	 //查询成品的配件信息
+	 function viewItem(){
+	   	 var obj = $('#dgd_writeoffs');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){
+	             	selectedObj=$(this).data('data');
+		 	   		//alert(writeoffsId);
+		 	    	//打开窗口
+		 	         var defaults = {
+		 		                title:'核销明细',
+		 		                id:'win_writeoffs_detail',
+		 		                url:'writeoffs_detail.html',
+		 		                success: loadSuccess4View,
+		 		                width: 816,
+		 		                height:520,
+		 		                buttons : [
+										   {name: '打印', onpress : detailPrint},
+		 		                           {name: '关闭', type: 'button', onpress : function (){
+		 		                               $(document).sgWindow('close',{id:'win_writeoffs_detail'});
+		 		                            }
+		 		                           }
+		 		                       ]
+		 		            };
+		 		        $(document).sgWindow(defaults);
+	                }
+	            });
+	        }
+	   	}
+		//初始化表格
+   	 var defaults = {
+   		        title: "核销查询",
+   		     	width:  '100%',
+		        height: 388,
+   		        url: '../../stock/findWriteoffs',
+	   		    usepager: true,
+	 	        rownumbers:true,
+	 	        useRp: true,
+	 	        colid:'id',  //主键
+	 	        query:{startDate:begeinDate,endDate:now},
+   		        colModel : [
+					{display: '核销单号', name : 'writeoffsNo', width : 140, sortable : false},
+					{display: '经办人', name : 'managersName', width : 60, sortable : false},
+				   	{display: '收据编号', name : 'receiptNo', width : 100, sortable : false},
+					{display: '人工费', name : 'peopleMoney', width : 70, sortable : false},
+		         	{display: '日期', name : 'stamp', width : 80, sortable : false},
+		         	{display: '备注', name : 'remark', width : 90, sortable : false}
+   		        ],
+		        searchitems :[	            
+		            {display:'核销单号',name:'writeoffsNo',type:'text',width:150},
+		         	{display:'经办人',html:'<input type="text" name="managersName" id="managersName" style="width:150px;" list="userDataList"/><input type="hidden" name="managersId" id="managersId" />'},
+		            {display:'开始日期',name:'startDate',type:'date',value:begeinDate,width:150},
+			      	{display:'结束日期',name:'endDate',type:'date',value:now,width:150}
+		        ],
+		        buttons : [
+	    		            {name: '查看', bclass: 'view', onpress : viewItem},
+	    		            {separator: true}
+	    		        ],
+		        exporturl:'../../stock/exportExcel4Writeoffs',
+		        order: true,
+   		        sortname: "id",
+   		        sortorder: "desc",
+   		        isCount:true
+   		    };
+   		    $('#dgd_writeoffs').sgDatagrid(defaults); 
+   		    
+   		//自动查询经办人
+			var checkUser = function(){
+				/* var text=this.value;
+				text = text.replace(/\s/g,''); //去除空格
+				if(text!=this.value){//有空格
+					this.value=text;
+					$(this).trigger('change');
+					return false;
+				} */
+				var params = {};
+				params.pageNo = 1;
+				params.pageSize = 10;
+				params.filter = {};
+				params.filter.opname = this.value;
+				params.filter.isCompany = true;//查询机构下的的所有操作人
+				var obj = $(this);
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../getOrgOperators',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  var manager = $("#managersName","#dgd_writeoffs");
+							  						  
+							  if(manager){
+								  if(data.items.length>0){
+							  		  userDataList = {};
+									  $("#userDataList").empty();
+								  }
+								  $.each(data.items,function(k,v){
+									  var op = $("<option></option>");
+									  op.val(obj.val()+" "+v.opname);
+									  $("#userDataList").append(op);
+									  
+									  userDataList[v.opname] = v.opid;
+			 				  	 }); 
+								}
+						  }else{
+						  	$(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					});
+			}
+			
+		  //填充经办人
+		    $.ajax( {
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../getOrgOperators',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#managersName","#dgd_writeoffs");
+					  if(manager){
+						  if(data.items.length>0){
+					          userDataList = {};
+							  $("#userDataList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(v.opname);
+							  $("#userDataList").append(op);
+							  
+							  userDataList[v.opname] = v.opid;
+						  	 }); 
+						  manager.on('keyup',checkUser);
+						  manager.on('change',function(){
+							  	var strs = this.value.split(" ");
+								 if(userDataList[strs[strs.length-1]]){
+										$(this).val(strs[strs.length-1]);
+										$("#managersId","#dgd_writeoffs").val(userDataList[strs[strs.length-1]]);
+										if($("#managersId","#dgd_writeoffs").val().length==0){
+											$("#managersName","#dgd_writeoffs").val("");
+										}
+								    }else{
+								    	$(this).val('');
+								    	$("#managersId","#dgd_writeoffs").val("");
+								    }
+								
+							});
+
+						};
+				  }else{
+				  	$(document).sgPup({message:'message_info',text: data});
+				  }
+			  },     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+			
+	})(jQuery)
+	
+	//打印页面元素设置
+  var callback=function(subWinBody,subWin){
+	$.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCurrentCompany',   
+		  data:JSON.stringify({}),
+		  success : function(data) {
+			  if(data){
+				  var total = 0;
+				  var money = 0;
+				  //表格拉长，左边的空白内容设置长一点
+				  try{
+				  //公司中文名字
+				  $("#cname",subWinBody).empty();
+				  $("#cname",subWinBody).append(data.cnfullname);
+				  //公司英文名字
+				  $("#ename",subWinBody).empty();
+				  $("#ename",subWinBody).append(data.enfullname);
+				  //表单名字
+				  $("#orderTitle",subWinBody).empty();
+				  $("#orderTitle",subWinBody).append("核销单");
+				  //表单日期
+				  $("#orderDate",subWinBody).empty();
+				  $("#orderDate",subWinBody).append(new Date().format('yyyy-MM-dd'));
+				  //表单单号
+				  $("#orderNo",subWinBody).empty();
+				  $("#orderNo",subWinBody).append(selectedObj.writeoffsNo);
+				  
+				 /*  //表前输入单
+				  $("#headInput",subWinBody).append('<span style="width:10%;">核销仓库：</span>');
+				  $("#headInput",subWinBody).append('<div style="width:15%;">'+wareHouseName+'</div>');
+				   */
+				  $("#headInput",subWinBody).append('<span style="width:10%;">收据编号：</span>');
+				  var receiptNoStr=selectedObj.receiptNo;
+				  if(!receiptNoStr){
+					  receiptNoStr='&nbsp;';
+				  }
+				  $("#headInput",subWinBody).append('<div style="width:15%;">'+receiptNoStr+'</div>');
+				  
+				  $("#headInput",subWinBody).append('<span style="width:10%;">人工费：</span>');
+				  var peopleMoneyStr=selectedObj.peopleMoney;
+				  if(!peopleMoneyStr){
+					  peopleMoneyStr='&nbsp;';
+				  }
+				  $("#headInput",subWinBody).append('<div style="width:15%;">'+peopleMoneyStr+'</div>');
+				  
+				  $("#headInput",subWinBody).append('<span style="width:10%;">经办人：</span>');
+				  $("#headInput",subWinBody).append('<div style="width:15%;">'+selectedObj.managersName+'</div>');
+				  
+				  //表头
+				  $("#tbHead",subWinBody).append('<td style="width: 6%;" axis="rownumbers">序号</td>'+
+														  '<td style="width: 15%;" axis="productCode">商品编码</td>'+
+														  '<td style="width: 15%;" axis="productName">商品名称</td>'+
+														  '<td style="width: 20%;" axis="norm">商品规格</td>'+
+														  '<td style="width: 15%;" axis="num">本次核销数量</td>'+
+														  '<td style="width: 5%;" axis="price">单价</td>'+
+														  '<td style="width: 15%;" axis="isExpired">是否在保质期内</td>'+
+														  '<td style="width: 15%;" axis="money">费用</td>');
+				  
+				  if(selectedObj.details){
+						//列头
+			           		var colModel=[];
+			           		colModel.push({name:'rownumbers'});
+			           		colModel.push({name:'productCode'});
+			           		colModel.push({name:'productName'});
+			           		colModel.push({name:'norm'});
+			           		colModel.push({name:'num'});
+			           		colModel.push({name:'price'});
+			           		colModel.push({name:'isExpired'});
+			           		colModel.push({name:'money'});
+			           		
+			           	   var tr=null;
+			    	        var td=null;
+			    	      var wnum=0;//合计入库数量
+			    	        $.each(selectedObj.details,function(i,row){
+			    	            tr = '<tr>';
+			                	$.each(colModel,function(k,v){
+			                		td ='<td>';
+			    	                var tdx = v.name;
+
+			    	            	if(tdx=='rownumbers'){
+			    	                 	var num = i+1;
+			    	                 	td=td+num+'</td>';              	
+			    	                 }if(tdx=='isExpired'){
+				    	                 if(row[tdx]==0){
+				    	                	 td=td+'否</td>';  
+				    	                 }else if(row[tdx]==1){
+				    	                	 td=td+'是</td>';
+				    	                 }else{
+				    	                	 td=td+'</td>';
+				    	                 }              	
+				    	             }else{
+			    	                	 if(row[tdx]=='null' || row[tdx]==null){
+			    	                		 row[tdx]='';
+			    	                	 }
+			    	                	 td=td+row[tdx];
+			    	                	 td=td+'</td>';
+			    	                	 
+			    	                	 if(tdx=='num'){
+			    	                		 wnum=Number(wnum)+Number(row[tdx]);
+			    	                	 }
+			    	                 }
+			    	           
+			    	            	tr=tr+td;
+			                	});
+			                	tr=tr+'</tr>';
+			                	$("#tbBody",subWinBody).append(tr);
+			    	        });
+			    	      
+			    	        if(selectedObj.details.length>0){
+			    	        	 //表合计
+			  				  var tbfoot = '<tr>';
+			  				  tbfoot=tbfoot+'<td colspan="4"><div style="text-align:right">小计:</div></td>';
+			  				  tbfoot=tbfoot+'<td colspan="1">'+wnum+'</td>';
+			  				  tbfoot=tbfoot+'<td colspan="1"></td>';
+			  				  tbfoot=tbfoot+'<td colspan="1"></td>';
+			  				  tbfoot=tbfoot+'<td colspan="1"></td>';
+			  				  tbfoot=tbfoot+'</tr>';
+			  				  $("#tbBody",subWinBody).append(tbfoot);
+			    	        }
+					  }
+	               
+				  //表尾输入单
+				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+													  '<span>复核人：</span><div>&nbsp;</div>'+
+													  '<span>仓管员：</span><div>&nbsp;</div>'+
+													  '<span>制单：</span><div>&nbsp;</div>');
+				  }catch(e){
+					 $(document).sgPup({message:'message_info',text: e});
+				  }
+				  
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+	
+    if (navigator.appName == 'Microsoft Internet Explorer'){
+    	subWin.print();  
+    }else{ 
+    	subWin.focus();
+    	subWin.print();  
+    }
+}
+</script>
+</html>

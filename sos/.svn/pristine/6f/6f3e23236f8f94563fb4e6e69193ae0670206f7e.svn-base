@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>维护统计表</title>
+    <link rel="stylesheet" type="text/css" href="jqplot/jquery.jqplot.min.css" />
+</head>
+<body>
+<div style="overflow-y:scroll;overflow-x:hidden;width:99.4%;height: 100%;padding-left:1px; ">
+	<form id='nw_private_form' method='post' class="form">
+		<div class='title'>营业部维护报表统计></div>
+		<fieldset style="width:830px;">
+		<div class='title'>保修时间类</div>
+		<div id="serverItem1" class="datagrid">
+	   	<div class="hDiv" style="margin:0px;padding:0px;width:830px;">
+	        <table>
+	            <thead>
+	            <tr>
+	                <th style="width:70px;">日期</th>
+	                <th style="width:80px;">2007年6</th>
+	                <th style="width:120px;">2006-6至07-5安装</th>
+	                <th style="width:120px;">2005-1至06-5安装</th>
+	                <th style="width:80px;">2004年安装</th>
+	                <th style="width:80px;">2003年安装</th>
+	                <th style="width:80px;">2002年安装</th>
+	                <th style="width:80px;">2001年安装</th>
+	                <th style="width:80px;">2000年安装</th>
+	                <th style="width:70px;">合计</th>
+	            </tr>
+	            <tr>
+	                <th>数量</th>
+	                <th>44</th>
+	                <th>286</th>
+	                <th>287</th>
+	                <th>303</th>
+	                <th>78</th>
+	                <th>30</th>
+	                <th>21</th>
+	                <th>3</th>
+	                <th>1052</th>
+	            </tr>
+	            </thead>
+	        </table>
+	   	</div>
+	    </div>
+	    <div id="pie1" style="margin-top:10px; margin-left:0px; width:800px; height:250px;"></div>
+	    </fieldset>
+	    
+	    <div class='title'>月维护数据统计</div>
+		<fieldset style="width:830px;">
+	    <div id="chart1" style="margin-top:10px; margin-left:0px; width:800px; height:250px;"></div>
+	    </fieldset>
+	    
+	    <div class='title'>日维护量走向</div>
+		<fieldset style="width:830px;">
+	    <div id="chart2" style="margin-top:10px; margin-left:0px; width:800px; height:250px;"></div>
+	    </fieldset>
+	    
+	    <div class='title'>维护产品分类</div>
+		<fieldset style="width:830px;">
+		<div id="serverItem2" class="datagrid">
+	   	<div class="hDiv" style="margin:0px;padding:0px;width:830px;">
+	        <table>
+	            <thead>
+	            <tr>
+	                <th style="width:30px;">产品型号</th>
+	                <th style="width:36px;">新恒星</th>
+	                <th style="width:36px;">天王星</th>
+	                <th style="width:36px;">世纪星</th>
+	                <th style="width:36px;">天威星</th>
+	                <th style="width:36px;">110型</th>
+	                <th style="width:36px;">天狼星</th>
+	                <th style="width:36px;">追踪器</th>
+	                <th style="width:36px;">时尚型</th>
+	                <th style="width:36px;">海王星</th>
+	                <th style="width:35px;">车神</th>
+	                <th style="width:36px;">小蜜蜂</th>
+	                <th style="width:35px;">VIP888</th>
+	                <th style="width:35px;">VIP25</th>
+	                <th style="width:35px;">VIP368</th>
+	                <th style="width:35px;">VIP668</th>
+	                <th style="width:35px;">PN90</th>
+	                <th style="width:35px;">TN168</th>
+	                <th style="width:35px;">合计</th>
+	            </tr>
+	            <tr>
+	                <th>数值</th>
+	                <th>11</th>
+	                <th>284</th>
+	                <th>107</th>
+	                <th>201</th>
+	                <th>16</th>
+	                <th>65</th>
+	                <th>263</th>
+	                <th>17</th>
+	                <th>46</th>
+	                <th>5</th>
+	                <th>2</th>
+	                <th>8</th>
+	                <th>18</th>
+	                <th>0</th>
+	                <th>7</th>
+	                <th>2</th>
+	                <th>0</th>
+	                <th>1052</th>
+	            </tr>
+	            </thead>
+	        </table>
+	   	</div>
+	    </div>
+	    <div id="chart3" style="margin-top:10px; margin-left:0px; width:800px; height:250px;"></div>
+	    <div style="margin-top:10px;">主机</div>
+	    <div id="serverItem3" class="datagrid">
+	   	<div class="hDiv" style="margin:0px;padding:0px;width:830px;">
+	        <table>
+	            <thead>
+	            <tr>
+	                <th style="width:70px;">故障类</th>
+	                <th style="width:70px;">不定位</th>
+	                <th style="width:80px;">主机返修</th>
+	                <th style="width:70px;">通话类</th>
+	                <th style="width:70px;">报警</th>
+	                <th style="width:70px;">遥控</th>
+	                <th style="width:80px;">主机进水</th>
+	                <th style="width:70px;">其它</th>
+	                <th style="width:70px;">合计</th>
+	            </tr>
+	            <tr>
+	                <th>主机</th>
+	                <th>22</th>
+	                <th>25</th>
+	                <th>2</th>
+	                <th>2</th>
+	                <th></th>
+	                <th>8</th>
+	                <th>76</th>
+	                <th>135</th>
+	            </tr>
+	            </thead>
+	        </table>
+	   	</div>
+	    </div>
+	    <div id="chart4" style="margin-top:10px; margin-left:0px; width:800px; height:250px;"></div>
+	    <div style="margin-top:10px;">遥控类</div>
+	    <div id="serverItem4" class="datagrid">
+	   	<div class="hDiv" style="margin:0px;padding:0px;width:830px;">
+	        <table>
+	            <thead>
+	            <tr>
+	                <th style="width:70px;">故障类</th>
+	                <th style="width:70px;">遥控外壳</th>
+	                <th style="width:70px;">遥控电池</th>
+	                <th style="width:70px;">遥控失灵</th>
+	                <th style="width:70px;">刹车功能</th>
+	                <th style="width:70px;">装回</th>
+	                <th style="width:70px;">转向灯</th>
+	                <th style="width:70px;">遥控丢失</th>
+	                <th style="width:70px;">遥控进水</th>
+	                <th style="width:70px;">其它</th>
+	                <th style="width:70px;">合计</th>
+	            </tr>
+	            <tr>
+	                <th>遥控类</th>
+	                <th>33</th>
+	                <th>19</th>
+	                <th>37</th>
+	                <th>8</th>
+	                <th>9</th>
+	                <th></th>
+	                <th>1</th>
+	                <th>2</th>
+	                <th>38</th>
+	                <th>147</th>
+	            </tr>
+	            </thead>
+	        </table>
+	   	</div>
+	    </div>
+	    <div id="chart5" style="margin-top:10px; margin-left:0px; width:800px; height:250px;"></div>
+	    </fieldset>
+	</form>
+</div>
+</body>
+<script type="text/javascript" src="jqplot/jquery.min.js"></script>
+<script type="text/javascript" src="jqplot/jquery.jqplot.min.js"></script>
+<script type="text/javascript" src="jqplot/jqplot.pieRenderer.min.js"></script>
+<script type="text/javascript" src="jqplot/jqplot.barRenderer.min.js"></script>
+<script type="text/javascript" src="jqplot/jqplot.categoryAxisRenderer.min.js"></script>
+<script type="text/javascript" src="jqplot/jqplot.pointLabels.min.js"></script>
+<script type="text/javascript" src="jqplot/jqplot.highlighter.min.js"></script>
+<script type="text/javascript" src="jqplot/jqplot.cursor.min.js"></script>
+<script class="code" type="text/javascript">
+	(function($) {
+		//饼状图
+	    var plot1 = $.jqplot('pie1', [[['2007年6',44],
+	                                   ['2006-6至07-5安装',286],
+	                                   ['2005-1至06-5安装',287],
+	                                   ['2004年安装',303],
+	                                   ['2003年安装',78],
+	                                   ['2002年安装',30],
+	                                   ['2001年安装',21],
+	                                   ['2000年安装',3]]], {
+	    	seriesDefaults:{
+	            renderer:$.jqplot.PieRenderer,
+	            rendererOptions: {
+	                showDataLabels: true
+	            }
+	        },
+	        legend:{show:true}       
+	    });
+	    //柱图1
+	    $.jqplot.config.enablePlugins = true;
+        var s1 = [1052, 807, 244, 35];
+        var ticks = ['月维护总量', '营业处现场维护量', '上门维护量', '每天平均维护量'];
+         
+        plot1 = $.jqplot('chart1', [s1], {
+            animate: !$.jqplot.use_excanvas,
+            seriesDefaults:{
+                renderer:$.jqplot.BarRenderer,
+                pointLabels: { show: true }
+            },
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.CategoryAxisRenderer,
+                    ticks: ticks
+                }
+            },
+            highlighter: { show: false }
+        });
+        //线型图
+        var s2 = [[1, 44], [2, 33], [3, 28], [4, 24], [5, 31], 
+                [6, 23], [7, 16], [8, 39], [9, 27], [10, 29], [11, 29], [12, 20], [13, 35],
+                [14, 12], [15, 41], [16, 34], [17, 37], [18, 30], [19, 48], [20, 34], [21, 60],
+                [22, 60], [23, 50], [24, 26], [25, 39], [26, 46], [27, 52], [28, 35], [29, 36],
+                [30, 35], [31, 29]];
+        var s3 = [[1, 44], [2, 33], [3, 28], [4, 24], [5, 31], 
+                 [6, 23], [7, 16], [8, 39], [9, 27], [10, 29], [11, 29], [12, 20], [13, 35],
+                 [14, 12], [15, 41], [16, 34], [17, 37], [18, 30], [19, 48], [20, 34], [21, 60],
+                 [22, 60], [23, 50], [24, 26], [25, 39], [26, 46], [27, 52], [28, 35], [29, 36],
+                 [30, 35], [31, 29]];
+               
+        plot1 = $.jqplot("chart2", [s3, s2], {
+            animate: true,
+            animateReplot: true,
+            cursor: {
+                show: true,
+                zoom: true,
+                looseZoom: true,
+                showTooltip: false
+            },
+            series:[
+                {
+                    pointLabels: {
+                        show: true
+                    },
+                    renderer: $.jqplot.BarRenderer,
+                    showHighlight: false,
+                    yaxis: 'y2axis',
+                    rendererOptions: {
+                        animation: {
+                            speed: 2500
+                        },
+                        barWidth: 15,
+                        barPadding: -15,
+                        barMargin: 0,
+                        highlightMouseOver: false
+                    }
+                }, 
+                {
+                    rendererOptions: {
+                        animation: {
+                            speed: 2000
+                        }
+                    }
+                }
+            ],
+            axesDefaults: {
+                pad: 0
+            },
+            axes: {
+                xaxis: {
+                    tickInterval: 1,
+                    drawMajorGridlines: false,
+                    drawMinorGridlines: true,
+                    drawMajorTickMarks: false,
+                    rendererOptions: {
+                    tickInset: 0.5,
+                    minorTicks: 1
+                }
+                },
+                yaxis: {
+                    tickOptions: {
+                        formatString: "%'d"
+                    },
+                    rendererOptions: {
+                        forceTickAt0: true
+                    }
+                },
+                y2axis: {
+                    tickOptions: {
+                        formatString: "%'d"
+                    },
+                    rendererOptions: {
+                        alignTicks: true,
+                        forceTickAt0: true
+                    }
+                }
+            },
+            highlighter: {
+                show: true, 
+                showLabel: true, 
+                tooltipAxes: 'y',
+                sizeAdjust: 7.5 , tooltipLocation : 'ne'
+            }
+        });
+        //柱图2
+        var s4 = [11, 284, 107, 201, 16, 65, 263, 17, 46, 5, 2, 8, 18, 0, 7, 2, 0];
+        var ticks2 = ['新恒星', '天王星', '世纪星', '天威星', '110型', '天狼星', '追踪器', '时尚型', 
+                     '海王星', '车神', '小蜜蜂', 'VIP888', 'VIP25', 'VIP368', 'VIP668',
+                     'PN90', 'TN168'];
+         
+        plot1 = $.jqplot('chart3', [s4], {
+            animate: !$.jqplot.use_excanvas,
+            seriesDefaults:{
+                renderer:$.jqplot.BarRenderer,
+                pointLabels: { show: true }
+            },
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.CategoryAxisRenderer,
+                    ticks: ticks2
+                }
+            },
+            highlighter: { show: false }
+        });
+        
+      	//柱图3
+        var s5 = [22, 25, 2, 2, 0, 8, 76];
+        var ticks3 = ['不定位', '主机返修', '通话类', '报警', '遥控', '主机进水', '其它'];
+         
+        plot1 = $.jqplot('chart4', [s5], {
+            animate: !$.jqplot.use_excanvas,
+            seriesDefaults:{
+                renderer:$.jqplot.BarRenderer,
+                pointLabels: { show: true }
+            },
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.CategoryAxisRenderer,
+                    ticks: ticks3
+                }
+            },
+            highlighter: { show: false }
+        });
+        
+      	//柱图4
+        var s6 = [33, 19, 37, 8, 9, 0, 1, 2, 38];
+        var ticks4 = ['遥控外壳', '遥控电池', '遥控失灵', '刹车功能', '装回', '转向灯', '遥控丢失', 
+                      '遥控进水', '其它'];
+         
+        plot1 = $.jqplot('chart5', [s6], {
+            animate: !$.jqplot.use_excanvas,
+            seriesDefaults:{
+                renderer:$.jqplot.BarRenderer,
+                pointLabels: { show: true }
+            },
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.CategoryAxisRenderer,
+                    ticks: ticks4
+                }
+            },
+            highlighter: { show: false }
+        });
+	    
+	})(jQuery);
+</script>
+<script type="text/javascript">
+	var j = $.noConflict(true);
+</script>
+</html>

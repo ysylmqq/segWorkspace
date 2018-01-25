@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>销售缴费</title>
+</head>
+<body>
+	<form id='whs_stockin_allocated_form' method='post' class="form" style="width:870px;">
+        <div class='title'>销售缴费></div>
+        <fieldset style="width:850px;">
+        	<div class="panel">
+				<div class='submit' id="divObj1" style="text-align:left;">
+					<span>客户名称:</span>
+	            	<input type='text' id="stamp" name='stamp' style="width:150px;" />
+					
+	            	<span>车牌号码:</span>
+	            	<input type='text' id="stamp" name='stamp' style="width:150px;" />
+	            	<button id="stockin_detail_submit" type="submit" style="width:80px;height:26px;" >查询</button>
+	        	</div>
+			</div>
+			<hr>
+			<div class="panel">
+				<span>客户名称:</span>
+            	<input type='text' id="stamp" name='stamp' style="width:150px;" disabled="disabled" />
+				
+            	<span>车牌号码:</span>
+            	<input type='text' id="stamp" name='stamp' style="width:150px;" disabled="disabled" />
+
+				<span>服务状态:</span>
+            	<select style="width:154px;" disabled="disabled">
+                	<option>在网</option>
+                	<option>离网</option>
+                	<option>欠费离网</option>
+                </select>
+			</div>
+			<div class="panel">
+                <span>代理商:</span>
+            	<input type='text' id="stamp" name='stamp' style="width:150px;" />
+            	
+            	<span>销售经理:</span>
+            	<input type='text' id="stamp" name='stamp' style="width:150px;" />
+            	
+            	<span>金额:</span>
+            	<input type='text' id="stamp" name='stamp' style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>办理人:</span>
+            	<input type='text' id="stamp" name='stamp' style="width:150px;" />
+            	
+            	<span>备注:</span>
+            	<input type='text' id="stamp" name='stamp' style="width:150px;" />
+            </div>
+        </fieldset>
+        <div class='title'>合计</div>
+        <fieldset style="width:850px;">
+			<div class="panel">
+                <span>应收金额:</span>
+                <input type='text' id="stockInNo" name='stockInNo' required="true"  style="width:170px;" />
+                
+                <span>实收金额:</span>
+                <input type='text' id="stockInStamp" name='stockInStamp' required="true" style="width:170px;" />
+                
+                <span>收据单号:</span>
+                <input type='text' id="stockInStamp" name='stockInStamp' required="true" style="width:170px;" />
+            </div>
+            <div class="panel">    
+                <span>经办人:</span>
+                <input type="text" name="stockInManagers" id="stockInManagers" required="true" list="userList" style="width:170px;" autocomplete="on" />
+                <input type="hidden" name="stockInManagersId" id="stockInManagersId" required="true" />
+                <datalist id="userList"></datalist>
+   
+                <span>交款方式:</span>
+                <input type="radio" name="color" id="colorBlue" value="0" checked="checked"  style="position: relative; top:5px;margin-right:5px;" />现金
+            		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            		<input type="radio" name="color" id="colorRed" value="1" style="position: relative; top:5px;margin-right:5px;" />刷卡 
+            		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            		<input type="radio" name="color" id="colorYellow" value="2" style="position: relative; top:5px;margin-right:5px;" />转帐
+            		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            		<input type="checkbox" name="flag" id="flag" value="2" style="position: relative; top:5px;margin-right:5px;" />发票
+            </div>
+            <div class="panel">    
+                <span>备注:</span>
+                <input type='text' id="stockInRemark" name='purchaseRemark' style="width:710px;" />
+            </div>
+        </fieldset>
+        <fieldset style="width:850px;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="stockin_detail_submit" type="submit" >打印</button>
+	            <button id="mysave" type="submit" >保存</button> 
+	            <button id="mycancel" type="button">重置</button>
+	        </div>
+        </fieldset>
+	</form>
+</body>
+<script type="text/javascript">
+	(function($){
+		//填充员工
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : 'getOrgOperators',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#stockInManagers","#whs_stockin_allocated_form");
+				  userList = {};
+				  if(manager){
+					  if(data.items.length>0){
+						  $("#userList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userList").append(op);
+						  
+						  userList[v.opname] = v.opid;
+					  	 }); 
+					  manager.on('keyup',checkUser);
+					  manager.on('change',function(){
+						  	var strs = this.value.split(" ");
+							$(this).val(strs[strs.length-1]);
+							$("#stockInManagersId","#whs_stockin_allocated_form").val(userList[strs[strs.length-1]]);
+							if($("#stockInManagersId","#whs_stockin_allocated_form").val().length==0){
+								$("#stockInManagers","#whs_stockin_allocated_form").val("");
+							}
+						});
+
+					};
+			  }else{
+			  	alert(data);
+			  }
+		  },     
+		  error : function(res,error) { 
+		  	 alert("responseText="+res.responseText+";error="+error);     
+		  }    
+		});
+	})(jQuery)
+</script>
+</html>

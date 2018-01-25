@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>销账明细</title>
+</head>
+
+<body style="padding: 0px;margin: 0px;">
+
+<form id="form_writeoffs4View" class="form" style="width:100%;height:440px;" >
+		<div class="title">销账信息></div>
+		<fieldset style="width:auto;height:110px;" >
+             <div style="height:30px;" class="panel">
+             	 <input type='hidden' id="id" name='id' disabled="disabled"/>
+              
+                <span>销账单号:</span>
+                <input type='text' id="writeoffNo" name='writeoffNo'  style="width:155px;" disabled="disabled"/>
+              
+                <span>日期:</span>
+                <input type='text' id="stamp" name='stamp'  style="width:155px;" disabled="disabled"/>
+              
+                <span>客户:</span>
+                <input type='text' id="channelName" name="channelName"  style="width:155px;" disabled="disabled"/>
+              
+             </div>
+              <div class="panel">
+                <span>销售经理:</span>
+                 <input name="managerName" id="managerName"   style="width:155px;" disabled="disabled" />
+                <input type="hidden" name="managerId" id="managerId" />
+                
+                <span style="vertical-align:top;">转账票号:</span>
+                <input type="text" id="ticketno"  name="ticketno" style="width:155px;vertical-align:top;" disabled="disabled"/>
+                
+                <span style="vertical-align:top;width: 82px;">上次销账金额:</span>
+                <input type="text" id="lastBalance"  name="lastBalance" style="width:152px;vertical-align:top;" disabled="disabled" />
+                
+            </div>
+             <div class="panel">
+                <span style="vertical-align:top;width: 82px;">本次销账金额:</span>
+                <input type="text" id="offAmount"  name="offAmount" style="width:152px;vertical-align:top;" disabled="disabled" />
+                
+                <span style="vertical-align:top;width: 82px;">本次结余金额:</span>
+                <input type="text" id="balance"  name="balance" style="width:155px;vertical-align:top;" disabled="disabled" />
+                
+                <span style="vertical-align:top;">备注:</span>
+                <textarea  id="remark" name='remark'  style="width:152px;" rows="2" disabled="disabled"></textarea>
+            </div>
+        </fieldset>
+		
+		<div class="title">商品信息></div>
+		<fieldset id="fs_product" class='fieldset'  style="width:auto;">
+ 		<div id="dgd_product" class="datagrid"></div>
+        </fieldset>
+</form>
+</body>
+<script type="text/javascript">
+    (function($){
+    	//初始化表格
+   	 	var defaults = {
+   		        width:  810,
+   		        height: 275,
+   		        //url: '../../stock/findWriteoffsDetails',
+   		        url:'',
+		        rownumbers:true,//序号
+		        isCount:true,
+   		        colModel : [
+					    {display: '商品编码', name : 'productCode', width : 100, sortable : false},
+    		            {display: '商品名称', name : 'productName', width : 140, sortable : false},
+    		            {display: '商品规格', name : 'norm', width : 160, sortable : false},
+    		            {display: '挂账数量', name : 'quantity', width :70, sortable : false,isAdd:true},
+    		            {display: '本次销账数量', name : 'num', width :80, sortable : false,isAdd:true},
+    		            {display: '剩余数量', name : 'remainQuantity', width : 70, sortable : false,isAdd:true},
+    		            {display: '金额', name : 'money', width : 60, sortable : false,isAdd:true},
+   		        ]
+   		    };
+   		    $('#dgd_product').sgDatagrid(defaults);
+   		    
+    })(jQuery)
+    
+</script>
+</html>

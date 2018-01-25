@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>销售报表(总部、分公司、营业处)</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+<div id="nw_document_all">
+	 <div id="dgd_stockout" class="datagrid"></div>
+	 <datalist id="companyDataList"></datalist>
+	  <datalist id="productDataList">
+	            </datalist>
+</div>         
+ <!-- 打印iframe -->
+	<iframe id="ifm_print_sales_main" name="ifm_print_sales_main" style="display: none"></iframe>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+	var level='0';//判断用户是总部、分公司、营业处的人
+	(function($){
+		var companyDataList = null;
+		var productDataList=[];//商品数组 key:商品名称,value code:productId
+		
+		var lastMonthDay=new Date();//上个月的今天
+    	//lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+		lastMonthDay.setDate(1);
+    	lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+		var today=new Date().format('yyyy-MM-dd');
+		  //修改表格的宽度
+        var height =$('#main_bd',window.parent.document).height()-288;
+		
+    	//初始化表格
+    	 var defaults = {
+    		        title: "销售报表",
+    		        width:  '100%',
+    		        fitColumn:  true,
+    		        height: height,
+    		        url: '../../stock/findSaleOutDetails',
+    		        usepager: true,
+    		        rownumbers:true,
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '商品编码', name : 'productCode', width : 100, sortable : false},
+    		            {display: '商品名称', name : 'productName', width : 120, sortable : false},
+    		            {display: '商品规格', name : 'norm', width : 220, sortable : false},
+    		            {display: '销售数量', name : 'num', width : 120, sortable : false,isAdd:true},
+       		            {display: '分公司名称', name : 'companyName', width : 90, sortable : false},
+       		         	{display: '仓库名称', name : 'whsName', width : 90, sortable : false},
+       		         	{display: '操作类型', name : 'type', width : 80, sortable : false},
+       		         	{display: '单号', name : 'stockCode', width : 130, sortable : false},
+    		            {display: '经办人', name : 'managersName', width : 90, sortable : false},
+    		         	{display: '客户', name : 'channelName', width : 90, sortable : false},
+    		         	{display: '备注', name : 'remark', width : 90, sortable : false},
+    		         	{display: '日期', name : 'stamp', width : 90, sortable : false}
+    		        ],
+    		        buttons : [
+    		        ],
+    		        searchitems :[
+						{display:'类别',html:'<select name="type" id="type" style="width:60px"><option value="0">汇总</option><option value="1">明细</option> </select>'},
+						{display:'商品名称',html:'<input type="text" name="productNameCondn" list="productDataList" style="width:150px;" /> <input type="hidden" id="productId" name="productId" />'},
+						{display:'分公司',html:'<input type="text" name="companyName" id="companyName" style="width:161px;" list="companyDataList"/><input type="hidden" name="companyId" id="companyId" />'},
+						{display:'营业处仓库',html:'<select size="1" name="whsId" id="whsId" style="width:150px"><option value="">--请选择--</option> </select>'},
+					    {display:'开始日期',name:'startDate',type:'date',value:lastMonthDay,width:150},
+					    {display:'结束日期',name:'endDate',type:'date',value:today,width:150}
+					  
+    		        ],
+    		        query:{startDate:lastMonthDay,endDate:today},
+    		        exporturl:'../../stock/exportExcel4SaleOutDetails',//导出excel
+    		        isCount:true//是否合计
+    		    };
+    		    $('#dgd_stockout').sgDatagrid(defaults); 
+    		    
+    		    $('#dgd_stockout table tr th:nth-child(7),td:nth-child(7)').hide();//分公司名称隐藏 
+     		   $('#dgd_stockout table tr th:nth-child(8),td:nth-child(8)').hide();//仓库名称隐藏
+     		   
+     		  $('#dgd_stockout table tr th:nth-child(9),td:nth-child(9)').hide();//操作类型隐藏 
+     		  $('#dgd_stockout table tr th:nth-child(10),td:nth-child(10)').hide();//单号隐藏 
+    		   $('#dgd_stockout table tr th:nth-child(11),td:nth-child(11)').hide();//经办人隐藏
+    		   $('#dgd_stockout table tr th:nth-child(12),td:nth-child(12)').hide();//客户名称隐藏 
+     		   $('#dgd_stockout table tr th:nth-child(13),td:nth-child(13)').hide();//备注隐藏
+     		  $('#dgd_stockout table tr th:nth-child(14),td:nth-child(14)').hide();//日期隐藏 
+     		  //表格的宽度=表头表格的宽度
+     	       $('#dgd_stockout .bDiv table').width($('#dgd_stockout .hDiv table').width());
+     		  
+     	      //自动查询商品
+     			var checkProduct = function(){
+     				/* var text=this.value;
+     				text = text.replace(/\s/g,''); //去除空格
+     				if(text!=this.value){//有空格
+     					this.value=text;
+     					$(this).trigger('change');
+     					return false;
+     				} */
+     				var params = {};
+     				params.pageNo = 1;
+     				params.pageSize = 15;
+     				params.filter = {};
+     				params.filter.nameOrCode = this.value;
+     				var obj = $(this);
+     				$.ajax({
+     					  type : 'post', 
+     					  async: true,   
+     					  contentType : 'application/json',     
+     					  dataType : 'json',     
+     					  url : '../../product/findProducts',   
+     					  data:JSON.stringify(params),
+     					  success : function(data) {
+     						  if(data){
+     							  var products = data.items;
+     							  if(products.length>0){
+     								  $("#productDataList").empty();
+     							      productDataList=[];
+     							  }
+     							  var key=null;
+     							  $.each( products, function(key,value){
+     								  var op = $("<option></option>");
+     								  key=value.code;
+     								  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+     									 
+     								  $("#productDataList").append(op);
+     								  productDataList[key]=value.id;
+     							 });
+     						  }else{
+     							  $(document).sgPup({message:'message_info',text: data});
+     						  }
+     					  } ,     
+     					  error : function(res,error) { 
+     					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+     					  }    
+     					});
+     			};
+     			
+     		  //填充商品
+     			$.ajax({
+     				  type : 'post', 
+     				  async: true,   
+     				  contentType : 'application/json',     
+     				  dataType : 'json',     
+     				  url : '../../product/findProducts',   
+     				  data:JSON.stringify({pageNo:1,pageSize:15,filter:{type:0}}),
+     				  success : function(data) {
+     					  if(data){
+     						  var products = data.items;
+     						  $("#productDataList").empty();
+     						  var key=null;
+     						  productDataList=[];
+     						  $.each( products, function(key,value){
+     							  var op = $("<option></option>");
+     							  key=value.code;
+     							  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+     							  
+     							  $("#productDataList").append(op);
+     							  productDataList[key]=value.id;
+     						 });
+     						var productNameCondn=$('input[name=productNameCondn]',$('#dgd_stockout'));
+     						productNameCondn.on('keyup',checkProduct);
+     						
+     						productNameCondn.on('change',function(){
+     							var strs = this.value.split(" ");
+     							$(this).val(strs[strs.length-3]);
+     							if($(this).val()){
+  								$("#productId",$('#dgd_stockout')).val(productDataList[strs[strs.length-2]]);
+  								if($("#productId",$('#dgd_stockout')).val().length==0){
+  									$("#productNameCondn",$('#dgd_stockout')).val("");
+  								}
+  						    }else{
+  						    	$(this).val('');
+  						    	$("#productId",$('#dgd_stockout')).val("");
+  						    }
+  						
+  							});
+
+     					  }else{
+     						  $(document).sgPup({message:'message_info',text: data});
+     					  }
+     				  } ,     
+     				  error : function(res,error) { 
+     				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+     				  }    
+     				}); 
+     		  
+    		  //自动查询分公司
+    			var stockCompany = function(){
+    				/* var text=this.value;
+    				text = text.replace(/\s/g,''); //去除空格
+    				if(text!=this.value){//有空格
+    					this.value=text;
+    					$(this).trigger('change');
+    					return false;
+    				} */
+    				var params = {};
+    				params.companyname = this.value;
+    				var obj = $(this);
+    				$.ajax({
+    					  type : 'post', 
+    					  async: true,   
+    					  contentType : 'application/json',     
+    					  dataType : 'json',     
+    					  url : '../../getBranchs',   
+    					  data:JSON.stringify(params),
+    					  success : function(data) {
+    						  if(data){
+    							  var companys = data;
+    							  if(companys.length>0){
+    								     $("#companyDataList").empty();
+    							  		companyDataList = {};
+    							   }
+    							  $.each( companys, function(key,value){
+    								  var op = $("<option></option>");
+    								  op.val(obj.val()+" "+value.companyname);
+    								  $("#companyDataList").append(op);
+    								  
+    								  companyDataList[value.companyname]=value.companyno;
+    								});
+    						  }else{
+    							  $(document).sgPup({message:'message_info',text: data});
+    						  }
+    					  } ,     
+    					  error : function(res,error) { 
+    					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+    					  }    
+    					});
+    			};
+    			
+    			  //判断是分公司还是总部，如果是分公司，还需要查询出所有仓库列表
+    			$.ajax({
+    				  type : 'POST', 
+    				  async: false,   
+    				  url : '../../getUserCompanyLevel',
+    				  dataType : 'json',    
+    				  contentType : 'application/json',     
+    				  data: JSON.stringify({}),
+    				  success : function(data) {
+    					  if(data){
+    						  if(data.success){
+    							  level=data.result;
+    							 if(level=='0'){//总部
+    								   //填分公司
+    								   $('#dgd_stockout .sDiv form .pGroup:eq(3)').hide();
+    									$.ajax({
+    										  type : 'post', 
+    										  async: true,   
+    										  contentType : 'application/json',     
+    										  dataType : 'json',     
+    										  url : '../../getBranchs',   
+    										  data:JSON.stringify({}),
+    										  success : function(data) {
+    											  if(data){
+    												  var companys = data;
+    				    							  if(companys.length>0){
+    				    								     $("#companyDataList").empty();
+    				    							  		companyDataList = {};
+    				    							   }
+    				    							  $.each( companys, function(key,value){
+    				    								  var op = $("<option></option>");
+    				    								  op.val(value.companyname);
+    				    								  $("#companyDataList").append(op);
+    				    								  
+    				    								  companyDataList[value.companyname]=value.companyno;
+    				    								});
+    												  
+    												  $("#companyName").on('keyup',stockCompany);
+    												  $("#companyName").on('change',function(){
+    													    var strs = this.value.split(" ");
+    													    if(companyDataList[strs[strs.length-1]]){
+    													    	$(this).val(strs[strs.length-1]);
+    															
+    															$("#companyId").val(companyDataList[strs[strs.length-1]]);
+    															
+    															if($("#companyId").val().length==0){
+    																$("#companyName").val("");
+    															}
+    													    }else{
+    													    	$(this).val('');
+    													    	$("#companyId").val("");
+    													   }
+    													    
+    													});
+    												  
+    											  }else{
+    												  $(document).sgPup({message:'message_info',text: data});
+    											  }
+    										  } ,     
+    										  error : function(res,error) { 
+    										  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+    										  }    
+    										});
+    							 }else if(level=='1'){//分公司
+    								 //隐藏分公司
+    								 $('#dgd_stockout .sDiv form .pGroup:eq(2)').hide();
+    								
+    								//填充仓库
+    								    $.ajax( {
+    									  type : 'post', 
+    									  async: false,   
+    									  contentType : 'application/json',     
+    									  dataType : 'json',     
+    									  url : './../../stock/findWarehouses',   
+    									  data:JSON.stringify({}),//除开本仓库
+    									  success : function(data) {
+    										  if(data){
+    											  var whsId=$("#whsId");
+    											  if(whsId.get(0)){
+    												  $.each(data,function(k,v){
+    													  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+    												  }); 
+    											  }
+    											 
+    										  }else{
+    											  $(document).sgPup({message:'message_info',text: data});
+    										  }
+    									  } ,     
+    									  error : function(res,error) { 
+    									  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+    									  }    
+    									});	
+    							 }else{//营业处
+    								 //隐藏分公司
+    								 $('#dgd_stockout .sDiv form .pGroup:eq(2)').hide();
+    								//隐藏仓库
+    								 $('#dgd_stockout .sDiv form .pGroup:eq(3)').hide();
+    								 //$('#dgd_stockout table tr th:nth-child(7),td:nth-child(7)').show();//仓库名称显示
+    							 }
+    							 //表格的宽度=表头表格的宽度
+    				     	      $('#dgd_stockout .bDiv table').width($('#dgd_stockout .hDiv table').width());
+    				     		  
+    						  }else{
+    							$(document).sgPup({message:'message_info',text: data.msg}); 
+    						  }
+    					  }
+    				  } 
+    			});
+    		 //复制一个查询,再把它插入到原来查询的后面
+			  $("#dgd_stockout .sDiv>.pGroup:first").clone().insertAfter($("#dgd_stockout .sDiv>.pGroup:first"));
+			  //隐藏之前的查询
+			  $('#dgd_stockout a.button:first').hide();
+			 //重写查询点击事件
+			  $('#dgd_stockout .sDiv>.pGroup:eq(1) a.button:first').on('click',function(){
+				  var params = {};
+				params.type=$('#dgd_stockout select[name=type]').val();
+				params.productId=$('#dgd_stockout input[name=productId]').val();
+				params.companyId=$('#dgd_stockout input[name=companyId]').val();
+				params.whsId=$('#dgd_stockout select[name=whsId]').val();
+				params.startDate=$('#dgd_stockout input[name=startDate]').val();
+				params.endDate=$('#dgd_stockout input[name=endDate]').val();  
+				
+				  $('#dgd_stockout').sgDatagrid('reload',{query:params});
+				  $('#dgd_stockout table tr th:nth-child(7),td:nth-child(7)').hide();//分公司隐藏
+				  $('#dgd_stockout table tr th:nth-child(8),td:nth-child(8)').hide();//仓库隐藏
+				  
+				  $('#dgd_stockout table tr th:nth-child(9),td:nth-child(9)').hide();//操作类型隐藏 
+	     		  $('#dgd_stockout table tr th:nth-child(10),td:nth-child(10)').hide();//单号隐藏 
+	    		   $('#dgd_stockout table tr th:nth-child(11),td:nth-child(11)').hide();//经办人隐藏
+	    		   $('#dgd_stockout table tr th:nth-child(12),td:nth-child(12)').hide();//客户名称隐藏 
+	     		   $('#dgd_stockout table tr th:nth-child(13),td:nth-child(13)').hide();//备注隐藏
+	     		  $('#dgd_stockout table tr th:nth-child(14),td:nth-child(14)').hide();//日期隐藏 
+	     	
+				  if(level=='0'){//总部
+					  if(params.type=='0'){//汇总
+						  $('#dgd_stockout table tr th:nth-child(7),td:nth-child(7)').hide();//分公司隐藏
+					  }else{//明细
+						  $('#dgd_stockout table tr th:nth-child(7),td:nth-child(7)').show();//分公司显示
+					  } 
+				  }else if(level=='1'){//分公司
+					  if(params.type=='0'){//汇总
+				  	 	  $('#dgd_stockout table tr th:nth-child(8),td:nth-child(8)').hide();//仓库名称隐藏
+					  }else{//明细
+						  $('#dgd_stockout table tr th:nth-child(8),td:nth-child(8)').show();//仓库显示
+					  } 
+				  }else{//营业处
+					  if(params.type=='0'){//汇总
+						  $('#dgd_stockout table tr th:nth-child(7),td:nth-child(7)').hide();//分公司隐藏
+				  	 	  $('#dgd_stockout table tr th:nth-child(8),td:nth-child(8)').hide();//仓库名称隐藏
+					  }else{//明细
+						  $('#dgd_stockout table tr th:nth-child(9),td:nth-child(9)').show();//操作类型显示
+			     		  $('#dgd_stockout table tr th:nth-child(10),td:nth-child(10)').show();//单号显示 
+			    		   $('#dgd_stockout table tr th:nth-child(11),td:nth-child(11)').show();//经办人显示
+			    		   $('#dgd_stockout table tr th:nth-child(12),td:nth-child(12)').show();//客户名称显示
+			     		   $('#dgd_stockout table tr th:nth-child(13),td:nth-child(13)').show();//备注显示
+			     		  $('#dgd_stockout table tr th:nth-child(14),td:nth-child(14)').show();//日期显示
+					  } 
+					  //$('#dgd_stockout table tr th:nth-child(7),td:nth-child(7)').show();//仓库名称显示
+				  }
+				 //表格的宽度=表头表格的宽度
+	     	      $('#dgd_stockout .bDiv table').width($('#dgd_stockout .hDiv table').width());
+	     		 
+			  });
+			 
+    		  //复制一个导出->打印,再把它插入到原来导出的后面
+			  $("#dgd_stockout .sDiv>.pGroup:eq(1)").clone().insertAfter($("#dgd_stockout .sDiv>.pGroup:last"));
+			  $("#dgd_stockout .sDiv>.pGroup:last a.button").attr('id','aprint');
+			  $("#dgd_stockout .sDiv>.pGroup:last span.button_span span").html('打印');
+			  //打印
+			 $('#aprint').on('click',function(){
+				 //$('#ifm_print_sales_main').attr('src','stock_print2.html');
+				 var	sName='winPrint';
+   					var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+   					if (isChrome){
+   					  sName='ifm_print_sales_main';
+   					}
+   					window.open('../whs/print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+   					if (!isChrome){
+   						//新增遮罩层
+   		  				var mask=$('<div id="print_mask"></div>');
+   		  				mask.addClass('window-mask');
+   		  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+   		  		        var span=$('<span></span');
+   		  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+   		  		        span.text('正在打印中...');
+   		  		        mask.append(span);
+   		  			    $(window.document.body).append(mask);
+					    } 
+			 });
+			  
+	})(jQuery)
+	
+	
+//打印页面元素设置
+  var callback=function(subWinBody,subWin){
+	         //查询数据
+	       var params = {};
+			params.type=$('#dgd_stockout select[name=type]').val();
+			params.productId=$('#dgd_stockout input[name=productId]').val();
+			params.companyId=$('#dgd_stockout input[name=companyId]').val();
+			params.whsId=$('#dgd_stockout select[name=whsId]').val();
+			params.startDate=$('#dgd_stockout input[name=startDate]').val();
+			params.endDate=$('#dgd_stockout input[name=endDate]').val();
+			
+	 		var resultData=null;//查询结果数据
+	 		
+	 		 $.ajax({
+	 	            type: "POST",
+	 	            async:false,
+	 	            contentType : 'application/json',
+	 	            url: '../../stock/findAllSaleOutDetails',
+	 	            data: JSON.stringify(params),
+	 	            dataType : 'json',
+	 	            success: function(data){
+	 	            	resultData=data;
+	 	            } ,     
+	 	  		  error : function(res,error) { 
+	 	 		  }  
+	 	        });
+	 
+	$.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCurrentCompany',   
+		  data:JSON.stringify({}),
+		  success : function(data) {
+			  if(data){
+				  var total = 0;
+				  //公司中文名字
+				  $("#cname",subWinBody).empty();
+				  $("#cname",subWinBody).append(data.cnfullname);
+				  //公司英文名字
+				  $("#ename",subWinBody).empty();
+				  $("#ename",subWinBody).append(data.enfullname);
+				  //表单名字
+				  $("#orderTitle",subWinBody).empty();
+				  $("#orderTitle",subWinBody).append("销售报表");
+				  //表单日期
+				  $("#orderDate",subWinBody).empty();
+				  $("#orderDate",subWinBody).append(new Date().format('yyyy-MM-dd'));
+				  //表单单号
+				  $("#orderNo",subWinBody).empty();
+				  $("#orderNo",subWinBody).append('&nbsp;');
+				  
+				  var behindColumnTd=[];//后面的列td
+				  var behindColumn=[];
+				  if(level=='0'){//总部
+					  if(params.type=='0'){//汇总
+					  
+					  }else{//明细
+						  behindColumnTd.push('<td style="width: 30%;" axis="companyName"><div>分公司名称</div></td>');
+						  behindColumn.push('companyName');
+					  } 
+				  }else if(level=='1'){//分公司
+					  if(params.type=='0'){//汇总
+					  
+					  }else{//明细
+						  behindColumnTd.push('<td style="width: 30%;" axis="whsName"><div>仓库名称</div></td>');
+						  behindColumn.push('whsName');
+					  } 
+				  }else{
+					  if(params.type=='0'){//汇总
+					  
+					  }else{//明细
+						  behindColumnTd.push('<td style="width: 7%;" axis="type"><div>操作类型</div></td>');
+						  behindColumn.push('type');
+						  behindColumnTd.push('<td style="width: 10%;" axis="stockCode"><div>单号</div></td>');
+						  behindColumn.push('stockCode');
+						  behindColumnTd.push('<td style="width: 10%;" axis="managersName"><div>经办人</div></td>');
+						  behindColumn.push('managersName');
+						  behindColumnTd.push('<td style="width: 10%;" axis="channelName"><div>客户</div></td>');
+						  behindColumn.push('channelName');
+						  behindColumnTd.push('<td style="width: 10%;" axis="remark"><div>备注</div></td>');
+						  behindColumn.push('remark');
+						  behindColumnTd.push('<td style="width: 8%;" axis="stamp"><div>日期</div></td>');
+						  behindColumn.push('stamp');
+					  }   
+				  }
+				  //表头
+				  $("#tbHead",subWinBody).append('<td style="width: 4%;" axis="rownumbers">序号</td>'+
+						  								  '<td style="width: 10%;" axis="productCode">商品编码</td>'+									  
+				  										  '<td style="width: 10%;" axis="productName">商品名称</td>'+
+														  '<td style="width: 15%;" axis="norm">商品规格</td>'+
+														  '<td style="width: 6%;" axis="num">数量</td>'+
+														  behindColumnTd.join('')
+														 );
+				  
+				  if(resultData){
+					//列头
+		           		var colModel=[];
+		           		colModel.push({name:'rownumbers'});
+		           		colModel.push({name:'productCode'});
+		           		colModel.push({name:'productName'});
+		           		colModel.push({name:'norm'});
+		           		colModel.push({name:'num'});
+		           		$.each(behindColumn,function(i,row){
+		           			colModel.push({name:row});
+		           		});
+		           	   var tr=null;
+		    	       var td=null;
+		    	      var stockNum=0;//合计销售数量
+		    	        $.each(resultData,function(i,row){
+		    	            tr = '<tr>';
+		                	$.each(colModel,function(k,v){
+		                		td ='<td>';
+		    	                var tdx = v.name;
+
+		    	            	if(tdx=='rownumbers'){
+		    	                 	var num = i+1;
+		    	                 	td=td+num+'</td>';              	
+		    	                 }else{
+		    	                	 if(row[tdx]=='null' || row[tdx]==null){
+		    	                		 row[tdx]='';
+		    	                	 }
+		    	                	 td=td+row[tdx];
+		    	                	 td=td+'</td>';
+		    	                	 
+		    	                	 if(tdx=='num'){
+		    	                		 stockNum=Number(stockNum)+Number(row[tdx]);
+		    	                	 }
+		    	                 }
+		    	           
+		    	            	tr=tr+td;
+		                	});
+		                	tr=tr+'</tr>';
+		                	$("#tbBody",subWinBody).append(tr);
+		    	        });
+		    	      
+		    	        if(resultData.length>0){
+							  //表合计
+							  var tbfoot = '<tr>';
+							  tbfoot=tbfoot+'<td colspan="4"><div style="text-align:right">小计:</div></td>';
+							  tbfoot=tbfoot+'<td colspan="1">'+stockNum+'</td>';
+							  $.each(behindColumn,function(i,row){
+									tbfoot=tbfoot+'<td colspan="1"></td>';
+				           		});
+							  tbfoot=tbfoot+'</tr>';
+							  $("#tbBody",subWinBody).append(tbfoot);
+						  }
+				  }
+				 
+				  //表尾输入单
+				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+													  '<span>复核人：</span><div>&nbsp;</div>'+
+													  '<span>仓管员：</span><div>&nbsp;</div>'+
+													  '<span>制单：</span><div>&nbsp;</div>');
+				  
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+	 if (navigator.appName == 'Microsoft Internet Explorer'){
+	    	subWin.print();  
+	    }else{ 
+	    	subWin.focus();
+	    	subWin.print();  
+	    }
+}
+</script>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>排班新增</title>
+</head>
+<body>
+	<form id='som_insure_form' method='post' class="form" style="width:100%" >
+		<fieldset style="width:1480px;">
+			<div class='submit' style="text-align:left;">
+	            	<span style="width:100px;">排班名称:</span>
+	                <input type='text' id="name" name='name' style="width:155px;" />            
+	        </div>	    
+	        <hr>
+	        <div class="panel">
+	        		
+	                <span style="width:100px;">排班人:</span>
+	                <input type='text' id="person" name='person' style="width:155px;" /> 
+	                
+	            	<span style="width:100px;">排班时间:</span>
+	                <input type='text' id="netname" name='netname' style="width:155px;" />
+	                
+	                <span style="width:100px;">月份:</span>
+	                <input type='month' id="netname" name='netname' style="width:155px;" />
+            
+	        </div>
+	        <div class="panel">
+      
+	                <span style="width:100px;">营业处:</span>
+	                <input type='text' id="sno" name='sno' style="width:155px;" />  
+	                
+	                <span style="width:100px;">上班开始时间:</span>
+	                <input type='time' id="sbdate" name='sbdate' style="width:155px;" /> 
+	                
+	            	<span style="width:100px;">上班结束时间:</span>
+					<input type='time' id="zbdate" name='zbdate' style="width:155px;" /> 
+	                           
+	        </div>
+	        <div class="panel">	                
+	                <span style="width:100px;">值班开始时间:</span>
+	                <input type='time' id="sbdate" name='sbdate' style="width:155px;" /> 
+	                
+	            	<span style="width:100px;">值班结束时间:</span>
+					<input type='time' id="zbdate" name='zbdate' style="width:155px;" /> 
+	                           
+	        </div>
+	    </fieldset>
+        <fieldset style="width:148s0px;">
+			<div id="dgd_work_detail" class="datagird"></div>
+		</fieldset>
+	</form>
+</body>
+<script type="text/javascript">
+(function($){
+	
+	var defaults = {
+	        width:  '1480',
+	        height: 240,
+	     	url:'',
+	        isNotCheckall:true,
+	        colModel : [
+				{display: '姓名', name : 'type', width : 50, sortable : false},
+	            {display: '1', name : '1', width : 25, sortable : false},
+	            {display: '2', name : '2', width : 25, sortable : false},
+	            {display: '3', name : '3', width : 25, sortable : false},
+	            {display: '4', name : '4', width : 25, sortable : false},
+	            {display: '5', name : '5', width : 25, sortable : false},
+	            {display: '6', name : '6', width : 25, sortable : false},
+	            {display: '7', name : '1', width : 25, sortable : false},	            
+	            {display: '8', name : '1', width : 25, sortable : false},
+	            {display: '9', name : '1', width : 25, sortable : false},
+	            {display: '10', name : '1', width : 25, sortable : false},
+	            {display: '11', name : '1', width : 25, sortable : false},
+	            {display: '12', name : '1', width : 25, sortable : false},
+	            {display: '13', name : '1', width : 25, sortable : false},	            
+	            {display: '14', name : '1', width : 25, sortable : false},
+	            {display: '15', name : '1', width : 25, sortable : false},
+	            {display: '16', name : '1', width : 25, sortable : false},
+	            {display: '17', name : '1', width : 25, sortable : false},	            
+	            {display: '18', name : '1', width : 25, sortable : false},
+	            {display: '19', name : '1', width : 25, sortable : false},
+	            {display: '20', name : '1', width : 25, sortable : false},
+	            {display: '21', name : '1', width : 25, sortable : false},
+	            {display: '22', name : '1', width : 25, sortable : false},
+	            {display: '23', name : '1', width : 25, sortable : false},
+	            {display: '24', name : '1', width : 25, sortable : false},
+	            {display: '25', name : '1', width : 25, sortable : false},
+	            {display: '26', name : '1', width : 25, sortable : false},
+	            {display: '27', name : '1', width : 25, sortable : false},
+	            {display: '28', name : '1', width : 25, sortable : false},
+	            {display: '29', name : '1', width : 25, sortable : false},
+	            {display: '30', name : '1', width : 25, sortable : false},
+	            {display: '31', name : '1', width : 25, sortable : false},
+	         	{display: '上班', name : 'channelName', width : 30, sortable : false},
+	         	{display: '休息', name : 'channelName', width : 30, sortable : false},
+	         	{display: '值班', name : 'channelName', width : 30, sortable : false},
+	         	{display: '出车', name : 'channelName', width : 30, sortable : false},
+	         	{display: '晚上出车', name : 'channelName', width : 30, sortable : false},
+	         	{display: '晚上值班', name : 'channelName', width : 30, sortable : false},
+	         	{display: '假期', name : 'channelName', width : 30, sortable : false}
+	        ]
+	    };
+	$('#dgd_work_detail').sgDatagrid(defaults);
+})(jQuery)
+</script>
+</html>

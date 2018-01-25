@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>总部商品导入</title>
+<style type="text/css">
+.form span{
+	width: 70px;
+}
+.form input[type=file] {
+	width:280px;
+}
+</style>
+</head>
+
+<body>
+<form id="form_productInImp" method="post" class="form" action="../../product/impProductInOut" target="frm_product_imp" enctype="multipart/form-data">
+		<table >
+		  <tr>
+		  	<td>
+		  		<span>选择文件:</span>
+		  	</td>
+		    <td >
+		   		<input type="hidden" id="isOverride" name="isOverride" value="false"/>
+			 	<input type="file" id="productInFile" width="100px" name="productInFile" multiple="multiple" accept="application/vnd.ms-excel" required="required"/>
+		 	</td>
+		    <td >
+		    	<input type="button" id="btn_template_down" value="模板下载" width="70px"/>
+		    </td>
+		  </tr>
+		</table>
+</form>
+<iframe name='frm_product_imp' id="frm_product_imp" style="display:none;" ></iframe> 
+</body>
+<script type="text/javascript">
+(function($){
+	$('#btn_template_down').on('click',function(){
+		document.getElementById('frm_product_imp').src="../../doc/template/Product_out.xls";
+	});
+})(jQuery)
+
+function callback(msg,flag)   
+{   
+	if(msg.indexOf('覆盖')>0){
+		$(document).sgConfirm({text: msg,cfn:function(r){ 
+		if(r){
+		
+			//再次提交	
+			$('#isOverride').val(true);
+			$('input[type=submit]','#win_productInImp').trigger('click');
+			$('#isOverride').val(false);
+		}else{//取消
+			 //移除遮罩层
+			 $('div#imp_mask',window.document.body).remove();
+		}
+	}});
+	}else{
+		$(document).sgPup({message:'message_info',text: msg});
+	}
+	//if(flag) {
+		 //移除遮罩层
+		 $('div#imp_mask',window.document.body).remove();
+		 
+		 $(document).sgWindow('close',{id:'win_productInImp'});
+		 $('#dgd_product_in').sgDatagrid('reload','sgDatagrid');
+	//}
+}   
+</script>
+</html>

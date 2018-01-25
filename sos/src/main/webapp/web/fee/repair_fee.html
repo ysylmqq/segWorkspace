@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>回单缴费</title>
+</head>
+<body>
+	<form id='answer_details_form' method='post' class="form" style="width:670px;">
+		<fieldset style="width:650px;">
+			<div id="answer_details_panel" style="overflow-y:auto">
+				<div id="answer_details_div" class="panel">
+	                <span style="width: 30px;">商品:</span>
+	                <input type='text' name='productName' list="productList" required="true" placeholder="请输入商品名" style="width:190px;" />
+	                <input type="hidden" name="productId" required="true" />
+	                <input type='hidden' name='productCode' required="true" />
+	                	                
+	                <span style="width: 30px;">规格:</span>
+	                <input type='text' name='productNorm' disabled="disabled" style="width:190px;" />
+	                
+	                <span style="width: 30px;">数量:</span>
+	                <input type='number' name='num' placeholder="只允许数字" required="true" value="1" pattern="^[+]?[1-9]+\d*$" style="width:85px;" min="1" onkeyup="this.value=this.value.replace(/\D/g,'')" />
+	            </div>
+			</div>
+			<hr>
+			<div class="panel">
+                <span>配件总金额:</span>
+                <input type='text' id="stockInNo" name='stockInNo' required="true"  style="width:170px;" />
+                
+                <span>安装费:</span>
+                <input type='text' id="stockInStamp" name='stockInStamp' required="true" style="width:170px;" />
+            </div>
+            <div class="panel">
+                <span>人工费:</span>
+                <input type='text' id="stockInNo" name='stockInNo' required="true"  style="width:170px;" />
+                
+                <span>上门费:</span>
+                <input type='text' id="stockInStamp" name='stockInStamp' required="true" style="width:170px;" />
+            </div>
+        </fieldset>
+        <div class='title'>合计></div>
+        <fieldset style="width:650px;">
+			<div class="panel">
+                <span>应收金额:</span>
+                <input type='text' id="stockInNo" name='stockInNo' required="true"  style="width:170px;" />
+                
+                <span>实收金额:</span>
+                <input type='text' id="stockInStamp" name='stockInStamp' required="true" style="width:170px;" />
+            </div>
+            <div class="panel">    
+                <span>经办人:</span>
+                <input type="text" name="stockInManagers" id="stockInManagers" required="true" list="userList" style="width:170px;" autocomplete="on" />
+                <input type="hidden" name="stockInManagersId" id="stockInManagersId" required="true" />
+                <datalist id="userList"></datalist>
+   
+                <span>交款方式:</span>
+                <input type="radio" name="color" id="colorBlue" value="0" checked="checked"  style="position: relative; top:5px;margin-right:5px;" />现金
+            		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            		<input type="radio" name="color" id="colorRed" value="1" style="position: relative; top:5px;margin-right:5px;" />刷卡 
+            		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            		<input type="radio" name="color" id="colorYellow" value="2" style="position: relative; top:5px;margin-right:5px;" />转帐
+            		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
+            <div class="panel">
+                <span>收据单号:</span>
+                <input type='text' id="stockInStamp" name='stockInStamp' required="true" style="width:170px;" />
+                
+                <span>发票:</span>
+                <input type="checkbox" name="flag" id="flag" value="2" style="position: relative; top:5px;margin-right:5px;" />
+            </div>
+            <div class="panel">    
+                <span>备注:</span>
+                <input type='text' id="stockInRemark" name='purchaseRemark' style="width:510px;" />
+            </div>
+        </fieldset>
+	</form>
+</body>
+<script type="text/javascript">
+(function($){
+	var flag = 0;
+	var productList = null;
+	var userList = null
+	
+	var checkProduct = function(){
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {};
+		params.filter.name = this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : 'product/findProducts',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var products = data.items;
+					  $("#productList").empty();
+					  productList = {};
+					  $.each( products, function(key,value){
+						  var op = $("<option></option>");
+						  op.val(obj.val()+" "+value.name.replace(/\s/g,'-')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+						  $("#productList").append(op);
+						  
+						  productList[value.code] = value.id;
+						});
+
+				  }else{
+					  alert(data);
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	 alert("responseText="+res.responseText+";error="+error);     
+			  }    
+			});
+	};
+	
+	$.ajax({
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : 'product/findProducts',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+		  success : function(data) {
+			  if(data){
+				  var products = data.items;
+				  $("#productList").empty();
+				  productList = {};
+				  $.each( products, function(key,value){
+					  var op = $("<option></option>");
+					  op.val(value.name.replace(/\s/g,'-')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+					  $("#productList").append(op);
+					  
+					  productList[value.code] = value.id;
+					});
+				  $("#stockin_detail_div input[list=productList]").on('keyup',checkProduct);
+				  $("#stockin_detail_div input[name=productName]").on('change',function(){
+						var strs = this.value.split(" ");
+						$(this).val(strs[strs.length-3]);
+						$("#stockin_detail_div input[name=productId]").val(productList[strs[strs.length-2]]);
+						$("#stockin_detail_div input[name=productCode]").val(strs[strs.length-2]);
+						$("#stockin_detail_div input[name=productNorm]").val(strs[strs.length-1]);
+					});
+
+			  }else{
+				  alert(data);
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	 alert("responseText="+res.responseText+";error="+error);     
+		  }    
+		});
+	
+	
+	$("#stockin_detail_div a").on('click',function(){
+		var detail_div = $("<div></div>");
+		var detail_id = "stockin_detail_div_"+flag;
+		detail_div.attr('id',detail_id);
+		detail_div.addClass("panel");
+		detail_div.append($("#stockin_detail_div").html());
+		
+		$("#stockin_detail_div").before(detail_div);
+		$("#"+detail_id+" img").attr('src','images/form_del.png');
+		$("#"+detail_id+" img").attr('title','删除明细');
+		$("#"+detail_id+" input[name=productName]").on('change',function(){
+			var strs = this.value.split(" ");
+			$(this).val(strs[strs.length-3]);
+			$("#"+detail_id+" input[type=hidden]").val(productList[strs[strs.length-2]]);
+			$("#"+detail_id+" input[name=productCode]").val(strs[strs.length-2]);
+			$("#"+detail_id+" input[name=productNorm]").val(strs[strs.length-1]);
+		});
+		$("#"+detail_id+" input[name=productName]").attr('autofocus','autofocus');
+		$("#"+detail_id+" a").on('click',function(){
+			$("#"+detail_id).remove();
+		})
+		$("#"+detail_id + " input[list=productList]").on('keyup',checkProduct);
+		flag=flag+1;
+	});	
+	
+	var checkUser = function(){
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {};
+		params.filter.opname = this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : 'getOrgOperators',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#stockInManagers","#whs_stockin_allocated_form");
+					  						  
+					  userList = {};
+					  if(manager){
+						  if(data.items.length>0){
+							  $("#userList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.opname);
+							  $("#userList").append(op);
+							  
+							  userList[v.opname] = v.opid;
+	 				  	 }); 
+						}
+				  }else{
+				  	alert(data);
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	 alert("responseText="+res.responseText+";error="+error);     
+			  }    
+			});
+	}
+	
+  //填充员工
+    $.ajax( {
+	  type : 'post', 
+	  async: false,   
+	  contentType : 'application/json',     
+	  dataType : 'json',     
+	  url : 'getOrgOperators',   
+	  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+	  success : function(data) {
+		  if(data){
+			  var manager = $("#stockInManagers","#whs_stockin_allocated_form");
+			  userList = {};
+			  if(manager){
+				  if(data.items.length>0){
+					  $("#userList").empty();
+				  }
+				  $.each(data.items,function(k,v){
+					  var op = $("<option></option>");
+					  op.val(v.opname);
+					  $("#userList").append(op);
+					  
+					  userList[v.opname] = v.opid;
+				  	 }); 
+				  manager.on('keyup',checkUser);
+				  manager.on('change',function(){
+					  	var strs = this.value.split(" ");
+						$(this).val(strs[strs.length-1]);
+						$("#stockInManagersId","#whs_stockin_allocated_form").val(userList[strs[strs.length-1]]);
+						if($("#stockInManagersId","#whs_stockin_allocated_form").val().length==0){
+							$("#stockInManagers","#whs_stockin_allocated_form").val("");
+						}
+					});
+
+				};
+		  }else{
+		  	alert(data);
+		  }
+	  },     
+	  error : function(res,error) { 
+	  	 alert("responseText="+res.responseText+";error="+error);     
+	  }    
+	});
+   
+   $("#whs_stockin_allocated_form").on('submit',function(e){
+	   if(window.confirm('确定进行调拨吗?')){
+		 //做表单提交
+           var params = {};
+           params.type = 1;
+           params.code = $('#stockInNo','#whs_stockin_allocated_form').val();
+           params.stamp= $('#stockInStamp','#whs_stockin_allocated_form').val();
+           params.managersId = $("#stockInManagersId",'#whs_stockin_allocated_form').val();	
+    	   params.remark= $('#stockInRemark','#whs_stockin_allocated_form').val();
+    	   params.outWhsId = $('#stockOutWhsId','#whs_stockin_allocated_form').val();
+    	   
+           var productIds = $('input[name=productId]','#whs_stockin_allocated_form');
+           var productNames=$('input[name=productName]','#whs_stockin_allocated_form');
+           var productNums= $('input[name=num]','#whs_stockin_allocated_form');
+           var remarks= $('input[name=remark]','#whs_stockin_allocated_form');
+           var details = new Array();
+           if(productIds.length==0){ 
+        	   alert('请添加商品！')
+        	   return false;
+           }
+           $.each(productIds,function(k,v){
+           	var obj = {};
+           	obj.productId = v.value;
+           	obj.productName = productNames[k].value;
+           	obj.inNum = productNums[k].value;
+           	obj.remark = remarks[k].value;
+           	details.push(obj);
+           })
+           params.stockinDetails = details;
+
+           //alert(JSON.stringify(params))
+           $.ajax( {
+   		  type : 'post', 
+   		  async: false,   
+   		  contentType : 'application/json',     
+   		  dataType : 'json',     
+   		  url : 'stock/addStockIn',   
+   		  data:JSON.stringify(params),
+   		  success : function(data) {
+   			  if(data){
+   				  if(data.success){
+   					  alert("入库成功！");
+   				  }else{
+   					  alert("入库失败！")
+   				  }
+   				 
+   			  }else{
+   				  alert(data);
+   			  }
+   		  } ,     
+   		  error : function(res,error) { 
+   		  	 alert("responseText="+res.responseText+";error="+error);     
+   		  }    
+   		}); 
+	   }	
+	   $('#ifm_print').attr('src','web/whs/stock_print.html');
+	   //window.open("web/whs/stock_print.html","stock_print","width=870,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no");       
+	   //$("#whs_stockin_allocated_form").unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	    e.stopPropagation();	
+	    return false;
+    });
+
+})(jQuery)
+</script>
+</html>

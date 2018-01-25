@@ -1,0 +1,489 @@
+package com.gboss.dao.impl;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.gboss.comm.SystemException;
+import com.gboss.dao.BackupDao;
+import com.gboss.pojo.Backup;
+import com.gboss.pojo.Collection;
+import com.gboss.pojo.Collectionbk;
+import com.gboss.pojo.Customer;
+import com.gboss.pojo.Customerbk;
+import com.gboss.pojo.Driver;
+import com.gboss.pojo.Driverbk;
+import com.gboss.pojo.FeeInfo;
+import com.gboss.pojo.FeeInfobk;
+import com.gboss.pojo.Unit;
+import com.gboss.pojo.Unitbk;
+import com.gboss.pojo.Vehicle;
+import com.gboss.pojo.Vehiclebk;
+import com.gboss.util.PageSelect;
+import com.gboss.util.StringUtils;
+import com.gboss.util.page.Page;
+import com.gboss.util.page.PageUtil;
+
+/**
+ * @Package:com.gboss.dao.impl
+ * @ClassName:BackupDaoImpl
+ * @Description:TODO
+ * @author:xiaoke
+ * @date:2014-7-10 下午3:42:49
+ */
+@Repository("BackupDao")  
+@Transactional
+public class BackupDaoImpl extends BaseDaoImpl implements BackupDao {
+
+	@Override
+	public Page<Backup> findBackup(PageSelect<Backup> pageSelect) {
+		String hql = "from Backup "
+				   + "where 1=1 ";
+		Map filter = pageSelect.getFilter();
+		Set<String> keys = filter.keySet();
+		for(Iterator it=keys.iterator();it.hasNext();){
+			String key = (String)it.next();
+			if (filter.get(key) instanceof Integer) {
+				Integer new_name = (Integer) filter.get(key);
+				hql += " and " + key + "=" + new_name ;
+			}else if (filter.get(key) instanceof Long) {
+				Long new_name = (Long) filter.get(key);
+				hql += " and " + key + "=" + new_name ;
+			}else if (filter.get(key) instanceof String) {
+				String value = (String)filter.get(key);
+				hql += " and " + key + " like '%" + value + "%' ";
+			}
+			
+		}
+		if(StringUtils.isNotBlank(pageSelect.getStart_date())){
+			hql += " and stamp > '" + pageSelect.getStart_date() + "'";
+		}
+		if(StringUtils.isNotBlank(pageSelect.getEnd_date())){
+			hql += " and stamp < '" + pageSelect.getEnd_date() + "'";
+		}
+		if(StringUtils.isNotBlank(pageSelect.getOrder())){
+			hql += " order by " + pageSelect.getOrder();
+			if(pageSelect.getIs_desc()){
+				hql += " desc ";
+			}else{
+				hql += " asc ";
+			}
+		}
+		List list = listAll(hql, pageSelect.getPageNo(), pageSelect.getPageSize());
+		int count = countAll(hql);
+		Page<Backup> page = PageUtil.getPage(count, pageSelect.getPageNo(), list, pageSelect.getPageSize());
+		return page;
+	}
+
+	@Override
+	public Page<Backup> findStopAndOpen(PageSelect<Backup> pageSelect) {
+		String hql = "from Backup "
+				   + "where 1=1 and (bk_type=7 or bk_type=8) ";
+		Map filter = pageSelect.getFilter();
+		Set<String> keys = filter.keySet();
+		for(Iterator it=keys.iterator();it.hasNext();){
+			String key = (String)it.next();
+			if (filter.get(key) instanceof Integer) {
+				Integer new_name = (Integer) filter.get(key);
+				hql += " and " + key + "=" + new_name ;
+			}else if (filter.get(key) instanceof Long) {
+				Long new_name = (Long) filter.get(key);
+				hql += " and " + key + "=" + new_name ;
+			}else if (filter.get(key) instanceof String) {
+				String value = (String)filter.get(key);
+				hql += " and " + key + " like '%" + value + "%' ";
+			}
+			
+		}
+		if(StringUtils.isNotBlank(pageSelect.getStart_date())){
+			hql += " and stamp > '" + pageSelect.getStart_date() + "'";
+		}
+		if(StringUtils.isNotBlank(pageSelect.getEnd_date())){
+			hql += " and stamp < '" + pageSelect.getEnd_date() + "'";
+		}
+		if(StringUtils.isNotBlank(pageSelect.getOrder())){
+			hql += " order by " + pageSelect.getOrder();
+			if(pageSelect.getIs_desc()){
+				hql += " desc ";
+			}else{
+				hql += " asc ";
+			}
+		}
+		List list = listAll(hql, pageSelect.getPageNo(), pageSelect.getPageSize());
+		int count = countAll(hql);
+		Page<Backup> page = PageUtil.getPage(count, pageSelect.getPageNo(), list, pageSelect.getPageSize());
+		return page;
+	}
+
+	@Override
+	public Backup getBackupByid(Long bk_id) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Backup.class); 
+		if(bk_id!=null){
+			criteria.add(Restrictions.eq("bk_id", bk_id));
+		}else{
+			return null;
+		}
+		List<Backup> list = criteria.list();
+		if(list==null||list.size()==0){
+			return null;
+		}
+		return list.get(0);
+	}
+
+	@Override
+	public Customerbk getCustomerbkbyid(Long bkc_id) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Customerbk.class); 
+		if(bkc_id!=null){
+			criteria.add(Restrictions.eq("bkc_id", bkc_id));
+		}else{
+			return null;
+		}
+		List<Customerbk> list = criteria.list();
+		if(list==null||list.size()==0){
+			return null;
+		}
+		return list.get(0);
+	}
+
+	@Override
+	public Vehiclebk getVehiclebkbyid(Long bkv_id) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Vehiclebk.class); 
+		if(bkv_id!=null){
+			criteria.add(Restrictions.eq("bkv_id", bkv_id));
+		}else{
+			return null;
+		}
+		List<Vehiclebk> list = criteria.list();
+		if(list==null||list.size()==0){
+			return null;
+		}
+		return list.get(0);
+	}
+
+	@Override
+	public Unitbk getUnitbkbyid(Long bku_id) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Unitbk.class); 
+		if(bku_id!=null){
+			criteria.add(Restrictions.eq("bku_id", bku_id));
+		}else{
+			return null;
+		}
+		List<Unitbk> list = criteria.list();
+		if(list==null||list.size()==0){
+			return null;
+		}
+		return list.get(0);
+	}
+
+	@Override
+	public Collectionbk getCollectionbkbyid(Long bkfc_id) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Collectionbk.class); 
+		if(bkfc_id!=null){
+			criteria.add(Restrictions.eq("bkfc_id", bkfc_id));
+		}else{
+			return null;
+		}
+		List<Collectionbk> list = criteria.list();
+		if(list==null||list.size()==0){
+			return null;
+		}
+		return list.get(0);
+	}
+
+	@Override
+	public FeeInfobk getFeeInfobkbyid(Long bkf_id) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(FeeInfobk.class); 
+		if(bkf_id!=null){
+			criteria.add(Restrictions.eq("bkf_id", bkf_id));
+		}else{
+			return null;
+		}
+		List<FeeInfobk> list = criteria.list();
+		if(list==null||list.size()==0){
+			return null;
+		}
+		return list.get(0);
+	}
+
+	@Override
+	public Driverbk getDriverbkbyid(Long bkd_id) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Driverbk.class); 
+		if(bkd_id!=null){
+			criteria.add(Restrictions.eq("bkd_id", bkd_id));
+		}else{
+			return null;
+		}
+		List<Driverbk> list = criteria.list();
+		if(list==null||list.size()==0){
+			return null;
+		}
+		return list.get(0);
+	}
+
+	@Override
+	public Customerbk getCustomerbk(Customer customer) {
+		Customerbk custbk = new Customerbk();
+		if(customer!=null){
+			custbk.setCustomer_id(customer.getCustomer_id());
+			custbk.setSubco_no(customer.getSubco_no());
+			custbk.setSubco_code(customer.getSubco_code());
+			custbk.setSubco_name(customer.getSubco_name());
+			custbk.setCustco_no(customer.getCustco_no());
+			custbk.setCustco_code(customer.getCustco_code());
+			custbk.setCustomer_name(customer.getCustomer_name());
+			custbk.setCust_type(customer.getCust_type());
+			custbk.setAddress(customer.getAddress());
+			custbk.setIdtype(customer.getIdtype());
+			custbk.setId_no(customer.getId_no());
+			custbk.setId_bdate(customer.getId_bdate());
+			custbk.setId_edate(customer.getId_edate());
+			custbk.setBirthday(customer.getBirthday());
+			custbk.setSex(customer.getSex());
+			custbk.setTrade(customer.getTrade());
+			custbk.setBloodtype(customer.getBloodtype());
+			custbk.setEmail(customer.getEmail());
+			custbk.setFax(customer.getFax());
+			custbk.setService_pwd(customer.getService_pwd());
+			custbk.setVip(customer.getVip());
+			custbk.setBl_no(customer.getBl_no());
+			custbk.setBl_bdate(customer.getBl_bdate());
+			custbk.setBl_edate(customer.getBl_edate());
+			custbk.setContract_no(customer.getContract_no());
+			custbk.setLocation(customer.getLocation());
+			custbk.setArchive_time(customer.getArchive_time());
+			custbk.setFlag(customer.getFlag());
+			custbk.setPay_model(customer.getPay_model());
+			custbk.setOp_id(customer.getOp_id());
+			custbk.setRemark(customer.getRemark());
+		}
+		return custbk;
+	}
+
+	@Override
+	public Vehiclebk getVehiclebk(Vehicle vehicle) {
+		Vehiclebk vehiclebk = new Vehiclebk();
+		if(vehicle!=null){
+			vehiclebk.setVehicle_id(vehicle.getVehicle_id());
+			vehiclebk.setSubco_no(vehicle.getSubco_no());
+			vehiclebk.setPlate_no(vehicle.getPlate_no());
+			vehiclebk.setDef_no(vehicle.getDef_no());
+			vehiclebk.setSecond_no(vehicle.getSecond_no());
+			vehiclebk.setPlate_color(vehicle.getPlate_color());
+			vehiclebk.setVehicle_type(vehicle.getVehicle_type());
+			vehiclebk.setVehicle_status(vehicle.getVehicle_status());
+			vehiclebk.setEquip_code(vehicle.getEquip_code());
+			vehiclebk.setFlag(vehicle.getFlag());
+			vehiclebk.setBrand(vehicle.getBrand());
+			vehiclebk.setSeries(vehicle.getSeries());
+			vehiclebk.setModel(vehicle.getModel());
+			vehiclebk.setVin(vehicle.getVin());
+			vehiclebk.setColor(vehicle.getColor());
+			vehiclebk.setEngine_no(vehicle.getEngine_no());
+			vehiclebk.setOil_type(vehicle.getOil_type());
+			vehiclebk.setFactory(vehicle.getFactory());
+			vehiclebk.setBuy_date(vehicle.getBuy_date());
+			vehiclebk.setChassis_no(vehicle.getChassis_no());
+			vehiclebk.setService_pwd(vehicle.getService_pwd());
+			vehiclebk.setPrivate_pwd(vehicle.getPrivate_pwd());
+			vehiclebk.setBuy_money(vehicle.getBuy_money());
+			vehiclebk.setRegister_date(vehicle.getRegister_date());
+			vehiclebk.setVl_owner(vehicle.getVl_owner());
+			vehiclebk.setVl_type(vehicle.getVl_type());
+			vehiclebk.setVl_use(vehicle.getVl_use());
+			vehiclebk.setVload(vehicle.getVload());
+			vehiclebk.setVl_quality(vehicle.getVl_quality());
+			vehiclebk.setVl_ap_quality(vehicle.getVl_ap_quality());
+			vehiclebk.setVl_qt_quality(vehicle.getVl_qt_quality());
+			vehiclebk.setVl_vsize(vehicle.getVl_vsize());
+			vehiclebk.setVl_doc_no(vehicle.getVl_doc_no());
+			vehiclebk.setVehicle_license(vehicle.getVehicle_license());
+			vehiclebk.setVl_bdate(vehicle.getVl_bdate());
+			vehiclebk.setVl_edate(vehicle.getVl_edate());
+			vehiclebk.setVl_remark(vehicle.getVl_remark());
+			vehiclebk.setVoc_no(vehicle.getVoc_no());
+			vehiclebk.setVoc_bdate(vehicle.getVoc_bdate());
+			vehiclebk.setVoc_edate(vehicle.getVoc_edate());
+			vehiclebk.setOp_id(vehicle.getOp_id());
+			vehiclebk.setFs_id(vehicle.getId_4s());
+			vehiclebk.setInsurance_id(vehicle.getInsurance_id());
+			vehiclebk.setIs_bdate(vehicle.getIs_bdate());
+			vehiclebk.setIs_edate(vehicle.getIs_edate());
+			vehiclebk.setIs_corp(vehicle.getIs_corp());
+			vehiclebk.setIs_pilfer(vehicle.getIs_pilfer());
+			vehiclebk.setRemark(vehicle.getRemark());
+			vehiclebk.setRemark2(vehicle.getRemark2());
+			vehiclebk.setCreate_date(vehicle.getCreate_date());
+		}
+		return vehiclebk;
+	}
+
+	@Override
+	public Unitbk getUnitbk(Unit unit) {
+		Unitbk unitbk = new Unitbk();
+		if(unit!=null){
+			unitbk.setUnit_id(unit.getUnit_id());
+			unitbk.setSubco_no(unit.getSubco_no());
+			unitbk.setCustomer_id(unit.getCustomer_id());
+			unitbk.setVehicle_id(unit.getVehicle_id());
+			unitbk.setProduct_id(unit.getProduct_id());
+			unitbk.setProduct_code(unit.getProduct_code());
+			unitbk.setProduct_name(unit.getProduct_name());
+			unitbk.setUnittype_id(unit.getUnittype_id());
+			unitbk.setMode(unit.getMode());
+			unitbk.setData_node(unit.getData_node());
+			unitbk.setSms_node(unit.getSms_node());
+			unitbk.setCall_letter(unit.getCall_letter());
+			unitbk.setTelecom(unit.getTelecom());
+			unitbk.setSim_type(unit.getSim_type());
+			unitbk.setAttribution(unit.getAttribution());
+			unitbk.setSales_ct_id(unit.getSales_ct_id());
+			unitbk.setSales_id(unit.getSales_id() == null ? 0 : unit.getSales_id());
+			unitbk.setSales(unit.getSales());
+			unitbk.setOrg_id(unit.getOrg_id());
+			unitbk.setBranch(unit.getBranch());
+			unitbk.setPack_id(unit.getPack_id());
+			unitbk.setWorker(unit.getWorker());
+			unitbk.setWorker_id(unit.getWorker_id());
+			unitbk.setFix_time(unit.getFix_time());
+			unitbk.setPlace(unit.getPlace());
+			unitbk.setTamper_code(unit.getTamper_code());
+			unitbk.setSpecial_no(unit.getSpecial_no());
+			unitbk.setOp_id(unit.getOp_id());
+			unitbk.setPay_model(unit.getPay_model());
+			unitbk.setFlag(unit.getFlag());
+			unitbk.setCreate_date(unit.getCreate_date());
+			unitbk.setService_date(unit.getService_date());
+			unitbk.setStop_date(unit.getStop_date());
+			unitbk.setLocation(unit.getLocation());
+			unitbk.setReg_status(unit.getReg_status());
+			unitbk.setTrade(unit.getTrade());
+			unitbk.setArea(unit.getArea());
+		}
+		return unitbk;
+	}
+
+	@Override
+	public Collectionbk getCollectionbk(Collection collection) {
+		Collectionbk collectionbk = new Collectionbk();
+		if(collection!=null){
+			collectionbk.setCollection_id(collection.getCollection_id());
+			collectionbk.setSubco_no(collection.getSubco_no());
+			collectionbk.setCustomer_id(collection.getCustomer_id());
+			collectionbk.setPay_ct_no(collection.getPay_ct_no());
+			collectionbk.setAc_no(collection.getAc_no());
+			collectionbk.setAc_type(collection.getAc_type());
+			collectionbk.setAc_name(collection.getAc_name());
+			collectionbk.setAc_id_no(collection.getAc_id_no());
+			collectionbk.setBank(collection.getBank());
+			collectionbk.setBank_code(collection.getBank_code());
+			collectionbk.setAgency(collection.getAgency());
+			collectionbk.setFee_cycle(collection.getFee_cycle());
+			collectionbk.setIs_delivery(collection.getIs_delivery());
+			collectionbk.setAddressee(collection.getAddressee());
+			collectionbk.setPrint_freq(collection.getPrint_freq());
+			collectionbk.setProvince(collection.getProvince());
+			collectionbk.setCity(collection.getCity());
+			collectionbk.setArea(collection.getArea());
+			collectionbk.setAddress(collection.getAddress());
+			collectionbk.setPost_code(collection.getPost_code());
+			collectionbk.setTel(collection.getTel());
+			collectionbk.setTransactor(collection.getTransactor());
+			collectionbk.setCreate_date(collection.getCreate_date());
+			collectionbk.setOp_id(collection.getOp_id());
+		}
+		return collectionbk;
+	}
+
+	@Override
+	public FeeInfobk getFeeInfobk(FeeInfo feeInfo) {
+		FeeInfobk feeInfobk = new FeeInfobk();
+		if(feeInfo!=null){
+			feeInfobk.setFee_id(feeInfo.getFee_id());
+			feeInfobk.setSubco_no(feeInfo.getSubco_no());
+			feeInfobk.setCustomer_id(feeInfo.getCustomer_id());
+			feeInfobk.setVehicle_id(feeInfo.getVehicle_id());
+			feeInfobk.setUnit_id(feeInfo.getUnit_id());
+			feeInfobk.setFeetype_id(feeInfo.getFeetype_id());
+			feeInfobk.setPay_model(feeInfo.getPay_model());
+			feeInfobk.setItem_id(feeInfo.getItem_id());
+			feeInfobk.setItems_id(feeInfo.getItems_id());
+			feeInfobk.setMonth_fee(feeInfo.getMonth_fee());
+			feeInfobk.setAc_amount(feeInfo.getAc_amount());
+			feeInfobk.setPay_ct_no(feeInfo.getPay_ct_no());
+			feeInfobk.setReal_amount(feeInfo.getReal_amount());
+			feeInfobk.setFee_date(feeInfo.getFee_date());
+			feeInfobk.setFee_cycle(feeInfo.getFee_cycle());
+			feeInfobk.setOp_id(feeInfo.getOp_id());
+			feeInfobk.setRemark(feeInfo.getRemark());
+		}
+		return feeInfobk;
+	}
+
+	@Override
+	public Driverbk getDriverbk(Driver driver) {
+		return null;
+	}
+
+	@Override
+	public Long addBackup(Backup backup) {
+		save(backup);
+		return backup.getBk_id();
+	}
+
+	@Override
+	public Long addCustomerbk(Customerbk customer) {
+		save(customer);
+		return customer.getBkc_id();
+	}
+
+	@Override
+	public Long addVehiclebk(Vehiclebk vehicle) {
+		save(vehicle);
+		return vehicle.getBkv_id();
+	}
+
+	@Override
+	public Long addUnitbk(Unitbk unit) {
+		save(unit);
+		return unit.getBku_id();
+	}
+
+	@Override
+	public Long addCollectionbk(Collectionbk collection) {
+		save(collection);
+		return collection.getBkfc_id();
+	}
+
+	@Override
+	public Long addFeeInfobk(FeeInfobk feeInfo) {
+		save(feeInfo);
+		return feeInfo.getBkf_id();
+	}
+
+	@Override
+	public Long addDriverbk(Driverbk driverbk) {
+		save(driverbk);
+		return driverbk.getBkd_id();
+	}
+
+	@Override
+	public List<HashMap<String, Object>> getListBk(HashMap<String, Object> map)
+			throws SystemException {
+		StringBuffer sb=new StringBuffer();
+		sb.append(" SELECT bk.bk_id,bk.unit_id,bk.vehicle_id,bk.bk_type,bk.bkc_id,bk.bkv_id,bk.bku_id,bk.bkfc_id,bk.bkf_ids,bk.bkd_ids,bk.bkis_id,bk.op_id,bk.op_name,bk.stamp,bk.remark,cust.customer_name,veh.plate_no FROM t_ba_bk bk LEFT JOIN t_ba_unit tbu ON bk.unit_id=tbu.unit_id LEFT JOIN t_ba_customer cust ON tbu.customer_id=cust.customer_id LEFT JOIN t_ba_vehicle veh ON bk.vehicle_id=veh.vehicle_id ORDER BY bk.stamp DESC ");
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sb.toString());  
+		query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+		return query.list();
+	}
+
+}
+

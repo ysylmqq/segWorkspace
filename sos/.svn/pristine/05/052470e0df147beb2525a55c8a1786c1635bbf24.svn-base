@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>代理商导入</title>
+<style type="text/css">
+.form span{
+	width: 70px;
+}
+.form input[type=file] {
+	width:280px;
+}
+</style>
+</head>
+
+<body>
+<form id="form_productInImp" method="post" class="form" action="../../sell/impChannel" target="frm_channel_imp" enctype="multipart/form-data">
+		<table >
+		  <tr>
+		  	<td>
+		  		<span>选择文件:</span>
+		  	</td>
+		    <td >
+		   		<input type="hidden" id="isOverride" name="isOverride" value="false"/>
+			 	<input type="file" id="channelFile" width="100px" name="channelFile" multiple="multiple" accept="application/vnd.ms-excel" required="required"/>
+		 	</td>
+		    <td >
+		    	<input type="button" id="btn_template_down" value="模板下载" width="70px"/>
+		    </td>
+		  </tr>
+		</table>
+		<button type="submit" value="提交" >提交</button>
+</form>
+<iframe name='frm_channel_imp' id="frm_channel_imp" style="display:none;" ></iframe> 
+</body>
+<script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript">
+(function($){
+	$('#btn_template_down').on('click',function(){
+		document.getElementById('frm_channel_imp').src="../../doc/template/channel.xls";
+	});
+})(jQuery)
+
+function callback(msg,flag)   
+{   
+	alert(msg);
+}   
+</script>
+</html>

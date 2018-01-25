@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>修改密码</title>
+<link rel="stylesheet" type="text/css" href="../../css/form.css" />
+</head>
+<body>
+	<form id='sys_pwd_form' method='post' class="form" style="width:290px;">
+		<fieldset style="width:280px;">
+            <div class="panel">
+                <span class="title">旧密码:</span>
+                <input type='password' id="oldpwd" name='oldpwd' required="true" style="width:160px;"/>
+            </div>
+            <div class="panel">
+                <span class="title">新密码:</span>
+                <input type='password' id="newpwd" name='newpwd' required="true" style="width:160px;"/>
+            </div>
+            <div class="panel">
+                <span class="title">检验新密码:</span>
+                <input type='password' id="newpwd2" name='newpwd2' required="true" style="width:160px;"/>
+            </div>
+        </fieldset>
+
+
+	</form>
+</body>
+</html>

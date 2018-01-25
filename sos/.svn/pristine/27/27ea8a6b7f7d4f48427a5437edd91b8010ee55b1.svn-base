@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd   
+           http://www.springframework.org/schema/aop 
+           http://www.springframework.org/schema/aop/spring-aop-3.0.xsd   
+           http://www.springframework.org/schema/tx 
+           http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+           http://www.springframework.org/schema/task      
+           http://www.springframework.org/schema/task/spring-task-3.1.xsd">
+
+	<context:component-scan base-package="com.gboss">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+	<context:property-placeholder location="classpath:jdbc.properties" ignore-unresolvable="true" />
+	<context:property-placeholder location="classpath:hibernate.properties" ignore-unresolvable="true" />
+	<context:property-placeholder location="classpath:system.properties" ignore-unresolvable="true" />
+	<bean id="springContext" class="com.gboss.util.SpringContext"></bean>
+
+	<!-- 自动代理的参数加入代理cglib的 ,则装载bean时，可以用实现类，不一定要用接口类-->
+	<aop:aspectj-autoproxy proxy-target-class="true"/>
+	<!-- com.alibaba.druid.pool.DruidDataSource -->
+	<bean id="dataSource" class="org.logicalcobwebs.proxool.ProxoolDataSource">
+		<property name="driver" value="${jdbc.driverClassName}" />
+		<property name="driverUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}" />
+		<property name="alias" value="${jdbc.alias}" />
+		<property name="testBeforeUse">
+			<value>false</value>
+		</property>
+    	<property name="houseKeepingSleepTime" value="${jdbc.houseKeepingSleepTime}" />
+		<property name="maximumConnectionCount" value="${jdbc.maximum.connection.count}" />
+		<property name="minimumConnectionCount" value="${jdbc.minimum.connection.count}" />
+		<property name="statistics" value="${jdbc.statistics}" />
+		<property name="simultaneousBuildThrottle" value="${jdbc.simultaneous.build.throttle}" />
+		<property name="houseKeepingTestSql"  value="${jdbc.houseKeepingTestSql}"  />
+		<property name="prototypeCount"  value="${jdbc.prototypeCount}"  />
+		<property name="trace"  value="${jdbc.trace}"  />
+		<property name="verbose"  value="${jdbc.verbose}"  />
+		<property name="maximumActiveTime" value="${jdbc.maximumActiveTime}" />
+		<property name="delegateProperties">
+			<value>
+			user=${jdbc.username},password=${jdbc.password}
+			</value>
+		</property>
+
+	</bean>
+
+	<!-- 配置sqlSessionFactory工厂 -->
+	
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan" value="com.gboss" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.query.substitutions">${hibernate.query.substitutions}</prop>
+				<prop key="hibernate.default_batch_fetch_size">${hibernate.default_batch_fetch_size}</prop>
+				<prop key="hibernate.max_fetch_depth">${hibernate.max_fetch_depth}</prop>
+				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>
+				<prop key="hibernate.bytecode.use_reflection_optimizer">${hibernate.bytecode.use_reflection_optimizer}</prop>
+
+				<prop key="hibernate.cache.use_second_level_cache">${hibernate.cache.use_second_level_cache}</prop>
+				<prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
+				<prop key="hibernate.cache.region.factory_class">${hibernate.cache.region.factory_class}</prop>
+				<prop key="net.sf.ehcache.configurationResourceName">${net.sf.ehcache.configurationResourceName}</prop>
+				<prop key="hibernate.cache.use_structured_entries">${hibernate.cache.use_structured_entries}</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- 使用spring内部的定时任务，功能没有quartz功能强大，够用了在这 -->
+	<bean id="job" class="com.gboss.util.JhWeatherJob"></bean>
+<!-- 	<task:scheduled-tasks >
+		<task:scheduled ref="job" method="flushWeather" cron="0 0/5 * * * ?" /> 秒   分钟  小时  日期   月份  星期   年  
+	</task:scheduled-tasks>  -->
+	<!-- spring quartz -->
+	<!-- 
+	<bean id="jobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="job"></property>
+		<property name="targetMethod" value="flushWeather"></property>
+		<property name="concurrent" value="false"></property>
+	</bean>
+	trigger
+	<bean id="trigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="jobDetail"></property>
+		<property name="cronExpression" value="0 0/1 * * * ?"></property>
+	</bean>
+	scheduler
+	<bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				可以配置多个任务
+				<ref bean="trigger"/>
+			</list>
+		</property>
+	</bean> -->
+	
+	
+	<!-- ================================= 事务控制相关 ============================================= -->
+	<!-- 开启AOP监听 只对当前配置文件有效 -->
+	<aop:aspectj-autoproxy expose-proxy="true" />
+
+	<!-- 开启注解事务 只对当前配置文件有效 -->
+	<tx:annotation-driven transaction-manager="txManager" />
+
+	<bean id="txManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="add*" propagation="REQUIRED" />
+			<tx:method name="create*" propagation="REQUIRED" />
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="merge*" propagation="REQUIRED" />
+			<tx:method name="del*" propagation="REQUIRED" />
+			<tx:method name="remove*" propagation="REQUIRED" />
+			<tx:method name="put*" propagation="REQUIRED" />
+			<tx:method name="use*" propagation="REQUIRED" />
+			<!--hibernate4必须配置为开启事务 否则 getCurrentSession()获取不到 -->
+			<tx:method name="get*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="count*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="find*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="list*" propagation="REQUIRED" read-only="true" />
+			<tx:method name="*" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+	<aop:config expose-proxy="true">
+		<!-- 只对业务逻辑层实施事务 -->
+		<aop:pointcut id="txPointcut"
+			expression="execution(* com.gboss..service..*.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut" />
+	</aop:config>
+
+	<!-- AOP 日志 -->	
+	
+ <!-- 支持上传文件 -->  
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> 
+     <!-- 指定所上传文件的总大小不能超过100m。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 --> 
+     <property name="maxUploadSize">
+        <value>104857600</value>
+    </property>
+    <property name="maxInMemorySize">
+        <value>4096</value>
+    </property>
+    </bean> 
+    
+</beans>  

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>sim卡校验</title>
+<link rel="stylesheet" type="text/css" href="../../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../../bslib/css/bootstrap-datetimepicker.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../../css/sos.css">
+</head>
+<body>
+	<div id="monitoring">
+		<div id="dgd_simverify_dv" class="datagrid"></div>
+	</div>
+</body>
+<script type="text/javascript" src="../../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../../bslib/js/bootstrap-datetimepicker.js"></script>
+<script type="text/javascript" src="../../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../../jscript/window.js"></script>
+<script type="text/javascript" src="../../../jscript/pup.js" ></script>
+<script type="text/javascript" src="../../../jscript/form.js"></script>
+<script type="text/javascript" src="../../../jscript/jquery.form.js"></script>
+<script type="text/javascript" src="../../../jscript/web/verify/verify.js"></script>
+<script type="text/javascript">
+	$.fn.datetimepicker.dates['zh'] = {
+		days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+		daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+		daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+		months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+		monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+		meridiem : [ "上午", "下午" ],
+		today : "今天"
+	};
+	$(document).ready(function(){
+		$(".hDiv-header-inner,#monitoring_tbl").css("width","1800px");
+		$(".form_datetime").datetimepicker({
+			language : "zh",
+			autoclose: true,
+			minView : "month",
+			format : 'yyyy-mm-dd'
+		});
+	});
+</script>
+</html>

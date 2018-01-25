@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>销售经理主页面</title>
+</head>
+
+<body>
+<form class="form" style="width:100%" >
+	<div class="form title">销售经理主页面</div>
+</form>
+<div id="tabContainer" class="tab_container f12">
+    <ul class="tabs">
+        <li><a href="#tab1">销售业绩</a></li>
+        <li><a href="#tab2">借用情况</a></li>
+        <li><a href="#tab3">销售明细</a></li>
+    </ul>
+    <div class="tab_div_container">
+        <div id="tab1" class="tab_content" src="web/som/manager_sales.html"></div>
+        <div id="tab2" class="tab_content" src="web/som/manager_borrow.html"></div>
+        <div id="tab3" class="tab_content" src="web/som/manager_detail.html"></div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    (function($) {
+        var defaults = {
+            width: 865,
+            height: 508
+        };
+
+        $('#tabContainer').sgTab(defaults);
+    })(jQuery);
+</script>
+</html>

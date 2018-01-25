@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>销售合同添加</title><style>
+fieldset div div.panel span{
+  width: 30px;
+  padding: 0 0 0 0;
+}
+</style>
+</head>
+<body>
+	<form id='sel_contract_add_form' method='post' class="form" style="width:100%;">
+		<div class='title'>销售合同信息></div>
+		<fieldset style="width:auto;">
+		    <input type="hidden" name="id" id="id">
+            <div class="panel">
+                <span>合同号:</span>
+                <input type='text' id="contractNo" name='contractNo' disabled="disabled"  style="width:195px;"/>
+                
+                <span>合同名称:</span>
+                <input type='text' id="contractName" name='contractName' required="true" autofocus='autofocus' style="width:195px;"/>
+                
+                <span>代理商名称:</span>
+                <input type='text' id="contractChannelName" list='channellist' required="true" name='contractChannelName' style="width:195px;" />
+                <input type="hidden" id="contractChannelId" name="contractChannelId" />                
+            </div>
+            <div class="panel">
+                <span>联系电话:</span>
+                <input type='text' id="contractPhone" name='contractPhone' required="true" style="width:195px;" />
+                
+                <span>签约人:</span>
+                <input type="text" name="contractor" id="contractor" list="contractorList" required="true" style="width:195px;" autocomplete="on" />
+                <datalist id="contractorList"></datalist>
+                <input type="hidden" name="contractorId" id="contractorId" required="true" />
+                
+                <span>签订日期:</span>
+                <input type='date' id="signDate" name='signDate' required="true" style="width:195px;" />
+                
+                
+            </div>
+            <div class="panel">
+                <span>生效日期:</span>
+                <input type='date' id="validDate" name='validDate' required="true" style="width:195px;" />
+                
+                <span>到期日期:</span>
+                <input type='date' id="matureDate" name='matureDate' required="true" style="width:195px;" />
+
+            </div>
+           <!--  <div class="panel">
+                <span>备注:</span>
+                <input type="text" name="contractRemark" id="contractRemark" style="width:785px;" />
+            </div> -->
+        </fieldset>
+
+        <div class="title">合同产品明细></div>
+		<fieldset class='fieldset' style="width:auto;">
+            <div id="sel_contract_detail_panel" style="height:288px; overflow-y:auto">
+				<div id="sel_contract_detail_div" class="panel">
+	                <span>商品:</span>
+	                <input type='text' name='productName' list="productlist" required="true" placeholder="请输入商品名称/编码" style="width:160px;" />
+	                <input type="hidden" name="productId" />
+	                
+	                <span>编码:</span>
+	                <input type='text' name='productCode' disabled="disabled" style="width:106px;"/>
+	              
+	                <span style="width: 30px;">规格:</span>
+	                <input type='text' name='productNorm' disabled="disabled" style="width:200px;" />
+	                <span>数量:</span>
+	                <input type='number' name='num' placeholder="只允许数字" required="true"  style="width:50px;" value="0" min="0"  pattern="^[+]?[1-9]+\d*$"  onkeyup="this.value=this.value.replace(/\D/g,'')" />
+	                <span style="width:60px;">销售价格:</span>
+	                <input type='text' name='price' placeholder="只允许数字" required="true" pattern="^\d+\.{0,1}\d*$" value="0" style="width:60px;"  />
+	                <span style="width:49px;">安装费:</span>
+	                <input type='text' name='fixFee' required="true" placeholder="只允许数字" pattern="^\d+\.{0,1}\d*$" value="0" style="width:60px;"  /> 
+	                <!-- 
+	                <span>佣金:</span>
+	                <input type='number' name='brokerage' required="true" placeholder="只允许数字" style="width:80px;"  />               
+	                 -->
+	                 <br/>
+	                <span>备注:</span>
+	                <input type='text' name='remark' style="width:887px;" />
+	                
+	                <a href="javascript:void(0);"><img alt="增加产品" src="../../images/form_add.png" title="增加产品" style="vertical-align:middle"></a>
+	            </div>	            
+			</div>
+            <datalist id="productlist">
+            </datalist>
+        </fieldset>
+        
+        <div class="title">销售套餐明细></div>
+		<fieldset class='fieldset' style="width:auto;">
+			<div id="sel_contract_pack_panel" style="height:60px; overflow-y:auto">
+				<div id="sel_contract_pack_div" class="panel">
+	                <span style="width:80px;">套餐名称:</span>
+	                <input type='text' name='packName' placeholder="请输入套餐名称" style="width:190px;" />
+	                <span style="width:80px;">套餐说明:</span>
+	                <input type='text' name='packLegend' placeholder="请输入文字" style="width:500px;"/>
+
+	                <a href="javascript:void(0);" style="margin:0px;padding:0px;padding-left:10px;padding-top:5px;"><img alt="增加套餐" src="../../images/form_add.png" title="增加套餐" style="vertical-align:middle"></a>
+	            </div>	            
+			</div>
+        </fieldset>
+        <datalist id="channellist"></datalist>
+<!-- 
+        <fieldset style="width:860px;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="order_detail_submit" type="submit" >提交</button> <button id="mycancel" type="reset">重置</button>
+	        </div>
+        </fieldset>
+ -->
+	</form>
+</body>
+<script type="text/javascript">
+	(function($){
+			var flag = 0;
+			var packFlag = 0;
+			var channelList = {};
+			var productList = null;
+			var contractorList = null;
+			
+			var today=new Date();
+			today.setMonth(today.getMonth()-1);
+			//生效日期
+			$("#validDate").val(today.format('yyyy-MM-dd'));
+			//到期日期
+			var matureDate=today;
+			matureDate.setFullYear(today.getFullYear()+1);
+			$("#matureDate").val(matureDate.format('yyyy-MM-dd'));
+			
+			$.ajax( {
+				  type : 'POST', 
+				  async: false,   
+				  url : '../../sell/getSalesContractNo',   
+				  data:{},
+				  success : function(data) {
+					  if(data){
+						  $("#contractNo").val(data);
+					  }
+				  } 
+			}); 
+			
+			var checkProduct = function(){
+				var params = {};
+				params.pageNo = 1;
+				params.pageSize = 15;
+				params.filter = {};
+				params.filter.nameOrCode = this.value;
+				var obj = $(this);
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../product/findProducts',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  var products = data.items;
+							  $("#productlist").empty();
+							  productList = {};
+							  $.each( products, function(key,value){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+								  $("#productlist").append(op);
+								  
+								  productList[value.code] = value.id;
+								});
+
+						  }else{
+							  $(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					});
+			};
+			
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../product/findProducts',   
+				  data:JSON.stringify({pageNo:1,pageSize:15,filter:{type:0}}),
+				  success : function(data) {
+					  if(data){
+						  var products = data.items;
+						  $("#productlist").empty();
+						  productList = {};
+						  $.each( products, function(key,value){
+							  var op = $("<option></option>");
+							  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+							  $("#productlist").append(op);
+							  
+							  productList[value.code] = value.id;
+							});
+						  
+						  $("#sel_contract_detail_div input[name=productName]").on('keyup',checkProduct);
+						  $("#sel_contract_detail_div input[name=productName]").on('change',function(e){
+								var strs = this.value.split(" ");
+								$(this).val(strs[strs.length-3]);
+								$("#sel_contract_detail_div input[type=hidden]").val(productList[strs[strs.length-2]]);
+								$("#sel_contract_detail_div input[name=productCode]").val(strs[strs.length-2]);
+								$("#sel_contract_detail_div input[name=productNorm]").val(strs[strs.length-1]);
+								if($("#sel_contract_detail_div input[type=hidden]").val().length==0){
+									$("#sel_contract_detail_div input[name=productName]").val("");
+								}
+							});
+						  
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+			
+			
+			$("#sel_contract_detail_div a").on('click',function(){
+				var detail_div = $("<div></div>");
+				var detail_id = "sel_contract_detail_div_"+flag;
+				detail_div.attr('id',detail_id);
+				detail_div.addClass("panel");
+				detail_div.append($("#sel_contract_detail_div").html());
+				
+				$("#sel_contract_detail_div").before(detail_div);
+				$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+				$("#"+detail_id+" img").attr('title','删除产品');
+				$("#"+detail_id+" input[name=productName]").on('change',function(){
+					var strs = this.value.split(" ");
+					$(this).val(strs[strs.length-3]);
+					$("#"+detail_id+" input[type=hidden]").val(productList[strs[strs.length-2]]);
+					$("#"+detail_id+" input[name=productCode]").val(strs[strs.length-2]);
+					$("#"+detail_id+" input[name=productNorm]").val(strs[strs.length-1]);
+				});
+				$("#"+detail_id+" input[name=productName]").attr('autofocus','autofocus');
+				$("#"+detail_id+" a").on('click',function(){
+					$("#"+detail_id).remove();
+				})
+				$("#"+detail_id + " input[list=productlist]").on('keyup',checkProduct);
+				flag=flag+1;
+			});			
+			
+			$("#signDate").val(new Date().format('yyyy-MM-dd'));
+			
+			$("#sel_contract_pack_div a").on('click',function(){
+				var detail_div = $("<div></div>");
+				var detail_id = "sel_contract_pack_div_"+packFlag;
+				detail_div.attr('id',detail_id);
+				detail_div.addClass("panel");
+				detail_div.append($("#sel_contract_pack_div").html());
+				
+				$("#sel_contract_pack_div").before(detail_div);
+				$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+				$("#"+detail_id+" img").attr('title','删除套餐');
+				$("#"+detail_id+" input[name=packName]").attr('autofocus','autofocus');
+				$("#"+detail_id+" a").on('click',function(){
+					$("#"+detail_id).remove();
+				})
+				packFlag=packFlag+1;
+			});
+			
+			var checkChannel = function(){
+				var params = {};
+				params.pageNo = 1;
+				params.pageSize = 10;
+				params.filter = {};
+				params.filter.name = this.value;
+				var obj = $(this);
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../sell/findChannels',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  var channels = data.items;
+							  $("#channellist").empty();
+							  channelList = {};
+							  $.each( channels, function(key,value){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+value.name);
+								  $("#channellist").append(op);
+								  
+								  channelList[value.name]=value.id;
+								});
+						  }else{
+							  $(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					});
+			};
+	
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../sell/findChannels',   
+				  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+				  success : function(data) {
+					  if(data){
+						  var channels = data.items;
+						  $("#channellist").empty();
+						  channelList = {};
+						  $.each( channels, function(key,value){
+							  var op = $("<option></option>");
+							  op.val(value.name);
+							  $("#channellist").append(op);
+							  channelList[value.name]=value.id;
+							});
+						  
+						  $("#contractChannelName","#sel_contract_add_form").on('keyup',checkChannel);
+						  $("#contractChannelName","#sel_contract_add_form").on('change',function(){
+							    var strs = this.value.split(" ");
+								$(this).val(strs[strs.length-1]);
+								$("#contractChannelId","#sel_contract_add_form").val(channelList[strs[strs.length-1]]);
+								if($("#contractChannelId","#sel_contract_add_form").val().length==0){
+									$("#contractChannelName","#sel_contract_add_form").val("");
+								}
+								
+								//设置代理商联系人电话，可能有多个联系人，只取第一个;有效的销售经理，未过时的
+								 $.ajax( {
+									  type : 'post', 
+									  async: false,   
+									  contentType : 'application/json',     
+									  dataType : 'json',     
+									  url : '../../sell/getChannel',   
+									  data:JSON.stringify({id:$("#contractChannelId","#sel_contract_add_form").val()}),
+									  success : function(data) {
+										  if(data){
+											if(data.channel){
+												//设置联系人电话
+												if(data.channel.channelcontacts && data.channel.channelcontacts.length>0){
+													var channelContract=data.channel.channelcontacts[0];
+													 $("#contractPhone","#sel_contract_add_form").val(channelContract.phone);
+												}
+												//设置销售经理
+												if(data.channel.salesManagerId){
+													 $("#contractorId","#sel_contract_add_form").val(data.channel.salesManagerId);
+													 $("#contractor","#sel_contract_add_form").val(data.channel.salesManagerName);
+												}
+											}else{
+												 $("#contractPhone","#sel_contract_add_form").val('');
+												 $("#contractorId","#sel_contract_add_form").val('');
+												 $("#contractor","#sel_contract_add_form").val('');
+											}
+										  }else{
+											  $("#contractPhone","#sel_contract_add_form").val('');
+											  $("#contractorId","#sel_contract_add_form").val('');
+											  $("#contractor","#sel_contract_add_form").val('');
+										  }
+									  } ,     
+									  error : function(res,error) { 
+									  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+									  }    
+									}); 
+							});
+						  
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});			
+			
+			
+			var checkContractor = function(){
+				var params = {};
+				params.pageNo = 1;
+				params.pageSize = 10;
+				params.filter = {};
+				params.filter.isCompany =true;//查询机构下的的所有操作人
+				
+				params.filter.opname = this.value;
+				var obj = $(this);
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../getCompanySaleManager',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  var contractor = $("#contractor","#sel_contract_add_form");
+							  $("#contractorList").empty();
+							  contractorList = {};
+							  if(contractor){
+								  $.each(data.items,function(k,v){
+									  var op = $("<option></option>");
+									  op.val(obj.val()+" "+v.opname);
+									  $("#contractorList").append(op);
+									  
+									  contractorList[v.opname] = v.opid;
+			 				  	 }); 
+								}
+						  }else{
+						  	$(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					});
+			  }
+			
+			//填充员工
+		    $.ajax( {
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../getCompanySaleManager',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+			  success : function(data) {
+				  if(data){
+					  var contractor = $("#contractor","#sel_contract_add_form");
+					  $("#contractorList").empty();
+					  contractorList = {};
+					  if(contractor){
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(v.opname);
+							  $("#contractorList").append(op);
+							  
+							  contractorList[v.opname] = v.opid;
+	 				  	 }); 
+						  contractor.on('keyup',checkContractor);
+						  contractor.on('change',function(){
+							  	var strs = this.value.split(" ");
+								$(this).val(strs[strs.length-1]);
+								$("#contractorId","#sel_contract_add_form").val(contractorList[strs[strs.length-1]]);
+								if($("#contractorId","#sel_contract_add_form").val().length==0){
+									$("#contractor","#sel_contract_add_form").val("");
+								}
+							});
+
+						};
+				  }else{
+				  	$(document).sgPup({message:'message_info',text: data});
+				  }
+			  },     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+	
+		
+		   
+	})(jQuery)
+</script>
+</html>

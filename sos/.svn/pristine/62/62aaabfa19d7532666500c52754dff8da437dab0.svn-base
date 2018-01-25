@@ -1,0 +1,43 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>the codeplayer</title>
+</head>
+<body>
+<article id="bm_main" style="float: left; width: 200px;" class="bsp_main accordion">
+<li class="accordion_li_open">客户信息(王小明;湘A2FW07;)</li>
+<ul style="display: block;">
+<div style="width: 198px; height: 495px; overflow-x: hidden;">
+	<article id="ba_left_main" class="accordion" style="width: 196px;">
+	<li class="accordion_li">基本资料</li>
+	<ul>
+	<li class="accordion_ul_li">客户名：<a href="javascript:void(0);" title="点击查看详情">王小明</a></li>
+	客户状态<li class="accordion_ul_li">入网</li>
+	<li class="accordion_ul_li">联系电话：138888888888</li>
+	</ul>
+	<li class="accordion_li">车辆资料</li>
+	<ul>
+	<li class="accordion_ul_li">车牌号码：湘A2FW07</li>
+	<li class="accordion_ul_li">车型：小型车</li>
+	<li class="accordion_ul_li">终端型号：TGR30-1</li>
+	<li class="accordion_ul_li">车载号码：13012345678</li>
+	</ul>
+	<li class="accordion_li">服务信息</li>
+	<ul>
+	<li class="accordion_ul_li">服务情况：即将到期</li>
+	<li class="accordion_ul_li">服务套餐：吉祥188元套餐</li>
+	<li class="accordion_ul_li">定位情况：2013-08-06 14:30:45</li>
+	</ul>
+	<li class="accordion_li">维修记录(3)</li>
+	<ul>
+	<li class="accordion_ul_li"><a href="javascript:void(0);" title="点击查看详情">2013-03-15</a></li>
+	<li class="accordion_ul_li"><a href="javascript:void(0);" title="点击查看详情">2013-05-25</a></li>
+	<li class="accordion_ul_li"><a href="javascript:void(0);" title="点击查看详情">2013-08-05</a></li></ul>
+	</article>
+</div>
+</ul>
+</article>
+</body>
+</html>

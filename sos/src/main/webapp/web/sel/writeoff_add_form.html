@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>销账</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<style type="text/css">
+#dgd_writeoffs_details td {
+  line-height: 16px;
+}
+table th,td {
+word-break:break-all;
+}
+</style>
+</head>
+<body>
+ <div id="nw_document_all">
+	<form id='writeOff_add_form' method='post' class="form" style="width:880px" >
+		<div class='title'>销账信息></div>
+		<fieldset style="width:860px;">
+            <div class="panel">
+            	<span style="width:100px;">销账单号:</span>
+                <input type='text' id="writeOffNo" name='writeOffNo' disabled="disabled" style="width:165px;" />
+            	
+                <span style="width:110px;">销售经理:</span>
+                <input type="text" name="writeOffManager" id="writeOffManager" list="userList" required="true" style="width:145px;" autocomplete="on" />
+                <input type="hidden" name="writeOffManagerId" id="writeOffManagerId" required="true" value="" />
+                <datalist id='userList'></datalist>
+                <span id="borrowedNum" style="vertical-align:top;width:10px;color: red"></span>
+                
+                <span style="width:86px;">代理商:</span>
+                <input type='text' id="writeOffChannelName" name='writeOffChannelName' list='channellist' required="true"  style="width:145px;" />
+                <input type="hidden" id="writeOffChannelId" name="writeOffChannelId" required="true" value="" />
+                <datalist id="channellist"></datalist>
+                
+            </div>
+            <div class="panel">                         
+                <span style="width:100px;">转账票号:</span>
+                <input type='text' id="writeOffTicketno" name='writeOffTicketno' style="width:165px;" />
+                
+                <span style="width:110px;">本次入账金额(元):</span>
+                <input type='number' id="writeOffAmount" name='writeOffAmount' required="true" value="0" style="width:145px;" />
+                
+                <span style="width:110px;">上次销账余额(元):</span>
+                <input type='number' id="writeOffLastBalance" name='writeOffLastBalance' disabled='disabled' value="0" style="width:145px;" />
+            </div>
+            <div class="panel">
+            	<span style="width:100px;">日期:</span>
+                <input type='date' id="writeOffTime" name='writeOffTime' required="true" style="width:165px;" />
+                
+                <span style="width:110px;">备注:</span>
+                <input type="text" name="remark" id="remark" style="width:425px;">
+            </div>
+        </fieldset>
+		
+		<div class="title">挂账列表></div>
+		<fieldset class='fieldset' style="width:860px">
+            <div id="dgd_borrows_detail" class="datagird"></div>
+        </fieldset>
+        
+		<div class="title">销账明细></div>
+		<fieldset class='fieldset'  style="width:860px;">
+            <div class='datagrid' style="width:850px;">
+            	<div class="hDiv" style="margin:0px;padding:0px;">
+            	<div class="hDiv-header-inner" style="display:block">
+	                <table style="width: 850px;table-layout: fixed;">
+	                    <thead>
+	                    <tr>
+	                        <th style="width:5%;">序号</th>
+	                        <th style="width:15%;">商品编码</th>
+	                        <th style="width:15%;">商品名称</th>
+	                        <th style="width:20%;">商品规格</th>
+	                        <th style="width:5%;">价格</th>
+	                        <th style="width:8%;">挂账数量</th>
+	                        <th style="width:12%;">本次销账数量</th>
+	                        <th style="width:10%;">剩余数量</th>
+	                        <th style="width:8%;">金额</th>
+	                    </tr>
+	                    </thead>
+	                </table>
+	                </div>
+                </div>
+                <div class="bDiv" style="height: 109px;margin:0px;padding:0px;font-family: Arial, Helvetica, sans-serif;" >
+                	<table id="dgd_writeoffs_details"  border="0" style="width:850px;table-layout: fixed;">
+                	</table>
+                </div>
+            </div>
+        </fieldset>
+        
+        <fieldset style="width:860px;border:0px">
+        	<div class="panel"> 
+                <span style="width:120px;">本次销账总金额(元):</span>
+                <input type='number' id="offAmount" name='offAmount' disabled='disabled' value="0" style="width:275px;" />               
+                <span style="width:120px;">本次销账余额(元):</span>
+                <input type='number' id="balance" name='balance' disabled='disabled' value="0" style="width:275px;" />
+            </div>
+        </fieldset>
+
+        <fieldset style="width:860px;">	
+	        <div class="submit">
+	            <!-- 提交并打印 -->
+	            <button id="stockin_detail_submit" type="submit" >提交</button> <button id="btns_reset" type="reset">重置</button>
+	        </div>
+        </fieldset>
+	</form>
+ </div>
+	<!-- 打印iframe -->
+	<iframe id="ifm_print_swaf" name="ifm_print_swaf" style="display: none"></iframe>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script>
+	<script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+	var contractId=null;//销售合同ID
+	(function($){
+		var flag = 0;
+		var channelList = null;
+		var managerList = null;
+		
+		$.ajax( {
+			  type : 'POST', 
+			  async: false,  
+			  dataType : 'json', 
+			  url : '../../stock/getWriteOffsNo',   
+			  data: {isHx:false},
+			  success : function(data) {
+				  if(data.success){
+					  $("#writeOffNo").val(data.code);
+				  }else{
+					  if(data.msg&&data.msg.indexOf('仓库正在盘点')>-1){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						  }
+					  $(document).sgPup({message:'message_info',text: data.msg,cfn:function(){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						}}); 
+					  }
+			  } 
+		});
+		
+		var checkManager = function(){
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.opname = this.value;
+			params.filter.isCompany = true;//查询机构下的的所有操作人
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getOrgOperators',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#writeOffManager","#writeOff_add_form");
+						  if(manager){
+							  if(data.items.length>0){
+								  $("#userList").empty();
+						  		  managerList = {};
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.opname);
+								  $("#userList").append(op);
+								  
+								  managerList[v.opname] = v.opid;
+		 				  	 }); 
+							}
+					  }else{
+					  	$(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) {
+				  	   if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		}
+		
+	  //填充员工
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getOrgOperators',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#writeOffManager","#writeOff_add_form");
+				  if(manager){
+					  if(data.items.length>0){
+						  $("#userList").empty();
+				  		  managerList = {};
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userList").append(op);
+						  
+						  managerList[v.opname] = v.opid;
+ 				  	 }); 
+					  manager.on('keyup',checkManager);
+					  manager.on('change',function(){
+						  	var strs = this.value.split(" ");
+							$(this).val(strs[strs.length-1]);
+							$("#writeOffManagerId","#writeOff_add_form").val(managerList[strs[strs.length-1]]);
+							if($("#writeOffManagerId","#writeOff_add_form").val().length==0){
+								$("#writeOffManager","#writeOff_add_form").val("");
+								 $('#borrowedNum').text('');
+							}else{
+								//根据经办人，获得他借用的商品总数量
+								$.ajax({
+									  type : 'POST', 
+									  async: false,   
+									  url : '../../stock/getBorrowTotalNum',  
+									  data: {borrowerId:$("#writeOffManagerId").val(),channelId:$("#writeOffChannelId","#writeOff_add_form").val()},
+									  success : function(data) {
+										  if(data){
+											 $('#borrowedNum').text("("+data+")");
+										  }else{
+											  $('#borrowedNum').text('(0)'); 
+										  }
+									  } 
+								});
+							}
+							
+							
+							
+							//重新加载借用明细列表
+							if($("#writeOffManagerId").val().length>0){
+								var query={borrowerId:$("#writeOffManagerId").val(),writeoffsStatus:0,type:1,remark:1};//用remark表示是否只查询明细,1表示只查询出明细
+								if($("#writeOffChannelId").val().length>0){
+									query.channelId=$("#writeOffChannelId").val();
+								}
+								$('#dgd_borrows_detail').sgDatagrid('reload',{query:query,url: '../../stock/findBorrows'});
+								$('#dgd_writeoffs_details').empty();
+								var params = {};
+								params.manager_id = $("#writeOffManagerId").val();
+								
+								$.ajax( {
+							  		  type : 'post', 
+							  		  async: false,   
+							  		  contentType : 'application/json',     
+							  		  dataType : 'json',     
+							  		  url : '../../writeoff/getLastBalance',   
+							  		  data:JSON.stringify(params),
+							  		  success : function(data) {
+							  			  if(data){
+							     				  if(data){
+							     					  if(data.last_balance!=null){
+							     						  $("#writeOffLastBalance").val(data.last_balance);
+							     					  }else{
+							     						  $("#writeOffLastBalance").val(0);
+							     					  }
+							     				  }else{
+							     					  $(document).sgPup({message:'message_info',text: "获取上次余额失败！"});
+							     				  }
+							     				 
+							     			  }else{
+							     				  $(document).sgPup({message:'message_info',text: data});
+							     			  }
+							  		  } ,     
+							  		  error : function(res,error) { 
+							  		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+							  		  }    
+							  		});
+							}
+						});
+
+					};
+			  }else{
+			  	$(document).sgPup({message:'message_info',text: data});
+			  }
+		  },     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+	  
+	    var checkChannel = function(){
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.name = this.value;
+			params.filter.exceptDicId='5';
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../sell/findChannels',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var channels = data.items;
+						  $("#channellist").empty();
+						  channelList = {};
+						  $.each( channels, function(key,value){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+value.name);
+							  $("#channellist").append(op);
+							  
+							  channelList[value.name]=value.id;
+							});
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		};
+		
+	   	$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../sell/findChannels',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{exceptDicId:'5'}}),
+			  success : function(data) {
+				  if(data){
+					  var channels = data.items;
+					  $("#channellist").empty();
+					  channelList = {};
+					  $.each( channels, function(key,value){
+						  var op = $("<option></option>");
+						  op.val(value.name);
+						  $("#channellist").append(op);
+						  channelList[value.name]=value.id;
+						});
+					  
+					  $("#writeOffChannelName","#writeOff_add_form").on('keyup',checkChannel);
+					  $("#writeOffChannelName","#writeOff_add_form").on('change',function(){
+						    var strs = this.value.split(" ");
+							$(this).val(strs[strs.length-1]);
+							$("#writeOffChannelId","#writeOff_add_form").val(channelList[strs[strs.length-1]]);
+							if($("#writeOffChannelId","#writeOff_add_form").val().length==0){
+								$("#writeOffChannelName","#writeOff_add_form").val("");
+							}else{
+								
+							}
+							
+							if($("#writeOffManagerId").val()){
+								//根据经办人，获得他借用的商品总数量
+								$.ajax({
+									  type : 'POST', 
+									  async: false,   
+									  url : '../../stock/getBorrowTotalNum',  
+									  data: {borrowerId:$("#writeOffManagerId").val(),channelId:$("#writeOffChannelId","#writeOff_add_form").val()},
+									  success : function(data) {
+										  if(data){
+											 $('#borrowedNum').text("("+data+")");
+										  }else{
+											  $('#borrowedNum').text('(0)'); 
+										  }
+									  } 
+								});
+							}
+							//重新加载借用明细列表
+							if($("#writeOffManagerId").val().length>0){
+								var query={borrowerId:$("#writeOffManagerId").val(),writeoffsStatus:0,type:1,remark:1};//用remark表示是否只查询明细,1表示只查询出明细
+								//$(document).sgPup({message:'message_info',text: $("#writeOffChannelId").val()});
+								if($("#writeOffChannelId").val().length>0){
+									query.channelId=$("#writeOffChannelId").val();
+								}
+								$('#dgd_borrows_detail').sgDatagrid('reload',{query:query,url: '../../stock/findBorrows'});
+								$('#dgd_writeoffs_details').empty();
+								
+								var params = {};
+								params.manager_id = $("#writeOffManagerId").val();;
+								
+								$.ajax( {
+							  		  type : 'post', 
+							  		  async: false,   
+							  		  contentType : 'application/json',     
+							  		  dataType : 'json',     
+							  		  url : '../../writeoff/getLastBalance',   
+							  		  data:JSON.stringify(params),
+							  		  success : function(data) {
+							  			  if(data){
+							     				  if(data){
+							     					  if(data.last_balance!=null){
+							     						  $("#writeOffLastBalance").val(data.last_balance);
+							     					  }else{
+							     						  $("#writeOffLastBalance").val(0);
+							     					  }
+							     				  }else{
+							     					  $(document).sgPup({message:'message_info',text: "获取上次余额失败！"});
+							     				  }
+							     				 
+							     			  }else{
+							     				  $(document).sgPup({message:'message_info',text: data});
+							     			  }
+							  		  } ,     
+							  		  error : function(res,error) { 
+							  		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+							  		  }    
+							  		});
+							}
+						});
+					  
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});	
+
+		var countAllMoney = function(){
+			var allMoney = 0;
+			var moneys = $('input[name=money]','#dgd_writeoffs_details');
+			$.each(moneys,function(k,v){
+				allMoney = Number(allMoney)+Number(v.value);
+			});
+			$('#offAmount','#writeOff_add_form').val(allMoney);
+			$('#balance','#writeOff_add_form').val(Number($('#writeOffAmount','#writeOff_add_form').val())+Number($('#writeOffLastBalance','#writeOff_add_form').val())-Number(allMoney));
+		}
+		
+		$('#writeOffAmount','#writeOff_add_form').on('change',function(){
+			countAllMoney();
+		});
+		$('#writeOffAmount','#writeOff_add_form').on('keyup',function(){
+			countAllMoney();
+		});
+		
+		var chkChange=function(index,rowData,isChecked){
+			var id=rowData.id;
+			if(isChecked){
+				var pid = rowData.productId;
+				var price = rowData.price;
+				var ptx = rowData.productName;
+				var code = rowData.productCode;
+				var norm = rowData.norm;
+				var num = rowData.num;
+				var money = rowData.money;
+				if(pid==null||pid==''){
+					$(document).sgPup({message:'message_info',text: "商品不能为空!"});
+					return false;
+				}
+	
+				if(num<=0){
+					$(document).sgPup({message:'message_info',text: "数量必须大于０!"});
+					return false;
+				}
+				
+				var grid = $('#dgd_writeoffs_details');
+				var tr = $('<tr></tr>');
+				tr.attr('id',id+'_tr');
+				
+				if($('#'+id+'_tr').get(0)){
+					$("#"+id+"_tr",$('#dgd_writeoffs_details')).remove();
+				}
+				
+				var sno = $('<td></td>')
+				//sno.width(34);
+				sno.css('width','5%');
+				tr.append(sno);
+				
+				var pcode = $('<td></td>')
+				pcode.css('width','15%');
+				pcode.append(code);
+				tr.append(pcode);
+				
+                
+				var td1 = $('<td></td>');
+				var rowId = $("<input type='hidden' name='borrowId' />")
+				rowId.val(id);
+				td1.append(rowId);
+				var sid = $("<input type='hidden' name='commodityId' />")
+				sid.val(pid);
+				td1.append(sid);
+				var sname = $("<input type='hidden' name='productName' />")
+				sname.val(ptx);
+				td1.append(sname);
+				var productCode = $("<input type='hidden' name='productCode' />")
+				productCode.val(code);
+				td1.append(productCode);
+				td1.append(ptx);
+				td1.css('width','15%');
+				//td1.width(160);
+				tr.append(td1);
+				
+				var td2 = $('<td style="line-height: 16px"></td>');
+				var productNorm = $("<input type='hidden' name='productNorm' disabled='disabled'/>");
+				productNorm.val(norm);
+				td2.append(productNorm);
+				td2.append(norm);
+				//td2.width(160);
+				td2.css('width','20%');
+				tr.append(td2)
+				
+				var td3 = $('<td></td>');
+				var productPrice = $("<input type='number' name='price3' disabled='disabled'/>");
+				productPrice.val(price);
+				productPrice.css('width','90%');
+				//productPrice.width(75);
+				//td3.width(80);
+				td3.css('width','5%');
+				td3.append(productPrice);
+				tr.append(td3);
+				
+				var td4 = $('<td></td>');
+				var innum = $("<input type='number' name='quantity' disabled='disabled'/>");
+				innum.val(num);
+				innum.css('width','90%');
+				//innum.width(55);
+				//td4.width(60);
+				td4.css('width','8%');
+				td4.append(innum);
+				tr.append(td4);
+				
+				var td5 = $('<td></td>');
+				var writeoffsNum = $("<input type='number' name='offQuantity' max='"+num+"' min='1' />");
+				writeoffsNum.on('keyup',function(){
+					this.value=this.value.replace(/\D/g,'');
+					$("input[name=remainQuantity]","#"+id+'_tr').val($("input[name=quantity]","#"+id+'_tr').val()-$("input[name=offQuantity]","#"+id+'_tr').val());
+					$("input[name=money]","#"+id+'_tr').val($("input[name=offQuantity]","#"+id+'_tr').val()*price);
+					countAllMoney();
+				});
+				writeoffsNum.on('change',function(){
+					$("input[name=remainQuantity]","#"+id+'_tr').val($("input[name=quantity]","#"+id+'_tr').val()-$("input[name=offQuantity]","#"+id+'_tr').val());
+					$("input[name=money]","#"+id+'_tr').val($("input[name=offQuantity]","#"+id+'_tr').val()*price);
+					countAllMoney();
+				});
+				writeoffsNum.val(num);
+				//writeoffsNum.width(90);
+				writeoffsNum.css('width','90%');
+				//td5.width(100);
+				td5.css('width','12%');
+				td5.append(writeoffsNum);
+				tr.append(td5);
+				
+				var td6 = $('<td></td>');
+				var writeoffsNum = $("<input type='number' name='remainQuantity' max='"+num+"' min='1' disabled='disabled' />");
+				writeoffsNum.val(0);
+				writeoffsNum.css('width','90%');
+				//writeoffsNum.width(55);
+				//td6.width(60);
+				td6.css('width','10%');
+				td6.append(writeoffsNum);
+				tr.append(td6);
+				
+				var td7 = $('<td></td>');
+				var writeoffsNum = $("<input type='number' name='money' disabled='disabled' />");
+				writeoffsNum.val(num*price);
+				//writeoffsNum.width(75);
+				writeoffsNum.css('width','90%');
+				//td7.width(80);
+				td7.css('width','8%');
+				td7.append(writeoffsNum);
+				tr.append(td7);
+				
+				
+				grid.append(tr);
+				
+				sno.append(grid.find('tr').length);
+			}else{
+				$("#"+id+"_tr",$('#dgd_writeoffs_details')).remove();
+				$.each($('#dgd_writeoffs_details').find('tr'),function(k,v){
+					$(v).find('td:first').html(k+1);
+				})
+			}
+			$('tr:odd','#dgd_writeoffs_details').addClass('normalRow');
+			countAllMoney();
+		}
+		
+		
+	    //初始化销售经理挂账商品表格
+	   	 var defaults = {
+	   				width:  850,
+	   		        height: 136,
+	   		     	url:'',
+	   		     	query:{managersId:'test'},
+	   		     	chkChange:chkChange,
+	   		        isNotCheckall:true,
+	   		     	colid:'id',  //主键
+	   		        rownumbers:true,//序号
+	   		        colModel : [
+						{display: '商品编码', name : 'productCode', width : 100, sortable : false},
+	   		            {display: '商品名称', name : 'productName', width : 120, sortable : false},
+	   		         	{display: '商品规格', name : 'norm', width : 140, sortable : false},
+	   		            {display: '商品价格', name : 'price', width : 56, sortable : false,formatter:function(value,row){
+   	   		             if(value && row.contractId){
+			                    value = '<a href="#" onClick="getSaleContract(\''+row.contractId+'\')">'+value+'</a>';
+			             }
+			                return value;
+	   		            }},
+	   		            {display: '数量', name : 'num', width : 40, sortable : false},
+	   		         	{display: '挂账时间', name : 'stamp', width : 80, sortable : false},
+	   		         	{display: '代理商', name : 'channelName', width : 150, sortable : false},
+	   		            {display: '仓库', name : 'whsName', width : 80, sortable : false}
+	   		        ],
+	   		        query:{writeoffsStatus:0}//未销
+	   		    };
+	   	$('#dgd_borrows_detail').sgDatagrid(defaults); 
+	    
+	   	$("#writeOffTime").val(new Date().format('yyyy-MM-dd'));
+	   	
+	   	
+		
+		
+	   	
+	   	//销售经理销账保存
+	   	$('#writeOff_add_form').on('submit',function(e){
+	   		
+		   	 $(document).sgConfirm({text: '确定进行销帐吗?',cfn:function(r){ 
+					if(r){
+				   		//做表单提交
+				            var params = {};
+					   	    var obj = $('#dgd_borrows_detail');
+					        var bDiv = $('.bDiv',obj);
+					        //$(document).sgPup({message:'message_info',text: $('input[type=checkbox][checked=checked]',bDiv).length});
+					        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length<1){
+					            $(document).sgPup({message:'message_info',text: "请选择一个挂账列表选项！"});
+					            return false;
+					        }
+				
+					        params.writeoffno = $('#writeOffNo','#writeOff_add_form').val();
+					        params.manager_id = $('#writeOffManagerId','#writeOff_add_form').val();
+					        params.manager_name = $('#writeOffManager','#writeOff_add_form').val();
+				            params.channel_id= $('#writeOffChannelId','#writeOff_add_form').val();
+				            params.off_amount = $("#offAmount",'#writeOff_add_form').val();	
+				     	    params.ticketno= $('#writeOffTicketno','#writeOff_add_form').val();
+				     	    params.time = $('#writeOffTime','#writeOff_add_form').val();
+				     	    params.balance = $('#balance','#writeOff_add_form').val();
+				     	    params.remark = $('#remark','#writeOff_add_form').val();
+				     	    params.last_balance =$('#writeOffLastBalance','#writeOff_add_form').val();
+				            
+				            var borrowIds = $('input[name=borrowId]','#writeOff_add_form')
+				     	    var commodityIds = $('input[name=commodityId]','#writeOff_add_form');
+				            //var productNames=$('input[name=productName]','#writeOff_add_form');
+				            var quantitys= $('input[name=quantity]','#writeOff_add_form');
+				            var offQuantitys = $('input[name=offQuantity]','#writeOff_add_form');
+				            var remainQuantitys = $('input[name=remainQuantity]','#writeOff_add_form');
+				            var moneys = $('input[name=money]','#writeOff_add_form');
+				            
+				            var details = new Array();
+				            if(!params.manager_id){
+				         	   $(document).sgPup({message:'message_info',text: '请选择经办人！'});
+				         	   return false;
+				            }
+				            if(params.balance<0){
+				            	$(document).sgPup({message:'message_info',text: '本次销账总余额不能小于0！'});
+					         	return false;
+				            }
+				            var isGoOn=true;
+				            $.each(commodityIds,function(k,v){
+				            	var obj = {};            	
+				            	
+				            	obj.commodityId = v.value;
+				            	//obj.productName = productNames[k].value;
+				            	obj.borrowId = borrowIds[k].value
+				            	obj.quantity = quantitys[k].value;
+				            	obj.offQuantity = offQuantitys[k].value;
+				            	obj.remainQuantity = remainQuantitys[k].value;
+				            	obj.money = moneys[k].value;
+				            	
+				            	details.push(obj);
+				            	if(!v.value){ 
+				               	   $(document).sgPup({message:'message_info',text: '请添加商品！'});
+				             	   isGoOn=false;
+				             	   return false;
+				                }
+				              });
+				              if(!isGoOn){
+				           	   return false;
+				              }
+				              params.writeoffDetails = details;
+				              
+				            //$(document).sgPup({message:'message_info',text: JSON.stringify(params)});
+				            $.ajax( {
+				    		  type : 'post', 
+				    		  async: false,   
+				    		  contentType : 'application/json',     
+				    		  dataType : 'json',     
+				    		  url : '../../writeoff/add',   
+				    		  data:JSON.stringify(params),
+				    		  success : function(data) {
+				    			  if(data){
+				       				  if(data.success){
+				       					  /* window.open('web/whs/print.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+					       					//新增遮罩层
+					       					var mask=$('<div id="print_mask"></div>');
+					       					mask.addClass('window-mask');
+					       					mask.css('z-index',$('div.window').css('z-index')+1);//如果有弹出窗口，则将遮罩层置为最上层
+					       			        var span=$('<span></span');
+					       			        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+					       			        span.text('正在打印中...');
+					       			        mask.append(span);
+					       				    $(document.body).append(mask); */
+				       				  }
+				       				$(document).sgPup({message:'message_info',text: data.msg});
+				       				if(data.success){
+				       					reset();
+				       				}
+				       			  }else{
+				       				  $(document).sgPup({message:'message_info',text: data});
+				       			  }
+				    		  } ,     
+				    		  error : function(res,error) { 
+				    		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				    		  }    
+				    		});
+
+					}
+		   	 
+		   	 }});
+   		   
+   		    //$("#writeOff_add_form").unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+		    e.stopPropagation();	
+		    return false;
+	   	});	
+	   	
+	})(jQuery)
+	
+	var reset = function(){
+	   	$('#borrowedNum').text('');
+	   	$("#writeOff_add_form").get(0).reset();
+        $('#dgd_borrows_detail .bDiv table').empty();
+    	$('#dgd_writeoffs_details').empty();
+		$("#writeOffTime").val(new Date().format('yyyy-MM-dd'));
+		$.ajax( {
+			  type : 'POST', 
+			  async: false,  
+			  dataType : 'json', 
+			  url : '../../stock/getWriteOffsNo',   
+			  data: {isHx:false},
+			  success : function(data) {
+				  if(data.success){
+					  $("#writeOffNo").val(data.code);
+				  }else{
+					  if(data.msg&&data.msg.indexOf('仓库正在盘点')>-1){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						  }
+					  $(document).sgPup({message:'message_info',text: data.msg,cfn:function(){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						}}); 
+					  }
+			  } 
+		});
+	};
+	
+	//打印页面元素设置
+	    var callback=function(subWinBody,subWin){
+	  	$.ajax( {
+	  		  type : 'post', 
+	  		  async: false,   
+	  		  contentType : 'application/json',     
+	  		  dataType : 'json',     
+	  		  url : 'getCurrentCompany',   
+	  		  data:JSON.stringify({}),
+	  		  success : function(data) {
+	  			  if(data){
+	  				  var total = 0;
+	  				  var rowtotal = 0;
+	  				  //公司中文名字
+	  				  $("#cname",subWinBody).empty();
+	  				  $("#cname",subWinBody).append(data.cnfullname);
+	  				  //公司英文名字
+	  				  $("#ename",subWinBody).empty();
+	  				  $("#ename",subWinBody).append(data.enfullname);
+	  				  //表单名字
+	  				  $("#orderTitle",subWinBody).empty();
+	  				  $("#orderTitle",subWinBody).append("销帐单");
+	  				  
+	  				  //表单日期
+	  				  $("#orderDate",subWinBody).empty();
+	  				  $("#orderDate",subWinBody).append($("#writeOffTime","#writeOff_add_form").val());
+	  				  //表单单号
+	  				  $("#orderNo",subWinBody).empty();
+	  				  $("#orderNo",subWinBody).append($("#writeOffNo","#writeOff_add_form").val());
+	  				  
+	  				  var inWhs = '<span>代理商：</span><div>'+$("#writeOffChannelName","#writeOff_add_form").val()+'</div>';
+	  				  $("#headInput",subWinBody).append(inWhs);	  				  
+	  				  
+	  				  var order = '<span>销售经理：</span><div>'+$("#writeOffManager","#writeOff_add_form").val()+'</div>';
+	  				  $("#headInput",subWinBody).append(order);
+	  			
+	  				  //表头
+	  				  $("#tbHead",subWinBody).append('<td style="width: 8%;">序号</td>'+
+	  														  '<td style="width: 12%;">商品编码</td>'+
+	  														  '<td style="width: 16%;">商品名称</td>'+
+	  														  '<td style="width: 20%;" >商品规格</td>'+
+	  														  '<td style="width: 10%;">价格(元)</td>'+
+	  														  '<td style="width: 10%;">挂帐数量</td>'+
+	  														  '<td style="width: 14%;">销帐数量</td>'+
+	  														  '<td style="width: 10%;">金额</td>');
+	  				  
+	  				  //表格主体
+	  				  var productIds = $('input[name=commodityId]','#writeOff_add_form');
+	  				  var productCodes=$('input[name=productCode]','#writeOff_add_form');
+          		      var productNorms=$('input[name=productNorm]','#writeOff_add_form');
+	                  var productNames=$('input[name=productName]','#writeOff_add_form');
+	                  var productPrices=$('input[name=price3]','#writeOff_add_form');
+	                  var nums= $('input[name=quantity]','#writeOff_add_form');
+	                  var offQuantitys = $('input[name=offQuantity]','#writeOff_add_form');
+	                  //var remainQuantitys = $('input[name=remainQuantity]','#writeOff_add_form');
+	                  var moneys = $('input[name=money]','#writeOff_add_form');
+            		  
+             	  
+	  	              $.each(productIds,function(k,v){
+	  	            	total = Number(total) + Number(moneys[k].value);
+	  	               	var tbbody_tr = '<tr><td >'+(k+1)+'</td>'
+										+'<td>'+productCodes[k].value+'</td>'
+	  	               	                +'<td>'+productNames[k].value+'</td>'
+	  	                                +'<td>'+productNorms[k].value+'</td>'
+	  	                              	+'<td>'+productPrices[k].value+'</td>'
+	  	                                +'<td>'+nums[k].value+'</td>'
+	  	                              	+'<td>'+offQuantitys[k].value+'</td>'
+	  	               					+'<td>'+moneys[k].value+'</td></tr>';
+
+	  	               	$("#tbBody",subWinBody).append(tbbody_tr);
+	  	              })
+	  				  
+	  				 /*  //表合计
+	  				  var tbfoot = '<tr><td style="width:428px;"><div style="text-align:right;">小计:</div></td><td style="width:526px;"><div style="text-align:right;padding-right:45px;">'+total+'</div></td></tr>';
+	  				  			  
+	  				  $("#tbFoot",subWinBody).append(tbfoot); */
+	  				  //表合计
+					  var tbfoot = '<tr>';
+					  tbfoot=tbfoot+'<td colspan="7"><div style="text-align:right">小计:</div></td>';
+					  tbfoot=tbfoot+'<td colspan="1">'+total+'</td>';
+					  tbfoot=tbfoot+'</tr>';
+		               
+					  $("#tbBody",subWinBody).append(tbfoot);
+	  				  
+	  				  //表尾输入单
+	  				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+	  													  '<span>经办人：</span><div>&nbsp;</div>'+
+	  													  '<span>财务：</span><div>&nbsp;</div>'+
+	  													  '<span>制单：</span><div>&nbsp;</div>');
+	  				reset();
+	  				  
+	  			  }else{
+	  				  $(document).sgPup({message:'message_info',text: data});
+	  			  }
+	  		  } ,     
+	  		  error : function(res,error) { 
+	  		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  		  }    
+	  		});
+	  	
+	      if (navigator.appName == 'Microsoft Internet Explorer'){
+	      	subWin.print();  
+	      }else{ 
+	      	subWin.focus();
+	      	subWin.print();  
+	      }
+	  }
+	
+
+	 //销售合同信息窗口加载成功后
+	  var contractWinload = function(){
+	  	if($('#sel_contract_detail_grid').get(0) && contractId){
+	  		 $.ajax({
+	  			  type : 'POST', 
+	  			  async: false,   
+	  			  contentType : 'application/json',     
+	 			  dataType : 'json',     
+	 			  url : '../../sell/getSalesContract',  
+	 			  data:JSON.stringify({id:contractId}),
+	  			  success : function(data) {
+	  				  if(data){
+	  					 $('#code','#sel_contract_edit_form').val(data['code']);
+	  					 $('#name','#sel_contract_edit_form').val(data['name']);
+	  					 $('#channelName','#sel_contract_edit_form').val(data['channelName']);
+	  					 $("#phone",'#sel_contract_edit_form').val(data['phone']);	
+	  					 $('#contractorName','#sel_contract_edit_form').val(data['contractorName']);
+	  					 $('#signDate','#sel_contract_edit_form').val(data['signDate']);
+	  					 $("#validDate",'#sel_contract_edit_form').val(data['validDate']);
+	  					 $("#matureDate",'#sel_contract_edit_form').val(data['matureDate']);
+	  					 $("#remark",'#sel_contract_edit_form').val(data['remark']);
+	  					 
+	  					 //初始化表格
+	  				   	 var detail_defaults = {
+	  				   		        width:  840,
+	  				   		        height: 120,
+	  				   		        url: '../../sell/findSalesProducts ',
+	  				   		        query:{contractId:contractId},
+	  				   		        rownumbers:true,//序号
+	  				   		        colModel : [
+	  				   		            {display: '商品名称', name : 'productName', width : 160, sortable : false},
+	  				   		            {display: '商品规格', name : 'norm', width : 160, sortable : false},
+	  				   		            {display: '数量', name : 'num', width : 60, sortable : false},
+	  				   		         	{display: '结算价格(元)', name : 'price', width : 80, sortable : false},
+	  				   		      		{display: '安装费用(元)', name : 'fixFee', width : 80, sortable : false},
+	  				   		   			{display: '备注', name : 'remark', width : 140, sortable : false}
+	  				   		        ]
+	  				   		    };
+	  					   $('#sel_contract_detail_grid').sgDatagrid(detail_defaults); 
+	  					   
+	  					   var customer_defaults = {
+	  				   		        width:  840,
+	  				   		        height: 120,
+	  				   		        url: '../../sell/findSalesPacks',
+	  				   		        query:{contractId:contractId},
+	  				   		        rownumbers:true,//序号
+	  				   		        colModel : [
+	  				   		            {display: '套餐名称', name : 'name', width : 200, sortable : false},
+	  				   		            {display: '套餐说明', name : 'legend', width : 500, sortable : false}
+	  				   		        ]
+	  				   		    };
+	  					   $('#sel_contract_pack_grid').sgDatagrid(customer_defaults);
+	  				  }else{
+	  				  }
+	  			  } ,     
+	  			  error : function(res,error) { 
+	  			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  			  }   
+	  			  
+	  		    });
+	  		
+	 		
+	  	}
+	 	}
+	  
+	  //查询销售合同信息
+	 	function getSaleContract(contractId1){
+	 		contractId=contractId1;
+	 	 	//打开窗口
+	 	    var defaults = {
+	 	            title:'销售合同查看',
+	 	            id:'sel_contract_edit_window',
+	 	            form:'sel_contract_edit_form',
+	 	            url:'contract_edit_form.html',
+	 	            success: contractWinload,
+	 	            width: 875,
+	 	            height: 580,
+	 	            buttons : [
+	 	                       {name: '关闭', type: 'submit', onpress : function(){
+	 	                    	   $(document).sgWindow('close',{id:'sel_contract_edit_window'});
+	 	                       } }
+	 	                   ]
+	 	        };
+	 	    $(document).sgWindow(defaults);
+	 	}
+</script>
+</html>

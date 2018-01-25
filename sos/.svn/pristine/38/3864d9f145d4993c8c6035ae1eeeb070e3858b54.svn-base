@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>办停</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" href="../../bslib/css/bootstrap-datetimepicker.css" /><!-- +++++ -->
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../css/sos.css">
+</head>
+<body>
+	<div id="nw_document_all">
+	<form id='search_form' name='search_form' method='post' class="form">
+		<div class='title'>办停></div>
+		<fieldset style="width:100%;">
+			<div class="panel">
+				<div class="row">
+	            	<div class="col-xs-4">
+	            		<span class="col-xs-4">车牌号码:</span>
+	            		<span class="col-xs-8">
+			            	<input type='text' id="searchnumber" name='searchnumber' class="form-control" />
+			            	<ul class="show_list" id="vehicleList"></ul>
+			            </span>
+		            </div>
+	            	
+	            	<div class="col-xs-4">
+		            	<span class="col-xs-4">车载电话:</span>
+		            	<span class="col-xs-8">
+			            	<input type='text' id="searchcall" name='searchcall' class="form-control" />
+			            	<ul class="show_list" id="unitList"></ul>
+			            </span>
+		            </div>
+	            	
+	            	<div class="col-xs-4">
+		            	<span class="col-xs-4">客户名称:</span>
+		            	<span class="col-xs-8">
+			            	<input type='text' id="custname" name='custname' class="form-control" />
+			            	<ul class="show_list" id="customerList"></ul>
+			            </span>
+            		</div>
+	        	</div>
+			</div>
+        </fieldset>
+    </form>
+    <form id='customer_form' name='customer_form' method='post' class="form">
+        <input type='hidden' id='cust_id' name='cust_id' />
+		<input type='hidden' id='vehicle_id' name='vehicle_id' />
+		<input type='hidden' id='unit_id' name='unit_id' />
+		<input type='hidden' id='reg_status' name='reg_status' >
+		<input type='hidden' id='url_tye' value='3' >
+        <div class='title'>基本资料</div>
+		<fieldset style="width:100%;">
+            <div class="panel"> 
+            	<div class="row">
+            		<span class="col-xs-4">
+            			<span class="col-xs-4">姓名:</span>
+	            		<span class="col-xs-8">
+		                	<input type='text' id="customer_name" name='customer_name' class="form-control" />
+		                </span>
+            		</span>
+	            	<span class="col-xs-4">
+		                <span class="col-xs-4" style="color:red;">入网状态:</span>
+		                <span class="col-xs-8">
+			                <select size="1" name="state" id="state" style="width:100%;" autocomplete="on">
+			                    <option value="0">在网</option>
+			                    <option value="1">离网</option>
+			                    <option value="2">欠费离网</option>
+			                    <option value="3">非入网</option>
+			                    <option value="4">研发测试</option>
+			                    <option value="5">电工测试</option>
+			                    <option value="6">重新开通</option>
+			                    <option value="7">不开通</option>
+			                </select>
+		                </span>
+		            </span>
+		            <span class="col-xs-4">
+		                <span class="col-xs-4">入网时间:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' class="form-control form_datetime" id="create_date" name='create_date' />
+		                </span>
+		            </span>
+            	</div>
+            </div>
+            <div class="panel">
+            	<div class="row">
+            		<span class="col-xs-4">
+		                <span class="col-xs-4">车牌号码:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id="number_plate" name='number_plate' class="form-control" />
+		                </span>
+		            </span>
+		            <span class="col-xs-4">
+		                <span class="col-xs-4">车型:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id="cartype" name='cartype' class="form-control" />
+		                </span>
+		            </span>
+		            <span class="col-xs-4">
+		                <span class="col-xs-4">颜色:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id="color" name='color' class="form-control" />
+		                </span>
+		            </span>
+	            </div>
+            </div>
+            <div class="panel">
+            	<div class="row">
+            		<span class="col-xs-4">
+		            	<span class="col-xs-4">车载电话:</span>
+		            	<span class="col-xs-8">
+		                	<input type='text' id="call_letter" name='call_letter' class="form-control" />
+		            	</span>
+		            </span>
+		            <span class="col-xs-4">
+		                <span class="col-xs-4">终端类型:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id="unitcode" name='unitcode' class="form-control" />
+		                </span>
+		            </span>
+		            <span class="col-xs-4">
+		                <span class="col-xs-4">安装日期:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' class="form-control form_datetime" id="time" name='time' />
+		                </span>
+		            </span>
+	            </div>
+            </div>
+            <div class="panel">
+            	<div class="row">
+            		<span class="col-xs-4">
+		            	<span class="col-xs-4">联系电话:</span>
+		            	<span class="col-xs-8">
+		                	<input type='text' id="phone" name='phone' class="form-control" />
+		            	</span>
+		            </span>
+		            <span class="col-xs-4">
+		                <span class="col-xs-4">销售经理:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id="managerName" name='managerName' class="form-control" />
+		                </span>
+		            </span>
+	            </div>
+            </div>
+            <div class="panel">
+            	<div class="row">
+            		<span class="col-xs-4">
+		                <span class="col-xs-4">银行账号:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id="account" name='account' class="form-control" />
+		                </span>
+		            </span>
+		            <span class="col-xs-4">
+		                <span class="col-xs-4">账号名称:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id="collection_name" name='collection_name' class="form-control" />
+		                </span>
+		            </span>
+		            <span class="col-xs-4">
+		                <span class="col-xs-4">托收机构:</span>
+		                <span class="col-xs-8">
+			                <select size="1" name="agency" id="agency" style="width:100%;" autocomplete="on" >
+			                    <option value="2">金融中心</option>
+			                    <option value="1">银盛</option>
+			                    <option value="3">银联</option>
+			                </select>
+		                </span>
+		            </span>
+                </div>
+            </div>
+        </fieldset>
+        
+        <div class='title'>计费信息</div>
+		<fieldset style="width:100%;">
+			<div id="feepanel5" style="display: none;"><!-- style="display:none" -->
+				<div class="panel">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+			                <span style="width:10%;padding-right:0;">前装服务费:</span>
+			                <span style="width:11%;">开始日期:</span>
+			                <span style="width:14%;">
+			                	<input type='text' class="form-control form_datetime" id="service_start_time5" name='service_start_time5' />
+			                </span>
+			                <span style="width:11%;">每月费用:</span>
+			                <span style="width:14%;">
+			                	<input type='number' id="price5" name='price5' class="form-control" onblur="getMonthprice();"/>
+			                </span>
+			                <span style="width:11%;">缴费方式:</span>
+			                <input type='radio' id="payment5" name="payment5" checked="checked" style='vertical-align:middle;' value='1' />现金
+			                &nbsp;
+			                <input type='radio' id="payment5" name="payment5" style='vertical-align:middle;' value='2' />转账
+			                &nbsp;
+			                <input type='radio' id="payment5" name="payment5" style='vertical-align:middle;' value='3' />刷卡
+			            </div>
+			        </div>
+	            </div>
+	            <div class="panel" id="pack_msg">
+	           	    <div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+			            	<span style="width:11%;margin-left:10.3%;">服务包:</span>
+			            	<span style="width:14%;">
+			            		<input type='text' id="pack_name" name='pack_name' class="form-control" />
+			            	</span>
+			            	<span style="width:11%;">服务包周期:</span>
+			            	<span style="width:14%;">
+			            		<input type='number' id="fee_cycle" name='fee_cycle' class="form-control" />
+			            	</span>
+			            </div>
+			        </div>
+	            </div>
+	            <div class="panel" id="combo_msg">
+	           	    <div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+			            	<span style="width:11%;margin-left:10.3%;">套餐名:</span>
+			            	<span style="width:14%;">
+			            		<input type='text' id="combo_name" name='combo_name' class="form-control" />
+			            	</span>
+			            	<span style="width:11%;">套餐价格:</span>
+			            	<span style="width:14%;">
+			            		<input type='number' id="month_fee" name='month_fee' readonly="readonly" class="form-control" />
+			            	</span>
+			            </div>
+			        </div>
+	            </div>
+	            <div class="panel" id="combo_voice_msg">
+	            	<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+			            	<span style="width:11%;margin-left:10.3%;">总通话时长(分):</span>
+			            	<span style="width:14%;">
+			            		<input type='number' id="voice_time" name='voice_time' readonly="readonly" class="form-control" />
+			            	</span>
+			            	<span style="width:11%;">剩余时长(兆):</span>
+			            	<span style="width:14%;">
+			            		<input type='number' id="residue_time" name='residue_time' readonly="readonly" class="form-control" />
+			            	</span>
+			           	</div>
+			        </div>
+	            </div>
+	            <div class="panel" id="combo_data_msg">
+	            	<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+			            	<span style="width:11%;margin-left:10.3%;">总流量(兆):</span>
+			            	<span style="width:14%;">
+			            		<input type='number' id="data" name='data' readonly="readonly" class="form-control" />
+			            	</span>
+			            	<span style="width:11%;">剩余流量:</span>
+			            	<span style="width:14%;">
+			            		<input type='number' id="residue_data" name='residue_data' readonly="readonly" class="form-control" />
+			            	</span>
+			            </div>
+			        </div>
+	            </div>
+	            <div class="panel" id="hmservicefee_q" style="display: none;">
+	            	<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+			            	<span style="width:11%;margin-left:10.3%;">欠费月数(月):</span>
+			            	<span style="width:14%;">
+			                	<input type='number' id="a_months5" name='a_months5' class="form-control" style="color:red;" />
+			                </span>
+			                <span style="width:11%;">欠费天数(天):</span>
+			                <span style="width:14%;">
+			                	<input type='number' id="a_days5" name='a_days5' class="form-control" style="color:red" />
+			                </span>
+			                <span style="width:11%;">欠费金额:</span>
+			                <span style="width:14%;">
+			                	<input type='number' id="arrearage_fee5" name='arrearage_fee5' class="form-control" style="color:red" />
+			                </span>
+			            </div>
+			        </div>
+	            </div>
+				<hr>
+			</div>
+			<div id="feepanel1" style="display: none;"><!-- style="display: none;" -->
+				<div class="panel">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+			                <span id='servicefee' style="width:10%;padding-right:0;">服务费:</span>
+			               	<span style="width:11%;">开始日期:</span>
+			               	<span style="width:14%;">
+				            	<input type='text' class="form-control form_datetime" id="service_start_time1" name='service_start_time1' />
+				            </span>
+			                <span style="width:11%;">每月费用:</span>
+			                <span style="width:14%;">
+			                	<input type='number' id="price1" name='price1' class="form-control" />
+			                </span>
+			                <span style="width:11%;">服务截止日期:</span>
+			                <span style="width:14%;">
+			                	<input type='text' class="form-control form_datetime" id="service_end_time1" name='service_end_time1' />
+			                </span>
+			                <!--  
+			                <span>目前状态:</span>
+			                <input type='radio' id="state1" name="state1" style='vertical-align:middle;' value='0' checked="checked"/>开通
+			                &nbsp;
+			                <input type='radio' id="state1" name="state1" style='vertical-align:middle;' value='1' />未开通
+			            	-->
+			            </div>
+			        </div>
+	            </div>
+	            <div class="panel" id="servicefee_q" style="display: none;">
+	            	<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+			            	<span style="width:11%;margin-left:10.3%;">欠费月数(月):</span>
+			            	<span style="width:14%;">
+			                	<input type='number' id="a_months1" name='a_months1' class="form-control" style="color:red" />
+			                </span>
+			                <span style="width:11%;">欠费天数(天):</span>
+			                <span style="width:14%;">
+			                	<input type='number' id="a_days1" name='a_days1' class="form-control" style="color:red" />
+			                </span>
+			                <span style="width:11%;">欠费金额:</span>
+			                <span style="width:14%;">
+			                	<input type='number' id="arrearage_fee1" name='arrearage_fee1' class="form-control" style="color:red" />
+			                </span>
+			            </div>
+			        </div>
+	            </div>
+	            <hr>
+            </div>
+            <div id="feepanel2" style="display: none;"><!-- style="display: none;" -->
+	            <div class="panel">
+	                <span id='servicefee' style="width:10%;padding-right:0;">SIM卡:</span>
+	               	<span style="width:11%;">开始日期:</span>
+	               	<span style="width:14%;">
+	                	<input type='text' class="form-control form_datetime" id="service_start_time2" name='service_start_time2' />
+	                </span>
+	                <span style="width:11%;">每月费用:</span>
+	                <span style="width:14%;">
+	                	<input type='number' id="price2" name='price2' class="form-control" />
+	                </span>
+	                <span style="width:11%;">服务截止日期:</span>
+	                <span style="width:14%;">
+	                	<input type='text' class="form-control form_datetime" id="service_end_time2" name='service_end_time2' />
+	                </span>
+	                <!--  
+	                <span>目前状态:</span>
+	                <input type='radio' id="state2" name="state2" style='vertical-align:middle;' value='0' checked="checked"/>开通
+	                &nbsp;
+	                <input type='radio' id="state2" name="state2" style='vertical-align:middle;' value='1' />未开通
+	            	-->
+	            </div>
+	            <div class="panel" id="simfee_q" style="display: none;">
+	            	<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+			            	<span style="width:11%;margin-left:10.3%;">欠费月数(月):</span>
+			            	<span style="width:14%;">
+			                	<input type='number' id="a_months2" name='a_months2' class="form-control" style="color:red" />
+			                </span>
+			                <span style="width:11%;">欠费天数(天):</span>
+			                <span style="width:14%;">
+			                	<input type='number' id="a_days2" name='a_days2' class="form-control" style="color:red" />
+			                </span>
+			                <span style="width:11%;">欠费金额:</span>
+			                <span style="width:14%;">
+			                	<input type='number' id="arrearage_fee2" name='arrearage_fee2' class="form-control" style="color:red" />
+			                </span>
+			            </div>
+			        </div>
+	            </div>
+	            <hr>
+            </div>
+            <div id="feepanel3" style="display: none;"><!-- style="display: none;" -->
+	            <div class="panel">
+	            	<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+			                <span id='servicefee' style="width:10%;padding-right:0;">盗抢险:</span>
+			                <span style="width:11%;">开始日期:</span>
+			                <span style="width:14%;">
+			                	<input type='text' class="form-control form_datetime" id="service_start_time3" name='service_start_time3' />
+			                </span>
+			                <span style="width:11%;">每月费用:</span>
+			                <span style="width:14%;">
+			                	<input type='number' id="price3" name='price3' class="form-control" />
+			                </span>
+			                <span style="width:11%;">服务截止日期:</span>
+			                <span style="width:14%;">
+			                	<input type='text' class="form-control form_datetime" id="service_end_time3" name='service_end_time3' />
+			                </span>
+			                <!--  
+			                <span>目前状态:</span>
+			                <input type='radio' id="state3" name="state3" style='vertical-align:middle;' value='0' checked="checked"/>开通
+			                &nbsp;
+			                <input type='radio' id="state3" name="state3" style='vertical-align:middle;' value='1' />未开通
+			            	-->
+			            </div>
+			        </div>
+	            </div>
+	            <div class="panel" id="policyfee_q" style="display: none;">
+	            	<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+			            	<span style="width:11%;margin-left:10.3%;">欠费月数(月):</span>
+			            	<span style="width:14%;">
+			                	<input type='number' id="a_months3" name='a_months3' class="form-control" style="color:red" />
+			                </span>
+			                <span style="width:11%;">欠费天数(天):</span>
+			                <span style="width:14%;">
+			                	<input type='number' id="a_days3" name='a_days3' class="form-control" style="color:red" />
+			                </span>
+			                <span style="width:11%;">欠费金额:</span>
+			                <span style="width:14%;">
+			                	<input type='number' id="arrearage_fee3" name='arrearage_fee3' class="form-control" style="color:red" />
+			                </span>
+			            </div>
+			        </div>
+	            </div>
+	            <hr>
+            </div>
+            <div id="feepanel4" style="display: none;"><!--  -->
+	            <div class="panel">
+	            	<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+			                <span id='servicefee' style="width:10%;padding-right:0;">网上查车:</span>
+			                <span style="width:11%;">开始日期:</span>
+			                <span style="width:14%;">
+				            	<input type='text' class="form-control form_datetime" id="service_start_time4" name='service_start_time4' />
+				            </span>
+			                <span style="width:11%;">每月费用:</span>
+			                <span style="width:14%;">
+			                	<input type='number' id="price4" name='price4' class="form-control" />
+			                </span>
+			                <span style="width:11%;">服务截止日期:</span>
+			                <span style="width:14%;">
+			                	<input type='text' class="form-control form_datetime" id="service_end_time4" name='service_end_time4' />
+			                </span>
+			                <!--  
+			                <span>目前状态:</span>
+			                <input type='radio' id="state4" name="state4" style='vertical-align:middle;' value='0' checked="checked"/>开通
+			                &nbsp;
+			                <input type='radio' id="state4" name="state4" style='vertical-align:middle;' value='1' />未开通
+			            	-->
+			            </div>
+			        </div>
+	            </div>
+	            <div class="panel" id="webfee_q" style="display: none;">
+	            	<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+			            	<span style="width:11%;margin-left:10.3%;">欠费月数(月):</span>
+			            	<span style="width:14%;">
+			                	<input type='number' id="a_months4" name='a_months4' class="form-control" style="color:red" />
+			                </span>
+			                <span style="width:11%;">欠费天数(天):</span>
+			                <span style="width:14%;">
+			                	<input type='number' id="a_days4" name='a_days4' class="form-control" style="color:red" />
+			                </span>
+			                <span style="width:11%;">欠费金额:</span>
+			                <span style="width:14%;">
+			                	<input type='number' id="arrearage_fee4" name='arrearage_fee4' class="form-control" style="color:red" />
+			                </span>
+			            </div>
+			        </div>
+	            </div>
+	            <hr>
+          	</div>
+          	<div class="panel" id="totalfee" style="display: none;">
+               	<span></span>
+                <span style="width:100px;padding-left: 210px;">合计欠费:</span>
+                <input type='number' id="total_arrears" name='total_arrears' style="width:120px;color:red" />
+            </div> 
+		</fieldset>
+		
+		<div class='title'>办停</div>
+		<fieldset style="width:100%;">
+            <div class="panel">
+            	<div class="row">
+            		<div class="col-xs-8">
+            			<span class="col-xs-2">选择办停项目:</span>
+            			<span class="col-xs-10" style="text-align:left;">
+			                <label id="check5" style="display: none;float:none;">
+			                <input type='checkbox' id="stopitem5" name="stopitem" style='vertical-align:middle;' value='101' />前装服务费
+			                &nbsp;
+			                </label>
+			                
+			                <label id="check1" style="display: none;float:none;">
+			                <input type='checkbox' id="stopitem1" name="stopitem" style='vertical-align:middle;' value='1' />服务费
+			                &nbsp;
+			                </label>
+			          
+			                <label id="check2" style="display: none;float:none;">
+			                <input type='checkbox' id="stopitem2" name="stopitem" style='vertical-align:middle;' value='2' />SIM卡
+			                &nbsp;
+			                </label>
+			                
+			                <label id="check3" style="display: none;float:none;">
+			                <input type='checkbox' id="stopitem3" name="stopitem" style='vertical-align:middle;' value='3' />盗抢险
+			                &nbsp;
+			                </label>
+			                
+			                <label id="check4" style="display: none;float:none;">
+			                <input type='checkbox' id="stopitem4" name="stopitem" style='vertical-align:middle;' value='4' />网上查车
+			            	</label>
+			            	
+			            	<label id="check5" style="float:none;">
+			                <input type='checkbox' id="stopitem5" name="stopitem" style='vertical-align:middle;' value='0' />其他原因
+			            	</label>
+			            </span>
+            		</div>
+            	</div>
+            </div>
+            <div class="panel">
+            	<div class="row">
+            		<div class="col-xs-4">
+            			<span class="col-xs-4">原因:</span>
+            			<span class="col-xs-8">
+			                <select size="1" id="reason" style="width:100%;">
+				                	<option value="1">车子将/已转卖/报废</option>
+				                	<option value="2">产品质量问题</option>
+				                	<option value="3">4S店服务品质问题</option>
+				                	<option value="4">服务中心服务质量问题</option>
+				                	<option value="5">营业处服务质量问题</option>
+				                	<option value="6">使用价值不大</option>
+				                	<option value="7">个人原因</option>
+				                	<option value="8">其他原因</option>
+				                	<option value="9">暂时停止</option>
+			                </select>
+			            </span>
+            		</div>
+            	</div>
+            </div>
+            <div class="panel">
+            	<div class="row">
+            		<div class="col-xs-4">
+		                <span class="col-xs-4">是否需要拆机:</span>
+		                <span class="col-xs-8" style="text-align:left;">
+			                <label style="float:none" >
+			                <input type='radio' id="is_tear" name="is_tear" checked="checked" style='vertical-align:middle;' value='0' />不拆机
+			                </label>
+			                <label style="float:none" >
+			                <input type='radio' id="is_tear" name="is_tear" style='vertical-align:middle;' value='1' />拆机
+			            	</label>
+			            </span>
+		            </div>
+		        </div>
+            </div>
+            <div class="panel">
+            	<div class="row">
+            		<div class="col-xs-8">
+		                <span class="col-xs-2">办理类型:</span>
+		                <span class="col-xs-10" style="text-align:left;">
+			                <label style="float:none" >
+			                <input type='radio' id="flag" name="flag" checked="checked" style='vertical-align:middle;' value='2' />营业处办理离网
+			                </label>
+			                <label style="float:none" >
+			                <input type='radio' id="flag" name="flag" style='vertical-align:middle;' value='3' />中心欠费催缴脱网
+			            	</label>
+			            	<label style="float:none" >
+			                <input type='radio' id="flag" name="flag" style='vertical-align:middle;' value='4' />分公司办理离网
+			                </label>
+			                <label style="float:none" >
+			                <input type='radio' id="flag" name="flag" style='vertical-align:middle;' value='99' />其他办停
+			            	</label>
+		            	</span>
+		            </div>
+		        </div>
+            </div>
+            <div class="panel">
+            	<div class="row">
+                    <div class="col-xs-12">
+		                <span style="width:11%;float:left;">备注:</span>
+		                <span class="col-xs-10">
+		                	<textarea id="remark" name="remark" class="form-control" style="height:48px;" rows="2"></textarea>
+		                </span>
+		            </div>
+			    </div>
+            </div>
+        </fieldset>
+        
+        <fieldset style="width:100%;border-top:0px;">	
+	        <div class='submit'>
+	            <button type="button" class="btn btn-primary btn-xs" onclick="dostop();" >确定</button>
+	        </div>
+        </fieldset>
+        
+        <div id='titleDiv2' class='title'>业务历史记录</div>
+
+	</form>
+	
+		<div id="records" class="datagird"></div>
+	</div>
+	<div id="watermark"  style="position:absolute;left:300px;top:200px;display: none;">
+		<img src="../../images/offgrid.png" />
+	</div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../bslib/js/bootstrap-datetimepicker.js"></script><!-- ++++ -->
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/storage_vehicle.js" ></script>
+<script type="text/javascript">
+function clearSearch() {
+	document.search_form.reset();
+}
+
+function getMonthprice(){
+	var price1 = $('#price1').val();
+	var price2 = $('#price2').val();
+	var price3 = $('#price3').val();
+	var price4 = $('#price4').val();
+	var price5 = $('#price5').val();
+	var monthprice = Number(price1) + Number(price2) + Number(price3) + Number(price4) + Number(price5);
+	$('#monthprice').val(monthprice);
+	var yearprice = (Number(price1) + Number(price2) + Number(price3) + Number(price4) + Number(price5))*12;
+	$('#yearprice').val(yearprice);
+}
+
+function closestop() {
+	$(document).sgWindow('close', {
+		id : 'dostop_window'
+	});
+}
+
+function dostop(){
+	var state = $('#reg_status').val();
+	if(state==1||state==2){
+		$(document).sgPup({message:'message_alert',text: "离网车辆不能办停操作!"});
+		return false;
+	}
+	var stops = [];
+	$('input:checkbox:checked').each(function() {
+		var obj = {};
+    	obj.customer_id = $('#cust_id').val();
+    	obj.vehicle_id = $('#vehicle_id').val();
+    	obj.unit_id = $('#unit_id').val();
+    	obj.type = $(this).val();
+    	obj.type_id = $('#reason').val();
+    	obj.is_tear = $("input[name='is_tear']:checked").val();
+    	obj.flag = $("input[name='flag']:checked").val();
+    	obj.remark = $('#remark').val();
+    	stops.push(obj);
+    });
+	if(stops.length==0){
+		var obj = {};
+    	obj.customer_id = $('#cust_id').val();
+    	obj.vehicle_id = $('#vehicle_id').val();
+    	obj.unit_id = $('#unit_id').val();
+    	obj.type = 0;
+    	obj.type_id = $('#reason').val();
+    	obj.is_tear = $("input[name='is_tear']:checked").val();
+    	obj.flag = $("input[name='flag']:checked").val();
+    	obj.remark = $('#remark').val();
+    	stops.push(obj);
+	}
+	
+	var msg = "";
+	var total_arrears = $('#total_arrears').val();
+	if(total_arrears!=null&&total_arrears>0){
+		msg = "该用户合计欠费:"+total_arrears+",具体欠费信息请看上面.";
+	}
+	$(document).sgConfirm({
+		title:'提示',
+		text: msg+'确认办停所选项目吗?',
+		cfn:function(r){
+			if(r){
+				$.ajax({
+					type : 'post',
+					async : false,
+					contentType : 'application/json',
+					dataType : 'json',
+					url : '../../stop/doStop',
+					data : JSON.stringify(stops),
+					success : function(data) {
+						if (data) {
+							$(document).sgPup({message:'message_alert',text: data.msg});
+							searchcust();
+						}
+					},
+					error : function(res, error) {
+						$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+							+ ";error=" + error});
+					}
+				});
+			}
+		}});
+}
+
+function loadSuccess() {
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../backup/getOldview',
+		data : JSON.stringify({
+			bk_id : bkid,
+		}),
+		success : function(data) {
+			if (data) {
+				//客戶信息
+				$('#customer_name', '#bk_window').val(data.customer.customer_name);
+				$('#idcard', '#bk_window').val(data.customer.id_no);
+				if(data.customer.birthday!=null){
+					$('#birthday', '#bk_window').val(data.customer.birthday.substring(0,10));
+				}
+				if(data.customer.sex){
+					$("input[name='sex'][value="+data.customer.sex+"]", '#bk_window').get(0).checked=true;
+				}
+				$('#email', '#bk_window').val(data.customer.email);
+				$('#vip', '#bk_window').val(data.customer.vip);
+				//车辆信息
+				$('#number_plate', '#bk_window').val(data.vehicle.plate_no);
+				$('#plate_color', '#bk_window').val(data.vehicle.plate_color);
+				$('#vehicle_type_view', '#bk_window').val(data.vehicle.vehicle_type);
+				$('#model', '#bk_window').val(data.model);
+				$('#code', '#bk_window').val(data.vehicle.vin);
+				$('#engine_no', '#bk_window').val(data.vehicle.engine_no);
+				$('#factory', '#bk_window').val(data.vehicle.factory);
+				$('#color', '#bk_window').val(data.vehicle.color);
+				if(data.vehicle.buy_date!=null){
+					$('#buy_time', '#bk_window').val(data.vehicle.buy_date.substring(0,10));
+				}
+				//车台信息
+				$('#call_letter', '#bk_window').val(data.unit.call_letter);
+				$('#unitcode', '#bk_window').val(data.unittype);
+				if(data.unit.fix_time!=null){
+					$('#time', '#bk_window').val(data.unit.fix_time.substring(0,10));
+				}
+				$('#state', '#bk_window').val(data.unit.reg_status);
+				//托收资料
+				if(data.collection){
+					$('#account', '#bk_window').val(data.collection.ac_no);
+					$('#confirm_account', '#bk_window').val(data.collection.ac_no);
+					$('#collection_name', '#bk_window').val(data.collection.ac_name);
+					$('#agency_view', '#bk_window').val(data.collection.agency);
+					$('#bank_view', '#bk_window').val(data.collection.bank_code);
+					$('#account_type', '#bk_window').val(data.collection.ac_type);
+					if(data.collection.is_delivery){
+						$("input[name='is_delivery'][value="+data.collection.is_delivery+"]").get(0).checked=true;
+					}
+					$('#addressee', '#bk_window').val(data.collection.addressee);
+					$('#tel', '#bk_window').val(data.collection.tel);
+					$('#post', '#bk_window').val(data.collection.post_code);
+					$('#pay_ct_no', '#bk_window').val(data.collection.pay_ct_no);
+					$('#province', '#bk_window').val(data.collection.province);
+					$('#city', '#bk_window').val(data.collection.city);
+					$('#area', '#bk_window').val(data.collection.area);
+					$('#address', '#bk_window').val(data.collection.address);
+					$('#ac_id_no', '#bk_window').val(data.collection.ac_id_no);
+				}
+				//计费信息
+				var serviceInfo = data.serviceInfo;
+				var simfeeInfo = data.simfeeInfo;
+				var webgisInfo = data.webgisInfo;
+				var insuranceInfo = data.insuranceInfo;
+				if(serviceInfo){
+					$('#feepanel1', '#bk_window').show();
+					if(serviceInfo.fee_date){
+						$('#service_start_time1', '#bk_window').val(serviceInfo.fee_date.substring(0,10));
+					}
+					if(serviceInfo.fee_sedate){
+						$('#service_end_time1', '#bk_window').val(serviceInfo.fee_sedate.substring(0,10));
+					}
+					$('#price1', '#bk_window').val(serviceInfo.month_fee);
+					$("input[name='payment1'][value="+serviceInfo.pay_model+"]", '#bk_window').get(0).checked=true;
+					
+					$('#fee_cycle1', '#bk_window').val(serviceInfo.fee_cycle);
+					$("input[name='childsitem']").each(function() {
+						if(serviceInfo.items_id.indexOf("," + $(this).val() + ",")!=-1
+								||serviceInfo.items_id.indexOf($(this).val() + ",")==0){
+							$(this).get(0).checked=true;
+						}
+			        });
+					$('#feeremark', '#bk_window').val(serviceInfo.remark);
+				}
+				if(simfeeInfo){
+					$('#feepanel2', '#bk_window').show();
+					if(simfeeInfo.fee_date){
+						$('#service_start_time2', '#bk_window').val(simfeeInfo.fee_date.substring(0,10));
+					}
+					if(simfeeInfo.fee_sedate){
+						$('#service_end_time2', '#bk_window').val(simfeeInfo.fee_sedate.substring(0,10));
+					}
+					$('#price2', '#bk_window').val(simfeeInfo.month_fee);
+					$("input[name='payment2'][value="+simfeeInfo.pay_model+"]", '#bk_window').get(0).checked=true;
+					$('#fee_cycle2', '#bk_window').val(simfeeInfo.fee_cycle);
+				}
+				if(webgisInfo){
+					$('#feepanel3', '#bk_window').show();
+					if(webgisInfo.fee_date){
+						$('#service_start_time3', '#bk_window').val(webgisInfo.fee_date.substring(0,10));
+					}
+					if(webgisInfo.fee_sedate){
+						$('#service_end_time3', '#bk_window').val(webgisInfo.fee_sedate.substring(0,10));
+					}
+					$('#price3', '#bk_window').val(webgisInfo.month_fee);
+					$("input[name='payment3'][value="+webgisInfo.pay_model+"]", '#bk_window').get(0).checked=true;
+					$('#fee_cycle3', '#bk_window').val(webgisInfo.fee_cycle);
+				}
+				if(insuranceInfo){
+					$('#feepanel4', '#bk_window').show();
+					if(insuranceInfo.fee_date){
+						$('#service_start_time4', '#bk_window').val(insuranceInfo.fee_date.substring(0,10));
+					}
+					if(insuranceInfo.fee_sedate){
+						$('#service_end_time4', '#bk_window').val(insuranceInfo.fee_sedate.substring(0,10));
+					}
+					$('#price4', '#bk_window').val(insuranceInfo.month_fee);
+					$("input[name='payment4'][value="+insuranceInfo.pay_model+"]", '#bk_window').get(0).checked=true;
+					$('#fee_cycle4', '#bk_window').val(insuranceInfo.fee_cycle);
+				}
+			}
+		},
+		error : function(res, error) {
+			$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+				+ ";error=" + error});
+		}
+	});
+	
+}
+
+function closeBk(){
+	$(document).sgWindow('close', {
+		id : 'bk_window'
+	});
+}
+
+function viewBk(bk_id){
+	bkid = bk_id;
+	
+	var defaults = {
+		title : '查看历史记录',
+		id : 'bk_window',
+		form : 'bk_form',
+		url : '../sc/oldview.html',
+		width : 890,
+		height : 440,
+		success : loadSuccess,
+		buttons : [ {
+			name : '确定',
+			onpress : closeBk
+		}]
+	};
+   	$(document).sgWindow(defaults);
+}
+
+function searchcust(){
+	var cust_id = $('#cust_id').val();
+	var vehicle_id = $('#vehicle_id').val();
+	var unit_id = $('#unit_id').val();
+	$('#feepanel1').hide();
+	$('#servicefee_q').hide();
+	$('#check1').hide();
+	$('#feepanel2').hide();
+	$('#simfee_q').hide();
+	$('#check2').hide();
+	$('#feepanel3').hide();
+	$('#policyfee_q').hide();
+	$('#check3').hide();
+	$('#feepanel4').hide();
+	$('#webfee_q').hide();
+	$('#check4').hide();
+	$('#feepanel5').hide();
+	$('#hmservicefee_q').hide();
+	$('#check5').hide();
+	$('#totalfee').hide();
+	$('#watermark').hide();
+	var total_arrears = '0';
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../getCustInfoFeeMsg',
+		data : JSON.stringify({
+			cust_id : cust_id,
+			vehicle_id : vehicle_id,
+			unit_id : unit_id
+		}),
+		success : function(data) {
+			if (data) {
+				document.customer_form.reset();
+				//客戶信息
+				$('#customer_name').val(data.customer.customer_name);
+				$('#cust_id').val(data.customer.customer_id);
+				//车辆信息
+				$('#vehicle_id').val(data.vehicle.vehicle_id);
+				$('#number_plate').val(data.vehicle.plate_no);
+				$('#cartype').val(data.vehicle.model_name);
+				$('#color').val(data.vehicle.color);
+				//车台信息
+				$('#reg_status').val('');
+				$('#reg_status').val(data.unit.reg_status);
+				$('#state').val(data.unit.reg_status);
+				if(data.unit.reg_status==1||data.unit.reg_status==2){
+					$('#watermark').show();
+				}
+				$('#unit_id').val(data.unit.unit_id);
+				if(data.unit.create_date!=null){
+					$('#create_date').val(data.unit.create_date.substring(0,10));
+				}
+				$('#call_letter').val(data.unit.call_letter);
+				$('#unitcode').val(data.unittype);
+				if(data.unit.fix_time!=null){
+					$('#time').val(data.unit.fix_time.substring(0,10));
+				}
+				$('#managerName').val(data.unit.sales);
+				var custphones = data.custphones;
+				$(custphones).each(function(k,v){
+					$('#phone').val(custphones[0].phone);
+				});
+				//托收资料
+				if(data.collection){
+					$('#account').val(data.collection.ac_no);
+					$('#collection_name').val(data.collection.ac_name);
+					$('#agency').val(data.collection.agency);	
+				}
+				
+				//最近操作车牌号码联系电话
+				addItem('storage_vehicle',{plateNo:data.vehicle.plate_no,callLetter:data.unit.call_letter});
+				// window.gbossLocalStorage.addItem('storage_vehicle',
+				// 		{plateNo:data.vehicle.plate_no,callLetter:data.unit.call_letter});
+
+
+				if(data.serviceInfo){
+					if(data.serviceInfo.fee_date){
+						$('#service_start_time1').val(data.serviceInfo.fee_date.substring(0,10));
+					}
+					if(data.serviceInfo.fee_sedate){
+						$('#service_end_time1').val(data.serviceInfo.fee_sedate.substring(0,10));
+					}
+					$('#price1').val(data.serviceInfo.month_fee);
+					$('#feepanel1').show();
+					$('#check1').show();
+					if(data.serviceInfo.arrearage_fee != 0){
+						$('#servicefee_q').show();
+						$('#totalfee').show();
+						$('#a_months1').val(data.serviceInfo.a_months);
+						$('#a_days1').val(data.serviceInfo.a_days);
+						$('#arrearage_fee1').val(data.serviceInfo.arrearage_fee);
+						total_arrears = parseInt(total_arrears) + data.serviceInfo.arrearage_fee;
+					}
+				}
+				if(data.simfeeInfo){
+					if(data.simfeeInfo.fee_date){
+						$('#service_start_time2').val(data.simfeeInfo.fee_date.substring(0,10));
+					}
+					if(data.simfeeInfo.fee_sedate){
+						$('#service_end_time2').val(data.simfeeInfo.fee_sedate.substring(0,10));
+					}
+					$('#price2').val(data.simfeeInfo.month_fee);
+					$('#feepanel2').show();
+					$('#check2').show();
+					if(data.simfeeInfo.arrearage_fee != 0){
+						$('#simfee_q').show();
+						$('#totalfee').show();
+						$('#a_months2').val(data.simfeeInfo.a_months);
+						$('#a_days2').val(data.simfeeInfo.a_days);
+						$('#arrearage_fee2').val(data.simfeeInfo.arrearage_fee);
+						total_arrears = parseInt(total_arrears) + data.simfeeInfo.arrearage_fee;
+					}
+				}
+				if(data.insuranceInfo){
+					if(data.insuranceInfo.fee_date){
+						$('#service_start_time3').val(data.insuranceInfo.fee_date.substring(0,10));
+					}
+					if(data.insuranceInfo.fee_sedate){
+						$('#service_end_time3').val(data.insuranceInfo.fee_sedate.substring(0,10));
+					}
+					$('#price3').val(data.insuranceInfo.month_fee);
+					$('#feepanel3').show();
+					$('#check3').show();
+					if(data.insuranceInfo.arrearage_fee != 0){
+						$('#policyfee_q').show();
+						$('#totalfee').show();
+						$('#a_months3').val(data.insuranceInfo.a_months);
+						$('#a_days3').val(data.insuranceInfo.a_days);
+						$('#arrearage_fee3').val(data.insuranceInfo.arrearage_fee);
+						total_arrears = parseInt(total_arrears) + data.insuranceInfo.arrearage_fee;
+					}
+				}
+				if(data.webgisInfo){
+					if(data.webgisInfo.fee_date){
+						$('#service_start_time4').val(data.webgisInfo.fee_date.substring(0,10));
+					}
+					if(data.webgisInfo.fee_sedate){
+						$('#service_start_time4').val(data.webgisInfo.fee_sedate.substring(0,10));
+					}
+					$('#price4').val(data.webgisInfo.month_fee);
+					$('#feepanel4').show();
+					$('#check4').show();
+					if(data.webgisInfo.arrearage_fee != 0){
+						$('#webfee_q').show();
+						$('#totalfee').show();
+						$('#a_months4').val(data.webgisInfo.a_months);
+						$('#a_days4').val(data.webgisInfo.a_days);
+						$('#arrearage_fee4').val(data.webgisInfo.arrearage_fee);
+						total_arrears = parseInt(total_arrears) + data.webgisInfo.arrearage_fee;
+					}
+				}
+				if(data.hmfeeInfo){
+					if(data.hmfeeInfo.fee_date){
+						$('#service_start_time5').val(data.hmfeeInfo.fee_date.substring(0,10));
+					}
+					if(data.hmfeeInfo.fee_sedate){
+						$('#service_start_time5').val(data.hmfeeInfo.fee_sedate.substring(0,10));
+					}
+					var pack_id = data.hmfeeInfo.item_id;
+					if(pack_id!=0){
+						$.ajax({
+							type : 'post',
+							async : false,
+							contentType : 'application/json',
+							dataType : 'json',
+							url : '../../getSimpackByid',
+							data : JSON.stringify({parameter:pack_id}),
+							success : function(data) {
+								if (data) {
+									$('#pack_name').val(data.pack_id);
+									$('#fee_cycle').val(data.fee_cycle);
+									//查询服务套餐
+									$.ajax({
+										type : 'post',
+										async : false,
+										contentType : 'application/json',
+										dataType : 'json',
+										url : '../../getComboByid',
+										data : JSON.stringify({parameter:data.combo_id}),
+										success : function(data2) {
+											if (data2) {
+												$('#combo_name').val(data2.combo_name);
+												$('#month_fee').val(data2.month_fee);
+												$('#voice_time').val(data2.voice_time);
+												$('#data').val(data2.data);
+											}
+										},
+										error : function(res, error) {
+											$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+												+ ";error=" + error});
+										}
+									});
+								}
+							},
+							error : function(res, error) {
+								$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+									+ ";error=" + error});
+							}
+						});
+					}
+					$('#price5').val(data.hmfeeInfo.month_fee);
+					$('#feepanel5').show();
+					$('#check5').show();
+					if(data.hmfeeInfo.arrearage_fee != 0){
+						$('#hmservicefee_q').show();
+						$('#totalfee').show();
+						$('#a_months5').val(data.hmfeeInfo.a_months);
+						$('#a_days5').val(data.hmfeeInfo.a_days);
+						$('#arrearage_fee5').val(data.hmfeeInfo.arrearage_fee);
+						total_arrears = parseInt(total_arrears) + data.hmfeeInfo.arrearage_fee;
+					}
+				}
+				$('#total_arrears').val(total_arrears);
+			}
+			
+			var defaults = {
+			        title: "",
+			        width:  '100%',
+			        height: 250,
+			        rownumbers:true,
+			        usepager: true,
+			        url: '../../backup/findStopAndOpen',
+			        useRp: true,
+			        colModel : [
+						{display: '日期', name : 'stamp', width : 120},
+						{display: '业务类别', name : 'bk_type', width : 150, formatter:function(value,row){
+			            	var type_names = "";
+							if(value.indexOf("7")!=-1){
+			            		type_names = "办停";
+			            	}
+							if(value.indexOf("8")!=-1){
+			            		type_names = "开通";
+			            	}
+							return type_names;
+			            }},
+						{display: '备注', name : 'remark', width : 300},
+						{display: '经办人', name : 'op_name', width : 80},
+						{display: '查看', name : 'bk_id', width : 80,formatter:function(value,row){
+			            	return "<a href='javascript:void(0)' onClick='viewBk("+value+")'>查看</a>";
+			            }}
+			        ]
+			    };
+				$('#records').empty();
+			    $('#records').sgDatagrid(defaults);
+		},
+		error : function(res, error) {
+			$(document).sgPup({message:'message_alert',text: "没有符合查询条件的查询结果."});
+		}
+	});
+	
+}
+
+(function($){
+    var defaults = {
+	        title: "",
+	        width:  '100%',
+	        height: 250,
+	        url: '',
+		    rownumbers:true,
+		    isNotCheckall:true,
+	        colModel : [
+				{display: '日期', name : 'stamp', width : 120},
+				{display: '业务类别', name : 'bk_type', width : 150},
+				{display: '备注', name : 'remark', width : 300},
+				{display: '经办人', name : 'op_name', width : 80},
+				{display: '查看', name : 'bk_id', width : 80}
+	        ]
+	    };
+	    $('#records').sgDatagrid(defaults);
+	
+})(jQuery)
+
+$.fn.datetimepicker.dates['zh'] = {
+  days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+  daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+  daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+  months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+  monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+  meridiem : [ "上午", "下午" ],
+  today : "今天"
+ };
+ $(".form_datetime").datetimepicker({
+  language : "zh",
+  autoclose: true,
+  minView: "month",
+  format : 'yyyy-mm-dd'
+ });
+</script>
+<script type="text/javascript" src="../../jscript/web/vehicleList.js"></script>
+<script type="text/javascript" src="../../jscript/web/unitList.js"></script>
+<script type="text/javascript" src="../../jscript/web/custList.js"></script>
+</html>

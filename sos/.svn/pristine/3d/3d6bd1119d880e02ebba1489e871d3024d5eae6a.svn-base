@@ -1,0 +1,306 @@
+
+<link href="../../../umeditor/themes/default/css/umeditor.css" type="text/css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="../../../jscript/web/city/select2.css">
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="col-sm-12 form-inline">
+                    <h3 class="s3-title2">接收对象</h3>
+                </div>
+                <div class="form-inline">
+                    <div class="radio" style="margin-right: 58px">
+                        <label class="sbaman2" for="zd_basic">
+                            <input type="radio" id="zd_basic" name="selectcara" checked>
+                            基础过滤
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label class="sbaman2" for="zd_filter">
+                            <input type="radio" id="zd_filter" name="selectcara">
+                            高级过滤
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-12 form-inline" style="margin-top: 35px;">
+                <label class="sbaman3" style="display: block">指定可见区域</label>
+                    <select id="zd_area">
+					  <option selected value="1">指定4S区域</option>
+					  <option value="2">指定地区</option>
+					</select>
+                </div>
+                
+                <div class="col-sm-12 form-inline" style="margin-top: 5px;" id="zd_filter_org">
+                    <input type="hidden" class="bigdrop" id="zd_filter_org_select" />
+                </div>
+                
+                <div class="col-sm-12 form-inline" style="display:none;margin-top: 5px;" id="zd_filter_area">
+                
+                   省: <select id="province">
+					    <option value="0">请选择省份</option>
+					</select>
+	    <br/>市:		<select id="city">
+					    <option value="0">请选择城市</option>
+					</select>
+	    <br/>区:			<select id="district">
+					    <option value="0">请选择区县</option>
+					</select>
+					
+					<!--下列为初始值(可选,编辑表单时设置)-->
+					<input type="hidden" value="440000" id="pre_province"/>
+					<input type="hidden" value="440800" id="pre_city"/>
+					<input type="hidden" value="440305" id="pre_district"/>
+                </div>
+                
+                <div class="col-sm-12 form-inline lefTopMagr" id="gj_guolv">
+                    <h5 class="s5-title foc-blue1">高级过滤</h5>
+                    <label class="sbaman3" style="display: block">车辆生产日期：</label>
+                    <div class="fnmline" style="width: 60%">
+                        开始时间<input id="vehicle_startTime" class="form-control" type="date" style="width: 100%;"/>
+                    </div>
+                    <span class="fnmline">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <div class="fnmline" style="width: 60%">
+                        结束时间<input id="vehicle_endTime" class="form-control" type="date" style="width: 100%;"/>
+                    </div>
+                    <div class="lefTopMagr2">
+                        <label class="sbaman3" for="zx_range_carType">指定车型:</label>
+                        <br/>
+                        <input id="zd_filter_cartype_select" type="hidden"/>
+                    </div>
+                    <div class="lefTopMagr2">                        
+                        <input id="zd_filter_vehicle_select" type="hidden"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-8 bco-f2" id="new_add_alwaysShow">
+                <div class="col-sm-12 form-inline">
+                    <h3 class="s3-title foc-blue1">资讯内容</h3>
+                    <input id="new_update_id" type="hidden" name="id" />
+                </div>
+                <div class="col-sm-12" style="text-align: right">
+                    <label class="checkbox-inline foc-heiti" style="font-size: 14px;line-height: 22px">
+                        <input id="zx_isTop" name="is_top" type="checkbox" value="1"> 置顶显示<small>(勾选此项，会将要发布的消息置顶到第一条）</small>
+                    </label>
+                </div>
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                    <label class="redfont sbaman2">资讯标题：</label>
+                    <input id="zx_title" name="title" class="form-control" style="width: 100%;height: 30px;" type="text" />
+                </div>
+                <div class="col-sm-12 form-inline tareachange" style="margin: 20px 0 5px 0;">
+                    <label class="redfont sbaman2">资讯摘要：</label>
+                    <div class="placeholder"><span>这里输入摘要</span></div>
+                    <textarea class="form-control" id="zx_summary" name="summary" rows="5" style="width: 100%;height: auto"></textarea>
+                </div>
+                <div style='float:left;margin:0 0 5px 15px;text-align: left;font-family: arial, "Microsoft YaHei", SimHei, "\9ed1\4f53"'>
+                    您还可以输入:<input name="remLen" type="text" value="1500" style="color:red;border:none;width:32px;background:#f2f2f2;text-align: center" readonly="readonly">个字符
+                </div>
+                <div class="col-sm-12 form-inline">
+                    <!--style给定宽度可以影响编辑器的最终宽度-->
+                    <script type="text/plain" id="myEditor">
+                        <p>这里输入资讯内容</p>
+                    </script>
+                   <input id="content" type="hidden"/>
+                </div>
+
+                <div class="col-sm-12 form-inline">
+                    <label class="sbaman fnmleft">有效日期：</label>
+                    <div class="fnmline">
+                        <input class="form-control" id="start_time" type="date" name="startTime"/>
+                    </div>
+                    <span class="fnmline">&nbsp;&nbsp;-&nbsp;&nbsp;</span>
+                    <div class="fnmline">
+                        <input class="form-control" id="end_time" type="date" name="endTime"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 预览模块 -->
+    <div class="modal fade" id="seeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <div class="mobile-outborder">
+                        <img src="../../../images/iPhone6exp.png" alt="iPhone6 Plus"/>
+                        <article class="mobile-inborder">
+                            <h4 id="seeModal_h4"></h4>
+                            <div class="container-fluid">
+                                <p class="sm_title">
+                                    <span>发布时间：</span><small id="seeModal_small"></small>
+                                </p>
+                                <section class="news-content"  id="new_view_context">
+
+                                </section>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript" src="../../../jscript/web/city/cityjs.js"></script>
+<script type="text/javascript" src="../../../jscript/web/city/select2.js"></script>
+<script type="text/javascript" src="../../../jscript/web/city/select2_locale_zh-CN.js"></script>
+<script type="text/javascript">
+window.UMEDITOR_HOME_URL = "../../../umeditor/";
+</script>
+<script type="text/javascript" charset="utf-8" src="../../../umeditor/umeditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../../umeditor/umeditor.min.js"></script>
+<script type="text/javascript" src="../../../umeditor/lang/zh-cn/zh-cn.js"></script>
+   
+<script>
+var um = UM.getEditor('myEditor');
+
+    (function($){
+
+//    高级过滤默认隐藏  	
+     
+      $("#gj_guolv").hide();
+//    高级过滤的radio切换显示隐藏
+        var shForChoose = function(){
+            if($(this).prop("id") == "zd_filter" && ($(this).prop("checked") == true)) {
+                $("#gj_guolv").show(400);
+            }else{
+                $("#gj_guolv").hide(400);
+            }
+        };
+        $('input[name="selectcara"]').on('click',shForChoose);
+
+     $('#zd_area').change(function(){ 
+        var p1=$(this).children('option:selected').val();//这就是selected的值 
+        if(p1=="1"){
+        	$("#zd_filter_area").hide();
+        	$("#zd_filter_org").show();
+        	 
+        }
+        else{
+        	$("#zd_filter_org").hide();
+        	$("#zd_filter_area").show();
+        	 
+        }
+       });
+     //初始化省市区
+     citySelector.Init($("#province"), $("#city"), $("#district"), $("#pre_province"), $("#pre_city"), $("#pre_district"), true);
+ 
+     function loadSuccess_edit(data){
+       	
+           //填充编辑前的值
+           if(data){
+           	
+               $("#new_update_id").val(data.id);
+               $("#zx_title").val(data.title);
+               $('#zx_summary').val(data.summary);
+               if(data.isTop==1){
+            	   $("#zx_isTop").prop("checked", true);//选中
+               }
+               
+               UM.getEditor('myEditor').execCommand('cleardoc');
+    	       UM.getEditor('myEditor').execCommand('insertHtml', data.content);
+              
+
+    	       if(data.startTime)
+    	          $("#start_time").val(data.startTime.substring(0,10));
+           	   if(data.endTime)
+           	      $("#end_time").val(data.endTime.substring(0,10));
+           	//初始化机构数据-------------------------------------
+           	  var ranges = [];
+           	  if(data.range){
+           		ranges = data.range.split(",");
+           	  }
+           
+              $.ajax({
+           			type : 'post',
+           			async : false,
+           			contentType : 'application/json',
+           			dataType : 'json',
+           			url : '../../../news/news/findDepartNode', 
+           			success : function(data) {
+           				if (data) {
+           					if(data.success){
+           						var items = data.items;
+           							$('#zd_filter_org_select').val(ranges).select2({
+              					    	 data:items,
+              					    	 placeholder: "选择一个4S机构",
+              					    	 width : '260px',
+              					    	 multiple :true
+              					    	
+              					     });
+           					}
+           				}
+           			},
+           			error : function(res, error) {
+           				$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+           					+ ";error=" + error});
+           			}
+           		});
+           	//初始化机构数据-------------------------------------END
+           	
+           	//初始化车型数据-------------------------------------
+           	 var cartypes =[];
+           	  if(data.rangeCarType){
+           		  $('#zd_filter').prop("checked", true);
+           		  $("#gj_guolv").show();
+           		 cartypes = data.rangeCarType.split(",");
+           	  }
+
+              $.ajax({
+           			type : 'post',
+           			async : false,
+           			contentType : 'application/json',
+           			dataType : 'json',
+           			url : '../../../news/news/findCarTypeAllNode',  
+           			success : function(data) {
+           				if (data) {
+           					if(data.success){
+           						var items = data.items;
+           					      $('#zd_filter_cartype_select').val(cartypes).select2({
+           					    	 data:items,
+           					       	 placeholder: "选择一个车型",
+           					       	 minimumInputLength : 2,
+           					       	 width : '260px',
+           					       	 multiple :true 
+           					        }); 
+
+           					}
+           				}
+           			},
+           			error : function(res, error) {
+           				$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+           					+ ";error=" + error});
+           			}
+           		});
+           	//初始化车型数据---------------------------------------------END
+           	//$('#zd_filter_vehicle_select').val(data.rangeVehicle);
+           	//$('#province').val();
+           	//$('#city').val();
+           	//$('#district').val();
+           	if(data.produceStartTime)
+           		$('#vehicle_startTime').val(data.produceStartTime.substring(0,10));//车辆生产日期，开始时间
+           	if(data.produceEndTime)
+           		$('#vehicle_endTime').val(data.produceEndTime.substring(0,10));//车辆生产日期，结束时间
+           }
+           editId=null;
+           editObj=null;
+       }
+       
+       $.ajax( {
+           type : 'post',
+           async: true,
+           dataType : 'json',
+           url : '../../../news/news/search/'+editId,
+           success : function(data) {
+            if(data){                            	
+                 
+            	loadSuccess_edit(data.obj);
+               }
+           } ,
+           error : function(res,error) {
+               if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}
+           }
+       });
+     
+ })(jQuery)
+</script>
+

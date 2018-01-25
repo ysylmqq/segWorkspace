@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>采购合同标表单(编辑和查看)</title>
+<style type="text/css">
+.btnsubmit{
+    margin:0 7px 0 0;
+    background-color:#4791d2;
+    border:1px solid #dedede;
+    border-top:1px solid #eee;
+    border-left:1px solid #eee;
+
+    font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size:12px;
+    line-height:130%;
+    text-decoration:none;
+    text-align:center;
+    font-weight:bold;
+    color:#fff;
+    cursor:pointer;
+    border-radius: 3px;
+    padding:5px 10px 6px 7px; /* Links */
+}
+#div_chk_companys{
+  width: 750px;
+  height: 190px;
+  border: 1px solid;
+  border-color:  #cbcbd5;
+  margin-left: 27px;
+}
+#div_chk_companys ul {
+	margin: 0px;
+	padding: 0px;
+	list-style-type: none;
+	vertical-align: middle;
+}
+#div_chk_companys li {
+	float: left;
+	display: block;
+	width: 120px;
+	height: 20px;
+	line-height: 20px;
+	font-size: 12px;
+	/*font-weight: bold;*/
+	text-decoration: none;
+	text-align: left;
+}
+#div_chk_companys li label {
+   width: 90px;
+}
+fieldset div div.panel span{
+  width: 30px;
+  padding: 0 0 0 0;
+}
+</style>
+</head>
+<body>
+	<form id='form_supply_contract'method='post' class="form" style="width:100%;">
+		<div class='title'>合同信息></div>
+		<input type="hidden" name="id" id="id">
+		<input type="hidden" name="id2" id="id2"><!-- 防止导入提交时，浏览器自动清空id数据，用id2代替 -->
+		<input type="hidden" name="isEdit" id="isEdit">
+		<fieldset style="width:auto;min-height:320px;max-height:330px; overflow-y:auto;">
+            <div class="panel">
+                <span>合同编号:</span>
+                <input type='text' id="code" name='code' required="true" placeholder="请输入合同编号"  style="width:150px;" disabled="disabled" />
+                
+                <span>合同名称:</span>
+                <input type='text' id="name" name='name' required="true" placeholder="请输入合同名称"  style="width:150px;" />
+                
+              </div>
+            
+             <div class="panel"> 
+                <span>适配公司:</span>是否全选<input type="checkbox" id="chk_isSelectAll" checked="checked" >
+                <div id="div_chk_companys">
+                
+                </div>
+            </div>
+            
+            <div class="panel">
+                <span>生效日期:</span>
+                <input type='date' id="validDate" name='validDate' required="true" style="width:150px;" />
+  				<span>到期日期:</span>
+                <input type='date' id="matureDate" name='matureDate' required="true" style="width:150px;" />
+ 				<span>是否生效:</span>
+                <input type="checkbox" id="status" name='status'  style="width:150px;" />
+            </div>
+            
+             <div class="panel">
+                 <span style="vertical-align:top;">备注:</span>
+            	 <textarea rows="2" id="remark" name='remark' style="width:665px;"></textarea>
+             </div>
+        </fieldset>
+        
+   		  <fieldset style="width:auto;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="btn_supply_contract" type="submit" >下一步</button> 
+	            <button id="btn_reset" type="button">重置</button>
+	            <button id="btn_close" type="button">关闭</button>
+	        </div>
+        </fieldset>
+
+	</form>
+	
+	<form id='form_supply_contract2' method='post' class="form" style="width:100%; display: none">
+	<div class='title'>合同信息明细></div>
+		<fieldset style="width:auto">
+			<div id="panel_supply_contract" style="min-height:320px;max-height:330px; overflow-y:auto;">
+					<span>合同列表:</span>
+	                 <input type='text'  name='contractCode' list="contractDataList"  placeholder="请输入合同编码"  autocomplete=false style="width:150px;" />
+	                <input type="hidden" name="contractId" />
+	               
+					<button id="btn_copy" type="button" class="btnsubmit">克隆</button>
+					<button id="btn_update_price" type="button" class="btnsubmit" >批量修改价格</button>
+					<input  id="txt_express"type="text" placeholder="+50" style="width:70px;display: none;" value="+50" />
+					<button id="btn_sure" type="button" class="btnsubmit" style="display:none;">确定</button>
+					<button id="btn_import" type="button" class="btnsubmit" style="">导入</button>
+					<button id="btn_export" type="button" class="btnsubmit" style="">导出</button>
+			    <div style="border-top: 1px solid #cbcbd5;margin-top: 3px;padding-top: 3px;"></div>
+			    
+				<div id="div_supply_contract" class="panel">
+	                <span>商品:</span>
+	                <input type='text' name='productName' list="productDataList" required="true" placeholder="请输入商品名称/编码"  autocomplete=false style="width:140px;" />
+	                <input type="hidden" name="productId" />
+	                
+	                <span>编码:</span>
+	                <input type='text' name='productCode' disabled="disabled" style="width:106px;"/>
+	              
+	                <span>规格:</span>
+	                <input type='text' name='norm' disabled="disabled" style="width:190px;"  />
+	                
+	                <span>单价:</span>
+	                <input type='text' name='price' placeholder="数字" required="true" pattern='^([1-9]\d+|\d)(\.\d+)?$' style="width:50px;"  oninvalid="setCustomValidity(\'请输入正浮点数!\')" />
+	                
+	                <span>备注:</span>
+	                <input type='text' name='remark' style="width:100px;" />
+	                <a href="javascript:void(0);" ><img alt="增加明细" src="../../images/form_add.png" title="增加明细" style="vertical-align:middle"></a>
+	            </div>
+	            
+			</div>
+            <datalist id="productDataList">
+            </datalist>
+             <datalist id="contractDataList">
+            </datalist>
+        </fieldset>
+        
+        <fieldset style="width:auto;border-top:0px;">	
+	        <div class='submit'>
+	        	<button id="btn_supply_contract21" type="button" >上一步</button> 
+	            <button id="btn_supply_contract2" type="submit"  >保存</button>
+	             <button id="btn_reset2" type="button">重置</button> 
+	            <button id="btn_close2" type="button">关闭</button>
+	        </div>
+        </fieldset>
+	</form>
+</body>
+<script type="text/javascript">
+(function($){
+	var flag = 0;
+	var productDataList=[];//商品数组 key:code,value:productId
+	var contractDataList=[];//合同数组 key:合同编号,value:id
+	var today=new Date();
+	today.setMonth(today.getMonth()-1);
+	//到期日期
+	var matureDate=today;
+	matureDate.setFullYear(today.getFullYear()+1);
+	
+	//分公司设置:是否全选
+	$('#chk_isSelectAll').on('click',function(){
+		if($('#chk_isSelectAll').get(0).checked){
+			$("input[name='CkbCompanys']",'#form_supply_contract').each(function() {
+		      	$(this).attr("checked",true);
+		      	$(this).get(0).checked = true;
+			});
+		}else{
+			$("input[name='CkbCompanys']",'#form_supply_contract').each(function() {
+		      	$(this).attr("checked", false);
+		      	$(this).get(0).checked = false;
+			});
+		}
+	});
+	
+	//合同主页表单页面的关闭
+	$('#btn_close,#btn_close2').on('click',function(){
+		 $(document).sgWindow('close',{id:'win_supply_contract'});
+	});
+	
+	//合同主页表单页面的重置
+	$('#btn_reset').on('click',function(){
+		//编辑回到初始化状态 add comment
+		/* var editId=$("#id",$("#form_supply_contract")).val();
+		$('#form_supply_contract').get(0).reset();
+		$.ajax( {
+	   		  type : 'post', 
+	   		  async: false,   
+	   		  contentType : 'application/json',     
+	   		  dataType : 'json',     
+	   		  url : '../../sell/getSupplyContract',   
+	   		  data:JSON.stringify({id:editId}),
+	   		  success : function(data) {
+	   			  if(data){
+	   				  $("#id",$("#form_supply_contract")).val(editId);
+	   				  $("#id2",$("#form_supply_contract")).val(editId);//防止导入提交时，浏览器自动清空id数据，用id2代替
+	   				  $("#code",$("#form_supply_contract")).val(data.code);
+	   				  $("#name",$("#form_supply_contract")).val(data.name);
+	   				  $("#type",$("#form_supply_contract")).val(data.type);
+	   				  $("#validDate",$("#form_supply_contract")).val(data.validDate);
+	   				  $("#matureDate",$("#form_supply_contract")).val(data.matureDate);
+	   				  if(data.status==1){//生效
+	   					 $("#status",$("#form_supply_contract")).prop("checked",true);
+	   					 $("#status",$("#form_supply_contract")).attr("checked","checked");
+	   				  }else{
+	   					 $("#status",$("#form_supply_contract")).prop("checked",null);
+	   					 $("#status",$("#form_supply_contract")).removeAttr("checked");
+	   				  }
+	   				  $("#remark",$("#form_supply_contract")).val(data.remark);
+	   				  //商品明细
+	   				  if(data.suppplyDetailsMap){
+	   					 var products = data.suppplyDetailsMap;
+						  //先删除原有的
+						  $('#div_supply_contract').prevAll('div[id^=div_supply_contract]').find('a').trigger('click');
+						  var divId=null;
+						  var flag2=0;
+						  $.each(products, function(key,value){
+							 divId='#div_supply_contract';
+							if(key>0){
+								 $("#div_supply_contract a").trigger('click',flag2);
+								 key=key-1;
+								 divId=divId+flag2;
+								 flag2=flag2+1;
+							}
+							 $('input[name=productName]',divId).val(value.productName.replace(/\s/g,''));
+							 $('input[name=productCode]',divId).val(value.productCode.replace(/\s/g,''));
+							 $('input[name=productId]',divId).val(value.productId);
+							 $('input[name=norm]',divId).val(value.norm.replace(/\s/g,'-'));
+							 $('input[name=price]',divId).val(value.price);
+							 $('input[name=remark]',divId).val(value.remark);
+						 });
+	   				 }
+	   			  }else{
+	   				  $(document).sgPup({message:'message_info',text: data});
+	   			  }
+	   		  } ,     
+	   		  error : function(res,error) { 
+	   		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	   		  }    
+	   		});  */
+	   	var id=$('#id2','#form_supply_contract').val();
+		$('#form_supply_contract').get(0).reset();
+		$('#id2','#form_supply_contract').val(id);
+		$('#id','#form_supply_contract').val(id);
+		//生效日期
+		$("#validDate").val(today.format('yyyy-MM-dd'));
+		//到期日期
+		$("#matureDate").val(matureDate.format('yyyy-MM-dd'));
+		
+		//自动生成合同编号
+		$.ajax({
+			  type : 'post', 
+			  async: false,   
+			  url : '../../sell/getSupplyContractNo',   
+			  data:{},
+			  success : function(data) {
+				  if(data){
+					$('#code','#form_supply_contract').val(data);
+					//$('#name').val(data);
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			}); 
+	});
+	
+	//下一步
+	$('#btn_supply_contract').on('click',function(){
+		   $("#form_supply_contract").unbind('submit');//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+		
+			//合同主体表单提交
+			$("#form_supply_contract").on('submit',function(e){
+				if($('#isEdit').val()=='true'){//编辑
+					//做表单提交
+			       var params = {};
+			       params.id = $('#id2','#form_supply_contract').val();
+			       params.code = $('#code','#form_supply_contract').val();
+			       params.name = $('#name','#form_supply_contract').val();
+			       params.type = 0;
+			       if($('#status','#form_supply_contract').is(':checked')){
+			      	 params.status= 1;
+			       }else{
+			    	 params.status= 0;
+			       }
+			       params.validDate = $("#validDate",'#form_supply_contract').val();
+			       params.matureDate = $("#matureDate",'#form_supply_contract').val();
+				   params.remark= $('#remark','#form_supply_contract').val();
+			     
+				   //分公司
+					//var companysArray=[];
+					   var supplyBranchs=[];
+					   var orgId=null;
+						$("input[name='CkbCompanys']:checked").each(function() {
+							//if ($(this).attr("checked") == true || $(this).attr("checked") == "checked") {
+								orgId=$(this).attr('id');
+								if(orgId){
+									orgId=orgId.replace('chk_','');
+								}
+								supplyBranchs.push({orgId:orgId,orgName:$(this).attr('value')});
+							//} 
+						});
+					 params.supplyBranchs=supplyBranchs;
+				   
+				   var url='../../sell/addSupplyContractBranchDetail';
+			      if($("#id",$("#form_supply_contract")).val()){
+			    	  url='../../sell/updateSupplyContractBranchDetail';
+			      }
+			      $(document).sgConfirm({text: '确定保存合同信息,进入下一步吗?',cfn:function(r){ 
+		    		     	if(r){
+			  
+				       $.ajax( {
+						  type : 'post', 
+						  async: false,   
+						  contentType : 'application/json',     
+						  dataType : 'json',     
+						  url : url,   
+						  data:JSON.stringify(params),
+						  success : function(data) {
+							  if(data){
+								  if(data.success){
+									 //$("#form_supply_contract").get(0).reset();
+									 //$(document).sgWindow('close',{id:'win_supply_contract'});
+									 //$('#dgd_supply_contract').sgDatagrid('reload','sgDatagrid');
+									 $('#form_supply_contract').hide();
+									 $('#form_supply_contract2').show();
+								  }else{
+									 $(document).sgPup({message:'message_info',text: data.msg});
+								  }
+								
+							  }else{
+								  $(document).sgPup({message:'message_info',text: data});
+							  }
+						  } ,     
+						  error : function(res,error) { 
+						  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+						  }    
+						}); 
+			      }
+			  }});
+			}else{//查看
+				$('#form_supply_contract').hide();
+				$('#form_supply_contract2').show();
+				//隐藏下一页的保存按钮
+				$('#btn_supply_contract2').hide();
+			}
+		       $('#form_supply_contract').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+			   e.stopPropagation();
+			   return false;
+		   });
+		
+	});
+	//填充商品
+	$.ajax({
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../product/findProducts',   
+		  data:JSON.stringify({pageNo:1,pageSize:15,filter:{type:0}}),
+		  success : function(data) {
+			  if(data){
+				  var products = data.items;
+				  $("#productDataList",'#form_supply_contract').empty();
+				  var key=null;
+				  productDataList=[];
+				  $.each( products, function(key,value){
+					  var op = $("<option></option>");
+					  key=value.code;
+					  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+					  
+					  $("#productDataList").append(op);
+					  productDataList[key]=value.id;
+				 });
+
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		}); 
+	
+	//自动填充商品
+	var checkProduct = function(){
+		/* var text=this.value;
+		text = text.replace(/\s/g,''); //去除空格
+		if(text!=this.value){//有空格
+			this.value=text;
+			$(this).trigger('change');
+			return false;
+		} */
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 15;
+		params.filter = {};
+		params.filter.nameOrCode = this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../product/findProducts',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var products = data.items;
+					  if(products.length>0){
+						  $("#productDataList").empty();
+					      productDataList=[];
+					  }
+					  var key=null;
+					  $.each( products, function(key,value){
+						  var op = $("<option></option>");
+						  key=value.code;
+						  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+						  
+						  $("#productDataList").append(op);
+						  productDataList[key]=value.id;
+					 });
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+	};
+	
+   $("#div_supply_contract input[list=productDataList]").on('keyup',checkProduct);
+	
+	//添加商品、数量按钮点击
+	$("#div_supply_contract a").on('click',function(arg,arg1){
+		//导入的时候传了一个值
+		if(typeof(arg1) != "undefined"){
+			flag=arg1;
+		}
+		var detail_div = $("<div></div>");
+		var detail_id = "div_supply_contract"+flag;
+		detail_div.attr('id',detail_id);
+		detail_div.addClass("panel");
+		detail_div.append($("#div_supply_contract").html());
+		
+		$("#div_supply_contract").before(detail_div);
+		$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+		$("#"+detail_id+" img").attr('title','删除明细');
+		$("#"+detail_id+" input[name=productName]").on('change',function(){
+		    var strs = this.value.split(" ");
+			$(this).val(strs[strs.length-3]);
+			if($(this).val()){
+				//设置productId
+				$(this).siblings('input[name=productId]').val(productDataList[strs[strs.length-2]]);
+				//设置商品编码productCode
+				$(this).siblings('input[name=productCode]').val(strs[strs.length-2]);
+				//设置商品规格
+	        	$(this).siblings('input[name=norm]').val(strs[strs.length-1]);
+			}else{
+				//设置productId
+				$(this).siblings('input[name=productId]').val('');
+				//设置商品编码productCode
+				$(this).siblings('input[name=productCode]').val('');
+				//设置商品规格
+	        	$(this).siblings('input[name=norm]').val('');
+			}
+        
+		});
+		$("#"+detail_id+" input[name=productName]").attr('autofocus','autofocus');
+		
+		$("#"+detail_id+" a").on('click',function(){
+			$("#"+detail_id).remove();
+		})
+		$("#"+detail_id + " input[list=productDataList]").on('keyup',checkProduct);
+		flag=flag+1;
+	});
+	
+	$("#div_supply_contract input[name=productName]").on('change',function(){
+	    var strs = this.value.split(" ");
+		$(this).val(strs[strs.length-3]);
+		if($(this).val()){
+			//设置productId
+			$(this).siblings('input[name=productId]').val(productDataList[strs[strs.length-2]]);
+			//设置商品编码productCode
+			$(this).siblings('input[name=productCode]').val(strs[strs.length-2]);
+			//设置商品规格
+        	$(this).siblings('input[name=norm]').val(strs[strs.length-1]);
+		}else{
+			//设置productId
+			$(this).siblings('input[name=productId]').val('');
+			//设置商品编码productCode
+			$(this).siblings('input[name=productCode]').val('');
+			//设置商品规格
+        	$(this).siblings('input[name=norm]').val('');
+		}
+	});
+	
+	//填充采购合同
+	$.ajax({
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../sell/findSupplyContracts',   
+		  data:JSON.stringify({}),
+		  success : function(data) {
+			  if(data){
+				  var contracts = data;
+				  $("#contractDataList",'#form_supply_contract2').empty();
+				  contractDataList=[];
+				  var key=null;
+				  $.each( contracts, function(key,value){
+					  //除开自己以外
+					  var id=$('#id','#form_supply_contract').val();
+					  if(value.id!=id){
+						  var op = $("<option></option>");
+						  key=value.code;
+						  op.val(value.name+" "+value.code);
+						  $("#contractDataList").append(op);
+						  contractDataList[key]=value.id;
+					  }
+				 });
+
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		}); 
+	
+	//自动填充采购合同
+	var checkContract = function(){
+		/* var text=this.value;
+		text = text.replace(/\s/g,''); //去除空格
+		if(text!=this.value){//有空格
+			this.value=text;
+			$(this).trigger('change');
+			return false;
+		} */
+		var params = {};
+		params.nameOrCode = this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../sell/findSupplyContracts',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var contracts = data;
+					  if(contracts.length>0){
+						  $("#contractDataList",'#form_supply_contract2').empty();
+						  contractDataList=[];
+					  }
+					  var key=null;
+					  $.each( contracts, function(key,value){
+						  //除开自己以外
+						  var id=$('#id','#form_supply_contract').val();
+						  if(value.id!=id){
+							  var op = $("<option></option>");
+							  key=value.code;
+							  op.val(obj.val()+" "+value.name+" "+value.code);
+							  $("#contractDataList").append(op);
+							  
+							  contractDataList[key]=value.id;
+						  }
+						  
+					 });
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+	};
+	
+   $("#form_supply_contract2 input[name=contractCode]").on('keyup',checkContract);
+   
+   $("#form_supply_contract2 input[name=contractCode]").on('change',function(){
+	   var strs = this.value.split(" ");
+		$(this).val(strs[strs.length-2]);
+		 //设置contractId
+		$(this).siblings('input[type=hidden]').val(contractDataList[strs[strs.length-1]]);
+	});
+   
+	//点击批量修改价格按钮
+	$("#btn_update_price").on('click',function(){
+		if($("#txt_express").is(":visible")){//可见
+			$("#txt_express").hide();
+			$("#btn_sure").hide();
+		}else{
+			$("#txt_express").show();
+			$("#btn_sure").show();
+		}
+	});
+	
+	//点击克隆
+	$("#btn_copy").on('click',function(){
+		var code=$('input[name=contractCode]');
+		if(code.val()){
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../sell/findProductsByContractId',   
+					  data:JSON.stringify({supplyId:$('input[name=contractId]').val()}),
+					  success : function(data) {
+						  if(data){
+							  var products = data;
+							 //先删除原有的
+							  $('#div_supply_contract').prevAll('div[id^=div_supply_contract]').find('a').trigger('click');
+							  flag = 0;
+							  var divId=null;
+							  $.each(products, function(key,value){
+								 divId='#div_supply_contract';
+								if(key>0){
+									 $("#div_supply_contract a").trigger('click');
+									 key=key-1;
+									 divId=divId+key;
+								}
+								 $('input[name=productName]',divId).val(value.productName.replace(/\s/g,''));
+								 $('input[name=productCode]',divId).val(value.productCode.replace(/\s/g,''));
+								 $('input[name=productId]',divId).val(value.productId);
+								 $('input[name=norm]',divId).val(value.norm.replace(/\s/g,'-'));
+								 $('input[name=price]',divId).val(value.price);
+								 $('input[name=remark]',divId).val(value.remark);
+							 });
+	
+						  }else{
+							  $(document).sgPup({message:'message_info',text: data});
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+					  }    
+					}); 
+		}else{
+			$(document).sgPup({message:'message_info',text: '请选择合同!'});
+			productCode.focus();
+		}
+	});
+	
+	//点击批量修改单价 确认
+	$("#btn_sure").on('click',function(){
+		 var prices= $('input[name=price]','#panel_supply_contract');
+		 $.each(prices,function(k,v){
+			$(this).val((eval(v.value+$('#txt_express').val())).toFixed(2));
+		 });
+	});
+	 function isvalidatefile(obj) {
+     		
+     		var extend = obj.substring(obj.lastIndexOf(".") + 1);
+     		//$(document).sgPup({message:'message_info',text: extend});
+     		if (extend == "") {
+     		} else {
+     			if (!(extend.toLocaleLowerCase() == "xls" || extend.toLocaleLowerCase() == "xlsx")) {
+     				$(document).sgPup({message:'message_info',text: "请上传后缀名为xls或xlsx的文件!"});
+     				
+     				return false;
+     			}
+     		}
+     		return true;
+     	}
+     	 var saveImp = function(){
+    		   $("#form_imp").on('submit',function(e){
+    			if ($('#checkFile').val() == '') {
+    				$(document).sgPup({message:'message_info',text: '请选择上传导入文件!'});
+    				$('#checkFile').focus();
+    				return false;
+    			}else{
+    				if(!isvalidatefile($('#checkFile').val()))
+    					  return false;
+    					
+    			}
+    	        	return true;
+    	        }); 
+    	   };
+    	   
+	   var winImpClose = function (){
+           $(document).sgWindow('close',{id:'win_imp'});
+        }
+	//导入
+	$('#btn_import').on('click',function(){
+		var defaults = {
+                title:'总部供货合同商品导入',
+                id:'win_imp',
+                form:'form_imp',
+                url:'supply_contract_import.html',
+                width: 458,
+                height: 145,
+                buttons : [
+                           {name: '确定', type: 'submit', onpress : saveImp},
+                           {name: '关闭', onpress : winImpClose}
+                       ]
+            };
+		$(document).sgWindow(defaults);
+	});
+	
+	
+	//导出
+	$('#btn_export').on('click',function(){
+		 var url="../../sell/exportExcel4SupplyContractProducts?id="+$('#id2','#form_supply_contract').val();
+         window.location.href=url;
+		
+	});
+	
+	//上一页
+	$('#btn_supply_contract21').on('click',function(){
+		$('#form_supply_contract').show();
+		$('#form_supply_contract2').hide();
+	});
+	//合同商品明细表单页面的重置
+	$('#btn_reset2').on('click',function(){
+		$('#form_supply_contract2').get(0).reset();
+		  //删除多行商品，只留下最后一行
+		$('#div_supply_contract').prevAll('div[id^=div_supply_contract]').find('a').trigger('click');
+	});
+	
+	//保存
+	$('#btn_supply_contract2').on('click',function(){
+		//先验证，再提交
+		//参数
+		   var existProductMap=[];//已选择的商品
+	       var params = {};
+	       params.id = $('#id2','#win_supply_contract #form_supply_contract').val();
+	       var productIds = $('input[name=productId]','#form_supply_contract2');
+	       var productCodes = $('input[name=productCode]','#form_supply_contract2');
+	       var productNames=$('input[name=productName]','#form_supply_contract2');
+	       var productNorms=$('input[name=norm]','#form_supply_contract2');
+	       var productPrices= $('input[name=price]','#form_supply_contract2');
+	       var remarks= $('input[name=remark]','#form_supply_contract2');
+	       
+	       var details = new Array();
+	       if(productIds.length==0){ 
+	    	   $(document).sgPup({message:'message_info',text: '请添加商品！'})
+	    	   return false;
+	       }
+	       
+	       $.each(productIds,function(k,v){
+	       	var obj = {};
+	       	obj.productId = v.value;
+	       	obj.price = productPrices[k].value;
+	       	obj.remark = remarks[k].value;
+	       	details.push(obj);
+	    	if(v.value){
+	       		productNames[k].setCustomValidity(''); 
+		       	if(existProductMap[productIds[k].value]){ 
+		        	productNames[k].setCustomValidity('此商品已添加!'); 
+		       	   	return false;
+		          }else{
+		        	  productNames[k].setCustomValidity(''); 
+		          	  existProductMap[productIds[k].value]=productIds[k].value;
+		          }
+		    }else{
+		    	productNames[k].setCustomValidity('请输入商品名称/编码!'); 
+		    }
+	       });
+	     params.supplyDetails = details;
+	     $('#form_supply_contract2').unbind('submit');//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+			
+		//商品表单提交
+		$("#form_supply_contract2").on('submit',function(e){
+		   var url='../../sell/updateSupplyContractDetail';
+		   $(document).sgConfirm({text: '确定保存合同商品信息吗?',cfn:function(r){ 
+		    if(r){
+		
+		       $.ajax( {
+				  type : 'post', 
+				  async: false,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : url,   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  if(data.success){
+							 //$("#form_supply_contract").get(0).reset();
+							 $(document).sgWindow('close',{id:'win_supply_contract'});
+							 $('#dgd_supply_contract').sgDatagrid('reload','sgDatagrid');
+							 //$("#id","#form_supply_contract").val(data.contractId);
+						  }
+						$(document).sgPup({message:'message_info',text: data.msg});
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				}); 
+		   }
+		}});
+	       $('#form_supply_contract2').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+		   e.stopPropagation();
+		   return false;
+	   });
+	 
+	});
+	
+})(jQuery)
+</script>
+</html>

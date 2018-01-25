@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>盘点查看</title>
+    <style type="text/css">
+    .btnsubmit{
+    margin-top:-1px;
+padding: 1px 0 1px 0px;
+    background-color:#4791d2;
+    border:1px solid #dedede;
+    border-top:1px solid #eee;
+    border-left:1px solid #eee;
+
+    font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size:12px;
+    line-height:14px;
+    text-decoration:none;
+    text-align:center;
+    color:#fff;
+    cursor:pointer;
+    border-radius: 3px;
+    height: 25px;
+    width:89px;
+}
+    </style>
+</head>
+
+<body style="padding: 0px;margin: 0px;">
+ <div id="dgd_check_details" class="datagrid"></div>
+</body>
+<script type="text/javascript">
+    (function($){
+    	//初始化表格
+   	 	var defaults = {
+   		        width:  '100%',
+   		        height: 350,
+   		     	url: '',
+   		        //url: '../../sell/getCheckDetails',
+   		        //colid:'id',  //主键
+   		        rownumbers:true,
+   		        colModel : [
+					{display: '商品id', name : 'productId', width : 0, formatter:function(value,row){
+		                var elements='<input type="hidden" name="productId" style="width:0px;" value="'+value+'" required="true"></input>';
+		                elements=elements+'<input type="hidden" name="id" style="width:0px;" value="'+row.id+'" required="true"></input>';
+		                return elements;
+		            }},
+   		            {display: '商品名称', name : 'productName', width : 120, sortable : false},
+   		            {display: '商品编码', name : 'productCode', width : 100, sortable : false},
+   		            {display: '商品规格', name : 'norm', width : 140, sortable : false},
+   		            {display: '上月帐面结存数量', name : 'lastSaveNum', width : 50, sortable : false},
+   		            {display: '本月入库数量', name : 'curInNum', width : 50, sortable : false},
+   		            {display: '本月出库数量', name : 'curOutNum', width : 50, sortable : false},
+   		            {display: '月未帐面结存数量', name : 'curSaveNum', width : 50, sortable : false},
+   		            {display: '月未实物盘存', name : 'curObjectNum', width : 50, sortable : false},
+   		         	{display: '盈亏数', name : 'overShortNum', width : 60, sortable : false},
+   		        	{display: '调账(出库)数', name : 'changeNum', width : 50, sortable : false,formatter:function(value,row){
+		            	if(value==null||value=='null'){
+		            		return 0;
+		            	}else{
+   		        		    return value;
+		            	}
+		            }},
+		         	{display: '备注', name : 'remark', width : 90, sortable : false}
+   		        ],
+   		        buttons : [
+   		        ],
+   		        searchitems :[
+   		            	{display:'名称',html:'<input type="text" name="name" required="true" disabled="true" style="width:250px;"/><input type="hidden" name="id"/>'},
+   		            	{display:'开始日期',html:'<input type="date" name="startDate"   disabled="true" style="width:122px;"/>'},
+				      	{display:'结束日期',html:'<input type="date" name="endDate"  disabled="true" style="width:122px;"/>'},
+				      	{display:'商品名称',html:'<input type="text" name="txt_productName" style="width:120px;"/>'}
+   		        ],
+   		        query:{}//只查出还未添加到分公司的总部商品
+   		        //exporturl:'',//导出excel
+   		    };
+   		    $('#dgd_check_details').sgDatagrid(defaults);
+   		    
+   	  		//隐藏商品ID
+		    $('table tr th:nth-child(2),table tr td:nth-child(2)','#dgd_check_details').hide();
+   		    
+		   //表格的宽度=表头表格的宽度
+     	    $('#dgd_check_details .bDiv table').width($('#dgd_check_details .hDiv table').width());
+     	
+		    //复制一个查询,再把它插入到原来查询的后面
+			$("#dgd_check_details .sDiv>.pGroup:first").clone().insertAfter($("#dgd_check_details .sDiv>.pGroup:first"));
+			
+			//重写查询点击事件
+			$('#dgd_check_details .sDiv>.pGroup:eq(1) a.button:first').on('click',function(){
+				var id=$('#dgd_check_details input[name=id]').val();
+				var productName=$('#dgd_check_details input[name=txt_productName]').val();
+				$('#dgd_check_details').sgDatagrid('reload',{url:'../../sell/getCheckDetails',query:{productName:productName,id:id}});
+				//隐藏商品ID
+			    $('table tr th:nth-child(2),table tr td:nth-child(2)','#dgd_check_details').hide();
+				
+			    //表格的宽度=表头表格的宽度
+	     	    $('#dgd_check_details .bDiv table').width($('#dgd_check_details .hDiv table').width());
+	     	
+			});
+   	  		
+			//之前的查询按钮隐藏
+   	  		$("#dgd_check_details .sDiv>.pGroup:first").hide();
+   	  		
+    })(jQuery)
+    
+</script>
+</html>

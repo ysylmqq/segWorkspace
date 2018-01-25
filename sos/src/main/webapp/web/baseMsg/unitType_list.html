@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+</head>
+<body>
+    <div id="unitType_list" class="datagrid"></div>
+</body>
+
+<script type="text/javascript">
+(function($){
+	
+	
+	function GetDateStr(AddDayCount) {
+	    var dd = new Date();
+	    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+	    return dd.format('yyyy-MM-dd');
+	}
+	
+	
+	var winClose = function() {
+		$(document).sgWindow('close', {
+			id : 'add_unitType'
+		});
+	}
+	
+	var winClose_edit = function() {
+		$(document).sgWindow('close', {
+			id : 'unittype_edit'
+		});
+	}
+	
+	
+	
+	var loadSuccess_edit = function(){
+ 		//填充编辑前的值
+ 		   if(editId && editObj){
+ 				  $("#unittype_id",$("#unittype_add_form")).val(editObj.id);
+				  $("#unittype",$("#unittype_add_form")).val(editObj.unittype);
+				  $("#typeclass",$("#unittype_add_form")).val(editObj.typeclass);
+				  $("#protocol_id",$("#unittype_add_form")).val(editObj.protocol_id);
+				  $("#memo",$("#unittype_add_form")).val(editObj.memo);
+ 		   }
+ 		  editId=null;
+ 		 editObj=null; 
+ 		  
+ 	   }
+
+    
+    
+    var addItem = function(){
+    	var defaults = {
+   			title : '新增',
+   			id : 'add_unitType',
+   			form : 'unittype_add_form',
+   			url : 'unittype_add.html',
+   			width : 500,
+   			height : 120,
+   			buttons : [ {
+   				name : '保存',
+   				type : 'submit',
+   			    onpress : save
+   			}, {
+   				name : '关闭',
+   				onpress : winClose
+   			} ]
+   		};
+   		$(document).sgWindow(defaults);
+    }
+    
+    
+
+    var editItem = function() {
+    	 	var obj = $('#unitType_list');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "只能选择一条记录！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	        	 $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){  
+		                	editId=this.value;
+		                	editObj=$(this).data('data');
+			    			var defaults = {
+			    				title : '编辑',
+			    				id : 'unittype_edit',
+			    				form : 'unittype_edit_form',
+			    				url : 'unittype_add.html',
+			    				success: loadSuccess_edit,
+			    				width : 500,
+			    				height : 120,
+			    				buttons : [ {
+			    	   				name : '保存',
+			    	   				type : 'submit',
+			    	   			    onpress : save
+			    	   			},{
+			    					name : '关闭',
+			    					onpress : winClose_edit
+			    				} ]
+			    			};
+			    			$(document).sgWindow(defaults);
+		                }
+		            });
+	   }else{
+		   $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	    }
+    	
+	}
+    
+    
+
+    function save() {
+    	var url = '../../unitType/add';
+    	var id =  $('#unittype_id', '#unittype_add_form').val();
+    	if(id != null && id != ""){
+    	   url = '../../unitType/update';
+    	}
+    	$.ajax({
+    		type : 'post',
+    		async : false,
+    		contentType : 'application/json',
+    		dataType : 'json',
+    		url : url,
+    		data : JSON.stringify({
+    			unittype_id : $('#unittype_id', '#unittype_add_form').val(),
+    			unittype : $('#unittype', '#unittype_add_form').val(),
+    			typeclass : $('#typeclass', '#unittype_add_form').val(),
+    			protocol_id : $('#protocol_id', '#unittype_add_form').val(),
+    			memo : $('#memo', '#unittype_add_form').val()
+    		}),
+    		success : function(data) {
+    			if (data) {
+    				if (data.success) {
+    					 $(document).sgWindow('close',{id:'add_unitType'});
+    					 $(document).sgWindow('close',{id:'unittype_edit'});
+    					 $('#unitType_list').sgDatagrid('reload','sgDatagrid');
+    				}
+    				$(document).sgPup({message:'message_info',text: data.msg});
+    			}
+    		},
+    		error : function(res, error) {
+    			alert("responseText=" + res.responseText
+    					+ ";error=" + error);
+    		}
+    	});
+    	$('#unittype_add_form').unbind();//以下两行可以阻止提交2次
+    	return false;
+    }
+    
+
+	   
+	 	   
+	 	   
+    var today = new Date().format('yyyy-MM-dd');
+    var twoDayBefore = GetDateStr(-2);
+
+    var defaults = {
+        title: "车台类型管理",
+        width:  '100%',
+        height: 395,
+        url: '../../unitType/findUnitTypesByPage',
+        datatype:"json",
+        usepager: true,
+	    rownumbers:true,
+        useRp: true,
+        colid:'id',  //主键
+        colModel : [
+            {display: '车台类型', name : 'unittype', width : 110, sortable : false},
+            {display: '协议名称', name : 'sname', width : 110, sortable : false},
+            {display: '用途分类', name : 'typeclass', width : 110, sortable : false}
+        ],
+        
+        buttons : [
+			{name: '新增', bclass: 'add', onpress : addItem},
+			{separator: true},
+			{name: '编辑', bclass: 'edit', onpress : editItem},
+			{separator: true}
+			/*
+			{name: '转单', bclass: 'add', onpress : shiftItem},
+			{separator: true},
+          
+            {name: '工单结束', bclass: 'add', onpress : endItem},
+            {separator: true} */
+        ],
+        searchitems :[
+            {display:'车台类型',html:'<span class="ltext"><input type="text" name="name" class="form-control"/></span>'},
+            {display:'协议名称',id:'type', name:'type',html:'<span class="ltext"><select class="form-control" id="type" name="type"><option value="" selected>请选择...</option></select></span>'}
+        ],
+        sortname: "id",
+        sortorder: "desc"
+    };
+    
+    $('#unitType_list').sgDatagrid(defaults);
+    
+    
+    
+	//填充协议
+	var type = $('#type');
+    $.ajax( {
+	  type : 'post', 
+	  async: false,   
+	  contentType : 'application/json',     
+	  dataType : 'json',     
+	  url : '../../unitType/getSysValue',   
+	  data:JSON.stringify({}),
+	  success : function(data) {
+		  if(data){
+			  if(type){
+				  $.each(data,function(k,v){
+					  type.append("<option value='" +v.svalue+"'>" + v.sname+"</option>");
+				  }); 
+			  }
+		  }
+	  } ,     
+	  error : function(res,error) { 
+	  	 alert("responseText="+res.responseText+";error="+error);     
+	  }    
+	});
+    
+    
+    
+    
+    
+    
+    
+    
+})(jQuery);
+
+
+
+
+</script>
+</html>

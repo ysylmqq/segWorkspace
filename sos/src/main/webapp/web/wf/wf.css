@@ -1,0 +1,44 @@
+#main_panel {
+/*  width: 100%;*/
+
+  /*width: 99.5%;*/
+  background-color: #fff;
+  border: 1px solid #e2e5ec;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  padding: 10px 20px;
+  margin: 5px 0 0 5px;
+  max-height: 664px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 664px;
+  color: #000;
+}
+.a-empty-world {
+  padding-left: 14px;
+}
+
+hr {
+  border-top: solid #CBCBD5 1px;
+}
+.select {
+  border: 1px solid #ccc;
+  width: 135px;
+  line-height: 24px;
+  height: 24px;
+
+}
+.head{
+  border-bottom: 1px #ccc solid;line-height: 24px;
+}
+.line select{
+  height: 24px;
+  padding: 0;
+  font-size: 13px;
+}
+.show_list{
+  list-style: none;
+  padding-left: 0; 
+}
+.show_list li{
+  margin: 0 6px;
+}

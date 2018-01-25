@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>离网汇总报表</title>
+<link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../../css/gbossIframe.css">
+</head>
+<body>
+	<div class='datagrid' id="monitoring">
+    </div>
+</body>
+
+<script type="text/javascript" src="../../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../../jscript/index.js"></script>
+<script type="text/javascript" src="../../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../../jscript/window.js"></script>
+<script type="text/javascript" src="../../../jscript/pup.js" ></script>
+<script type="text/javascript" src="../../../jscript/form.js"></script>
+<script type="text/javascript">
+
+
+
+    (function($) {
+    	
+    	var winCloseView = function() {
+    		$(document).sgWindow('close', {
+    			id : 'outlineDetail_view'
+    		});
+    		
+    	}
+
+    	var loadSuccess_view = function(){
+    			//填充编辑前的值
+    		var startTime = $("#startTime").val();
+    		var endTime = $("#endTime").val();
+    		var modelId = "";
+    		if($("#modelId").val() != ""){		//车型id
+    			modelId = $("#modelId").val();
+    		}
+    			
+    		if(editId && editObj){
+    				 var obj= $('#outline_detail','#outlineDetail_view');
+    				 var settings = obj.data('sgDatagrid');
+    				 settings.url='../../../rpt/offNetDetail';
+    				 settings.query={s_id:editObj.s_id,startTime:startTime,endTime:endTime,modelId:modelId};
+    				 obj.data('sgDatagrid', settings);
+    				 obj.sgDatagrid('reload','sgDatagrid'); 
+    		}
+    			 editId=null;
+    			 editObj=null;
+    			  
+    		   }
+    	    
+
+    	var viewItem = function() {
+    	 	var obj = $('#monitoring');
+    	    var bDiv = $('.bDiv',obj);
+    	    if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+    	        $(document).sgPup({message:'message_info',text: "只能选择一个选项！"});
+    	    }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+    	        $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+    	    }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+    	    	 $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+    	                if($(this).attr("checked")){  
+    	                	editId=this.value;
+    	                	editObj=$(this).data('data');
+    		    			var defaults = {
+    		    				title : '离网明细',
+    		    				id : 'outlineDetail_view',
+    		    				form : 'outlineDetail_view_form',
+    		    				url : 'outline_detail.html',
+    		    				success: loadSuccess_view,
+    		    				width : 730,
+    		    				height : 390,
+    		    				buttons : [
+    		    				  			 {name : '关闭',onpress : winCloseView} 
+    		    						  ]
+    		    			};
+    		    			$(document).sgWindow(defaults);
+    	                }
+    	            });
+    	}else{
+    	   $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+    	}
+
+    	}
+
+    	
+    	var now =new Date().format('yyyy-MM-dd');
+    	var today=new Date().format('yyyy-MM');
+    	var twoDayBefore = GetDateStr(-30);
+    	var height = 476;
+    	//初始化表格
+    	var defaults = {
+    		        title: "离网汇总报表",
+    		        width:  '100%',
+    		        height: height,
+    		        rownumbers:true,
+    		        usepager: true,
+    		        url:'../../../rpt/offNetSum',
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '4S店名', name : 'companyName', width : 110},
+						{display: '入网总量', name : 'join_count', width : 100},
+						{display: '在网数量', name : 'totalOnlineNum', width : 90},
+						{display: '离网数量', name : 'totalOutlineNum', width : 90}
+    		        ],
+    		        buttons : [ 
+    		   		         {name: '查看明细',bclass : 'view',onpress : viewItem}
+    		  	             ],
+    		        searchitems :[
+    		  		           {
+    		  						display : '车型',
+    		  						name : 'model',
+    		  						html:'<input type="text" name="modelName" style="width:120px" id="modelName" placeholder="请输入车型" list="modelDataList"/>'
+    		  							+ '<input type="hidden" name="modelId" id="modelId">'
+    		  							+ '<datalist id="modelDataList"></datalist>'
+    		  				    },
+    		  				    {
+    		  						display : '4S店',
+    		  						name : 'fcenter',
+    		  						html:'<input type="text" name="fcenter" id="fcenter" style="width:120px" placeholder="请输入4S店" list="fcDataList"/>'
+    		  							+ '<input type="hidden" name="4sId" id="4sId">'
+    		  							+ '<datalist id="fcDataList"></datalist>'
+    		  				    },
+    		  				  {
+    		  						display : '开始日期',
+    		  						name : 'startTime',
+    		  						html:'<input type="date" name="startTime" id="startTime" style="width:120px"  class="form-control schInput">'
+    		  				    },
+    		  				    {
+    		  						display : '结束日期',
+    		  						name : 'endTime',
+    		  						html:'<input type="date" name="endTime" id="endTime" style="width:120px"  class="form-control schInput">'
+    		  				    } 
+    		  		            
+    		    		        ],
+    		    		        //exporturl:'../../../policy/exportExcelPolicysNew'
+    		      		     
+    		    };
+    		    $('#monitoring').sgDatagrid(defaults);
+    })(jQuery);
+    
+    
+    
+    
+    
+	//车型下拉
+	$.ajax({
+		type : 'post',
+		async : true,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../../rpt/getModels',
+		data : JSON.stringify({brandId:101}),
+		success : function(data) {
+			if (data) {
+				var model = data;
+				if (model.length > 0) {
+					$("#modelDataList").empty();
+					modelDataList = {};
+				}
+				$.each(model, function(key, value) {
+					var op = $("<option></option>");
+					op.val(value.model_name);
+					$("#modelDataList").append(op);
+					modelDataList[value.model_name] = value.model_id;
+				});
+
+				$("#modelName").on('change', function() {
+					var strs = this.value.split(" ");
+					if (modelDataList[strs[strs.length - 1]]) {
+						$(this).val(strs[strs.length - 1]);
+						$("#modelId").val(modelDataList[strs[strs.length - 1]]);
+						if ($("#modelId").val().length == 0) {
+							$("#modelName").val("");
+						}
+					} else {
+						$(this).val('');
+						$("#modelId").val("");
+					}
+				});
+			} else {
+				$(document).sgPup({message : 'message_info', text : data});
+			}
+		},
+		error : function(res, error) {
+			if (res && res.responseText) {
+				$(document).sgPup({message : 'message_info', text : res.responseText});
+			}
+		}
+	});
+	
+	//4s店下拉
+	$.ajax({
+		type : 'post',
+		async : true,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../../rpt/get4SShop',
+		data : JSON.stringify({companyno:201}),
+		success : function(data) {
+			if (data) {
+				var fcShop = data;
+				if (fcShop.length > 0) {
+					$("#fcDataList").empty();
+					fcDataList = {};
+				}
+				$.each(fcShop, function(key, value) {
+					var op = $("<option></option>");
+					op.val(value.companyname);
+					$("#fcDataList").append(op);
+					fcDataList[value.companyname] = value.companyno;
+				});
+
+				$("#fcenter").on('change', function() {
+					var strs = this.value.split(" ");
+					if (fcDataList[strs[strs.length - 1]]) {
+						$(this).val(strs[strs.length - 1]);
+						$("#4sId").val(fcDataList[strs[strs.length - 1]]);
+						if ($("#4sId").val().length == 0) {
+							$("#fcenter").val("");
+						}
+					} else {
+						$(this).val('');
+						$("#4sId").val("");
+					}
+				});
+			} else {
+				$(document).sgPup({message : 'message_info', text : data});
+			}
+		},
+		error : function(res, error) {
+			if (res && res.responseText) {
+				$(document).sgPup({message : 'message_info', text : res.responseText});
+			}
+		}
+	});
+    
+    
+    function GetDateStr(AddDayCount) {
+	    var dd = new Date();
+	    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+	    return dd.format('yyyy-MM-dd');
+	}
+</script>
+</html>

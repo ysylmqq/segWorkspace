@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>进销存明细(个人、集客)</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<body>
+<div id="nw_document_all">
+ <div id="dgd_stockinout" class="datagrid"></div>
+  <datalist id="userDataList"></datalist>
+  <datalist id="productDataList">
+</div>
+            </datalist>
+  <!-- 打印iframe -->
+	<iframe id="ifm_print_rso_m" name="ifm_print_rso_m" style="display: none"></iframe>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+var borrowDetailsObj={};//挂账明细对象
+	(function($){
+		var userDataList = {};//销售经理 key:name,value:id
+		var productDataList=[];//商品数组 key:商品名称,value code:productId
+		
+		var lastMonthDay=new Date();//上个月的今天
+    	//lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+		lastMonthDay.setDate(1);
+    	lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+		var today=new Date().format('yyyy-MM-dd');
+		  //修改表格的宽度
+         var height =$('#main_bd',window.parent.document).height()-281;
+    	//初始化表格
+    	 var defaults = {
+    		        title: "进销存明细",
+    		        width:  '100%',
+    		        height: height,
+    		        //url: '../../stock/findBorrows',
+    		        url:'',
+    		        rownumbers:true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '借用人', name : 'borrowerName', width : 90, sortable : false},
+						{display: '代理商', name : 'channelName', width : 90, sortable : false},
+    		            {display: '最终客户', name : 'customerName', width : 90, sortable : false},
+						{display: '时间', name : 'stamp', width : 120, sortable : false},
+						{display: '商品编码', name : 'productCode', width : 100, sortable : false},
+    		            {display: '商品名称', name : 'productName', width : 110, sortable : false},
+    		            {display: '商品规格', name : 'norm', width : 150, sortable : false},
+    		            {display: '借用数量', name : 'borrowNum', width : 50, sortable : false,isAdd:true,formatter:function(value,row){
+    		            	if(value){
+    		            		return Number(value);
+    		            	}else{
+    		            		return value;
+    		            	} 
+    		            }},
+    		            {display: '已还库数量', name : 'returnNum', width : 60, sortable : false,isAdd:true,formatter:function(value,row){
+    		            	if(value){
+    		            		var obj=[];
+    		            		obj.push(1);
+    		            		obj.push(row.id);
+    		            		obj.push(row.productId);
+    		            		obj.push(row.productCode);
+    		            		obj.push(row.productName);
+    		            		obj.push(row.norm);
+    		                    value = '<a href="#" onClick="findReturns(\''+obj.join(",")+'\')">'+value+'</a>';
+    		                }
+    		            	return value;
+    		            }},
+    		            {display: '已销账数量', name : 'writeoffsNum', width : 60, sortable : false,isAdd:true,formatter:function(value,row){
+    		            	if(value){
+    		            		var obj=[];
+    		            		obj.push(2);
+    		            		obj.push(row.id);
+    		            		obj.push(row.productId);
+    		            		obj.push(row.productCode);
+    		            		obj.push(row.productName);
+    		            		obj.push(row.norm);
+    		                    value = '<a href="#" onClick="findReturns(\''+obj.join(",")+'\')">'+value+'</a>';
+    		                }
+    		            	return value;
+	    		         }},
+			            {display: '已核销数量', name : 'writeoffsNum2', width : 60, sortable : false,isAdd:true,formatter:function(value,row){
+			            	if(value){
+			            		var obj=[];
+			            		obj.push(3);
+			            		obj.push(row.id);
+			            		obj.push(row.productId);
+			            		obj.push(row.productCode);
+    		            		obj.push(row.productName);
+    		            		obj.push(row.norm);
+			                    value = '<a href="#" onClick="findReturns(\''+obj.join(",")+'\')">'+value+'</a>';
+			                }
+			            	return value;
+			            }},
+			            {display: '未还库数量', name : 'num', width : 60, sortable : false,isAdd:true,formatter:function(value,row){
+    		            	if(value){
+    		            		return Number(value);
+    		            	}else{
+    		            		return value;
+    		            	}
+    		            }},
+    		            {display: '仓库', name : 'whsName', width : 100, sortable : true}
+    		        ],
+    		        buttons : [
+    		        ],
+    		        searchitems :[
+						{display:'类型',name:'status',html:'<select name="type2" style="width:178px;" ><option value="1"  selected>个人进销存明细</option><option value="0">代理商进销存明细</option></select>'},	
+						{display:'营业处仓库',html:'<select size="1" name="whsId" id="whsId" style="width:141px"><option value="">--请选择--</option> </select>'},
+						{display:'开始日期',name:'startDate',type:'date',value:lastMonthDay,width:150},
+				      	{display:'结束日期',name:'endDate',type:'date',value:today,width:150},
+				      	{display:'借用人',html:'<input type="text" name="managersName" id="managersName" style="width:161px;" list="userDataList"/><input type="hidden" name="managersId" id="managersId" />'},
+				      	{display:'商品名称',html:'<input type="text" name="productNameCondn" list="productDataList" style="width:150px;" /> <input type="hidden" id="productId" name="productId" />'}
+    		        ],
+    		        query:{startDate:lastMonthDay,endDate:today,remark:'1',type2:1},
+    		        exporturl:'../../stock/exportExcel4BorrowDetails',//导出excel
+       		        isCount:true//是否合计
+    		    };
+    		    $('#dgd_stockinout').sgDatagrid(defaults); 
+    		    
+    		    //判断是否是销售经理,如果是，则隐藏借用人的查询条件
+    		     $.ajax( {
+				  type : 'post', 
+				  async: false,   
+				  //contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../isSaleManager',   
+				  data:{},
+				  success : function(data) {
+					  if(data.success){//如果是
+						  $('#dgd_stockinout .sDiv input[name=managersName]').prev().hide();
+						  $('#dgd_stockinout .sDiv input[name=managersName]').hide();
+					  }else{//不是销售经理
+						  
+					  }
+				  }});
+    		    
+    		  //填充仓库
+			    $.ajax( {
+				  type : 'post', 
+				  async: false,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : './../../stock/findWarehouses',   
+				  data:JSON.stringify({}),//除开本仓库
+				  success : function(data) {
+					  if(data){
+						  var whsId=$("#whsId");
+						  if(whsId.get(0)){
+							  $.each(data,function(k,v){
+								  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+							  }); 
+						  }
+						 
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+    		  
+    		  //自动查询商品
+       			var checkProduct = function(){
+       				/* var text=this.value;
+       				text = text.replace(/\s/g,''); //去除空格
+       				if(text!=this.value){//有空格
+       					this.value=text;
+       					$(this).trigger('change');
+       					return false;
+       				} */
+       				var params = {};
+       				params.pageNo = 1;
+       				params.pageSize = 15;
+       				params.filter = {};
+       				params.filter.nameOrCode = this.value;
+       				var obj = $(this);
+       				$.ajax({
+       					  type : 'post', 
+       					  async: true,   
+       					  contentType : 'application/json',     
+       					  dataType : 'json',     
+       					  url : '../../product/findProducts',   
+       					  data:JSON.stringify(params),
+       					  success : function(data) {
+       						  if(data){
+       							  var products = data.items;
+       							  if(products.length>0){
+       								  $("#productDataList").empty();
+       							      productDataList=[];
+       							  }
+       							  var key=null;
+       							  $.each( products, function(key,value){
+       								  var op = $("<option></option>");
+       								  key=value.code;
+       								  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+       									 
+       								  $("#productDataList").append(op);
+       								  productDataList[key]=value.id;
+       							 });
+       						  }else{
+       							  $(document).sgPup({message:'message_info',text: data});
+       						  }
+       					  } ,     
+       					  error : function(res,error) { 
+       					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+       					  }    
+       					});
+       			};
+       			
+       		  //填充商品
+       			$.ajax({
+       				  type : 'post', 
+       				  async: true,   
+       				  contentType : 'application/json',     
+       				  dataType : 'json',     
+       				  url : '../../product/findProducts',   
+       				  data:JSON.stringify({pageNo:1,pageSize:15,filter:{type:0}}),
+       				  success : function(data) {
+       					  if(data){
+       						  var products = data.items;
+       						  $("#productDataList").empty();
+       						  var key=null;
+       						  productDataList=[];
+       						  $.each( products, function(key,value){
+       							  var op = $("<option></option>");
+       							  key=value.code;
+       							  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+       							  
+       							  $("#productDataList").append(op);
+       							  productDataList[key]=value.id;
+       						 });
+       						var productNameCondn=$('input[name=productNameCondn]',$('#dgd_stockinout'));
+       						productNameCondn.on('keyup',checkProduct);
+       						
+       						productNameCondn.on('change',function(){
+       							var strs = this.value.split(" ");
+       							$(this).val(strs[strs.length-3]);
+       							if($(this).val()){
+    								$("#productId",$('#dgd_stockinout')).val(productDataList[strs[strs.length-2]]);
+    								if($("#productId",$('#dgd_stockinout')).val().length==0){
+    									$("#productNameCondn",$('#dgd_stockinout')).val("");
+    								}
+    						    }else{
+    						    	$(this).val('');
+    						    	$("#productId",$('#dgd_stockinout')).val("");
+    						    }
+    						
+    							});
+
+       					  }else{
+       						  $(document).sgPup({message:'message_info',text: data});
+       					  }
+       				  } ,     
+       				  error : function(res,error) { 
+       				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+       				  }    
+       				}); 
+    		    //默认查询个人进销存明细
+    		    //$('#dgd_stockinout table tr th:nth-child(3),td:nth-child(3)').hide();//单位
+				//$('#dgd_stockinout table tr th:nth-child(4),td:nth-child(4)').show();//经办人
+				 //表格的宽度=表头表格的宽度
+	     	    $('#dgd_stockinout .bDiv table').width($('#dgd_stockinout .hDiv table').width());
+	     		
+				//复制一个查询,再把它插入到原来查询的后面
+				$("#dgd_stockinout .sDiv>.pGroup:first").clone().insertAfter($("#dgd_stockinout .sDiv>.pGroup:first"));
+				
+				//类型改变
+				$('#dgd_stockinout .sDiv input[name=managersName]').prev().width(39);
+				$('#dgd_stockinout .sDiv select[name=type2]').change(function(){
+					//清空文本框
+					$('#dgd_stockinout .sDiv input[name=managersName]').val('');
+					$('#dgd_stockinout .sDiv input[name=managersId]').val('');
+					if(this.value=='1'){//个人
+						$('#dgd_stockinout .sDiv input[name=managersName]').prev().text('借用人:');
+						 //填充经办人
+					    $.ajax( {
+						  type : 'post', 
+						  async: false,   
+						  contentType : 'application/json',     
+						  dataType : 'json',     
+						  url : '../../getOrgOperators',   
+						  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+						  success : function(data) {
+							  if(data){
+								  var manager = $("#managersName","#dgd_stockinout");
+								  if(manager){
+									  if(data.items.length>0){
+								 		  userDataList = {};
+										  $("#userDataList").empty();
+									  }
+									  $.each(data.items,function(k,v){
+										  var op = $("<option></option>");
+										  op.val(v.opname);
+										  $("#userDataList").append(op);
+										  
+										  userDataList[v.opname] = v.opid;
+									  	 }); 
+									  $("#managersName","#dgd_stockinout").unbind('keyup');
+									  manager.on('keyup',checkUser);
+									  manager.on('change',function(){
+										  	var strs = this.value.split(" ");
+											 if(userDataList[strs[strs.length-1]]){
+													$(this).val(strs[strs.length-1]);
+													$("#managersId","#dgd_stockinout").val(userDataList[strs[strs.length-1]]);
+													if($("#managersId","#dgd_stockinout").val().length==0){
+														$("#managersName","#dgd_stockinout").val("");
+													}
+											    }else{
+											    	$(this).val('');
+											    	$("#managersId","#dgd_stockinout").val("");
+											    }
+											
+										});
+
+									};
+							  }else{
+							  	$(document).sgPup({message:'message_info',text: data});
+							  }
+						  },     
+						  error : function(res,error) { 
+						  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+						  }    
+						});
+					}else{
+						$('#dgd_stockinout .sDiv input[name=managersName]').prev().text(' 代理商:');
+						
+						//填充代理商
+						$.ajax({
+							  type : 'post', 
+							  async: true,   
+							  contentType : 'application/json',     
+							  dataType : 'json',     
+							  url : '../../sell/findChannels',   
+							  data:JSON.stringify({pageNo:1,pageSize:10,filter:{exceptDicId:'5'}}),
+							  success : function(data) {
+								  if(data){
+									  var channels = data.items;
+									  if(channels.length>0){
+										     $("#userDataList").empty();
+									  		userDataList = {};
+										  }
+									  $.each( channels, function(key,value){
+										  var op = $("<option></option>");
+										  op.val(value.name);
+										  $("#userDataList").append(op);
+										  userDataList[value.name]=value.id;
+										});
+									  $("#managersName","#dgd_stockinout").unbind('keyup');
+									  $("#managersName","#dgd_stockinout").on('keyup',checkChannel);
+									  $("#managersName","#dgd_stockinout").on('change',function(){
+										    var strs = this.value.split(" ");
+										    
+										    if(userDataList[strs[strs.length-1]]){
+										    	$(this).val(strs[strs.length-1]);
+												
+												$("#managersId","#dgd_stockinout").val(userDataList[strs[strs.length-1]]);
+												if($("#managersId","#dgd_stockinout").val().length==0){
+													$("#managersName","#dgd_stockinout").val("");
+												}
+										    }else{
+										    	$(this).val('');
+										    	$("#managersId","#dgd_stockinout").val("");
+										   }
+										    
+										});
+									  
+								  }else{
+									  $(document).sgPup({message:'message_info',text: data});
+								  }
+							  } ,     
+							  error : function(res,error) { 
+							  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+							  }    
+							});
+					}
+				});
+				
+				//重写查询点击事件
+				$('#dgd_stockinout .sDiv>.pGroup:eq(1) a.button:first').on('click',function(){
+					var type2=$('#dgd_stockinout select[name=type2]').val();
+					var productId=$('#dgd_stockinout input[name=productId]').val();
+					var params={
+							type2:type2,
+							remark:'1',
+							startDate:$('#dgd_stockinout input[name=startDate]').val(),
+							endDate:$('#dgd_stockinout input[name=endDate]').val(),
+							productId:productId,
+							whsId:$('#dgd_stockinout select[name=whsId]').val()
+							};
+					if(type2==1){//个人
+						params.borrowerId=$('#dgd_stockinout input[name=managersId]').val();
+						$('#dgd_stockinout').sgDatagrid('reload',{url:'../../stock/findBorrows',query:params});
+						//$('#dgd_stockinout table tr th:nth-child(3),td:nth-child(3)').hide();//单位
+						$('#dgd_stockinout table tr th:nth-child(3),td:nth-child(3)').show();//经办人
+						$('#dgd_stockinout table tr th:nth-child(5),td:nth-child(5)').show();//最终客户
+					}else{//集客
+						params.channelId=$('#dgd_stockinout input[name=managersId]').val();
+						$('#dgd_stockinout').sgDatagrid('reload',{url:'../../stock/findBorrows',query:params});
+						//$('#dgd_stockinout table tr th:nth-child(3),td:nth-child(3)').width(90);
+						//$('div',$('#dgd_stockinout table tr th:nth-child(3),td:nth-child(3)')).width(90);
+						//$('#dgd_stockinout table tr th:nth-child(3),td:nth-child(3)').show();//单位
+						$('#dgd_stockinout table tr th:nth-child(3),td:nth-child(3)').hide();//经办人
+						$('#dgd_stockinout table tr th:nth-child(5),td:nth-child(5)').hide();//最终客户
+					}
+					 //表格的宽度=表头表格的宽度
+		     	    $('#dgd_stockinout .bDiv table').width($('#dgd_stockinout .hDiv table').width());
+		     		
+				});
+				
+				//隐藏之前的查询
+				$('#dgd_stockinout a.button:first').hide();
+				
+				//自动查询代理商
+				var checkChannel = function(){
+					/* var text=this.value;
+					text = text.replace(/\s/g,''); //去除空格
+					if(text!=this.value){//有空格
+						this.value=text;
+						$(this).trigger('change');
+						return false;
+					} */
+					var params = {};
+					params.pageNo = 1;
+					params.pageSize = 10;
+					params.filter = {};
+					params.filter.name = this.value;
+					params.filter.exceptDicId='5';
+					var obj = $(this);
+					$.ajax({
+						  type : 'post', 
+						  async: true,   
+						  contentType : 'application/json',     
+						  dataType : 'json',     
+						  url : '../../sell/findChannels',   
+						  data:JSON.stringify(params),
+						  success : function(data) {
+							  if(data){
+								  var channels = data.items;
+								  if(channels.length>0){
+									     $("#userDataList").empty();
+								  		userDataList = {};
+								   }
+								  $.each( channels, function(key,value){
+									  var op = $("<option></option>");
+									  op.val(obj.val()+" "+value.name);
+									  $("#userDataList").append(op);
+									  
+									  userDataList[value.name]=value.id;
+									});
+							  }else{
+								  $(document).sgPup({message:'message_info',text: data});
+							  }
+						  } ,     
+						  error : function(res,error) { 
+						  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+						  }    
+						});
+				};
+				//自动查询经办人
+				var checkUser = function(){
+					/* var text=this.value;
+					text = text.replace(/\s/g,''); //去除空格
+					if(text!=this.value){//有空格
+						this.value=text;
+						$(this).trigger('change');
+						return false;
+					} */
+					var params = {};
+					params.pageNo = 1;
+					params.pageSize = 10;
+					params.filter = {};
+					params.filter.opname = this.value;
+					params.filter.isCompany = true;//查询机构下的的所有操作人
+					var obj = $(this);
+					$.ajax({
+						  type : 'post', 
+						  async: true,   
+						  contentType : 'application/json',     
+						  dataType : 'json',     
+						  url : '../../getOrgOperators',   
+						  data:JSON.stringify(params),
+						  success : function(data) {
+							  if(data){
+								  var manager = $("#managersName","#dgd_stockinout");
+								  						  
+								  if(manager){
+									  if(data.items.length>0){
+								  		  userDataList = {};
+										  $("#userDataList").empty();
+									  }
+									  $.each(data.items,function(k,v){
+										  var op = $("<option></option>");
+										  op.val(obj.val()+" "+v.opname);
+										  $("#userDataList").append(op);
+										  
+										  userDataList[v.opname] = v.opid;
+				 				  	 }); 
+									}
+							  }else{
+							  	$(document).sgPup({message:'message_info',text: data});
+							  }
+						  } ,     
+						  error : function(res,error) { 
+						  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+						  }    
+						});
+				}
+				
+			  //填充经办人
+			    $.ajax( {
+				  type : 'post', 
+				  async: false,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getOrgOperators',   
+				  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#managersName","#dgd_stockinout");
+						  if(manager){
+							  if(data.items.length>0){
+						  			userDataList = {};
+								  $("#userDataList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(v.opname);
+								  $("#userDataList").append(op);
+								  
+								  userDataList[v.opname] = v.opid;
+							  	 }); 
+							  manager.on('keyup',checkUser);
+							  manager.on('change',function(){
+								  	var strs = this.value.split(" ");
+									 if(userDataList[strs[strs.length-1]]){
+											$(this).val(strs[strs.length-1]);
+											$("#managersId","#dgd_stockinout").val(userDataList[strs[strs.length-1]]);
+											if($("#managersId","#dgd_stockinout").val().length==0){
+												$("#managersName","#dgd_stockinout").val("");
+											}
+									    }else{
+									    	$(this).val('');
+									    	$("#managersId","#dgd_stockinout").val("");
+									    }
+									
+								});
+
+							};
+					  }else{
+					  	$(document).sgPup({message:'message_info',text: data});
+					  }
+				  },     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+				
+				
+				//复制一个导出->打印,再把它插入到原来导出的后面
+				  $("#dgd_stockinout .sDiv>.pGroup:eq(1)").clone().insertAfter($("#dgd_stockinout .sDiv>.pGroup:last"));
+				  $("#dgd_stockinout .sDiv>.pGroup:last a.button").attr('id','aprint');
+				  $("#dgd_stockinout .sDiv>.pGroup:last span.button_span span").html('打印');
+				  //打印
+				 $('#aprint').on('click',function(){
+					 //$('#ifm_print_rso_m').attr('src','stock_print2.html');
+					    var	sName='winPrint';
+       					var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+       					if (isChrome){
+       					  sName='ifm_print_rso_m';
+       					}
+       					window.open('../whs/print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+       					if (!isChrome){
+       						//新增遮罩层
+       		  				var mask=$('<div id="print_mask"></div>');
+       		  				mask.addClass('window-mask');
+       		  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+       		  		        var span=$('<span></span');
+       		  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+       		  		        span.text('正在打印中...');
+       		  		        mask.append(span);
+       		  			    $(window.document.body).append(mask);
+   					    } 
+				 });
+    		   
+	})(jQuery)
+	
+	//打印页面元素设置
+  var callback=function(subWinBody,subWin){
+	 var wareHouseName=null;//仓库名称
+		//得到仓库名称
+	         $.ajax({
+			  type : 'POST', 
+			  async: false,   
+			  url : '../../stock/getWarehouseName', 
+			  dataType : 'json',  
+			  data:{},
+			  success : function(data) {
+				  if(data){
+					wareHouseName=data.name;
+				  }else{
+					wareHouseName='&nbsp;';
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }   
+			  
+		    });
+	        if(!wareHouseName){
+	        	wareHouseName='&nbsp;';
+	        }
+	         //查询数据
+	        var param={};
+	     	var type2=$('#dgd_stockinout select[name=type2]').val();
+	     	var titleType="代理商进销存明细";
+	     	var tdStr='<td style="width: 10%;" axis="channelName">代理商</td>';
+	     	var countBefColumns=6;//合计前的列数
+			if(type2==1){//个人 
+				titleType="个人进销存明细";
+				tdStr='<td style="width: 5%;" axis="borrowerName">借用人</td>'+tdStr;
+				tdStr=tdStr+'<td style="width: 5%;" axis="customerName">最终客户</td>';
+				param.borrowerId=$('#dgd_stockinout input[name=managersId]').val();
+				countBefColumns=8;
+			}else{
+				param.channelId=$('#dgd_stockinout input[name=managersId]').val();
+			}
+			var productId=$('#dgd_stockinout input[name=productId]').val();
+			param.type2=type2;
+			param.remark='1';
+	 		param.startDate=$("input[name=startDate]").val();
+	 		param.endDate=$("input[name=endDate]").val();
+			param.productId=productId;
+			param.whsId=$('#dgd_stockinout select[name=whsId]').val();
+			
+	 		var resultData=null;//查询结果数据
+	 		 $.ajax({
+	 	            type: "POST",
+	 	            async:false,
+	 	            contentType : 'application/json',
+	 	            url: '../../stock/findBorrows',
+	 	            data: JSON.stringify(param),
+	 	            dataType : 'json',
+	 	            success: function(data){
+	 	            	resultData=data;
+	 	            } ,     
+	 	  		  error : function(res,error) { 
+	 	 		  }  
+	 	        });
+	 debugger;
+	$.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCurrentCompany',   
+		  data:JSON.stringify({}),
+		  success : function(data) {
+			  if(data){
+				  var total = 0;
+				  //公司中文名字
+				  $("#cname",subWinBody).empty();
+				  $("#cname",subWinBody).append(data.cnfullname);
+				  //公司英文名字
+				  $("#ename",subWinBody).empty();
+				  $("#ename",subWinBody).append(data.enfullname);
+				  //表单名字
+				  $("#orderTitle",subWinBody).empty();
+				  $("#orderTitle",subWinBody).append(titleType);
+				  //表单日期
+				  $("#orderDate",subWinBody).empty();
+				  $("#orderDate",subWinBody).append(new Date().format('yyyy-MM-dd'));
+				  //表单单号
+				  $("#orderNo",subWinBody).empty();
+				  $("#orderNo",subWinBody).append('&nbsp;');
+				  
+				  //表前输入单
+				  var outWhs ='<span style="width:10%;">仓库：</span>';
+				  outWhs=outWhs+'<div style="width:23%;">'+wareHouseName+'</div>';
+				 
+				  $("#headInput",subWinBody).append(outWhs);
+				  
+				  var startDate = '<span style="width:10%;">开始日期：</span>';
+				  var startDateVal='&nbsp;';
+				  if($("input[name=startDate]").val()){
+					  startDateVal=$("input[name=startDate]").val();
+				  }
+				  startDate=startDate+'<div style="width:23%;">'+startDateVal+'</div>';
+				  $("#headInput",subWinBody).append(startDate);
+				  
+				  var endDate = '<span style="width:10%;">结束日期：</span>';
+				  endDate = endDate+'<div style="width:23%;">'+$("input[name=endDate]").val()+'</div>';
+				  $("#headInput",subWinBody).append(endDate);
+				  
+				  //表头
+				  $("#tbHead",subWinBody).append('<td style="width: 4%;" axis="rownumbers"><div>序号</div></td>'+
+						  									tdStr+
+														  '<td style="width: 8%;" axis="stamp"><div>时间</div></td>'+
+														  '<td style="width: 10%;" axis="productName"><div>商品编码</div></td>'+
+														  '<td style="width: 10%;" axis="productName"><div>商品名称</div></td>'+
+														  '<td style="width: 15%;" axis="norm"><div>商品规格</div></td>'+
+														  '<td style="width: 6%;" axis="borrowNum"><div>借用数量</div></td>'+
+														  '<td style="width: 5%;" axis="returnNum"><div>已还库数量</div></td>'+
+														  '<td style="width: 5%;" axis="writeoffsNum"><div>已销账数量</div></td>'+
+														  '<td style="width: 5%;" axis="writeoffsNum2"><div>已核销数量</div></td>'+
+														  '<td style="width: 6%;" axis="num"><div>未还库数量</div></td>'+
+														  '<td style="width: 5%;" axis="whsName"><div>仓库</div></td>');
+				  
+				  if(resultData){
+					//列头
+		           		var colModel=[];
+		           		colModel.push({name:'rownumbers'});
+		           		
+		           		if(type2==1){//个人
+		           			colModel.push({name: 'borrowerName'});
+		           			colModel.push({name: 'channelName'});
+		           			colModel.push({name: 'customerName'});
+		           		}else{//代理商
+		           			colModel.push({name: 'channelName'});
+		           		}
+		           		colModel.push({name:'stamp'});
+		           		colModel.push({name:'productCode'});
+		           		colModel.push({name:'productName'});
+		           		colModel.push({name:'norm'});
+		           		colModel.push({name:'borrowNum'});
+		           		colModel.push({name:'returnNum'});
+		           		colModel.push({name:'writeoffsNum'});
+		           		colModel.push({name:'writeoffsNum2'});
+		           		colModel.push({name:'num'});
+		           		colModel.push({name:'whsName'});
+		           		
+		           	   var tr=null;
+		    	        var td=null;
+		    	        var borrowNumTotal = 0;
+		    	        var returnNumTotal = 0;
+		    	        var writeoffsNumTotal = 0;
+		    	        var writeoffsNumTotal2 = 0;
+		    	        var numTotal = 0;
+		    	        $.each(resultData,function(i,row){
+		    	            tr = '<tr>';
+		                	$.each(colModel,function(k,v){
+		                		td ='<td>';
+		    	                var tdx = v.name;
+
+		    	            	if(tdx=='rownumbers'){
+		    	                 	var num = i+1;
+		    	                 	td=td+num+'</td>';              	
+		    	                 }else{
+		    	                	 td=td+row[tdx];
+		    	                	 td=td+'</td>';
+		    	                	 if(tdx=='borrowNum'){
+		    	                		 borrowNumTotal=Number(borrowNumTotal)+Number(row[tdx]);
+		    	                	 }else if(tdx=='returnNum'){
+		    	                		 returnNumTotal=Number(returnNumTotal)+Number(row[tdx]);
+		   		    	              
+		    	                	 }else if(tdx=='writeoffsNum'){
+		    	                		 writeoffsNumTotal=Number(writeoffsNumTotal)+Number(row[tdx]);
+		   		    	              
+		    	                	 }else if(tdx=='writeoffsNum2'){
+		    	                		 writeoffsNumTotal2=Number(writeoffsNumTotal2)+Number(row[tdx]);
+		   		    	              
+		    	                	 }else if(tdx=='num'){
+		    	                		 numTotal=Number(numTotal)+Number(row[tdx]);
+		   		    	              
+		    	                	 }
+		    	                 }
+		    	           
+		    	            	tr=tr+td;
+		                	});
+		                	tr=tr+'</tr>';
+		                	$("#tbBody",subWinBody).append(tr);
+		    	        });
+		    	        
+		    	        if(resultData.length>0){
+							  //表合计
+							  var tbfoot = '<tr>';
+							  tbfoot=tbfoot+'<td colspan="'+countBefColumns+'"><div style="text-align:right">小计:</div></td>';
+							  tbfoot=tbfoot+'<td colspan="1">'+borrowNumTotal+'</td>';
+							  tbfoot=tbfoot+'<td colspan="1">'+returnNumTotal+'</td>';
+							  tbfoot=tbfoot+'<td colspan="1">'+writeoffsNumTotal+'</td>';
+							  tbfoot=tbfoot+'<td colspan="1">'+writeoffsNumTotal2+'</td>';
+							  tbfoot=tbfoot+'<td colspan="1">'+numTotal+'</td>';
+							  tbfoot=tbfoot+'<td colspan="1"></td>';
+							  tbfoot=tbfoot+'</tr>';
+							  $("#tbBody",subWinBody).append(tbfoot);
+						  }
+				  }
+				  
+				  //表尾输入单
+				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+													  '<span>复核人：</span><div>&nbsp;</div>'+
+													  '<span>仓管员：</span><div>&nbsp;</div>'+
+													  '<span>制单：</span><div>&nbsp;</div>');
+				  
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+	
+    if (navigator.appName == 'Microsoft Internet Explorer'){
+    	subWin.print();  
+    }else{ 
+    	subWin.focus();
+    	subWin.print();  
+    }
+}
+	
+	 //归还信息窗口加载成功后
+    var returnsWinLoad = function(){
+    	if($('#dgd_stockindetails').get(0)){
+        	var query={productId:borrowDetailsObj.productId,borrowId:borrowDetailsObj.borrowId};
+        	$('#dgd_stockindetails').sgDatagrid('reload',{url:'../../stock/findAllStockIn4Report',query:query});
+    	}
+ 	}
+    //销账信息窗口加载成功后
+    var writeoffxzWinLoad = function(){
+    	if($('#dgd_writeoffxzdetails').get(0)){
+        	var query={productId:borrowDetailsObj.productId,borrowId:borrowDetailsObj.borrowId};
+        	$('#dgd_writeoffxzdetails').sgDatagrid('reload',{url:'../../stock/findWriteoffsAndDetails4Xz',query:query});
+        	
+        	//商品名称列、规格列赋值
+    		var productNameDiv=$('#dgd_writeoffxzdetails table tr:not(:last) td:nth-child(4)');
+    		var normDiv=$('#dgd_writeoffxzdetails table tr:not(:last) td:nth-child(5)');
+    		$('div',productNameDiv).html(borrowDetailsObj.productName);
+    		$('div',normDiv).html(borrowDetailsObj.norm);
+    	}
+ 	}
+    //销账信息窗口加载成功后
+    var writeoffWinLoad = function(){
+    	if($('#dgd_writeoffdetails').get(0)){
+        	var query={productId:borrowDetailsObj.productId,borrowId:borrowDetailsObj.borrowId};
+        	$('#dgd_writeoffdetails').sgDatagrid('reload',{url:'../../stock/findWriteoffsAndDetails',query:query});
+        	
+        	//商品名称列、规格列赋值
+    		var productNameDiv=$('#dgd_writeoffdetails table tr:not(:last) td:nth-child(4)');
+    		var normDiv=$('#dgd_writeoffdetails table tr:not(:last) td:nth-child(5)');
+    		$('div',productNameDiv).html(borrowDetailsObj.productName);
+    		$('div',normDiv).html(borrowDetailsObj.norm);
+    	}
+ 	}
+    //查询归还明细
+   	function findReturns(borrowDetailsObj1){
+    	if(borrowDetailsObj1){
+	   		borrowDetailsObj1=borrowDetailsObj1.split(',');
+	   		borrowDetailsObj={};
+	   		borrowDetailsObj.borrowId=borrowDetailsObj1[1];
+	   		borrowDetailsObj.productId=borrowDetailsObj1[2];
+	   		borrowDetailsObj.productCode=borrowDetailsObj1[3];
+	   		borrowDetailsObj.productName=borrowDetailsObj1[4];
+	   		borrowDetailsObj.norm=borrowDetailsObj1[5];
+	   		var type=borrowDetailsObj1[0];
+	   		var defaults=null;
+	   		if(type==1){
+		         defaults = {
+			                title:'归还入库信息',
+			                id:'win_returns',
+			                url:'web/rp/stockin_details.html',
+			                success: returnsWinLoad,
+			                width: 828,
+			                height: 425,
+			                buttons : [
+			                           {name: '关闭', type: 'button', onpress : function (){
+			                               $(document).sgWindow('close',{id:'win_returns'});
+			                            }
+			                           }
+			                       ]
+			            };
+	   		}else if(type==2){
+		         defaults = {
+			                title:'销账信息',
+			                id:'win_returns',
+			                url:'writeoffxz_details.html',
+			                success: writeoffxzWinLoad,
+			                width: 828,
+			                height: 425,
+			                buttons : [
+			                           {name: '关闭', type: 'button', onpress : function (){
+			                               $(document).sgWindow('close',{id:'win_returns'});
+			                            }
+			                           }
+			                       ]
+			            };
+	   		}else if(type==3){
+	             defaults = {
+		                title:'核销信息',
+		                id:'win_returns',
+		                url:'writeoff_details.html',
+		                success: writeoffWinLoad,
+		                width: 828,
+		                height: 425,
+		                buttons : [
+		                           {name: '关闭', type: 'button', onpress : function (){
+		                               $(document).sgWindow('close',{id:'win_returns'});
+		                            }
+		                           }
+		                       ]
+		            };
+		}
+		$(document).sgWindow(defaults);
+ 	
+	 }
+    }
+</script>
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>机构详细信息</title>
+</head>
+<body>
+	<form id='company_detail' method='post' class="form" style="width:100%;">
+		<input type="hidden" id="cust_companyno" name="cust_companyno" /> 
+		<div class='title'>详细信息</div>
+		<fieldset style="width:100%;">
+            <div class="panel">
+            	<div class="row">
+            		<span class="col-xs-2">机构名称:</span>
+            		<span class="col-xs-6">
+                		<input type='text' id="companyname" name='companyname' required="true" class="form-control" />
+                	</span>
+            	</div>
+            </div>
+            <div class="panel">
+            	<div class="row">
+	                <span class="col-xs-2">排序:</span>
+	                <span class="col-xs-6">
+	                	<input type='number' value="0" id="order" name='order' required="true" class="form-control" />
+	                </span>
+	            </div>
+            </div>
+            <div class="panel">
+            	<div class="row">
+	                <span class="col-xs-2">备注:</span>
+	                <span class="col-xs-6">
+	                	<input type='text' id="remark" name='remark' class="form-control" />
+	                </span>
+	            </div>
+            </div>
+            <br>
+            <br>
+            <br>
+            <br>
+        </fieldset>
+        
+        <fieldset style="width:100%;border-top:0px;">	
+	        <div class='submit' style="text-align:left;">
+	            <button id="company_add" type="button" class="btn btn-primary btn-xs" onclick="addItem();">添加机构</button>
+				<button id="company_del" type="button" class="btn btn-primary btn-xs" onclick="delItem();">删除机构</button>
+				<button id="company_save" type="submit" class="btn btn-primary btn-xs" onclick="save();">保存</button>
+				<button id="company_account" type="button" class="btn btn-primary btn-xs" onclick="accountItem();" style="width:120px;">添加机构子账号</button>
+				<input type="reset" style="display:none;" />
+	        </div>
+        </fieldset>
+
+	</form>
+</body>
+
+<script type="text/javascript">
+	function loadSuccess() {
+		$('#parentid', '#company_add_window').val($('#cust_companyno').val());
+		$('#parentname', '#company_add_window').val($('#companyname').val());
+	}
+	
+	function loadSuccess2() {
+		$('#customer_name', '#account_add_window').val($('#companyname').val());
+	}
+
+	function addCompany() {
+		$("#company_add_form").on('submit',
+				function(e) {
+		$.ajax({
+			type : 'post',
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : '../../company/add',
+			data : JSON.stringify({
+				parentcompanyno : $('#parentid', '#company_add_window').val(),
+				companyname : $('#companyname', '#company_add_window').val(),
+				order : $('#order', '#company_add_window').val(),
+				companycode : $('#remark', '#company_add_window').val(),
+				companytype : 10
+			}),
+			success : function(data) {
+				if (data) {
+					if (data.success) {
+						$(document).sgWindow('close', {
+							id : 'company_add_window'
+						});
+						$('#cust_left').empty();
+						var defaults = {
+				       		isexpend: true,
+				       		url: '../../company/tree',
+				            data : JSON.stringify({
+				            	companyname : $('#customer_name').val()
+							}),
+				            root: '集团机构列表',
+				            onclick: myclick
+				        };
+				        $('#cust_left').sgTree(defaults);
+					}
+			        $(document).sgPup({message:'message_alert',text: data.msg});
+				}
+			},
+			error : function(res, error) {
+				$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+					+ ";error=" + error});
+			}
+		});
+		$('#company_add_form').unbind();//以下两行可以阻止提交2次
+		e.stopPropagation();
+		return false;
+		});
+	}
+
+	function closeCompany() {
+		$(document).sgWindow('close', {
+			id : 'company_add_window'
+		});
+	}
+	
+	function addAccount() {
+		$("#account_add_form").on('submit',
+				function(e){
+			var server_pwd = $('#server_pwd','#account_add_window').val();
+			var confirm_pwd = $('#confirm_pwd','#account_add_window').val();
+			if(server_pwd!=confirm_pwd){
+				$(document).sgPup({message:'message_alert',text: '输入两次密码必须相同!'});
+				return false;
+			}
+			var account = $('#account','#account_add_window').val();
+			var confirm_account = $('#confirm_account','#account_add_window').val();
+			if(account!=confirm_account){
+				$(document).sgPup({message:'message_alert',text: '输入两次银行账号必须相同!'});
+				return false;
+			}
+			var linkmans = $('input[name=linkman]','#account_add_window');
+			var phones = $('input[name=phone]','#account_add_window');
+			var remarks = $('input[name=remark]','#account_add_window');
+			var custphones = new Array();
+			$('select[name=phone_type]','#account_add_window').each(function(k,v){
+				var obj = {};
+				obj.linkman = linkmans[k].value;
+	        	obj.phone = phones[k].value;
+	        	obj.linkman_type = $(this).val();
+	        	obj.title = remarks[k].value;
+	        	custphones.push(obj);
+			});
+			
+			var account = $('#account','#account_add_window').val();
+			while(account.indexOf(" ")!=-1){
+				account = account.replace(" ","");
+			}
+			var ac_id_no = $("#ac_id_no",'#account_add_window').val();
+			while(ac_id_no.indexOf(" ")!=-1){
+				ac_id_no = ac_id_no.replace(" ","");
+			}
+			$.ajax({
+				type : 'post',
+				async : false,
+				contentType : 'application/json',
+				dataType : 'json',
+				url : '../../addChildlargeCust',
+				data : JSON.stringify({
+					companyno : $('#cust_companyno').val(),
+					loginname : $('#register','#account_add_window').val(),
+					server_pwd : $('#server_pwd','#account_add_window').val()==''?'123456':$('#server_pwd','#account_add_window').val(),
+					customer_name : $('#customer_name','#account_add_window').val(),
+					cust_address : $('#cust_address','#account_add_window').val(),
+					email : $('#email','#account_add_window').val(),
+					vip : $('#vip option:selected','#account_add_window').val(),
+					trade : $('#trade option:selected','#account_add_window').val(),
+					fileno : $("#fileno",'#account_add_window').val(),
+					location : $('#location','#account_add_window').val(),
+					remark : $('#cust_remark','#account_add_window').val(),
+					custphones : custphones,
+					account : account,
+					collection_name : $('#collection_name','#account_add_window').val(),
+					agency : $('#child_agency','#account_add_window').val(),
+					bank : $('#child_bank option:selected','#account_add_window').text(),
+					bankcode : $('#child_bank','#account_add_window').val(),
+					type : $('#account_type option:selected','#account_add_window').val(),
+					is_delivery : $("input[name='is_delivery']:checked",'#account_add_window').val(),
+					is_guarantee : $("input[name='is_guarantee']:checked",'#account_add_window').val(),
+					addressee : $('#addressee','#account_add_window').val(),
+					post_code : $("#post",'#account_add_window').val(),
+					pay_ct_no : $("#pay_ct_no",'#account_add_window').val(),
+					tel : $("#tel",'#account_add_window').val(),
+					ac_id_no : ac_id_no,
+					province : $('#province','#account_add_window').val(),
+					city : $('#city','#account_add_window').val(),
+					area : $('#area','#account_add_window').val(),
+					manager : $('#managerName2','#account_add_window').val(),
+					managerid : $('#managerId2','#account_add_window').val(),
+					address : $("#address",'#account_add_window').val()
+				}),
+				success : function(data) {
+					if (data) {
+						$(document).sgPup({message:'message_alert',text: data.msg});
+						$(document).sgWindow('close', {
+							id : 'account_add_window'
+						});
+					}
+				},
+				error : function(res, error) {
+					$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+						+ ";error=" + error});
+				}
+			});
+			$('#account_add_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		});
+	}
+
+	function closeAccount() {
+		$(document).sgWindow('close', {
+			id : 'account_add_window'
+		});
+	}
+
+	function addItem() {
+		if ($('#cust_companyno').val() == '') {
+			$(document).sgPup({message:'message_alert',text: '请先选择一个机构做为父机构再添加机构.'});
+			return;
+		}
+		var defaults = {
+			title : '添加机构',
+			id : 'company_add_window',
+			form : 'company_add_form',
+			url : 'custcompany_add.html',
+			success : loadSuccess,
+			width : 400,
+			height : 180,
+			buttons : [ {
+				name : '确定',
+				type : 'submit',
+				onpress : addCompany
+			}, {
+				name : '取消',
+				onpress : closeCompany
+			} ]
+		};
+		$(document).sgWindow(defaults);
+	}
+	
+	function accountItem() {
+		if ($('#cust_companyno').val() == '') {
+			$(document).sgPup({message:'message_alert',text: '请先选择一个机构.'});
+			return;
+		}
+		var titleStr = $('#companyname').val()+'机构子账号';
+		var defaults = {
+			title : titleStr,
+			id : 'account_add_window',
+			form : 'account_add_form',
+			url : 'account_add.html',
+			success : loadSuccess2,
+			width : 890,
+			height : 430,
+			buttons : [ {
+				name : '确定',
+				type : 'submit',
+				onpress : addAccount
+			}, {
+				name : '取消',
+				onpress : closeAccount
+			} ]
+		};
+		$(document).sgWindow(defaults);
+	}
+	
+	function delItem() {
+		if ($('#cust_companyno').val() == '') {
+			$(document).sgPup({message:'message_alert',text: '请选择要删除的机构.'});
+			return;
+		}
+		
+		$(document).sgConfirm({
+			title:'提示',
+			text: '确定删除吗?',
+			cfn:function(r){
+				if(r){
+					$.ajax( {
+			      		  type : 'post', 
+			      		  async: false,   
+			      		  contentType : 'application/json',     
+			      		  dataType : 'json',     
+			      		  url : '../../company/delete',   
+			      		  data:JSON.stringify({
+			      			companyno : $('#cust_companyno').val()
+						  }),
+			      		  success : function(data) {
+			      			  if(data){
+			      				 if(data.success){
+			      					$('#cust_left').empty();
+									var defaults = {
+							       		isexpend: true,
+							       		url: '../../company/tree',
+							            data : JSON.stringify({
+							            	companyname : $('#customer_name').val()
+										}),
+							            root: '集团机构列表',
+							            onclick: myclick
+							        };
+							        $('#cust_left').sgTree(defaults);
+									$("input[type=reset]").trigger("click");//触发reset按钮
+			      				 }
+			      				 $(document).sgPup({message:'message_alert',text: data.msg});
+			      			  }
+			      		  } ,     
+			      		  error : function(res,error) { 
+			      			 $(document).sgPup({message:'message_alert',text: "responseText="+res.responseText+";error="+error});    
+			      		  }    
+			      		});
+				}
+		}});
+	}
+
+	function save() {
+		$("#company_detail").on('submit',
+				function(e) {
+		if ($('#companyname').val() == '') {
+			$(document).sgPup({message:'message_alert',text: "机构名称不能为空!"});
+			return;
+		}
+		//做表单提交
+		$.ajax({
+			type : 'post',
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : '../../company/update',
+			data : JSON.stringify({
+				companyno : $('#cust_companyno').val(),
+				companyname : $('#companyname').val(),
+				order : $('#order').val(),
+				companycode : $('#remark').val()
+			}),
+			success : function(data) {
+				if (data) {
+					if (data.success) {
+						$('#cust_left').empty();
+						var defaults = {
+				       		isexpend: true,
+				       		url: '../../company/tree',
+				            data : JSON.stringify({
+				            	companyname : $('#customer_name').val()
+							}),
+				            root: '集团机构列表',
+				            onclick: myclick
+				        };
+				        $('#cust_left').sgTree(defaults);
+					}
+					$(document).sgPup({message:'message_alert',text: data.msg});
+				}
+			},
+			error : function(res, error) {
+				$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText + ";error=" + error});
+			}
+		});
+		$('#company_detail').unbind();//以下两行可以阻止提交2次
+		e.stopPropagation();
+		return false;
+		});
+	}
+</script>
+</html>

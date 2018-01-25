@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>销售合同查看</title>
+</head>
+<body>
+	<form id='sel_contract_edit_form' method='post' class="form" style="width:880px;">
+		<div class='title'>销售合同信息></div>
+		<fieldset style="width:860px;">
+            <div class="panel">
+                <span>合同名称:</span>
+                <input type='text' id="code" name='code' style="width:165px;" disabled="disabled"/>
+                
+                <span>合同名称:</span>
+                <input type='text' id="name" name='name' style="width:165px;" disabled="disabled"/>
+                
+                <span>代理商名称:</span>
+                <input type='text' id="channelName" name='channelName' disabled="disabled" style="width:155px;" />                
+            </div>          
+            <div class="panel">
+                <span>联系电话:</span>
+                <input type='text' id="phone" name='phone' disabled="disabled" style="width:165px;" />
+                
+                <span>签约人:</span>
+                <input type="text" name="contractorName" id="contractorName" list="contractorList" disabled="disabled" style="width:165px;" autocomplete="on" />
+                
+                <span>签订日期:</span>
+                <input type='text' id="signDate" name='signDate' disabled="disabled" style="width:155px;" />            
+            </div>
+            <div class="panel">
+                <span>生效日期:</span>
+                <input type='text' id="validDate" name='validDate' disabled="disabled" style="width:165px;" />
+                
+                <span>到期日期:</span>
+                <input type='text' id="matureDate" name='matureDate' disabled="disabled" style="width:165px;" />
+
+            </div>
+          <!--   <div class="panel">
+                <span>备注:</span>
+                <input type="text" name="remark" id="remark" disabled="disabled" style="width:685px;" />
+            </div> -->
+        </fieldset>
+
+        <div class="title">合同产品列表></div>
+		<fieldset class='fieldset' style="width:98.9%;">
+            <div id="sel_contract_detail_grid" class="datagird"></div>
+        </fieldset>
+        
+        <div class="title">销售套餐列表></div>
+		<fieldset class='fieldset' style="width:98.9%;">
+            <div id="sel_contract_pack_grid" class="datagird"></div>
+        </fieldset>
+<!--
+        <fieldset style="width:860px;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="order_detail_close" type="button" >关闭</button>
+	        </div>
+        </fieldset>
+  -->
+	</form>
+</body>
+</html>

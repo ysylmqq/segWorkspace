@@ -1,0 +1,121 @@
+ @CHARSET "UTF-8";
+ .body-panel {
+  margin: 0;
+  padding: 5px;
+  height: 100%;
+  font-family: Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+  color: #333333;
+  background: #e2e5ec;
+  border: 1px solid #CFCFCF;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  min-width: 710px;
+ }
+ .panel-heading {
+  height: 33px;
+  vertical-align: middle;
+ }
+
+ .panel-body{
+  /*padding: 10px;*/
+  padding: 0;
+  background-color: transparent;
+ }
+
+ .modal-header {
+  height: 35px;
+  padding: 8px;
+ }
+
+ .noborder {
+  border: none !important;
+  border: hidden !important;
+ }
+
+ .nogap {
+  margin: 0 !important;
+  padding: 0 !important;
+ }
+
+ .nogap-bottom {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+ }
+
+ .nogap-top {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+ }
+ .nogap-left {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+ }
+ .nogap-right {
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+ }
+
+ .nobreak {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+ }
+
+ .nobgcolor {
+  background-color: transparent !important;
+ }
+
+ .selected, .selected * {
+  background-color: #ccc !important;
+ }
+
+ .closeit {
+  line-height: 15px;
+ }
+
+ .form_datetime{
+  min-width: 130px;
+ }
+
+.col-xs-1,.col-xs-2,.col-xs-3,.col-xs-4,.col-xs-5,.col-xs-6,.col-xs-7,.col-xs-8,.col-xs-9,.col-xs-10,.col-xs-11,.col-xs-12{
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+input[type=text]{
+  /*width:260px;*/
+  height:24px;
+  padding:0 3px 0 2px;
+  font-size: 12px;
+  color: #000;
+}
+
+.form span {
+  /*width: 34%;*/
+    /*padding-top: 3px;*/
+  text-align: right;
+  /*padding-right: 1%;*/
+  display:inline-block;
+  line-height: 24px;
+  vertical-align:middle;
+}
+
+.label{
+  margin-left:14px;
+  font-size: 12px;
+  color: #000;
+}
+
+.title{
+  text-align: right;
+  line-height: 24px;
+  padding-right: 0;
+}
+
+.line{
+  margin-bottom: 7px;
+}
+hr {
+  border-top: solid #CBCBD5 1px;
+}

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>采购入库查看明细</title>
+<style>
+	.fieldset {
+	background:#f2f2e6; 
+	padding:10px; 
+	border:1px solid #fff; 
+	border-color:#666661 #666661 #666661 #666661; 
+	margin-bottom:3px; 
+	width:600px;
+}
+
+.legend {
+	background:#bfbf30; 
+	color:#fff; 
+	font:17px/21px Calibri, Arial, Helvetica, sans-serif; 
+	padding:0 10px; 
+	font-weight:bold; 
+	border:1px solid #fff; 
+	border-color:#e5e5c3 #505014 #505014 #e5e5c3;
+}
+</style>
+</head>
+<body>
+	<form id='whs_stockin_edit_form' style="width:920px;">
+		<div class="form">
+			<fieldset style="width:910px;">
+	            <legend>入库数据</legend>
+	            <div>
+	                <span>类型:</span>
+	                <select size="1" name="purchaseType" id="purchaseType" required="true" autocomplete="on" disabled="disabled">
+	                    <option value="">--请选择--</option>
+	                    <option value="0" selected='true'>采购</option>
+						<option value="1">报废</option>
+						<option value="2">调拨</option>
+						<option value="3">退货</option>
+						<option value="4">回收</option>
+						<option value="5">归还</option>
+	                </select>
+	            
+	                <span>经办人:</span>
+	                <select size="1" name="purchaseManagersId" id="purchaseManagersId" required="true"  autocomplete="on" disabled="disabled">
+	                    <option value="" selected>--请选择--</option>
+	                </select>
+	            </div>
+	            <div>    
+	                <span>归还仓库:</span>
+	                <select size="1" name="purchaseInWhsId" id="purchaseInWhsId"  required="true"  autocomplete="on" disabled="disabled">
+	                    <option value="" selected>--请选择--</option>
+	                </select>
+	   
+	                <span>入库单号:</span>
+	                <input type='number' id="purchaseStockInNo" disabled="disabled" name='purchaseStockInNo' required="true" placeholder="只允许数字" pattern="^[+]?[1-9]+\d*$"  onkeyup="this.value=this.value.replace(/\D/g,'')" />
+	            </div>
+	            <div id="for_add_div">                
+	                <span>入库日期:</span>
+	                <input type='date' id="purchaseStamp" disabled="disabled" name='purchaseStamp' required="true" style="width:315px;" />
+	                
+	                <span id="for_add_span">采购单号:</span>
+	                <input type='number' id="purchaseNO" disabled="disabled" name='purchaseNO' placeholder="只允许数字" required="true" pattern="^[+]?[1-9]+\d*$"  onkeyup="this.value=this.value.replace(/\D/g,'')" />
+	   
+	            </div>
+	            <div>    
+	                <span>备注:</span>
+	                <input type='text' id="purchaseRemark" disabled="disabled" name='purchaseRemark' style="width:760px;" />
+	            </div>
+	        </fieldset>
+        </div>
+		<fieldset class='fieldset' style="width:910px;height:200px;">
+            <legend class='legend'>入库明细</legend>
+                <div id="whs_stockin_edit_grid" class="datagrid" ></div>
+            </div>
+        </fieldset>
+        <!-- 
+        <fieldset style="width:940px;">	
+	        <div class='submit'>
+	            <button id="mysub" type="button" >提交</button> <button id="mycancel" type="reset">重置</button>
+	        </div>
+        </fieldset>
+         -->
+	</form>
+</body>
+<script type="text/javascript">
+	(function($){
+		//填充商品
+		$.ajax( {
+  		  type : 'post', 
+  		  async: false,
+  		  contentType : 'application/json',     
+  		  dataType : 'json',     
+  		  url : '../../product/findAllProducts ', 
+  		  data:JSON.stringify({}),
+  		  success : function(data) {
+  			  if(data){
+  				  var product=$("#product");
+  				  if(product){
+  					  $.each(data,function(k,v){
+  					  	product.append("<option value='" +v.productId+"'>" + v.name+"</option>");
+      				  }); 
+  				  }
+  				 
+  			  }else{
+  				  $(document).sgPup({message:'message_info',text: data});
+  			  }
+  		  } ,     
+  		  error : function(res,error) { 
+  		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+  		  }    
+  		});
+		
+		//填充员工
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getOrgOperators',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true }}),
+		  success : function(data) {
+			  if(data){
+				  //alert(JSON.stringify(data));
+				  var managerId=$("#purchaseManagersId");
+				  if(managerId ){
+					  $.each(data,function(k,v){
+						  managerId.append("<option value='" +v.opid+"'>" + v.opname+"</option>");
+ 				  }); 
+				  }
+				 
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+		
+		//填充入库仓库
+	    $.ajax( {
+	 		  type : 'post', 
+	 		  async: false,   
+	 		  contentType : 'application/json',     
+	 		  dataType : 'json',     
+	 		  url : '../../stock/findWareHouses',   
+	 		  data:JSON.stringify({}),
+	 		  success : function(data) {
+	 			  if(data){
+	 				  //alert(JSON.stringify(data));
+	 				  var inWhsId=$("#purchaseInWhsId");
+	 				  if(inWhsId){
+	 					  $.each(data,function(k,v){
+	 						  inWhsId.append("<option value='" +v.id+"'>" + v.name+"</option>");
+	     				  }); 
+	 				  }
+	 				 
+	 			  }else{
+	 				  $(document).sgPup({message:'message_info',text: data});
+	 			  }
+	 		  } ,     
+	 		  error : function(res,error) { 
+	 		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	 		  }    
+	 		});
+
+	})(jQuery)
+</script>
+</html>

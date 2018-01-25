@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>仓库盘点</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+
+<body>
+<div id="nw_document_all">
+ <div id="dgd_check" class="datagrid"></div>
+</div>
+ <!-- 打印iframe -->
+	<iframe id="ifm_print_wcheck_m" name="ifm_print_wcheck_m" style="display: none"></iframe>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+    var printSource=1;//1:盘点录入,2:审核,3:调账，4：查看
+    var stockOut4ChangeNum=null;//调账出库后的数据
+    (function($){
+    	
+       var editId=null;//编辑时选中行ID
+       var editObj=null;//编辑时选中行对象
+       var isView=false;//是否是查看
+ 	   var loadSuccess = function(){
+    	   	//修改form的id
+ 			$('#win_check #dgd_check_details .sDiv form').attr('id','form_check');
+    	   	//设置提交按钮的表单
+ 			$('input:submit','#win_check').attr('form','form_check');
+ 			//设置提交按钮的的宽度
+ 			$('input:submit:eq(1)','#win_check').width(120);
+    	   	//录入
+    	   if(editObj&&editId){
+    		   var param={};
+    		   param.id=editId;
+    		   if(editObj.status==3){//要进行调账,默认查询账不平的商品
+    			   param.flat='2';
+    		   }
+    		   $.ajax( {
+          		  type : 'POST', 
+          		  async: false,   
+          		  contentType : 'application/json',     
+          		  dataType : 'json',     
+          		  url : '../../sell/getCheckAndDetails',  
+          		  data:JSON.stringify(param),
+          		  success : function(data) {
+          			  if(data){
+          				      $("input[name=id]",$("#dgd_check_details .sDiv")).val(data.id);
+        	   				  $("input[name=name]",$("#dgd_check_details .sDiv")).val(data.name);
+        	   				  var startDate=data.startDate;
+        	   				  if(startDate && startDate.length>10){
+        	   					startDate=startDate.substring(0,10);
+        	            	  }
+        	   				  var endDate=data.endDate;
+       	   				 	  if(endDate && endDate.length>10){
+       	   				 		endDate=endDate.substring(0,10);
+       	            	 	  }
+        	   				  $("input[name=startDate]",$("#dgd_check_details .sDiv")).val(startDate);
+        	   				  $("input[name=endDate]",$("#dgd_check_details .sDiv")).val(endDate);
+        	   				  //商品明细
+        	   				  if(data.checkDetailsMap){
+        	   					$('#dgd_check_details').sgDatagrid('appendData',data.checkDetailsMap);
+        	   					if(editObj.status==1||editObj.status==2){//要进行盘点录入
+        	   					    //隐藏商品ID
+            	   				    $('table tr th:nth-child(3),table tr td:nth-child(3)','#dgd_check_details').hide();
+        	   					    //当月未实物盘存修改时，自动设置盈亏数
+            	   					$('input[name=curObjectNum]',$('#dgd_check_details table tr')).on('keyup',function(){
+            	   						//月未帐面结存数量
+            	   						var curSaveNum= $(this).parents('td').prev().find('input[name=curSaveNum]');
+            	   						if(curSaveNum.val()!=''){
+            	   							//自动设置盈亏数
+            	   							$(this).parents('td').nextAll(':eq(0)').find('input[name=overShortNum]').val(Number($(this).val())-Number(curSaveNum.val()));
+            	   						}else{
+            	   							curSaveNum.focus();
+            	   							$(document).sgPup({message:'message_info',text: '请先输入月未帐面结存数量！'});
+            	   						}
+            	   					});
+        	   					}else if(editObj.status==3){//要进行调账
+        	   						//提交并打印调账出库 按钮宽度修改
+        	   						$('input:submit:eq(1)','#win_check').width(140);
+        	   					//隐藏商品ID
+            	   				    $('table tr th:nth-child(2),table tr td:nth-child(2)','#dgd_check_details').hide();
+        	   					}else{
+        	   					//隐藏商品ID
+            	   				    $('table tr th:nth-child(2),table tr td:nth-child(2)','#dgd_check_details').hide();
+            	   				
+        	   					}
+        	   					
+        	   					//查看
+        	   					if(isView){
+        	   						//隐藏本次调账数列
+            	   				    $('table tr th:nth-child(13),table tr td:nth-child(13)','#dgd_check_details').hide();
+            	   				    //备注列的文本框去掉边框
+            	   				    $('input','#dgd_check_details table tr th:nth-child(14),table tr td:nth-child(14)').css({'border':'0px','background-color':'transparent'}).attr('disabled',true);
+        	   				
+        	   					}
+        	   				   
+        	   					//表格的宽度=表头表格的宽度
+        	   		     	    $('#dgd_check_details .bDiv table').width($('#dgd_check_details .hDiv table').width());
+        	   		     	
+        	   				  }
+          			  }
+          		  } ,     
+          		  error : function(res,error) { 
+          		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+          		  }    
+          		}); 
+    	   }else{//生成盘点表
+    	   }
+ 	   }
+ 	  var loadSuccess4View = function(){
+ 		  if(editObj&&editId){
+ 			 var param={};
+  		   param.id=editId;
+ 			 $.ajax( {
+         		  type : 'POST', 
+         		  async: false,   
+         		  contentType : 'application/json',     
+         		  dataType : 'json',     
+         		  url : '../../sell/getCheckAndDetails',  
+         		  data:JSON.stringify(param),
+         		  success : function(data) {
+         			  if(data){
+         				  $("input[name=id]",$("#dgd_check_details .sDiv")).val(data.id);
+       	   				  $("input[name=name]",$("#dgd_check_details .sDiv")).val(data.name);
+	       	   			 var startDate=data.startDate;
+		   				  if(startDate && startDate.length>10){
+		   					startDate=startDate.substring(0,10);
+		            	  }
+    	   				  var endDate=data.endDate;
+   	   				 	  if(endDate && endDate.length>10){
+   	   				 		endDate=endDate.substring(0,10);
+   	            	 	  }
+	   				
+       	   				  $("input[name=startDate]",$("#dgd_check_details .sDiv")).val(startDate);
+       	   				  $("input[name=endDate]",$("#dgd_check_details .sDiv")).val(endDate);
+       	   				  //商品明细
+       	   				  if(data.checkDetailsMap){
+       	   					  $('#dgd_check_details').sgDatagrid('appendData',data.checkDetailsMap);
+       	   					//隐藏商品ID
+           	   				   $('table tr th:nth-child(2),table tr td:nth-child(2)','#dgd_check_details').hide();
+       	   					}
+       	   					
+         			  }
+         		  } ,     
+         		  error : function(res,error) { 
+         		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+         		  }    
+         		}); 
+ 		  }
+ 	  }
+       var winClose = function (){
+          $(document).sgWindow('close',{id:'win_check'});
+       }
+       
+ 	   var save = function(){
+ 		   $("#form_check").on('submit',function(e){
+ 			    var obj = $('#dgd_check_details');
+ 		        var bDiv = $('.bDiv',obj);
+ 		        var params={};
+ 		        var name=$('#dgd_check_details .sDiv input[name=name]');
+				var startDate=$('#dgd_check_details .sDiv input[name=startDate]');
+				var endDate=$('#dgd_check_details .sDiv input[name=endDate]');
+				params.name=name.val();
+				if(!params.name){
+					return false;
+				}
+				params.startDate=startDate.val();
+				params.endDate=endDate.val();
+				
+				var productIds = $('input[name=productId]','#dgd_check_details');
+	            var lastSaveNums=$('input[name=lastSaveNum]','#dgd_check_details');
+	            var curInNums= $('input[name=curInNum]','#dgd_check_details');
+	            var curOutNums= $('input[name=curOutNum]','#dgd_check_details');
+	            var curSaveNums= $('input[name=curSaveNum]','#dgd_check_details');
+		            var details = new Array();
+		            var isGoOn=true;
+		            $.each(productIds,function(k,v){
+		            	var obj = {};
+		            	obj.productId = v.value;
+		            	obj.lastSaveNum = lastSaveNums[k].value;
+		            	obj.curInNum = curInNums[k].value;
+		            	obj.curOutNum = curOutNums[k].value;
+		            	obj.curSaveNum = curSaveNums[k].value;
+		            	details.push(obj);
+		              });
+					if(!isGoOn){
+						return false;
+					}
+					params.checkDetails=details;
+					$(document).sgConfirm({text: '确定要生成盘点表吗?',cfn:function(r){ 
+		    		  if(r){
+ 		        	
+ 		        		 $.ajax( {
+ 	            		  type : 'POST', 
+ 	            		  async: false,   
+ 	            		  contentType : 'application/json',     
+ 	            		  dataType : 'json',     
+ 	            		  url : '../../sell/addCheck',  
+ 	            		  data:JSON.stringify(params),
+ 	            		  success : function(data) {
+ 	            			  if(data){
+ 	            				 if(data.success){
+ 	            					 $(document).sgWindow('close',{id:'win_check'}); 
+ 	    	          		 		 $('#dgd_check').sgDatagrid('reload','sgDatagrid');
+ 	            				 }
+ 	            				$(document).sgPup({message:'message_info',text: data.msg});
+ 	            			  }
+ 	            		  } ,     
+ 	            		  error : function(res,error) { 
+ 	            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+ 	            		  }    
+ 	            		}); 
+ 		        	}
+ 		        }});
+ 		        	
+ 		       $('#form_check').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+ 				e.stopPropagation();
+ 	        	return false;
+ 	        });
+  
+ 	   };
+
+ 	  var save4edit1 = function(){
+ 		 var existProductMap=[];//已选择的商品
+ 		var obj = $('#dgd_check_details');
+        var bDiv = $('.bDiv',obj);
+        var params={};
+        var id=$('#dgd_check_details .sDiv input[name=id]');
+        var name=$('#dgd_check_details .sDiv input[name=name]');
+		var startDate=$('#dgd_check_details .sDiv input[name=startDate]');
+		var endDate=$('#dgd_check_details .sDiv input[name=endDate]');
+		params.id=id.val();
+		params.name=name.val();
+		params.startDate=startDate.val();
+		params.endDate=endDate.val();
+		params.status=2;
+		
+		var productIds = $('input[name=productId]','#dgd_check_details');
+		var productNames = $('input[name=productName]','#dgd_check_details');
+        var lastSaveNums=$('input[name=lastSaveNum]','#dgd_check_details');
+        var curInNums= $('input[name=curInNum]','#dgd_check_details');
+        var curOutNums= $('input[name=curOutNum]','#dgd_check_details');
+        var curSaveNums= $('input[name=curSaveNum]','#dgd_check_details');
+        var curObjectNum= $('input[name=curObjectNum]','#dgd_check_details');
+        var overShortNums= $('input[name=overShortNum]','#dgd_check_details');
+        var remarks= $('input[name=remark]','#dgd_check_details');
+        if(productIds.length==0){ 
+	     	   $(document).sgPup({message:'message_info',text: '没有商品需要盘点，盘点无效！'})
+	     	   return false;
+	        }
+            var details = new Array();
+            $.each(productIds,function(k,v){
+            	var obj = {};
+            	obj.productId = v.value;
+            	obj.lastSaveNum = lastSaveNums[k].value;
+            	obj.curInNum = curInNums[k].value;
+            	obj.curOutNum = curOutNums[k].value;
+            	obj.curSaveNum = curSaveNums[k].value;
+            	obj.curObjectNum = curObjectNum[k].value;
+            	obj.overShortNum = overShortNums[k].value;
+            	obj.remark = remarks[k].value;
+            	details.push(obj);
+            	if(v.value){
+    	       		productNames[k].setCustomValidity(''); 
+    		       	if(existProductMap[productIds[k].value]){ 
+    		        	productNames[k].setCustomValidity('此商品已添加!'); 
+    		       	   	return false;
+    		          }else{
+    		        	  productNames[k].setCustomValidity(''); 
+    		          	  existProductMap[productIds[k].value]=productIds[k].value;
+    		          }
+    		    }else{
+    		    	productNames[k].setCustomValidity('请输入商品名称/编码!'); 
+    		    }
+              });
+			params.checkDetails=details;
+		$("#form_check").unbind('submit');//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+			
+ 		 $("#form_check").on('submit',function(e){
+ 		 	$(document).sgConfirm({text: '确定要保存盘点信息吗?',cfn:function(r){ 
+		    		if(r){
+		        	
+		        		 $.ajax( {
+	            		  type : 'POST', 
+	            		  async: false,   
+	            		  contentType : 'application/json',     
+	            		  dataType : 'json',     
+	            		  url : '../../sell/updateCheck',  
+	            		  data:JSON.stringify(params),
+	            		  success : function(data) {
+	            			  if(data){
+	            				 if(data.success){
+	            					 $(document).sgWindow('close',{id:'win_check'}); 
+	    	          		 		 $('#dgd_check').sgDatagrid('reload','sgDatagrid');
+	            				 }
+	            				$(document).sgPup({message:'message_info',text: data.msg});
+	            			  }
+	            		  } ,     
+	            		  error : function(res,error) { 
+	            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	            		  }    
+	            		}); 
+		        	}
+		        }});
+		        	
+		       $('#form_check').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+				e.stopPropagation();
+	        	return false;
+	        });
+	   };
+	   var print4edit1 = function(){
+		   printSource=1;
+		   //$('#ifm_print_wcheck_m').attr('src','stock_print2.html');
+		   var	sName='winPrint';
+					var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+					if (isChrome){
+					  sName='ifm_print_wcheck_m';
+					}
+					window.open('print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+					if (!isChrome){
+						//新增遮罩层
+		  				var mask=$('<div id="print_mask"></div>');
+		  				mask.addClass('window-mask');
+		  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+		  		        var span=$('<span></span');
+		  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+		  		        span.text('正在打印中...');
+		  		        mask.append(span);
+		  			    $(window.document.body).append(mask);
+				    }
+		};
+	   var save4edit3 = function(){
+		   var $this=$(this);
+		   printSource=3;//调账
+		    $('#form_check').unbind('submit');
+	 		$("#form_check").on('submit',function(e){
+				    var obj = $('#dgd_check_details');
+			        var bDiv = $('.bDiv',obj);
+			        var params={};
+			        var id=$('#dgd_check_details .sDiv input[name=id]');
+					params.id=id.val();
+					params.status=4;
+					
+					var ids = $('input[name=id]','#dgd_check_details .bDiv');
+		            var changeNums= $('input[name=changeNum]','#dgd_check_details .bDiv');
+		            var remarks= $('input[name=remark]','#dgd_check_details .bDiv');
+			            var details = new Array();
+			            $.each(ids,function(k,v){
+			            	var obj = {};
+			            	obj.id = v.value;
+			            	obj.productName=$(this).parents('td').siblings('td:eq(1)').text();
+			            	obj.productCode=$(this).parents('td').siblings('td:eq(2)').text();
+			            	obj.norm=$(this).parents('td').siblings('td:eq(3)').text();
+			            	obj.changeNum = changeNums[k].value;
+			            	obj.remark = remarks[k].value;
+			            	details.push(obj);
+			              });
+						params.checkDetails=details;
+						//$(document).sgPup({message:'message_info',text: JSON.stringify(params)});
+						$(document).sgConfirm({text: '确定要保存调账信息吗?',cfn:function(r){ 
+		    		     if(r){
+			        
+			        		 $.ajax( {
+		            		  type : 'POST', 
+		            		  async: false,   
+		            		  contentType : 'application/json',     
+		            		  dataType : 'json',     
+		            		  url : '../../sell/updateCheckChangeNum',  
+		            		  data:JSON.stringify(params),
+		            		  success : function(data) {
+		            			  if(data){
+		            			  	 $(document).sgPup({message:'message_info',text: data.msg,cfn:function(){
+   	       				
+		            				 if(data.success){
+		            					 //$(document).sgPup({message:'message_info',text: data.stockOut});
+		            					 //$(document).sgWindow('close',{id:'win_check'}); 
+		    	          		 		 $('#dgd_check').sgDatagrid('reload','sgDatagrid');
+		    	          		 		 if($this.attr('name')=='确定并打印调账出库'){
+			    	          		 		 if(data.stockOut){//有出库信息就打印
+			    	          		 				stockOut4ChangeNum=data.stockOut;
+				    	          		 			//$('#ifm_print_wcheck_m').attr('src','stock_print2.html');
+			    	          		 				var	sName='winPrint';
+						   	       					var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+						   	       					if (isChrome){
+						   	       					  sName='ifm_print_wcheck_m';
+						   	       					}
+						   	       					window.open('print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+						   	       					if (!isChrome){
+						   	       						//新增遮罩层
+						   	       		  				var mask=$('<div id="print_mask"></div>');
+						   	       		  				mask.addClass('window-mask');
+						   	       		  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+						   	       		  		        var span=$('<span></span');
+						   	       		  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+						   	       		  		        span.text('正在打印中...');
+						   	       		  		        mask.append(span);
+						   	       		  			    $(window.document.body).append(mask);
+					   	       					    }
+			    	          		 			}
+		    	          		 			
+		    	          		 		 }else{
+		    	          		 			$(document).sgWindow('close',{id:'win_check'});
+		    	          		 		 }
+		            				 }
+		            				}});
+		            				//$(document).sgPup({message:'message_info',text: data.msg});
+		            			  }
+		            		  } ,     
+		            		  error : function(res,error) { 
+		            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		            		  }    
+		            		}); 
+			        	}
+			        }});
+			        	
+			       //$('#form_check').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+					//e.stopPropagation();
+		        	return false;
+		        });
+		   };
+ 	   var addItem = function(){
+ 		    editId=null;
+ 	       	editObj=null;
+ 	       	
+ 	       	var title='仓库盘点';
+ 	       	//得到仓库名称
+ 	       	$.ajax({
+			  type : 'POST', 
+			  async: false,   
+			  url : '../../stock/getWarehouseName', 
+			  dataType : 'json',  
+			  data:{},
+			  success : function(data) {
+				  if(data){
+					  title=title+"["+data.name+"]";
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }   
+			  
+		    });
+ 	       
+ 	        var defaults = {
+ 	                title:title,
+ 	                id:'win_check',
+ 	                form:'form_check',
+ 	                url:'check_add_form.html',
+ 	                success: loadSuccess,
+ 	                width: 858,
+ 	                height: 500,
+ 	                buttons : [
+ 	                           {name: '确定',id:'btn_submit', type: 'submit', onpress : save},
+ 	                           {name: '关闭', onpress : winClose}
+ 	                       ]
+ 	            };
+ 	        $(document).sgWindow(defaults);
+ 	        
+ 	        
+ 	    };
+ 	        
+
+ 	    var delItem = function(){
+ 	    	var obj = $('#dgd_check');
+ 	        var bDiv = $('.bDiv',obj);
+ 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+ 	        	var ids=[];
+ 	        	var isGoOn=true;
+ 	        	$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	 	        		ids.push(this.value);
+	 	        		if($(this).data('data').status==3){
+	 	        			$(document).sgPup({message:'message_info',text: '名称为['+$(this).data('data').name+"]的盘点记录已审核,不能删除!"});
+	 	        			isGoOn=false;
+	 	        			return false;
+	 	        		}else if($(this).data('data').status==4){
+	 	        			$(document).sgPup({message:'message_info',text: '名称为['+$(this).data('data').name+"]的盘点记录已调账,不能删除!"});
+	 	        			isGoOn=false;
+	 	        			return false;
+	 	        		}
+ 	            });
+        		if(!isGoOn){
+        			return;
+        		}
+        		$(document).sgConfirm({text: '删除后不可恢复，确定删除?',cfn:function(r){ 
+		    	  if(r){
+ 	        
+ 	        		 $.ajax( {
+	            		  type : 'post', 
+	            		  async: false,   
+	            		  contentType : 'application/json',     
+	            		  dataType : 'json',     
+	            		  url : '../../sell/deleteChecks',   
+	            		  data:JSON.stringify(ids),
+	            		  success : function(data) {
+	            			  if(data){
+	            				 if(data.success){
+	    	          		 		 $('#dgd_check').sgDatagrid('reload','sgDatagrid');
+	            				 }
+	            				$(document).sgPup({message:'message_info',text: data.msg});
+	            			  }
+	            		  } ,     
+	            		  error : function(res,error) { 
+	            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	            		  }    
+	            		}); 
+ 	        	}
+ 	        }});
+ 	        	
+ 	        }else{
+ 	            $(document).sgPup({message:'message_info',text: "请选择要删除的选项！"});
+ 	        }
+ 	    }
+ 	    ;
+ 	   var editItem1 = function(){
+	    	var obj = $('#dgd_check');
+	        var bDiv = $('.bDiv',obj);
+ 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+ 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+ 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+ 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+ 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+ 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	 	                if($(this).attr("checked")){    
+ 	 	                	editId=this.value;
+ 	 	                	editObj=$(this).data('data');
+ 	 	                	var isGoOn=true;
+ 	 	                	/* test comment*/
+ 	 	                	if(editObj.status==3){
+ 	 	 	        			$(document).sgPup({message:'message_info',text: '名称为['+editObj.name+"]的盘点记录已审核,不能再进行盘点录入!"});
+ 	 	 	        			isGoOn=false;
+ 	 	 	        			return false;
+ 	 	 	        		}else if(editObj.status==4){
+	 	 	        			$(document).sgPup({message:'message_info',text: '名称为['+editObj.name+"]的盘点记录已调账,不能再进行盘点录入!"});
+	 	 	        			isGoOn=false;
+	 	 	        			return false;
+	 	 	        		}  
+ 	 	                	if(!isGoOn){
+ 	 	                		return false;
+ 	 	                	}
+ 	 	        	       	var title='仓库盘点';
+ 	 	        	       	//得到仓库名称
+ 	 	        	       	$.ajax({
+ 		 	       			  type : 'POST', 
+ 		 	       			  async: false,   
+ 		 	       			  url : '../../stock/getWarehouseName', 
+ 		 	       			  dataType : 'json',  
+ 		 	       			  data:{},
+ 		 	       			  success : function(data) {
+ 		 	       				  if(data){
+ 		 	       					  title=title+"["+data.name+"]";
+ 		 	       				  }
+ 		 	       			  } ,     
+ 		 	       			  error : function(res,error) { 
+ 		 	       			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+ 		 	       			  }   
+ 		 	       			  
+ 		 	       		    });
+ 	 	        	       
+ 	 	        	        var defaults = {
+ 	 	        	                title:title,
+ 	 	        	                id:'win_check',
+ 	 	        	                form:'form_check',
+ 	 	        	                url:'check_edit_form1.html',
+ 	 	        	                success: loadSuccess,
+ 	 	        	                width: 1008,
+ 	 	        	                height: 500,
+ 	 	        	                buttons : [
+ 	 	        	                           {name: '确定',id:'btn_submit', type: 'submit', onpress : save4edit1},
+ 	 	        	                           {name: '打印', type: 'button', onpress : print4edit1},
+ 	 	        	                           {name: '关闭', onpress : winClose}
+ 	 	        	                       ]
+ 	 	        	            };
+ 	 	        	        $(document).sgWindow(defaults);
+ 	 	        	        
+ 	 	        	        
+ 	 	                }
+ 	 	       		 });
+ 	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择要编辑的选项！"});
+	        }
+	    };
+ 	    var editItem3 = function(){
+ 	    	isView=false;
+ 	    	var obj = $('#dgd_check');
+	        var bDiv = $('.bDiv',obj);
+ 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+ 	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+ 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+ 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+ 	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+ 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	 	                if($(this).attr("checked")){    
+ 	 	                	editId=this.value;
+ 	 	                	editObj=$(this).data('data');
+ 	 	                	var isGoOn=true;
+ 	 	                	/* test comment*/
+ 	 	                	if(editObj.status==1||editObj.status==2){
+ 	 	 	        			$(document).sgPup({message:'message_info',text: '名称为['+editObj.name+"]的盘点记录还未审核,不能进行调账!"});
+ 	 	 	        			isGoOn=false;
+ 	 	 	        			return false;
+ 	 	 	        		}else if(editObj.status==4){
+ 	 	 	        			$(document).sgPup({message:'message_info',text: '名称为['+editObj.name+"]的盘点记录已调账,不能再进行调账!"});
+ 	 	 	        			isGoOn=false;
+ 	 	 	        			return false;
+ 	 	 	        		} 
+ 	 	                	if(!isGoOn){
+ 	 	                		return false;
+ 	 	                	}
+ 	 	        	       	var title='仓库盘点';
+ 	 	        	       	//得到仓库名称
+ 	 	        	       	$.ajax({
+ 		 	       			  type : 'POST', 
+ 		 	       			  async: false,   
+ 		 	       			  url : '../../stock/getWarehouseName', 
+ 		 	       			  dataType : 'json',  
+ 		 	       			  data:{},
+ 		 	       			  success : function(data) {
+ 		 	       				  if(data){
+ 		 	       					  title=title+"["+data.name+"]";
+ 		 	       				  }
+ 		 	       			  } ,     
+ 		 	       			  error : function(res,error) { 
+ 		 	       			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+ 		 	       			  }   
+ 		 	       			  
+ 		 	       		    });
+ 	 	        	       
+ 	 	        	        var defaults = {
+ 	 	        	                title:title,
+ 	 	        	                id:'win_check',
+ 	 	        	                form:'form_check',
+ 	 	        	                url:'check_edit_form3.html',
+ 	 	        	                success: loadSuccess,
+ 	 	        	                width: 1008,
+ 	 	        	                height: 500,
+ 	 	        	                buttons : [
+											   {name: '确定',id:'btn_submit2', type: 'submit', onpress : save4edit3},
+ 	 	        	                           {name: '确定并打印调账出库',id:'btn_submit', type: 'submit', onpress : save4edit3},
+ 	 	        	                           {name: '关闭', onpress : winClose}
+ 	 	        	                       ]
+ 	 	        	            };
+ 	 	        	        $(document).sgWindow(defaults);
+ 	 	                }
+ 	 	       		 });
+ 	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择要编辑的选项！"});
+	        }
+ 	    };
+ 	    
+
+		
+ 	   function isvalidatefile(obj) {
+ 	       		
+ 	       		var extend = obj.substring(obj.lastIndexOf(".") + 1);
+ 	       		//$(document).sgPup({message:'message_info',text: extend});
+ 	       		if (extend == "") {
+ 	       		} else {
+ 	       		if (!(extend.toLocaleLowerCase() == "xls" || extend.toLocaleLowerCase() == "xlsx")) {
+ 	       				$(document).sgPup({message:'message_info',text: "请上传后缀名为xls或xlsx的文件!"});
+ 	       				
+ 	       				return false;
+ 	       			}
+ 	       		}
+ 	       		return true;
+ 	       	}
+ 	       	 var saveImp = function(){
+ 	      		   $("#form_imp").on('submit',function(e){
+ 	      			if ($('#checkFile').val() == '') {
+ 	      				$(document).sgPup({message:'message_info',text: '请选择上传导入文件!'});
+ 	      				$('#checkFile').focus();
+ 	      				return false;
+ 	      			}else{
+ 	      				if(!isvalidatefile($('#checkFile').val()))
+ 	      					  return false;
+ 	      					
+ 	      			}
+ 	      	        	return true;
+ 	      	        }); 
+ 	      	   };
+
+         var winImpClose = function (){
+            $(document).sgWindow('close',{id:'win_imp'});
+         }
+ 	   var impItem = function(){
+   		var defaults = {
+	                title:'盘点导入',
+	                id:'win_imp',
+	                form:'form_imp',
+	                url:'web/rp/check_import.html',
+	                width: 458,
+	                height: 205,
+	                buttons : [
+	                           {name: '确定', type: 'submit', onpress : saveImp},
+	                           {name: '关闭', onpress : winImpClose}
+	                       ]
+	            };
+   		$(document).sgWindow(defaults);
+	    };
+	    
+	    var print4view = function(){
+	    	printSource=4;
+	    	//$('#ifm_print_wcheck_m').attr('src','stock_print2.html');
+	    	var	sName='winPrint';
+					var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+					if (isChrome){
+					  sName='ifm_print_wcheck_m';
+					}
+					window.open('print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+					if (!isChrome){
+						//新增遮罩层
+		  				var mask=$('<div id="print_mask"></div>');
+		  				mask.addClass('window-mask');
+		  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+		  		        var span=$('<span></span');
+		  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+		  		        span.text('正在打印中...');
+		  		        mask.append(span);
+		  			    $(window.document.body).append(mask);
+				    }
+		};
+	    var exportExcel = function(){
+	    	 var url="../../sell/exportCheck4View?id="+editId;
+	         window.location.href=url;
+		};
+ 	   var viewItem = function(){
+ 		  isView=true;
+	    	var obj = $('#dgd_check');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	 	                if($(this).attr("checked")){    
+	 	                	editId=this.value;
+	 	                	editObj=$(this).data('data');
+	 	        	       	var title='仓库盘点';
+	 	        	       	//得到仓库名称
+	 	        	       	$.ajax({
+		 	       			  type : 'POST', 
+		 	       			  async: false,   
+		 	       			  url : '../../stock/getWarehouseName', 
+		 	       			  dataType : 'json',  
+		 	       			  data:{},
+		 	       			  success : function(data) {
+		 	       				  if(data){
+		 	       					  title=title+"["+data.name+"]";
+		 	       				  }
+		 	       			  } ,     
+		 	       			  error : function(res,error) { 
+		 	       			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		 	       			  }   
+		 	       			  
+		 	       		    });
+	 	        	       
+	 	        	        var defaults = {
+	 	        	                title:title,
+	 	        	                id:'win_check',
+	 	        	                form:'form_check',
+	 	        	                url:'check_view_form4.html',
+	 	        	                success: loadSuccess4View,
+	 	        	                width: 1008,
+	 	        	                height: 500,
+	 	        	                buttons : [
+											 {name: '打印', onpress : print4view},
+											 {name: '导出Excel', onpress : exportExcel},
+	 	        	                         {name: '关闭', onpress : winClose}
+	 	        	                       ]
+	 	        	            };
+	 	        	        $(document).sgWindow(defaults);
+	 	        	        
+	 	        	        
+	 	                }
+	 	       		 });
+	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择要编辑的选项！"});
+	        }
+	    }
+ 	   //修改表格的宽度
+        var height =$('#main_bd',window.parent.document).height()-320;
+    	//初始化表格
+    	 var defaults = {
+    		        title: "仓库盘点",
+    		        width:  '100%',
+    		        height: height,
+    		        url: '../../sell/findChecksByPage',
+    		        usepager: true,
+    		        rownumbers:true,
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+    		            {display:'盘点名称',name:'name',width : 200,sortable : true},
+    		            {display: '开始日期', name : 'startDate', width : 100, sortable : true,formatter:function(value,row){
+    		            	if(value && value.length>10){
+    		            		value=value.substring(0,10);
+    		            	}
+    		            	return value;
+    		            }},
+    		            {display: '结束日期', name : 'endDate', width : 180, sortable : true,formatter:function(value,row){
+    		            	if(value && value.length>10){
+    		            		value=value.substring(0,10);
+    		            	}
+    		            	return value;
+    		            }},
+    		            {display: '盘点状态', name : 'status', width : 100, sortable : true,formatter:function(value,row){
+    		                if(value==1){
+    		                    value = '<font color="#FF7400">已开始</font>';
+    		                }else if(value==2){
+    		                     value = '<font color="#3914AF">盘点录入</font>';
+    		                }else if(value==3){
+    		                    value = '<font color="#C10087">审核结束</font>';
+    		                }else{
+    		                    value = '<font color="#2DD700">调账结束</font>';
+    		                } 
+    		                return value;
+    		            }},
+    		            {display: '盘点时间', name : 'stamp', width : 120, sortable : true}
+    		        ],
+    		        buttons : [
+    		            {name: '生成盘点表', bclass: 'add', onpress : addItem},
+    		            {separator: true},
+    		            {name: '盘点录入', bclass: 'edit', onpress : editItem1},
+    		            {separator: true},
+    		            {name: '调账', bclass: 'edit', onpress : editItem3},
+    		            {separator: true},
+    		            {name: '删除', bclass: 'delete', onpress : delItem},
+    		            {separator: true}/* ,
+    		            {name: '导入', bclass: 'add', onpress : impItem},
+    		            {separator: true} */,
+    		            {name: '查看', bclass: 'view', onpress : viewItem},
+    		            {separator: true}
+    		        ],
+    		        searchitems :[
+    		            {display:'盘点名称',name:'name',type:'text'},
+    		            {display:'盘点状态',html:'<select name="status" ><option value="">请选择...</option><option value="1">已开始</option><option value="2" >盘点录入</option><option value="3" >审核结束</option><option value="4" >调账结束</option></select>'},
+    		            {display:'盘点开始时间',name:'startDate',type:'date'},
+    		            {display:'盘点结束时间',name:'endDate',type:'date'}
+    		        ],
+    		        exporturl:'../../sell/exportCheck',//导出excel
+    		        //query:{name:''},//查询默认参数
+    		        order:true,
+       		        sortname: "stamp",
+       		        sortorder: "desc"
+    		    };
+    		    $('#dgd_check').sgDatagrid(defaults); 
+
+    			 //回车事件代替tab键
+    			$(window.document).keydown(function(event){
+    		        switch(event.keyCode) {
+    		            case 13:
+    		                event.keyCode=9;
+    		                break;
+    		        }
+    		    });
+    })(jQuery)
+    
+    	
+//打印页面元素设置
+  var callback=function(subWinBody,subWin){
+    	
+    	 var wareHouseName=null;//仓库名称
+ 		//得到仓库名称
+ 	         $.ajax({
+ 			  type : 'POST', 
+ 			  async: false,   
+ 			  url : '../../stock/getWarehouseName', 
+ 			  dataType : 'json',  
+ 			  data:{},
+ 			  success : function(data) {
+ 				  if(data){
+ 					wareHouseName=data.name;
+ 				  }else{
+ 					wareHouseName='&nbsp;';
+ 				  }
+ 			  } ,     
+ 			  error : function(res,error) { 
+ 			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+ 			  }   
+ 			  
+ 		    });
+    	 
+	$.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCurrentCompany',   
+		  data:JSON.stringify({}),
+		  success : function(data) {
+			  if(data){
+				  var total = 0;
+				  //公司中文名字
+				  $("#cname",subWinBody).empty();
+				  $("#cname",subWinBody).append(data.cnfullname);
+				  //公司英文名字
+				  $("#ename",subWinBody).empty();
+				  $("#ename",subWinBody).append(data.enfullname);
+				  
+				  
+				  if(printSource==1){//盘点录入中的打印
+					//表单名字
+					  $("#orderTitle",subWinBody).empty();
+					  $("#orderTitle",subWinBody).append("仓库盘点");
+					  //表单日期
+					  $("#orderDate",subWinBody).empty();
+					  $("#orderDate",subWinBody).append(new Date().format('yyyy-MM-dd'));
+					  //表单单号
+					  $("#orderNo",subWinBody).empty();
+					  $("#orderNo",subWinBody).append($('#dgd_check_details .sDiv input[name=name]').val());
+					  $("#orderNo",subWinBody).prev('span').text('名称：');
+					 
+					  //表前输入单
+					  var startDate = '<span style="width:10%;">开始日期：</span>';
+					  startDate=startDate+'<div style="width:23%;">'+$('#dgd_check_details .sDiv input[name=startDate]').val()+'</div>';
+					  $("#headInput",subWinBody).append(startDate);
+					  
+					  var endDate = '<span style="width:10%;">结束日期：</span>';
+					  endDate=endDate+'<div style="width:23%;">'+$('#dgd_check_details .sDiv input[name=endDate]').val()+'</div>';
+					  $("#headInput",subWinBody).append(endDate);
+					  
+					  var outWhs ='<span style="width:10%;">盘点仓库：</span>';
+					  outWhs=outWhs+'<div style="width:23%;">'+wareHouseName+'</div>';
+					 
+					  $("#headInput",subWinBody).append(outWhs);
+					  
+					  //表头
+					  $("#tbHead",subWinBody).append('<td style="width: 4%;">序号</td>'+
+															  '<td style="width: 10p%">商品编码</td>'+
+															  '<td style="width: 10%">商品名称</td>'+
+															  '<td style="width: 20%">商品规格</td>'+
+															  '<td style="width: 8%;">上月帐面结存数量</td>'+
+															  '<td style="width: 8%;">本月入库数量</td>'+
+															  '<td style="width: 8%;">本月出库数量</td>'+
+															  '<td style="width: 8%;">月未帐面结存数量</td>'+
+															  '<td style="width: 8%;">月未实物盘存</td>'+
+															  '<td style="width: 6%;">盈亏数</td>'+
+															  '<td style="width: 10%;">备注</td>');
+	 		       
+					  //表格主体
+		            var productIds = $('input[name=productId]','#dgd_check_details');
+		            var productNames = $('input[name=productName]','#dgd_check_details');
+		            var lastSaveNums=$('input[name=lastSaveNum]','#dgd_check_details');
+		            var curInNums= $('input[name=curInNum]','#dgd_check_details');
+		            var curOutNums= $('input[name=curOutNum]','#dgd_check_details');
+		            var curSaveNums= $('input[name=curSaveNum]','#dgd_check_details');
+		            var curObjectNum= $('input[name=curObjectNum]','#dgd_check_details');
+		            var overShortNums= $('input[name=overShortNum]','#dgd_check_details');
+		            var remarks= $('input[name=remark]','#dgd_check_details');
+		              $.each(productIds,function(k,v){
+		               	
+		            	var tbbody_tr ='<tr>';
+		               	
+		               	var tbbody_td1 = '<td  style="word-break:break-all;">'+(k+1)+'</td>';
+		               	tbbody_tr=tbbody_tr+tbbody_td1;
+		               	
+		               	var tbbody_td2 ='<td width="10p%" style="word-break:break-all;">'+$(this).parents('td').siblings('td:eq(3)').text()+'</td>';
+		               	tbbody_tr=tbbody_tr+tbbody_td2;
+		               	
+		               	var tbbody_td3 = '<td style="word-break:break-all;">'+productNames[k].value+'</td>';
+		               	tbbody_tr=tbbody_tr+tbbody_td3;
+		               	
+		               	var tbbody_td4 = '<td width="20%" style="word-break:break-all;">'+$(this).parents('td').siblings('td:eq(4)').text()+'</td>';
+		               	tbbody_tr=tbbody_tr+tbbody_td4;
+		               	
+		               	var tbbody_td5 = '<td >'+lastSaveNums[k].value+'</td>';
+		               	tbbody_tr=tbbody_tr+tbbody_td5;
+		               	
+		               	var tbbody_td_price = '<td >'+curInNums[k].value+'</td>';
+		            	tbbody_tr=tbbody_tr+tbbody_td_price;
+		               	
+		               	var tbbody_td6 ='<td >'+curOutNums[k].value+'</td>';
+		               	tbbody_tr=tbbody_tr+tbbody_td6;
+		               	
+		            	var tbbody_td7= '<td >'+curSaveNums[k].value+'</td>';
+		            	tbbody_tr=tbbody_tr+tbbody_td7;
+		               	
+		            	var tbbody_td8 = '<td >&nbsp;</td>';//curObjectNum[k].value
+		            	tbbody_tr=tbbody_tr+tbbody_td8;
+		               	
+		            	var tbbody_td9 = '<td width="6%">&nbsp;</td>';//overShortNums[k].value
+		            	tbbody_tr=tbbody_tr+tbbody_td9;
+	
+		            	var tbbody_td10 = '<td>'+remarks[k].value+'</td>';
+		            	tbbody_tr=tbbody_tr+tbbody_td10;
+		            	
+		            	tbbody_tr=tbbody_tr+'</tr>';
+		            	
+		               	$("#tbBody",subWinBody).append(tbbody_tr);
+		              });
+				  }else if(printSource==3 && stockOut4ChangeNum){//调账中的打印 ,打印出库信息
+					  var total = 0;
+					  //表单名字
+					  $("#orderTitle",subWinBody).empty();
+					  $("#orderTitle",subWinBody).append("调账出库单");
+					  //表单日期
+					  $("#orderDate",subWinBody).empty();
+					  //$("#orderDate",subWinBody).append(stockOut4ChangeNum.stamp);
+					  $("#orderDate",subWinBody).append(new Date().format('yyyy-MM-dd'));
+					  //表单单号
+					  $("#orderNo",subWinBody).empty();
+					  $("#orderNo",subWinBody).append(stockOut4ChangeNum.code);
+					  
+					  //表前输入单
+					  var outWhs = '<span>出库仓库：</span>';
+					  outWhs=outWhs+'<div>'+wareHouseName+'</div>';
+					  $("#headInput",subWinBody).append(outWhs);
+					  
+					  var managers = '<span>经办人：</span>';
+					  var loginUserName=$("#welcometext",top.document.body).html();
+					  if(loginUserName && loginUserName.length>0){
+						  loginUserName=loginUserName.substring(loginUserName.lastIndexOf("！")+1,loginUserName.length-1);
+					  }
+					  managers=managers+'<div>'+loginUserName+'</div>';
+					  $("#headInput",subWinBody).append(managers);
+					  
+					  //表头
+					  $("#tbHead",subWinBody).append('<td style="width: 10%"><div>序号</div></td>'+
+															  '<td style="width: 20%;"><div>商品编码</div></td>'+
+															  '<td style="width: 20%;"><div>商品名称</div></td>'+
+															  '<td style="width: 20%;" ><div>商品规格</div></td>'+
+															  '<td style="width: 10%;"><div>数量</div></td>'+
+															  '<td style="width: 20%;"><div>备注</div></td>');
+					  
+					if(stockOut4ChangeNum.stockoutDetails){
+						 $.each(stockOut4ChangeNum.stockoutDetails,function(k,v){
+				               	var tbbody_tr = '<tr>';//'</tr>');
+				               	
+				               	var tbbody_td1 = '<td>'+(k+1)+'</td>';
+				               	tbbody_tr=tbbody_tr+tbbody_td1;
+				               	
+				               	var tbbody_td2 ='<td >'+v.productCode+'</td>';
+				               	tbbody_tr=tbbody_tr+tbbody_td2;
+				               	
+				               	var tbbody_td3 ='<td>'+v.productName+'</td>';
+				            	tbbody_tr=tbbody_tr+tbbody_td3;
+				               	
+				               	var tbbody_td4 = '<td>'+v.norm+'</td>';
+				               	tbbody_tr=tbbody_tr+tbbody_td4;
+				               	
+				               	var tbbody_td5 = '<td >'+v.outNum+'</td>';
+				               	tbbody_tr=tbbody_tr+tbbody_td5;
+				               	total=Number(total)+Number(v.outNum);
+				               	
+				               	var tbbody_td6 = '<td>'+v.remark+'</td>';
+				            	tbbody_tr=tbbody_tr+tbbody_td6;
+
+				            	tbbody_tr=tbbody_tr+'</tr>';
+				               	$("#tbBody",subWinBody).append(tbbody_tr);
+				              });
+					}
+		             
+		              /* //表合计
+					  var tbfoot = '<tr>';
+					  
+					  var tbfoot_td1 ='<td width="428px"><div style="text-align:right">小计:</div></td>';
+					  tbfoot=tbfoot+tbfoot_td1;
+					  
+					  var tbfoot_td2 = '<td width="349px"><div style="text-align:right;padding-right:76px;">'+total+'</div></td>';
+					  tbfoot=tbfoot+tbfoot_td2;
+					  
+					  tbfoot=tbfoot+'<td style="width: 180px"><div>&nbsp;</div></td></tr>';				  
+					  $("#tbFoot",subWinBody).append(tbfoot); */
+					  
+					 //表合计
+					  var tbfoot = '<tr>';
+					  tbfoot=tbfoot+'<td colspan="4"><div style="text-align:right">小计:</div></td>';
+					  tbfoot=tbfoot+'<td colspan="1">'+total+'</td>';
+					  tbfoot=tbfoot+'<td colspan="1"></td>';
+					  tbfoot=tbfoot+'</tr>';
+					  $("#tbBody",subWinBody).append(tbfoot);
+					  
+				  }else if(printSource==4){//查看中的打印
+					//表单名字
+					  $("#orderTitle",subWinBody).empty();
+					  $("#orderTitle",subWinBody).append("仓库盘点");
+					  //表单日期
+					  $("#orderDate",subWinBody).empty();
+					  $("#orderDate",subWinBody).append(new Date().format('yyyy-MM-dd'));
+					  //表单单号
+					  $("#orderNo",subWinBody).empty();
+					  $("#orderNo",subWinBody).append($('#dgd_check_details .sDiv input[name=name]').val());
+					  $("#orderNo",subWinBody).prev('span').text('名称：');
+					 
+					  //表前输入单
+					  var startDate = '<span style="width:10%;">开始日期：</span>';
+					  startDate=startDate+'<div style="width:23%;">'+$('#dgd_check_details .sDiv input[name=startDate]').val()+'</div>';
+					  $("#headInput",subWinBody).append(startDate);
+					  
+					  var endDate = '<span style="width:10%;">结束日期：</span>';
+					  endDate=endDate+'<div style="width:23%;">'+$('#dgd_check_details .sDiv input[name=endDate]').val()+'</div>';
+					  $("#headInput",subWinBody).append(endDate);
+					  
+					  var outWhs ='<span style="width:10%;">盘点仓库：</span>';
+					  outWhs=outWhs+'<div style="width:23%;">'+wareHouseName+'</div>';
+					 
+					  $("#headInput",subWinBody).append(outWhs);
+					  //表头
+					  $("#tbHead",subWinBody).append('<td style="width: 4%"><div>序号</div></td>'+
+															  '<td style="width: 10%"><div>商品编码</div></td>'+
+															  '<td style="width: 10%"><div>商品名称</div></td>'+
+															  '<td style="width: 16%"><div>商品规格</div></td>'+
+															  '<td style="width: 8%"><div>上月帐面结存数量</div></td>'+
+															  '<td style="width: 8%"><div>本月入库数量</div></td>'+
+															  '<td style="width: 8%"><div>本月出库数量</div></td>'+
+															  '<td style="width: 8%"><div>月未帐面结存数量</div></td>'+
+															  '<td style="width: 8%"><div>月未实物盘存</div></td>'+
+															  '<td style="width: 5%"><div>盈亏数</div></td>'+
+															  '<td style="width: 5%"><div>调账数</div></td>'+
+															  '<td style="width: 10%"><div>备注</div></td>');
+	 		       
+					  //表格主体
+		            var productIds = $('input[name=productId]','#dgd_check_details');
+		            var remarks= $('input[name=remark]','#dgd_check_details');
+		              $.each(productIds,function(k,v){
+		            	var tbbody_tr ='<tr>';
+			               	
+		               	var tbbody_td1 = '<td >'+(k+1)+'</td>';
+		               	tbbody_tr=tbbody_tr+tbbody_td1;
+		               	
+		               	var tbbody_td2 = '<td >'+$(this).parents('td').siblings('td:eq(2)').text()+'</td>';
+		               	tbbody_tr=tbbody_tr+tbbody_td2;
+		               	
+		               	var tbbody_td3 = '<td >'+$(this).parents('td').siblings('td:eq(1)').text()+'</td>';
+		               	tbbody_tr=tbbody_tr+tbbody_td3;
+		               	
+		               	var tbbody_td4 = '<td >'+$(this).parents('td').siblings('td:eq(3)').text()+'</td>';;
+		               	tbbody_tr=tbbody_tr+tbbody_td4;
+		               	
+		               	var tbbody_td5 ='<td >'+$(this).parents('td').siblings('td:eq(4)').text()+'</td>';;
+		               	tbbody_tr=tbbody_tr+tbbody_td5;
+		               	
+		               	var tbbody_td_price ='<td >'+$(this).parents('td').siblings('td:eq(5)').text()+'</td>';;
+		               	tbbody_tr=tbbody_tr+tbbody_td_price;
+		               	
+		               	var tbbody_td6 = '<td >'+$(this).parents('td').siblings('td:eq(6)').text()+'</td>';;
+		             	tbbody_tr=tbbody_tr+tbbody_td6;
+		               	
+		            	var tbbody_td7= '<td >'+$(this).parents('td').siblings('td:eq(7)').text()+'</td>';;
+		            	tbbody_tr=tbbody_tr+tbbody_td7;
+		               	
+		            	var tbbody_td8 = '<td >'+$(this).parents('td').siblings('td:eq(8)').text()+'</td>';;
+		            	tbbody_tr=tbbody_tr+tbbody_td8;
+		               	
+		            	var tbbody_td9 = '<td>'+$(this).parents('td').siblings('td:eq(9)').text()+'</td>';;
+		            	tbbody_tr=tbbody_tr+tbbody_td9;
+		               	
+		               	var tbbody_td10 ='<td>'+$(this).parents('td').siblings('td:eq(10)').text()+'</td>';;
+		               	tbbody_tr=tbbody_tr+tbbody_td10;
+		               	
+		            	var tbbody_td11 = '<td>'+$(this).parents('td').siblings('td:eq(11)').text()+'</td>';
+		            	tbbody_tr=tbbody_tr+tbbody_td11;
+		            	
+		            	tbbody_tr=tbbody_tr+'</tr>';
+		            	
+		               	$("#tbBody",subWinBody).append(tbbody_tr);
+		              });
+				  }
+				  //表尾输入单
+				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+													  '<span>复核人：</span><div>&nbsp;</div>'+
+													  '<span>仓管员：</span><div>&nbsp;</div>'+
+													  '<span>制单：</span><div>&nbsp;</div>');
+				  
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+	
+    if (navigator.appName == 'Microsoft Internet Explorer'){
+    	subWin.print();  
+    }else{ 
+    	subWin.focus();
+    	subWin.print();  
+    }
+}
+</script>
+</html>

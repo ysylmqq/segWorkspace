@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>车型详细信息</title>
+<!-- <link rel="stylesheet" type="text/css" href="../../css/base.css" /> -->
+</head>
+
+<body>
+
+		<input type="hidden" id="companyid" name="companyid" /> 
+		<input type="hidden" id="level" name="level" />
+		<input type="hidden" id="opid" name="opid" />
+		<input type="hidden" id="brand_id" name="brand_id" />
+		<input type="hidden" id="brand_name_series" name="brand_name_series" />
+		<input type="hidden" id="series_name_model" name="series_name_model" />
+		<input type="hidden" id="series_id" name="series_id" />
+		
+		<input type="hidden" id="id" name="id" />
+		<input type="hidden" id="name" name="name" />
+		
+		<input type="hidden" id="companytype" name="companytype" />
+
+	<form id='company_detail' method='post' class="form" style="width:100%; " >
+		<div class='title'>详细信息</div>
+		<fieldset style="width:100%;">
+            <div class="row">
+	            <div class="panel col-xs-6" id="brand_name1">
+	                <span class="col-xs-4">品牌名称:</span>
+	                <span class="col-xs-8">
+	                	<input type='text' id="brand_name" name="brand_name" required="true" class="form-control" />
+	                </span>
+	            </div>
+	        </div>
+	        <div class="row">
+	            <div class="panel col-xs-6" id="series_name1" style="display:none">
+	            	<span class="col-xs-4">车系名称:</span>
+	                <span class="col-xs-8">
+	                	<input type='text' id="series_name" name="series_name" required="true" class="form-control" />
+	                </span>
+	            </div>
+	        </div>
+	        <div class="row">
+	            <div class="panel col-xs-6" id="producer1" style="display:none" >
+	            	<span class="col-xs-4">车系厂商:</span>
+	                <span class="col-xs-8">
+	                	<input type='text' id="producer" name="producer" class="form-control" />
+	                </span>
+	            </div>
+	        </div>
+	        <div class="row">
+	            <div class="panel col-xs-6" id="remark1" style="display:none">
+	                <span class="col-xs-4">备注:</span>
+	                <span class="col-xs-8">
+	                	<input type='text' id="remark" name="remark" class="form-control" />
+	                </span>
+	            </div>
+            </div>
+            <img id ="img"  src=""  alt="车型图片" style="display:none"/>
+            
+        </fieldset>
+        
+        <fieldset style="width:100%;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="company_add" type="button" class="btn btn-xs btn-primary" onclick="addItem0();">添加品牌</button>
+	             <button id="series_add" type="button" class="btn btn-xs btn-primary" onclick="addItem1();" style="display:none;" >添加车系</button>
+	             <button id="model_add" type="button" class="btn btn-xs btn-primary" onclick="addItem2();" style="display:none;" >添加车型</button>
+				<button id="company_del" type="button" class="btn btn-xs btn-primary" onclick="delItem();">删除</button>
+				<button id="company_save" type="submit" class="btn btn-xs btn-primary" onclick="save();">保存</button>
+				<!-- <button id="maintain" type="button" style="display:none" onclick="maintainItemsItem();">保养</button> -->
+				
+				 <input type="reset" class="btn btn-xs btn-primary" style="display:none;" /> 
+	        </div>
+        </fieldset>
+
+	</form>
+	
+	
+	<form id='model_detail' method='post' class="form" action="../../model/updateModel" style="width:100%;display:none;" enctype="multipart/form-data" target="model_frame" >
+		<div class='title'>详细信息</div>
+		<fieldset style="width:100%;">
+			<div class="row">
+	            <div class="col-xs-6">
+	            	<input type="hidden" id="series_id_1" name="series_id_1" />
+			    	<input type="hidden" id="id_1" name="id_1" />
+		            <div class="panel col-xs-12" id="model_name1">
+		            	<span class="col-xs-4">车型名称:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id="model_name" name='model_name' required="true" class="form-control" />
+		                </span>
+		            </div>
+	            
+		            <div class="panel col-xs-12" id="standart_oil_1">
+		                <span class="col-xs-4">标准油耗:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id="standart_oil" name='standart_oil' class="form-control" />
+		                </span>
+		            </div>
+	            
+		            <div class="panel col-xs-12" id="displacement1">
+		                <span class="col-xs-4">车型排量:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id="displacement" name='displacement' class="form-control" />
+		                </span>
+		            </div>
+
+		            <div class="panel col-xs-12" id="oil_volume1">
+		                <span class="col-xs-4">油箱容量(L):</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id="oil_volume" name='oil_volume' class="form-control" />
+		                </span>
+		            </div>
+	            
+		            <div class="panel col-xs-12" id="image1">
+		                <span class="col-xs-4">车型图片:</span>
+		                <span class="col-xs-8">
+		                	<input type="file" id='img' name='img' accept="image/*" style="width:205px;" />
+		                </span>
+		            </div>
+	              
+	                <div class="panel col-xs-12">
+	                	<span class="col-xs-4">中控:</span>
+	                	<span class="col-xs-8">
+			                <select id="center_control" name="center_control" style="width:100%;">
+				                <option value="5">不支持</option>
+			                	<option value="4">支持</option>
+				            </select>
+			            </span>
+		            </div>
+
+			    	<div class="panel col-xs-12">
+	                	<span class="col-xs-4">喇叭:</span>
+	                	<span class="col-xs-8">
+		                	<select id="horn_control" name="horn_control" style="width:100%;">
+			                	<option value="5">不支持</option>
+			                	<option value="4">支持</option>
+			                </select>
+		                </span>
+	            	</div>
+
+					<div class="panel col-xs-12">
+	                	<span class="col-xs-4">车窗:</span>
+	                	<span class="col-xs-8">
+		                	<select id="window_control" name="window_control" style="width:100%;">
+			                	<option value="5">不支持</option>
+			                	<option value="4">支持</option>
+			                </select>
+		                </span>
+	            	</div>
+	            
+		            <div class="panel col-xs-12">
+		               	<span class="col-xs-4">首保里程:</span>
+		               	<span class="col-xs-8">
+		                 	<select id="first_service_mileage" name="first_service_mileage" required="true" style="width:100%;">
+			                	<option value="1000">1000公里</option>
+			                	<option value="1500">1500公里</option>
+			                	<option value="2000">2000公里</option>
+			                	<option value="2500">2500公里</option>
+			                	<option value="3000">3000公里</option>
+			                	<option value="3500">3500公里</option>
+			                	<option value="4000">4000公里</option>
+			                	<option value="4500">4500公里</option>
+			                	<option value="5000">5000公里</option>
+			                	<option value="5500">5500公里</option>
+			                	<option value="6000">6000公里</option>
+			                	<option value="6500">6500公里</option>
+			                	<option value="7000">7000公里</option>
+			                	<option value="7500">7500公里</option>
+			                	<option value="8000">8000公里</option>
+			                	<option value="8500">8500公里</option>
+			                	<option value="9000">9000公里</option>
+			                	<option value="9500">9500公里</option>
+			                	<option value="10000">10000公里</option>
+			                	<option value="10500">10500公里</option>
+			                	<option value="11000">11000公里</option>
+			                	<option value="11500">11500公里</option>
+			                	<option value="12000">12000公里</option>
+			                	<option value="12500">12500公里</option>
+			                	<option value="13000">13000公里</option>
+			                	<option value="13500">13500公里</option>
+			                	<option value="14000">14000公里</option>
+			                	<option value="14500">14500公里</option>
+			                	<option value="15000">15000公里</option>
+			           		</select>
+			           	</span>
+	             	</div>
+	            
+	             	<div class="panel col-xs-12">
+	              		<span class="col-xs-4">首保时间:</span>
+	              		<span class="col-xs-8">
+	                		<select id="first_service_time" name="first_service_time" required="true" style="width:100%;">
+			                	<option value="1">1个月</option>
+			                	<option value="2">2个月</option>
+			                	<option value="3">3个月</option>
+			                	<option value="4">4个月</option>
+			                	<option value="5">5个月</option>
+			                	<option value="6">6个月</option>
+			                	<option value="7">7个月</option>
+			                	<option value="8">8个月</option>
+			                	<option value="9">9个月</option>
+			                	<option value="10">10个月</option>
+			                	<option value="11">11个月</option>
+			                	<option value="12">12个月</option>
+			           		</select>
+			           	</span>
+	              	</div>
+
+	                <div class="panel col-xs-12">
+	                	<span class="col-xs-4">二保里程:</span>
+	                	<span class="col-xs-8">
+	                		<select id="second_service_mileage" name="second_service_mileage" required="true" style="width:100%;">
+			                	<option value="3000">3000公里</option>
+			                	<option value="3500">3500公里</option>
+			                	<option value="4000">4000公里</option>
+			                	<option value="4500">4500公里</option>
+			                	<option value="5000">5000公里</option>
+			                	<option value="5500">5500公里</option>
+			                	<option value="6000">6000公里</option>
+			                	<option value="6500">6500公里</option>
+			                	<option value="7000">7000公里</option>
+			                	<option value="7500">7500公里</option>
+			                	<option value="8000">8000公里</option>
+			                	<option value="8500">8500公里</option>
+			                	<option value="9000">9000公里</option>
+			                	<option value="9500">9500公里</option>
+			                	<option value="10000">10000公里</option>
+			                	<option value="10500">10500公里</option>
+			                	<option value="11000">11000公里</option>
+			                	<option value="11500">11500公里</option>
+			                	<option value="12000">12000公里</option>
+			                	<option value="12500">12500公里</option>
+			                	<option value="13000">13000公里</option>
+			                	<option value="13500">13500公里</option>
+			                	<option value="14000">14000公里</option>
+			                	<option value="14500">14500公里</option>
+			                	<option value="15000">15000公里</option>
+			                	<option value="15500">15500公里</option>
+			                	<option value="16000">16000公里</option>
+			                	<option value="16500">16500公里</option>
+			                	<option value="17000">17000公里</option>
+			                	<option value="17500">17500公里</option>
+			                	<option value="18000">18000公里</option>
+			                	<option value="18500">18500公里</option>
+			                	<option value="19000">19000公里</option>
+			                	<option value="19500">19500公里</option>
+			                	<option value="20000">20000公里</option>
+			                	<option value="20500">20500公里</option>
+			                	<option value="21000">21000公里</option>
+			                	<option value="21500">21500公里</option>
+			                	<option value="22000">22000公里</option>
+			                	<option value="22500">22500公里</option>
+			                	<option value="23000">23000公里</option>
+			                	<option value="23500">23500公里</option>
+			                	<option value="24000">24000公里</option>
+			                	<option value="24500">24500公里</option>
+			                	<option value="25000">25000公里</option>
+			           		</select>
+			           	</span> 
+			        </div>
+
+		            <div class="panel col-xs-12" id="second_service_time">
+		                <span class="col-xs-4">二保时间:</span>
+		                <span class="col-xs-8">
+		                	<select id="second_service_time" name="second_service_time" required="true" style="width:100%;">
+			                	<option value="1">1个月</option>
+			                	<option value="2">2个月</option>
+			                	<option value="3">3个月</option>
+			                	<option value="4">4个月</option>
+			                	<option value="5">5个月</option>
+			                	<option value="6">6个月</option>
+			                	<option value="7">7个月</option>
+			                	<option value="8">8个月</option>
+			                	<option value="9">9个月</option>
+			                	<option value="10">10个月</option>
+			                	<option value="11">11个月</option>
+			                	<option value="12">12个月</option>
+			                	<option value="13">13个月</option>
+			                	<option value="14">14个月</option>
+			                	<option value="15">15个月</option>
+			                	<option value="16">16个月</option>
+			                	<option value="17">17个月</option>
+			                	<option value="18">18个月</option>
+			                	<option value="19">19个月</option>
+			                	<option value="20">20个月</option>
+			                	<option value="21">21个月</option>
+			                	<option value="22">22个月</option>
+			                	<option value="23">23个月</option>
+			                	<option value="24">24个月</option>
+			           		</select>
+			           	</span>
+	            	</div>
+
+		            <div class="panel col-xs-12">
+		                <span class="col-xs-4">里程间隔:</span>
+		                <span class="col-xs-8">
+	                    	<select id="interval_mileage" name="interval_mileage" required="true" style="width:100%;">
+			                	<option value="3000">3000公里</option>
+			                	<option value="5000">5000公里</option>
+			                	<option value="7500">7500公里</option>
+			                	<option value="8000">8000公里</option>
+			                	<option value="9000">9000公里</option>
+			                	<option value="10000">10000公里</option>
+			                	<option value="10500">10500公里</option>
+			                	<option value="11000">11000公里</option>
+			                	<option value="11500">11500公里</option>
+			                	<option value="12000">12000公里</option>
+			                	<option value="12500">12500公里</option>
+			                	<option value="13000">13000公里</option>
+			                	<option value="13500">13500公里</option>
+			                	<option value="14000">14000公里</option>
+			                	<option value="14500">14500公里</option>
+			                	<option value="15000">15000公里</option>
+			           		</select>
+				        </span>
+			        </div>
+	                 
+                    <div class="panel col-xs-12">
+                   		<span class="col-xs-4">时间间隔:</span>
+                   		<span class="col-xs-8">
+	                		<select id="interval_time" name="interval_time"  required="true" style="width:100%;">
+			                	<option value="3">3个月</option>
+			                	<option value="4">4个月</option>
+			                	<option value="5">5个月</option>
+			                	<option value="6">6个月</option>
+			                	<option value="7">7个月</option>
+			                	<option value="8">8个月</option>
+			                	<option value="9">9个月</option>
+			                	<option value="10">10个月</option>
+			                	<option value="11">11个月</option>
+			                	<option value="12">12个月</option>
+			           		</select>
+			           	</span>
+	            	</div>
+
+	            </div>
+            
+            </div>
+            <img id ="image"  src=""  alt="车型图片" style="float:left;" />
+            
+        </fieldset>
+        
+        <fieldset style="width:100%;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="company_add" type="button" class="btn btn-xs btn-primary" onclick="addItem2();">添加</button>
+				<button id="company_del" type="button" class="btn btn-xs btn-primary" onclick="delItem();">删除</button>
+				<button id="company_save" type="submit" class="btn btn-xs btn-primary" >保存</button>
+				<button id="maintain" type="button" class="btn btn-xs btn-primary" onclick="maintainItemsItem();">保养</button>
+				
+				<input type="reset"  style="display:none;" /> 
+	        </div>
+        </fieldset>
+
+	</form>
+	<iframe id="model_frame" name="model_frame" style="display:none;"></iframe>
+</body>
+<script type="text/javascript" src="../../jscript/autoCheckbox.js"></script>
+<script type="text/javascript">
+
+
+
+	
+	function loadSuccess3() {
+		
+		 $('#model_id', '#maintainItems_form').val($('#id').val());
+			   $.ajax({
+				  type : 'post', 
+				  async: true,   
+				  url : '../../maintainItems/getDataList',   
+				  data:{id:$('#id').val()}, 
+				  success : function(data) {
+					  if(data){
+						  $('#maintainItems').sgDatagrid('appendData',data);
+						   
+							var $checkboxs = $('input[type="checkbox"][name="ac_system"]', '#maintainItems_form');	
+							$checkboxs.autoCheckbox();
+								
+							var $checkboxs = $('input[type="checkbox"][name="air_filter"]', '#maintainItems_form');	
+							$checkboxs.autoCheckbox();
+								
+							var $checkboxs = $('input[type="checkbox"][name="belt"]', '#maintainItems_form');	
+							$checkboxs.autoCheckbox();
+							
+							  
+							var $checkboxs = $('input[type="checkbox"][name="break_fluid"]', '#maintainItems_form');	
+							$checkboxs.autoCheckbox();
+								
+							var $checkboxs = $('input[type="checkbox"][name="break_front"]', '#maintainItems_form');	
+							$checkboxs.autoCheckbox();
+								
+							var $checkboxs = $('input[type="checkbox"][name="break_rear"]', '#maintainItems_form');	
+							$checkboxs.autoCheckbox();
+							  
+							var $checkboxs = $('input[type="checkbox"][name="coolant_fluid"]', '#maintainItems_form');	
+							$checkboxs.autoCheckbox();
+								
+							var $checkboxs = $('input[type="checkbox"][name="engine_oil"]', '#maintainItems_form');	
+							$checkboxs.autoCheckbox();
+								
+							var $checkboxs = $('input[type="checkbox"][name="fuel_filter"]', '#maintainItems_form');	
+							$checkboxs.autoCheckbox();
+							
+							  
+							var $checkboxs = $('input[type="checkbox"][name="oil_channels"]', '#maintainItems_form');	
+							$checkboxs.autoCheckbox();
+								
+							var $checkboxs = $('input[type="checkbox"][name="oil_filter"]', '#maintainItems_form');	
+							$checkboxs.autoCheckbox();
+								
+							var $checkboxs = $('input[type="checkbox"][name="power_steering"]', '#maintainItems_form');	
+							$checkboxs.autoCheckbox();
+							  
+							var $checkboxs = $('input[type="checkbox"][name="spark_plugs"]', '#maintainItems_form');	
+							$checkboxs.autoCheckbox();
+								
+							var $checkboxs = $('input[type="checkbox"][name="transmission_fluid"]', '#maintainItems_form');	
+							$checkboxs.autoCheckbox();
+								
+							
+					  }else{
+						  $(document).sgPup({message:'message_alert',text: data.msg});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ alert(res.responseText);}     
+				  }    
+				}); 
+			  
+		
+	}
+
+	function loadSuccess() {
+		$('#brand_id', '#series_add_window').val($('#brand_id').val());
+		$('#brand_name', '#series_add_window').val($('#brand_name_series').val());
+	}
+	
+	function loadSuccess2() {
+		$('#series_id', '#model_add_window').val($('#series_id').val());
+		$('#series_name', '#model_add_window').val($('#series_name_model').val());
+	}
+
+	function addCompany() {
+		$("#company_add_form").on('submit',
+				function(e) {
+		$.ajax({
+			type : 'post',
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : 'company/add',
+			data : JSON.stringify({
+				companyname : $('#companyname', '#company_add_window').val(),
+				address : $('#address', '#company_add_window').val(),
+				time : $('#time', '#company_add_window').val(),
+				opid : $('#opid_add','#company_add_window').val(),
+				order : $('#order', '#company_add_window').val(),
+				cnfullname : $('#cnfullname', '#company_add_window').val(),
+				enfullname : $('#enfullname', '#company_add_window').val(),
+				companycode : $('#companycode', '#company_add_window').val(),
+				companytype : $('#companytype_add', '#company_add_window').val(),
+				parentcompanyno : $('#companyid').val(),
+				companylevel : $('#companylevel').val()
+			}),
+			success : function(data) {
+				if (data) {
+					if (data.success) {
+						$(document).sgWindow('close', {
+							id : 'company_add_window'
+						});
+						 $("#search_btn").trigger("click");//触发按钮
+						//$('#company_tree').sgTree('reload');
+					}
+					$(document).sgPup({message:'message_alert',text: data.msg});
+				}
+			},
+			error : function(res, error) {
+				alert("responseText=" + res.responseText
+						+ ";error=" + error);
+			}
+		});
+		$('#company_add_form').unbind();//以下两行可以阻止提交2次
+		e.stopPropagation();
+		return false;
+		});
+	}
+	
+	
+	function saveModel(){
+		
+	}
+
+	
+	
+	
+	function saveBrand() {
+		$("#brand_add_form").on('submit',
+				function(e) {
+		$.ajax({
+			type : 'post',
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : '../../brand/add',
+			data : JSON.stringify({
+				name : $('#name', '#brand_add_form').val()
+			}),
+			success : function(data) {
+				if (data) {
+					if (data.success) {
+						$(document).sgWindow('close', {
+							id : 'brand_add_window'
+						});
+						 $("#search_btn").trigger("click");//触发按钮
+						//$('#company_tree').sgTree('reload');
+					}
+					$(document).sgPup({message:'message_alert',text: data.msg});
+				}
+			},
+			error : function(res, error) {
+				alert("responseText=" + res.responseText
+						+ ";error=" + error);
+			}
+		});
+		$('#brand_add_form').unbind();//以下两行可以阻止提交2次
+		e.stopPropagation();
+		return false;
+		});
+	}
+	
+	
+	
+	function saveMain() {
+		
+		$("#maintainItems_form").on('submit',
+				function(e) {
+			 var params = {};
+	         var url='../../maintainItems/save';
+	         var  model = $('#model_id', '#maintainItems_form').val();
+	         
+	         var id = $('input[type="checkbox"][name="ac_system"]', '#maintainItems_form').attr("id");
+	         
+	         
+	         var engine_oil_ids = [];
+				$("input[type='checkbox'][name='engine_oil']:checked", "#maintainItems_form").each(
+				        function() {
+				        	engine_oil_ids.push($(this).attr("mark"));
+				        }
+				  );
+				
+				var oil_filter_ids = [];
+				$("input[type='checkbox'][name='oil_filter']:checked", "#maintainItems_form").each(
+				        function() {
+				        	oil_filter_ids.push($(this).attr("mark"));
+				        }
+				  );
+				var air_filter_ids = [];
+				$("input[type='checkbox'][name='air_filter']:checked", "#maintainItems_form").each(
+				        function() {
+				        	air_filter_ids.push($(this).attr("mark"));
+				        }
+				  );
+				
+				var fuel_filter_ids = [];
+				$("input[type='checkbox'][name='fuel_filter']:checked", "#maintainItems_form").each(
+				        function() {
+				        	fuel_filter_ids.push($(this).attr("mark"));
+				        }
+				  );
+				var spark_plugs_ids = [];
+				$("input[type='checkbox'][name='spark_plugs']:checked", "#maintainItems_form").each(
+				        function() {
+				        	spark_plugs_ids.push($(this).attr("mark"));
+				        }
+				  );
+				
+				var oil_channels_ids = [];
+				$("input[type='checkbox'][name='oil_channels']:checked", "#maintainItems_form").each(
+				        function() {
+				        	oil_channels_ids.push($(this).attr("mark"));
+				        }
+				  );
+				
+				var coolant_fluid_ids = [];
+				$("input[type='checkbox'][name='coolant_fluid']:checked", "#maintainItems_form").each(
+				        function() {
+				        	coolant_fluid_ids.push($(this).attr("mark"));
+				        }
+				  );
+				
+				var ac_system_ids = [];
+				$("input[type='checkbox'][name='ac_system']:checked", "#maintainItems_form").each(
+				        function() {
+				        	ac_system_ids.push($(this).attr("mark"));
+				        }
+				  );
+				
+				var transmission_fluid_ids = [];
+				$("input[type='checkbox'][name='transmission_fluid']:checked", "#maintainItems_form").each(
+				        function() {
+				        	transmission_fluid_ids.push($(this).attr("mark"));
+				        }
+				  );
+				
+				var break_fluid_ids = [];
+				$("input[type='checkbox'][name='break_fluid']:checked", "#maintainItems_form").each(
+				        function() {
+				        	break_fluid_ids.push($(this).attr("mark"));
+				        }
+				  );
+				
+				var break_front_ids = [];
+				$("input[type='checkbox'][name='break_front']:checked", "#maintainItems_form").each(
+				        function() {
+				        	break_front_ids.push($(this).attr("mark"));
+				        }
+				  );
+				
+				var break_rear_ids = [];
+				$("input[type='checkbox'][name='break_rear']:checked", "#maintainItems_form").each(
+				        function() {
+				        	break_rear_ids.push($(this).attr("mark"));
+				        }
+				  );
+				
+				var belt_ids = [];
+				$("input[type='checkbox'][name='belt']:checked", "#maintainItems_form").each(
+				        function() {
+				        	belt_ids.push($(this).attr("mark"));
+				        }
+				  );
+				
+				var power_steering_ids = [];
+				$("input[type='checkbox'][name='power_steering']:checked", "#maintainItems_form").each(
+				        function() {
+				        	power_steering_ids.push($(this).attr("mark"));
+				        }
+				  ); 
+				
+				params.id = id;
+				params.engine_oil_ids=engine_oil_ids;
+			 	params.oil_filter_ids=oil_filter_ids;
+				params.air_filter_ids=air_filter_ids;
+				params.fuel_filter_ids=fuel_filter_ids;
+				params.spark_plugs_ids=spark_plugs_ids;
+				params.oil_channels_ids=oil_channels_ids;
+				params.coolant_fluid_ids=coolant_fluid_ids;
+				params.ac_system_ids=ac_system_ids;
+				params.transmission_fluid_ids=transmission_fluid_ids;
+				params.break_fluid_ids=break_fluid_ids;
+				params.break_front_ids=break_front_ids;
+				params.break_rear_ids=break_rear_ids;
+				params.belt_ids=belt_ids;
+				params.power_steering_ids=power_steering_ids; 
+				params.model=model;
+			
+		     $.ajax( {
+          		  type : 'post', 
+          		  async: false,   
+          		  contentType : 'application/json',     
+          		  dataType : 'json',     
+          		  url : url,   
+          		  data:JSON.stringify(params),
+          		  success : function(data) {
+          			  if(data){
+          				 if(data.success){
+          					 $(document).sgWindow('close',{id:'maintainItems_window'}); 
+          					 $("#search_btn").trigger("click");//触发按钮
+          					 //$('#company_tree').sgTree('reload');
+  	          		 		
+          				 }
+          				 $(document).sgPup({message:'message_alert',text: data.msg});
+          			  }
+          		  } ,     
+          		  error : function(res,error) { 
+          		  	 alert(res.responseText);     
+          		  }    
+          		}); 
+			
+			
+	
+		$('#maintainItems_form').unbind();//以下两行可以阻止提交2次
+		e.stopPropagation();
+		return false;
+		}); 
+	}
+
+	
+	
+	function saveSeries() {
+		$("#series_add_form").on('submit',
+				function(e) {
+		$.ajax({
+			type : 'post',
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : '../../series/add',
+			data : JSON.stringify({
+				name : $('#name', '#series_add_form').val(),
+				brand_id : $('#brand_id', '#series_add_form').val(),
+				producer : $('#producer', '#series_add_form').val(),
+				remark : $('#remark', '#series_add_form').val()
+				
+			}),
+			success : function(data) {
+				if (data) {
+					if (data.success) {
+						$(document).sgWindow('close', {
+							id : 'series_add_window'
+						});
+						 $("#search_btn").trigger("click");//触发按钮
+						//$('#company_tree').sgTree('reload');
+					}
+					$(document).sgPup({message:'message_alert',text: data.msg});
+				}
+			},
+			error : function(res, error) {
+				alert("responseText=" + res.responseText
+						+ ";error=" + error);
+			}
+		});
+		$('#series_add_form').unbind();//以下两行可以阻止提交2次
+		e.stopPropagation();
+		return false;
+		});
+	}
+	
+
+	
+	function closeBrand() {
+		$(document).sgWindow('close', {
+			id : 'brand_add_window'
+		});
+	}
+	
+	function closeSeries() {
+		$(document).sgWindow('close', {
+			id : 'series_add_window'
+		});
+	}
+	
+	
+	function close_main() {
+		$(document).sgWindow('close', {
+			id : 'maintainItems_window'
+		});
+	}
+	
+	
+	
+	
+	function closeCompany() {
+		$(document).sgWindow('close', {
+			id : 'model_add_window'
+		});
+	}
+	
+	
+	function addItem0() {
+	
+			var defaults = {
+					title : '添加品牌',
+					id : 'brand_add_window',
+					form : 'brand_add_form',
+					url : 'brand_add.html',
+					/* success : loadSuccess, */
+					width : 260,
+					height : 80,
+					buttons : [ {
+						name : '确定',
+						type : 'submit',
+						onpress : saveBrand
+					}, {
+						name : '取消',
+						onpress : closeBrand
+					} ]
+				};
+				$(document).sgWindow(defaults);
+	}
+	
+	function addItem1() {
+		
+		var defaults = {
+				title : '添加车系',
+				id : 'series_add_window',
+				form : 'series_add_form',
+				url : 'series_add.html',
+				success : loadSuccess,
+				width : 300,
+				height : 185,
+				buttons : [ {
+					name : '确定',
+					type : 'submit',
+					onpress : saveSeries
+				}, {
+					name : '取消',
+					onpress : closeSeries
+				} ]
+			};
+			$(document).sgWindow(defaults);
+}
+	
+	
+	
+
+	function addItem2() {
+			var defaults = {
+					title : '添加车型',
+					id : 'model_add_window',
+					form : 'model_add_form',
+					url : 'model_add.html',
+					success : loadSuccess2,
+					width : 660,
+					height : 390,
+					buttons : [ {
+						name : '确定',
+						type : 'submit',
+						onpress : saveModel
+					}, {
+						name : '取消',
+						onpress : closeCompany
+					} ]
+				};
+				$(document).sgWindow(defaults);
+	}
+	
+	
+
+	function maintainItemsItem() {
+			var defaults = {
+					title : '保养',
+					id : 'maintainItems_window',
+					form : 'maintainItems_form',
+					url : 'maintainItems.html',
+					success : loadSuccess3,
+					width : 900,
+					height : 500,
+					buttons : [ {
+						name : '确定',
+						type : 'submit',
+						onpress : saveMain
+					}, {
+						name : '取消',
+						onpress : close_main
+					} ]
+				};
+				$(document).sgWindow(defaults);
+	}
+	
+	function delItem() {
+		if ($('#id').val() == '') {
+			$(document).sgPup({message:'message_alert',text: "请选择要删除的项！"});
+			return;
+		}
+		var level =  $('#level').val();
+		var url ='';
+		if(level == 0){
+			url ='../../brand/delete';
+		}else if(level == 1){
+			url ='../../series/delete';
+		}else{
+			url ='../../model/delete';
+		}
+
+		$(document).sgConfirm({text: '确定删除吗?',cfn:function(r){ 
+			  if(r){
+			$.ajax( {
+				  type : 'POST', 
+				  async: false,  
+				  url : url,   
+				  data:{id:$("#id").val()},
+      		  success : function(data) {
+      			  if(data){
+      				 if(data.success){
+      					 $("#search_btn").trigger("click");//触发按钮
+						//$('#company_tree').sgTree('reload');
+						$("input[type=reset]").trigger("click");//触发reset按钮
+						$('#img').attr("src",''); 
+      				 }
+      				$(document).sgPup({message:'message_alert',text: data.msg});
+      			  }
+      		  } ,     
+      		  error : function(res,error) { 
+      		  	 alert("responseText="+res.responseText+";error="+error);     
+      		  }    
+      		}); 
+			
+			
+		} 	  
+	          }});
+		
+		
+	}
+
+	function save() {
+		$("#company_detail").on('submit',
+				function(e) {
+		var level =  $('#level').val();
+		if(level ==0){
+			//做表单提交
+			$.ajax({
+				type : 'post',
+				async : false,
+				contentType : 'application/json',
+				dataType : 'json',
+				url : '../../brand/update',
+				data : JSON.stringify({
+					id : $('#id').val(),
+					name : $('#brand_name').val()
+				}),
+				success : function(data) {
+					if (data) {
+						if (data.success) {
+							$("#search_btn").trigger("click");//触发按钮
+							//$('#company_tree').sgTree('reload');
+						}
+						$(document).sgPup({message:'message_alert',text: data.msg});
+					}
+				},
+				error : function(res, error) {
+					alert("responseText=" + res.responseText + ";error=" + error);
+				}
+			});
+			
+		}else if(level ==1){
+			
+			//做表单提交
+			$.ajax({
+				type : 'post',
+				async : false,
+				contentType : 'application/json',
+				dataType : 'json',
+				url : '../../series/update',
+				data : JSON.stringify({
+					id : $('#id').val(),
+					name : $('#series_name').val(),
+					producer : $('#producer').val(),
+					remark : $('#remark').val()
+				}),
+				success : function(data) {
+					if (data) {
+						if (data.success) {
+							 $("#search_btn").trigger("click");//触发按钮
+							//$('#company_tree').sgTree('reload');
+						}
+						$(document).sgPup({message:'message_alert',text: data.msg});
+					}
+				},
+				error : function(res, error) {
+					alert("responseText=" + res.responseText + ";error=" + error);
+				}
+			});
+			
+		}else{
+			//做表单提交
+			$.ajax({
+				type : 'post',
+				async : false,
+				contentType : 'application/json',
+				dataType : 'json',
+				url : '../../model/update',
+				data : JSON.stringify({
+					id : $('#id').val(),
+					name : $('#model_name').val()
+				}),
+				success : function(data) {
+					if (data) {
+						if (data.success) {
+							 $("#search_btn").trigger("click");//触发按钮
+							//$('#company_tree').sgTree('reload');
+						}
+						$(document).sgPup({message:'message_alert',text: data.msg});
+					}
+				},
+				error : function(res, error) {
+					alert("responseText=" + res.responseText + ";error=" + error);
+				}
+			});
+			
+			
+		}
+		
+		$('#company_detail').unbind();//以下两行可以阻止提交2次
+		e.stopPropagation();
+		return false;
+		});
+	}
+	
+	function callback(url,flag) {
+		if(flag){
+			 $(document).sgPup({message:'message_info',text: "操作成功！"});
+			 $("#search_btn").trigger("click");//触发按钮
+				//$('#company_tree').sgTree('reload');
+				if(url != null){
+					$("#image",$("#company_main")).show();
+					$('#image','#company_main').attr("src",url); 
+				}
+		}
+	}
+	
+	
+	
+</script>
+</html>

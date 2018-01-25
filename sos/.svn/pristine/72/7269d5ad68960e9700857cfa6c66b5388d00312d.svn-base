@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css"><link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<title>归还入库</title>
+</head>
+<body>
+   <div id="nw_document_all">
+	<form id='whs_stockin_return_form' method='post' class="form" style="width:880px;" >
+		<div class='title'>归还入库信息></div>
+		<fieldset style="width:860px;">
+            <div class="panel">
+                <span>入库单号:</span>
+                <input type='text' id="stockInNo" name='stockInNo' disabled="disabled" style="width:165px;" />
+                
+                <span>入库日期:</span>
+                <input type='date' id="stockInStamp" name='stockInStamp' disabled="disabled" style="width:155px;" />
+                
+                <span>经办人:</span>
+                <input type="text" name="stockInManagers" id="stockInManagers" required="true" list="userList" style="width:170px;" autocomplete="on" />
+                <input type="hidden" name="stockInManagersId" id="stockInManagersId" required="true" />
+                <datalist id="userList"></datalist>
+            </div>
+            <div class="panel"> 
+                <span>备注:</span>
+                <input type='text' id="stockInRemark" name='purchaseRemark' style="width:690px;" />
+            </div>
+        </fieldset>
+		
+		<div class="title">借用列表></div>
+		<fieldset class='fieldset' style="width:860px;">
+            <div id="dgd_borrows_detail" class="datagird"></div>
+        </fieldset>
+        
+		<div class="title">归还明细></div>
+		<fieldset class='fieldset'  style="width:860px;">
+            <div class='datagrid'>
+            	<div class="hDiv" style="margin:0px;padding:0px;">
+	                <table>
+	                    <thead>
+	                    <tr>
+	                        <th style="width:34px;">序号</th>
+	                        <th style="width:100px;">商品编码</th>
+	                        <th style="width:170px;">商品名称</th>
+	                        <th style="width:260px;">商品规格</th>
+	                        <th style="width:80px;">借用数量</th>
+	                        <th style="width:100px;">本次归还数量</th>
+	                    </tr>
+	                    </thead>
+	                </table>
+                </div>
+                <div class="bDiv" style="height: 160px;margin:0px;padding:0px;" >
+                	<table id="dgd_writeoffs_details" cellpadding="0" cellspacing="0" border="0">
+                	</table>
+                </div>
+            </div>
+        </fieldset>
+        
+        <fieldset style="width:860px;">	
+	        <div class="submit">
+	        <button id="stockin_detail_submit1" type="submit"style="width:60px;">提交</button>
+	            <button id="stockin_detail_submit" type="submit" style="width:112px;">提交并打印</button> <button id="btns_reset" type="button">重置</button>
+	        <button id="btn_print" type="button" style="display: none;">打印</button>
+	        </div>
+        </fieldset>
+	</form>
+	</div>
+	<!-- 打印iframe -->
+	<iframe id="ifm_print_wsrf" name="ifm_print_wsrf" style="display: none"></iframe>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+	(function($){
+		var userList = null
+		
+		$.ajax( {
+			  type : 'POST', 
+			  async: false,  
+			  dataType : 'json', 
+			  url : '../../stock/getStockInOutNo',   
+			  data: {isIn:true},
+			  success : function(data) {
+				  if(data.success){
+					  $("#stockInNo").val(data.code);
+				  }else{
+					  if(data.msg&&data.msg.indexOf('仓库正在盘点')>-1){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						  }
+					  $(document).sgPup({message:'message_info',text: data.msg,cfn:function(){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						}});  
+					  }
+			  } 
+		});
+		
+		var checkUser = function(){
+			if(!this.value){
+				return false;
+			}
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.opname = this.value;
+			params.filter.isCompany = true;//查询机构下的的所有操作人
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getOrgOperators',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#stockInManagers","#whs_stockin_return_form");
+						  						  
+						  if(manager){
+							  if(data.items.length>0){
+						 		  userList = {};
+								  $("#userList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.opname);
+								  $("#userList").append(op);
+								  
+								  userList[v.opname] = v.opid;
+		 				  	 }); 
+							}
+					  }else{
+					  	$(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		}
+		
+	  //填充员工
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getOrgOperators',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#stockInManagers","#whs_stockin_return_form");
+				  if(manager){
+					  if(data.items.length>0){
+				  		  userList = {};
+						  $("#userList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userList").append(op);
+						  
+						  userList[v.opname] = v.opid;
+ 				  	 }); 
+					  manager.on('keyup',checkUser);
+					  manager.on('change',function(){
+						  	var strs = this.value.split(" ");
+							$(this).val(strs[strs.length-1]);
+							$("#stockInManagersId","#whs_stockin_return_form").val(userList[strs[strs.length-1]]);
+							if($("#stockInManagersId","#whs_stockin_return_form").val().length==0){
+								$("#stockInManagers","#whs_stockin_return_form").val("");
+							}
+						});
+
+					};
+			  }else{
+			  	$(document).sgPup({message:'message_info',text: data});
+			  }
+		  },     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});	
+		
+		
+		//改变电工,修改借用信息
+		$('#stockInManagers').change(function(){
+			try{
+				//重新加载借用明细列表
+				if($("#stockInManagersId").val().length>0){
+					var query={borrowerId:$("#stockInManagersId").val(),writeoffsStatus:0,type:0,remark:1};//用remark表示是否只查询明细,1表示只查询出明细
+					$('#dgd_borrows_detail').sgDatagrid('reload',{query:query,url: '../../stock/findBorrows'});
+				};
+				
+			}catch(e){
+				$(document).sgPup({message:'message_info',text: e});
+			}
+		});
+		
+		var chkChange=function(index,rowData,isChecked){
+			var id=rowData.id;
+			if(isChecked){
+				var pid = rowData.productId;
+				var ptx = rowData.productName;
+				var code = rowData.productCode;
+				var norm = rowData.norm;
+				var num = rowData.num;
+				var money = rowData.money;
+				if(pid==null||pid==''){
+					$(document).sgPup({message:'message_info',text: "商品不能为空!"})
+					return false;
+				}
+	
+				if(num<=0){
+					$(document).sgPup({message:'message_info',text: "数量必须大于０!"})
+					return false;
+				}
+				
+				var grid = $('#dgd_writeoffs_details');
+				var tr = $('<tr></tr>');
+				tr.attr('id',id+'_tr');
+				
+				if($('#'+id+'_tr').get(0)){
+					$("#"+id+"_tr",$('#dgd_writeoffs_details')).remove();
+				}
+				
+				var sno = $('<td></td>')
+				sno.width(34);
+				tr.append(sno);
+				
+				var td1 = $('<td></td>');
+				var rowId = $("<input type='hidden' name='borrowId3' />")
+				rowId.val(id);
+				td1.append(rowId);
+				var sid = $("<input type='hidden' name='productId3' />")
+				sid.val(pid);
+				td1.append(sid);
+				
+
+				var td2 = $('<td></td>');
+				var productCode = $("<input type='hidden' name='commodityCode' disabled='disabled'/>");
+				productCode.val(code);
+				productCode.width(90);
+				td2.width(100);
+				td2.append(productCode);
+				td2.append(code);
+				tr.append(td2);
+				
+				var productName = $("<input type='hidden' name='commodityName' disabled='disabled'/>");
+				productName.val(ptx);
+				productName.width(160);
+				td1.append(productName);
+				td1.append(ptx);
+				td1.width(170);
+				tr.append(td1);
+				
+				var td3 = $('<td></td>');
+				var productNorm = $("<input type='hidden' name='commodityNorm' disabled='disabled'/>");
+				productNorm.val(norm);
+				productNorm.width(250);
+				td3.width(260);
+				td3.append(productNorm);
+				var dv = $('<div></div>');
+                dv.css('padding-top','5px');
+                dv.css('line-height','16px');
+                dv.append(norm);
+				td3.append(dv);
+				tr.append(td3);
+				
+				var td4 = $('<td></td>');
+				var innum = $("<input type='number' name='num3' disabled='disabled'/>");
+				innum.on('keyup',function(){
+					this.value=this.value.replace(/\D/g,'');
+				});
+				innum.val(num);
+				innum.width(70);
+				td4.width(80);
+				td4.append(innum);
+				tr.append(td4);
+				
+				var td5 = $('<td></td>');
+				var writeoffsNum = $("<input type='number' name='writeoffsNum3' max='"+num+"' min='1' />");
+				writeoffsNum.on('keyup',function(){
+					this.value=this.value.replace(/\D/g,'');
+				});
+				writeoffsNum.val(num);
+				writeoffsNum.width(80);
+				td5.width(100);
+				td5.append(writeoffsNum);
+				tr.append(td5);
+				
+				
+				grid.append(tr);
+				
+				sno.append(grid.find('tr').length);
+			}else{
+				$("#"+id+"_tr",$('#dgd_writeoffs_details')).remove();
+				$.each($('#dgd_writeoffs_details').find('tr'),function(k,v){
+					$(v).find('td:first').html(k+1);
+				})
+			}
+			
+			$('tr:odd','#dgd_writeoffs_details').addClass('normalRow');
+			
+		}
+		
+	    //初始化员工借用商品表格
+	   	 var defaults = {
+	   				width:  850,
+	   		        height: 150,
+	   		     	url:'',
+	   		        //url: '../../stock/findBorrows',
+	   		     	query:{managersId:'test'},
+	   		     	chkChange:chkChange,
+	   		        isNotCheckall:true,
+	   		     	colid:'id',  //主键
+	   		        rownumbers:true,//序号
+	   		        colModel : [
+	   		            {display: '商品名称', name : 'productName', width : 140, sortable : false},
+	   		         	{display: '商品编码', name : 'productCode', width : 100, sortable : false},
+	   		         	{display: '商品规格', name : 'norm', width : 140, sortable : false},
+	   		            {display: '数量', name : 'num', width : 60, sortable : false},
+	   		         	{display: '借用时间', name : 'stamp', width : 120, sortable : false},
+	   		         	{display: '代理商', name : 'channelName', width : 140, sortable : false}
+	   		        ],
+	   		        query:{writeoffsStatus:0}//未销
+	   		    };
+	   	$('#dgd_borrows_detail').sgDatagrid(defaults); 
+	    
+	   	$("#stockInStamp").val(new Date().format('yyyy-MM-dd'));
+	   	
+	   	//归还入库保存
+		$('button[type=submit]').on('click',function(){
+			var $this=this;
+			$('form:eq(0)').unbind('submit');
+		   	$('#whs_stockin_return_form').on('submit',function(e){
+		   		$(document).sgConfirm({text: '确定进行归还入库吗?',cfn:function(r){ 
+			     if(r){
+		   		   //做表单提交
+		            var params = {};
+			   	    var obj = $('#dgd_borrows_detail');
+			        var bDiv = $('.bDiv',obj);
+			        //alert($('input[type=checkbox][checked=checked]',bDiv).length) ;
+			        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length<1){
+			            $(document).sgPup({message:'message_info',text: "请选择一个借用列表选项！"});
+			            return false;
+			        }
+			        params.type = 2;
+		            params.code = $('#stockInNo','#whs_stockin_return_form').val();
+		            params.stamp= $('#stockInStamp','#whs_stockin_return_form').val();
+		            params.managersId = $("#stockInManagersId",'#whs_stockin_return_form').val();
+		            params.managersName = $("#stockInManagers",'#whs_stockin_return_form').val();
+		     	    params.remark= $('#stockInRemark','#whs_stockin_return_form').val();
+		            
+		            var productIds = $('input[name=productId3]','#whs_stockin_return_form');
+		            var borrowIds=$('input[name=borrowId3]','#whs_stockin_return_form');
+		            var productNums= $('input[name=writeoffsNum3]','#whs_stockin_return_form');
+		            var details = new Array();
+		            if(!params.managersId){
+		         	   $(document).sgPup({message:'message_info',text: '请选择经办人！'})
+		         	   return false;
+		            }
+		            var isGoOn=true;
+		            $.each(productIds,function(k,v){
+		            	var obj = {};
+		            	obj.productId = v.value;
+		            	obj.borrowId = borrowIds[k].value;
+		            	obj.inNum = productNums[k].value;
+		            	details.push(obj);
+		            	if(!v.value){ 
+		               	   $(document).sgPup({message:'message_info',text: '请添加商品！'});
+		             	   isGoOn=false;
+		             	   return false;
+		                }else if(!productNums[k].value){ 
+		               	   $(document).sgPup({message:'message_info',text: '请输入商品数量！'});
+		              	   isGoOn=false;
+		              	   return false;
+		                 }
+		              });
+		              if(!isGoOn){
+		           	   return false;
+		              }
+		              params.stockinDetails = details;
+		            //alert(JSON.stringify(params));
+		            $.ajax( {
+		    		  type : 'post', 
+		    		  async: false,   
+		    		  contentType : 'application/json',     
+		    		  dataType : 'json',     
+		    		  url : '../../stock/addStockIn',   
+		    		  data:JSON.stringify(params),
+		    		  success : function(data) {
+		    			  if(data){
+		    			  	 $(document).sgPup({message:'message_info',text: data.msg,cfn:function(){
+	   	       				
+		       				  if(data.success){
+		       					 if($($this).text()=='提交并打印'){
+		       						var	sName='winPrint';
+		       						var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+		       						if (isChrome){
+		       						  sName='ifm_print_wsrf';
+		       						}
+		       						window.open('print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+		       						if (!isChrome){
+		       							//新增遮罩层
+		       			  				var mask=$('<div id="print_mask"></div>');
+		       			  				mask.addClass('window-mask');
+		       			  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+		       			  		        var span=$('<span></span');
+		       			  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+		       			  		        span.text('正在打印中...');
+		       			  		        mask.append(span);
+		       			  			    $(window.document.body).append(mask);
+		       						}
+		       					 }
+		       				    
+		       				  }
+		       				}});
+		       				//$(document).sgPup({message:'message_info',text: data.msg});
+		       			  }else{
+		       				  $(document).sgPup({message:'message_info',text: data});
+		       			  }
+		    		  } ,     
+		    		  error : function(res,error) { 
+		    		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		    		  }    
+		    		});
+		   		}
+		   	}});
+			    
+		   		    //$("#whs_stockin_return_form").unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+				    e.stopPropagation();	
+				    return false;
+			   	});
+		});
+	  //打印
+		$('#btn_print').on('click',function(){
+			//$('#ifm_print_wsrf').attr('src','stock_print2.html');
+			var	sName='winPrint';
+			var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+			if (isChrome){
+			  sName='ifm_print_wsrf';
+			}
+			window.open('print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+			if (!isChrome){
+				//新增遮罩层
+  				var mask=$('<div id="print_mask"></div>');
+  				mask.addClass('window-mask');
+  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+  		        var span=$('<span></span');
+  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+  		        span.text('正在打印中...');
+  		        mask.append(span);
+  			    $(window.document.body).append(mask);
+			}
+		});
+	})(jQuery)
+	
+	var reset = function(){
+		$("#whs_stockin_return_form").get(0).reset();
+        $('#dgd_borrows_detail .bDiv table').empty();
+    	$('#dgd_writeoffs_details').empty();
+  		$("#stockInStamp").val(new Date().format('yyyy-MM-dd'));
+  		$.ajax( {
+			  type : 'POST', 
+			  async: false,  
+			  dataType : 'json', 
+			  url : '../../stock/getStockInOutNo',   
+			  data: {isIn:true},
+			  success : function(data) {
+				  if(data.success){
+					  $("#stockInNo").val(data.code);
+				  }else{
+					  if(data.msg&&data.msg.indexOf('仓库正在盘点')>-1){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						  }
+					  $(document).sgPup({message:'message_info',text: data.msg,cfn:function(){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						}});  
+					  }
+			  } 
+		});
+	};
+	
+	$("#btns_reset").on('click',function(e){
+		 reset();
+	})
+	
+	//打印页面元素设置
+	    var callback=function(subWinBody,subWin){
+	  	$.ajax( {
+	  		  type : 'post', 
+	  		  async: false,   
+	  		  contentType : 'application/json',     
+	  		  dataType : 'json',     
+	  		  url : '../../getCurrentCompany',   
+	  		  data:JSON.stringify({}),
+	  		  success : function(data) {
+	  			  if(data){
+	  				  var total = 0;
+	  				  var rowtotal = 0;
+	  				  //公司中文名字
+	  				  $("#cname",subWinBody).empty();
+	  				  $("#cname",subWinBody).append(data.cnfullname);
+	  				  //公司英文名字
+	  				  $("#ename",subWinBody).empty();
+	  				  $("#ename",subWinBody).append(data.enfullname);
+	  				  //表单名字
+	  				  $("#orderTitle",subWinBody).empty();
+	  				  $("#orderTitle",subWinBody).append("归还入库单");
+	  				  
+	  				  //表单日期
+	  				  $("#orderDate",subWinBody).empty();
+	  				  $("#orderDate",subWinBody).append($("#stockInStamp","#whs_stockin_return_form").val());
+	  				  //表单单号
+	  				  $("#orderNo",subWinBody).empty();
+	  				  $("#orderNo",subWinBody).append($("#stockInNo","#whs_stockin_return_form").val());
+	  				  
+	  				  //表前输入单
+	  				  //得到仓库名称
+	         	         $.ajax({
+	  	       			  type : 'POST', 
+	  	       			  async: false,   
+	  	       			  url : '../../stock/getWarehouseName', 
+	  	       			  dataType : 'json',  
+	  	       			  data:{},
+	  	       			  success : function(data) {
+	  	       				  if(data){
+	  	       					 var str = '<span>入库仓库：</span><div>'+data.name+'</div>';
+	 	       					 $("#headInput",subWinBody).append(str);
+	  	       				  }else{
+	  	       					 var str = '<span>入库仓库：</span><div>&nbsp;</div>';
+	       					 	 $("#headInput",subWinBody).append(str);
+	  	       				  }
+	  	       			  } ,     
+	  	       			  error : function(res,error) { 
+	  	       			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  	       			  }   
+	  	       			  
+	  	       		    });
+	  				  
+	  				  var order = '<span>借用人：</span><div>'+$("#stockInManagers").val()+'</div>';
+	  				  $("#headInput",subWinBody).append(order);
+	  			
+	  				  //表头
+	  				  $("#tbHead",subWinBody).append('<td style="width: 10%;">序号</td>'+
+	  														  '<td style="width: 15%;">商品编码</td>'+
+	  														  '<td style="width: 15%;">商品名称</td>'+
+	  														  '<td style="width: 20%;" >商品规格</td>'+
+	  														  '<td style="width: 20%;">借用数量</td>'+
+	  														  '<td style="width: 20%;">本次归还数量</td>');
+	  				  
+	  				  //表格主体
+	  				  var productIds = $('input[name=productId3]','#whs_stockin_return_form');
+	  				  var nums= $('input[name=num3]','#whs_stockin_return_form');
+	                  var productNums= $('input[name=writeoffsNum3]','#whs_stockin_return_form');
+            		  var productNames=$('input[name=commodityName]','#whs_stockin_return_form');
+            		  var productCodes=$('input[name=commodityCode]','#whs_stockin_return_form');
+            		  var productNorms=$('input[name=commodityNorm]','#whs_stockin_return_form');
+             	  
+	  	              $.each(productIds,function(k,v){
+	  	            	total = Number(total) + Number(productNums[k].value);
+	  	               	var tbbody_tr = '<tr><td>'+(k+1)+'</td>'
+										+'<td>'+productCodes[k].value+'</td>'
+	  	               	                +'<td>'+productNames[k].value+'</td>'
+	  	                                +'<td>'+productNorms[k].value+'</td>'
+	  	               	                +'<td>'+nums[k].value+'</td>'
+	  	               					+'<td>'+productNums[k].value+'</td></tr>';	
+
+	  	               	$("#tbBody",subWinBody).append(tbbody_tr);
+	  	              })
+	  				   //表合计
+					  var tbfoot = '<tr>';
+					  tbfoot=tbfoot+'<td colspan="5"><div style="text-align:right">小计:</div></td>';
+					  tbfoot=tbfoot+'<td colspan="1"><div style="text-align:right">'+total+'</div></td>';
+					  tbfoot=tbfoot+'</tr>';
+					  $("#tbBody",subWinBody).append(tbfoot);
+	  				 /*  //表合计
+	  				  var tbfoot = '<tr><td style="width:428px;"><div style="text-align:right;">小计:</div></td><td style="width:498px;"><div style="text-align:right;padding-right:130px;">'+total+'</div></td></tr>';
+	  				  			  
+	  				  $("#tbFoot",subWinBody).append(tbfoot); */
+	  				  
+	  				  //表尾输入单
+	  				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+	  													  '<span>归还人：</span><div>&nbsp;</div>'+
+	  													  '<span>仓库：</span><div>&nbsp;</div>'+
+	  													  '<span>制单：</span><div>&nbsp;</div>');
+	  				reset();
+	  				  
+	  			  }else{
+	  				  $(document).sgPup({message:'message_info',text: data});
+	  			  }
+	  		  } ,     
+	  		  error : function(res,error) { 
+	  		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  		  }    
+	  		});
+	  	
+	      if (navigator.appName == 'Microsoft Internet Explorer'){
+	      	subWin.print();  
+	      }else{ 
+	      	subWin.focus();
+	      	subWin.print();  
+	      }
+	      
+	      
+	  }
+</script>
+</html>

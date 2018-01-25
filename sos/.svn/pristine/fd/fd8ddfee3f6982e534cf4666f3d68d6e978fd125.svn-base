@@ -1,0 +1,54 @@
+
+<meta charset="UTF-8">
+&nbsp;警情声音:<input type="checkbox" checked="checked" style='vertical-align:middle;'/>
+
+<div id="ba_left_alarm" class="datagrid" style="overflow:hidden"></div>
+
+<script type="text/javascript">
+
+	(function($){
+		var head_defaults = {
+	            id: 'grid1',
+	            width:  198,
+	            height: 460,
+	            url: 'web/bsp/alarm.json',
+	            colModel : [
+	                {display: '工单号', name : 'key', width : 109},
+	                {display: '任务类型', name : 'value', width : 50}
+	            ]
+	        };
+	    $("#ba_left_alarm").sgDatagrid(head_defaults);
+	})(jQuery)
+	
+	$(function () {
+		var winClose = function() {
+			$(document).sgWindow('close', {
+				id : 'dispathch'
+			});
+		}
+		
+		$("#ba_left_alarm a").on('click',function(){
+			var defaults = {
+       			title : '出警派工单',
+       			id : 'dispathch',
+       			form : 'dispathch_form',
+       			url : 'web/bsp/dispathch/dispathch_repair.html',
+       			width : 710,
+       			height : 440,
+       			buttons : [ {
+       				name : '保存',
+       				type : 'submit',
+       				onpress : winClose
+       			}, {
+       				name : '发送短信',
+       				onpress : winClose
+       			}, {
+       				name : '打印',
+       				onpress : winClose
+       			} ]
+       		};
+       		$(document).sgWindow(defaults);
+		});
+		
+	});
+</script>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>报表主页面</title>
+    <link rel="stylesheet" type="text/css" href="css/ba_layout.css">
+    <style type="text/css">
+    	.ba_menu a:hover { 
+			background:#c4cdd9; 
+		}
+    </style>
+</head>
+
+<body>
+    <aside id="rp_menu" style="overflow: hidden" class="ba_menu"></aside>
+    <article id="rp_main" class="ba_main"></article>
+</body>
+<script type="text/javascript">
+    (function($){
+    	var myclick = function(treenode){
+    		window.mainUrl = treenode.url;
+            $("#rp_main").load('web/'+treenode.url);
+        }        
+        var defaults = {
+                url: 'moduleList',
+                onclick: myclick,
+                level:2,
+                parentMenu:'rp',
+                rendto:'rp_menu'
+            };
+
+        $('#rp_menu').sgMenu(defaults);
+        if(window.mainUrl!=null) $("#rp_main").load("web/"+window.mainUrl);
+        else{
+        	$("#rp_main").load("web/"+window.rp_main);
+        	window.mainUrl = window.rp_main;
+        }
+
+    })(jQuery)
+</script>
+</html>

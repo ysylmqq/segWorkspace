@@ -1,0 +1,262 @@
+package com.gboss.pojo;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import com.gboss.util.CustomDateSerializer;
+
+/**
+ * @Package:com.gboss.pojo
+ * @ClassName:Collection
+ * @Description:TODO
+ * @author:xiaoke
+ * @date:2014-4-2 上午11:49:17
+ */
+
+@Entity
+@Table(name = "t_ba_collection")
+public class Collection extends BaseEntity {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long collection_id;//'托收资料ID',
+	private Long customer_id;//'客户ID',
+	private Long subco_no;//LDAP分公司ID
+	private String pay_ct_no="";//'托收合同号, 集团客户与归档合同号可能不同',
+	private String ac_no="";//'银行帐号',
+	private Integer ac_type=0;//'账号类型, 系统值3120, 0=借记卡, 1=存折, 2=信用卡',
+	private String ac_name="";//'账户名/托收用户名, 集客为公司名, 一般与客户名一致',
+	private String ac_id_no;//'账户名对应的身份证号码',
+	private String bank="";//'银行名称',
+	private String bank_code="";//'银行编号(与托收机构相关)',
+	private Integer agency=2;//'托收机构, 系统值3000, 1=银盛, 2=金融中心, 3=银联',
+	private Integer fee_cycle=1;//'收费周期(月)',
+	private Integer is_delivery=0;//'发票是否投递, 系统值3110, 0=不投递, 1=平邮, 2=挂号信, 3=电子账单',
+	private String addressee;//'发票收件人',
+	private Integer print_freq;//'发票打印频率(月)',
+	private String province;//'投递地址省',
+	private String city;//'投递地址市',
+	private String area;//'投递地址县/区',
+	private String address;//'具体地址(街道门牌号码)',
+	private String post_code;//'邮政编码',
+	private String tel;//收件人联系电话
+	private String transactor;//'客户经办人(客户委托人)',
+	private Date create_date;//'录入时间, 第一次记录',
+	private Long op_id;//'操作员ID',
+	private Date stamp;//'操作时间',
+	
+	@Id
+	@Column(name = "collection_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)//可以用increment，或者seqence(oracle),identity(mysql,ms sql)
+	public Long getCollection_id() {
+		return collection_id;
+	}
+	public void setCollection_id(Long collection_id) {
+		this.collection_id = collection_id;
+	}
+	
+	@Column(name = "customer_id")
+	public Long getCustomer_id() {
+		return customer_id;
+	}
+	public void setCustomer_id(Long customer_id) {
+		this.customer_id = customer_id;
+	}
+	
+	@Column(name = "subco_no")
+	public Long getSubco_no() {
+		return subco_no;
+	}
+	public void setSubco_no(Long subco_no) {
+		this.subco_no = subco_no;
+	}
+	
+	@Column(name = "pay_ct_no")
+	public String getPay_ct_no() {
+		return pay_ct_no;
+	}
+	public void setPay_ct_no(String pay_ct_no) {
+		this.pay_ct_no = pay_ct_no;
+	}
+	
+	@Column(name = "ac_no")
+	public String getAc_no() {
+		return ac_no;
+	}
+	public void setAc_no(String ac_no) {
+		this.ac_no = ac_no;
+	}
+	
+	@Column(name = "ac_type")
+	public Integer getAc_type() {
+		return ac_type;
+	}
+	public void setAc_type(Integer ac_type) {
+		this.ac_type = ac_type;
+	}
+	
+	@Column(name = "ac_name")
+	public String getAc_name() {
+		return ac_name;
+	}
+	public void setAc_name(String ac_name) {
+		this.ac_name = ac_name;
+	}
+	
+	@Column(name = "ac_id_no")
+	public String getAc_id_no() {
+		return ac_id_no;
+	}
+	public void setAc_id_no(String ac_id_no) {
+		this.ac_id_no = ac_id_no;
+	}
+	
+	@Column(name = "bank")
+	public String getBank() {
+		return bank;
+	}
+	public void setBank(String bank) {
+		this.bank = bank;
+	}
+	
+	@Column(name = "bank_code")
+	public String getBank_code() {
+		return bank_code;
+	}
+	public void setBank_code(String bank_code) {
+		this.bank_code = bank_code;
+	}
+	
+	@Column(name = "agency")
+	public Integer getAgency() {
+		return agency;
+	}
+	public void setAgency(Integer agency) {
+		this.agency = agency;
+	}
+	
+	@Column(name = "fee_cycle")
+	public Integer getFee_cycle() {
+		return fee_cycle;
+	}
+	public void setFee_cycle(Integer fee_cycle) {
+		this.fee_cycle = fee_cycle;
+	}
+	
+	@Column(name = "is_delivery")
+	public Integer getIs_delivery() {
+		return is_delivery;
+	}
+	public void setIs_delivery(Integer is_delivery) {
+		this.is_delivery = is_delivery;
+	}
+	
+	@Column(name = "addressee")
+	public String getAddressee() {
+		return addressee;
+	}
+	public void setAddressee(String addressee) {
+		this.addressee = addressee;
+	}
+	
+	@Column(name = "print_freq")
+	public Integer getPrint_freq() {
+		return print_freq;
+	}
+	public void setPrint_freq(Integer print_freq) {
+		this.print_freq = print_freq;
+	}
+	
+	@Column(name = "province")
+	public String getProvince() {
+		return province;
+	}
+	public void setProvince(String province) {
+		this.province = province;
+	}
+	
+	@Column(name = "city")
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	
+	@Column(name = "area")
+	public String getArea() {
+		return area;
+	}
+	public void setArea(String area) {
+		this.area = area;
+	}
+	
+	@Column(name = "address")
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	
+	@Column(name = "post_code")
+	public String getPost_code() {
+		return post_code;
+	}
+	public void setPost_code(String post_code) {
+		this.post_code = post_code;
+	}
+	
+	@Column(name = "tel")
+	public String getTel() {
+		return tel;
+	}
+	public void setTel(String tel) {
+		this.tel = tel;
+	}
+	
+	@Column(name = "transactor")
+	public String getTransactor() {
+		return transactor;
+	}
+	public void setTransactor(String transactor) {
+		this.transactor = transactor;
+	}
+	
+	@Column(name = "create_date")
+	public Date getCreate_date() {
+		return create_date;
+	}
+	public void setCreate_date(Date create_date) {
+		this.create_date = create_date;
+	}
+	
+	@Column(name = "op_id")
+	public Long getOp_id() {
+		return op_id;
+	}
+	public void setOp_id(Long op_id) {
+		this.op_id = op_id;
+	}
+	
+	@Column(name = "stamp",nullable=false,updatable=true,insertable=true)
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonSerialize(using = CustomDateSerializer.class)
+	public Date getStamp() {
+		return stamp;
+	}
+	public void setStamp(Date stamp) {
+		this.stamp = stamp;
+	}
+	
+}

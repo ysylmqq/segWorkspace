@@ -1,0 +1,138 @@
+body{
+    font-size: 15px;
+    margin: 0px;
+    padding: 0px;
+}
+.head{
+    overflow: hidden;
+    margin: 0px;
+    padding: 0px;
+}
+.head .space{
+    float: left;
+    width: 200px;
+}
+.head .title{
+    float: left;
+    width: 100%;
+}
+.head .title .cname{
+    font-size: 24px;
+    text-align: center;
+    font-weight:bold;
+}
+.head .title .ename{
+    font-size: 18px;
+    text-align: center;
+    font-weight:bold;
+}
+.head .title .content{
+    margin: 10px;
+    font-size: 28px;
+    text-align: right;
+    font-weight:bold;
+    width: 55%;
+    float: left;
+}
+.title_10{
+	width: 40%;
+	float: left;
+}
+.title_10 span {
+	padding-left: 7%;
+	display: inline-block;
+	height: 24px;
+	line-height: 24px;
+}
+.title_1{
+	width: 100%;
+}
+.title_ib {
+	display: inline-block;
+}
+.head .other{
+    float: left;
+    width: 250px;
+    margin-top: 30px;
+    font-size: 16px;
+    overflow: hidden;
+}
+.head .other span{
+    float: left;
+    text-align: right;
+    width:100px;
+    margin-bottom: 5px;
+}
+.head .other div{
+    float: left;
+    text-align: left;
+    width:150px;
+    margin-bottom: 5px;
+}
+.headinput{
+    overflow: hidden;
+    margin-bottom: 10px;
+    font-size: 16px;
+    width: 1000px;
+}
+.headinput span{
+    float: left;
+    text-align: right;
+    width:180px;
+}
+.headinput div{
+    float: left;
+    text-align: left;
+    width:300px;
+}
+
+.datagrid {
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: normal;
+    border: 0px solid #000;
+    overflow: hidden;
+    color: #000;
+}
+.hDiv{
+    overflow: hidden;
+}
+
+.hDiv table {
+    border: 1px solid #000;
+    border-bottom: 0px;
+    border-right: 0px;
+}
+
+.hDiv td{
+    text-align: left;
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+    overflow: hidden;
+    vertical-align: top !important;
+    padding-left: 4px;
+    padding-right: 4px;
+    line-height: 21px;
+    word-break:break-all;
+}
+.hDiv thead,tbody{
+	font-size: 16px;
+}
+.hDiv td div{
+    padding-top: 5px; line-height: 20px;
+} 
+.foot{
+    overflow: hidden;
+    margin-top:10px;
+    font-size: 17px;
+    font-weight:bold;
+}
+.foot span{
+    float: left;
+    text-align: right;
+    width:80px;
+}
+.foot div{
+    float: left;
+    text-align: left;
+    width:140px;
+}

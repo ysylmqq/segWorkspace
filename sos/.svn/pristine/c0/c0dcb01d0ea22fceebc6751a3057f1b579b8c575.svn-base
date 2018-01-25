@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>盘点导入</title>
+<style type="text/css">
+.form span{
+	width: 70px;
+}
+.form input[type=file] {
+	width:280px;
+}
+</style>
+</head>
+
+<body>
+<form id="form_imp" method="post" class="form" action="../../sell/impCheck" target="frm_imp" enctype="multipart/form-data">
+		<table >
+		  <tr>
+		  	<td>
+		  		<span>选择文件:</span>
+		  	</td>
+		    <td >
+			 	<input type="file" id="checkFile" width="100px" name="checkFile" required="required"/>
+		 	</td>
+		    <td >
+		    	<input type="button" id="btn_template_down" value="模板下载" width="70px"/>
+		    </td>
+		  </tr>
+		</table>
+</form>
+<iframe name='frm_imp' id="frm_imp" style="display:none;" ></iframe> 
+</body>
+<script type="text/javascript">
+(function($){
+	$('#btn_template_down').on('click',function(){
+		document.getElementById('frm_imp').src="../../doc/template/Check.xls";
+	});
+})(jQuery)
+function callback(msg)   
+{   
+	$(document).sgPup({message:'message_info',text: msg});
+	if(msg=='导入成功') {
+		 $(document).sgWindow('close',{id:'win_imp'});
+		 $('#dgd_check').sgDatagrid('reload','sgDatagrid');
+	}
+}   
+</script>
+</html>

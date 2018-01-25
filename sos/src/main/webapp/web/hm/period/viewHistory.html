@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>历史情况查询</title>
+</head>
+<body>
+	<div id="monitoring"><!-- nw_document_all -->
+		<div id="dgd_history_dv" class="datagrid"></div>
+	</div>
+	<script type="text/javascript">
+		//初始化表格
+		var defaults = {
+			title: "历史情况查询 ",
+			width:  '100%',
+			fitColumn:  true,
+			height: 280,
+			url:'',
+			usepager: true,
+			rownumbers:true,
+	//		autoLoad : true,
+			useRp: true,
+			colid:'call_letter',  //主键
+			colModel : [
+				{display: '呼号', name : 'call_letter', width : 110, sortable : false},
+				{display: '通话时长', name : 'voice_time', width : 80, sortable : false},
+				{display: '流量', name : 'data', width : 80, sortable : false},
+				{display: '月份', name : 'month', width : 80, sortable : false},
+				{display: '天数', name : 'days', width : 80, sortable : false},
+				{display: '生成时间', name : 'stamp', width : 110, sortable : false}
+			],
+			buttons : [
+			],
+			query:{}
+		};
+		$('#dgd_history_dv').sgDatagrid(defaults);
+	</script>
+</body>
+</html>

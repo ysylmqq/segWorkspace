@@ -1,0 +1,101 @@
+@CHARSET "UTF-8";
+/* 全局 start  */
+body {
+ margin: 0;
+ padding: 0;
+}
+
+.right-panel {
+ margin-left: 295px;
+ padding-bottom: 0;
+ margin-bottom: 0;
+}
+
+.left-panel {
+ width: 290px;
+ padding-bottom: 0;
+ margin-bottom: 0;
+ position: absolute;
+}
+
+/* 全局 end  */
+#_searchResultPanel, #_watchListPanel, #_GPSMsgPanel, #_orderMsgPanel,
+#_position_search_result_table {
+ overflow-y: auto;
+}
+#_GPSMsgPanel td {
+ white-space: nowrap;
+}
+#body_panel {
+ min-height: 615px;
+}
+#_searchResultPanel, #_watchListPanel ,#_orderMsgPanel {
+ min-height: 408px;
+}
+#_GPSMsgPanel {
+ min-height: 145px;
+}
+#_position_search_result_table {
+ min-height: 453px;
+}
+#_orderMsgPanel .wait {
+ background: url(../images/wait.png) no-repeat 0 2px;
+ padding-left:15px;
+}
+#_orderMsgPanel .correct {
+ background: url(../images/correct.png) no-repeat 0 2px;
+ padding-left:15px;
+}
+#_orderMsgPanel .error {
+ background: url(../images/error.png) no-repeat 0 2px;
+ padding-left:15px;
+}
+#_orderMsgPanel>.list-group>.list-group-item  {
+ padding-bottom: 0;
+ padding-top: 5px;
+}
+#_orderMsgPanel>.list-group>.list-group-item>i {
+ cursor: pointer;
+}
+#_orderMsgPanel>.list-group>.list-group-item>.list-group>.list-group-item {
+ margin: 0;
+ padding-right: 0;
+ padding-bottom: 0;
+ padding-top: 0;
+}
+#_orderMsgPanel>.list-group>.list-group-item>.list-group>.list-group-item>div {
+ margin-left:20px;
+}
+/*  滑块start  */
+.left-panel, .right-panel{
+ cursor: auto;
+}
+
+/* 地图 start */
+#map_panel {
+ margin-bottom: 5px;
+}
+
+#map_toolbar a:link, #map_toolbar a:visited, #map_toolbar a:hover, #map_toolbar a:active {
+ color: #3174c7;
+ text-decoration: none;
+}
+
+#map_toolbar a {
+ margin-left: 8px;
+ font-size: 12px;
+ white-space: nowrap; /*规定段落中的文本不进行换行*/
+ text-overflow: ellipsis;
+ overflow: hidden;
+}
+
+#map {
+ min-height: 370px;
+}
+
+#map_toolbar a:hover {
+ text-decoration: none;
+ cursor: pointer;
+}
+
+/* 地图 end */

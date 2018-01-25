@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SIM月租费</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+	<form id='sim_form' name='sim_form' method='post' class="form">
+        <div class='title'>SIM月租费></div>
+        <fieldset style="width:850px;">
+        	<div class="panel">
+				<div class='submit' id="divObj1" style="text-align:left;">
+					<input type='hidden' id='cust_id' name='cust_id' />
+					<input type='hidden' id='unit_id' name='unit_id' />
+					<input type='hidden' id='vehicle_id' name='vehicle_id' />
+					<input type='hidden' id='cust_id_value' name='cust_id_value' />
+					<input type='hidden' id='unit_id_value' name='unit_id_value' />
+					<input type='hidden' id='vehicle_id_value' name='vehicle_id_value' />
+					<span>客户名称:</span>
+	            	<input type='text' id="custname" name='custname' style="width:150px;" list="customerList"/>
+            		<datalist id='customerList'></datalist>
+            		
+            		<span>车牌号码:</span>
+	            	<input type='text' id="searchnumber" name='searchnumber' style="width:150px;" list="vehicleList"/>
+	            	<datalist id='vehicleList'></datalist>
+	            	
+	            	<span>车载号码:</span>
+	            	<input type='text' id="searchcall" name='searchcall' style="width:150px;" list="unitList"/>
+	            	<datalist id='unitList'></datalist>
+	            	<button id="search_btn" type="button" style="width:80px;height:26px;" onclick="searchcust();" >查询</button>
+	        	</div>
+			</div>
+			<hr>
+			<div class="panel">
+				<span>客户名称:</span>
+            	<input type='text' id="customer_name" name='customer_name' style="width:150px;" disabled="disabled" />
+				
+            	<span>车牌号码:</span>
+            	<input type='text' id="number_plate" name='number_plate' style="width:150px;" disabled="disabled" />
+            	
+            	<span>托收账号:</span>
+            	<input type='text' id="account" name='account' style="width:150px;" disabled="disabled" />
+			</div>
+			<div class="panel">
+				<span>服务状态:</span>
+            	<select name="state" id="state" style="width:154px;" disabled="disabled">
+                	<option value="0">在网</option>
+                    <option value="1">离网</option>
+                    <option value="2">欠费离网</option>
+                    <option value="3">非入网</option>
+                    <option value="4">研发测试</option>
+                    <option value="5">电工测试</option>
+                </select>
+			</div>
+            <br>
+			<div class="panel">
+				<span>SIM卡月租费:</span>
+                <input type='text' id="price" name='price' style="width:150px;" disabled="disabled"/>
+                
+                <span>开始日期:</span>
+                <input type='date' id="service_start_time2" name='service_start_time2' style="width:150px;" disabled="disabled"/>
+                
+                <span>旧截止日期:</span>
+                <input type='date' id="service_end_time2" name='service_end_time2' style="width:150px;" disabled="disabled"/>
+            </div>
+            <div class="panel">
+            	<span>服务时长(月):</span>
+                <input type='number' id="s_months" name='s_months' onblur="javascript:getAmount();" style="width:150px;" />
+			
+                <span>应缴金额:</span>
+                <input type='number' id="ac_amount" name='ac_amount' style="width:150px;" />
+                
+                <span>实缴金额:</span>
+                <input type='number' id="real_amount" name='real_amount' style="width:150px;" />
+            </div>
+        </fieldset>
+        <div class='title'>合计</div>
+        <fieldset style="width:850px;">
+			<div class="panel">
+                <span>应收金额:</span>
+                <input type='number' id="total_ac_amount" name='total_ac_amount' required="true" onblur="getAcamount();" style="width:150px;" />
+                
+                <span>实收金额:</span>
+                <input type='number' id="total_real_amount" name='total_real_amount' required="true" onblur="getRealamount();" style="width:150px;" />
+            
+            	<span>收据单号:</span>
+                <input type='text' id="bw_no" name='bw_no' required="true" style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>经办人:</span>
+                <input type="text" name="agent_name" id="agent_name" required="true" list="userList" style="width:150px;" autocomplete="on" />
+                <input type="hidden" name="agent_id" id="agent_id" />
+                <datalist id="userList"></datalist>
+   
+                <span>交款方式:</span>
+                <input type="radio" name="pay_model" id="pay_model" value="0" checked="checked"  style="position: relative; top:5px;margin-right:5px;" />现金
+           		&nbsp;&nbsp;
+           		<input type="radio" name="pay_model" id="pay_model" value="1" style="position: relative; top:5px;margin-right:5px;" />刷卡 
+           		&nbsp;&nbsp;
+           		<input type="radio" name="pay_model" id="pay_model" value="2" style="position: relative; top:5px;margin-right:5px;" />转帐
+           		&nbsp;&nbsp;&nbsp;&nbsp;
+           		<input type="checkbox" name="is_invoice" id="is_invoice" style="position: relative; top:5px;margin-right:5px;" />发票
+            </div>
+            <div class="panel">    
+                <span>备注:</span>
+                <input type='text' id="remark" name='remark' style="width:650px;" />
+            </div>
+        </fieldset>
+        <fieldset style="width:850px;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="service_submit" type="submit" onclick="privateservice_save();">保存</button> 
+	            <button id="service_reset" type="button" onclick="privateservice_reset();">重置</button>
+	        </div>
+        </fieldset>
+	</form>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript">
+	function getAmount(){
+		var price = $("#price").val();
+		var month = $("#s_months").val();
+		var amount = price*month;
+		$("#ac_amount").val(amount);
+	}
+	
+	function getAcamount(){
+		var total_acamount = 0;
+		var acamounts = $('input[name=ac_amount]');
+		acamounts.each(function(k,v){
+			total_acamount = Number(total_acamount) + Number(acamounts[k].value);
+		});
+		$('#total_ac_amount').val(total_acamount);
+	}
+	
+	function getRealamount(){
+		var total_realamount = 0;
+		var realamounts = $('input[name=real_amount]');
+		realamounts.each(function(k,v){
+			total_realamount = Number(total_realamount) + Number(realamounts[k].value);
+		});
+		$('#total_real_amount').val(total_realamount);
+	}
+
+	function privateservice_save(){
+		$("#sim_form").on('submit',
+				function(e){
+			var payments = new Array();
+			var start_time = $('#service_start_time2').val();
+			var end_time = $('#service_end_time2').val();
+			var is_invoice = 0;
+			var is_invoicebox = document.getElementById("is_invoice");
+			if(is_invoicebox.checked){
+				is_invoice = 1;
+			}
+			var obj = {};
+			obj.item_id= 0;
+			var s_date;
+			if(end_time==''){
+				s_date = start_time;
+			}else{
+				s_date = end_time;
+			}
+			obj.s_date = s_date;
+			obj.s_months = $('#s_months').val();
+			obj.ac_amount = $('#ac_amount').val();
+			obj.real_amount = $('#real_amount').val();
+			obj.customer_id = $('#cust_id_value').val();
+			obj.vehicle_id = $('#vehicle_id_value').val();
+			obj.unit_id = $('#unit_id_value').val();
+			obj.feetype_id = 2;
+			obj.pay_model = $("input[name='pay_model']:checked").val();
+			obj.bw_no = $('#bw_no').val();
+			obj.agent_id = $("#agent_id").val();
+			obj.agent_name = $('#agent_name').val();
+			obj.remark = $('#remark').val();
+			obj.is_invoice = is_invoice;
+			payments.push(obj);
+			
+			$.ajax({
+				type : 'post',
+				async : false,
+				contentType : 'application/json',
+				dataType : 'json',
+				url : '../../payment/add',
+				data : JSON.stringify(
+					payments
+				),
+				success : function(data) {
+					if (data) {
+						$(document).sgPup({message:'message_alert',text: data.msg});
+					}
+				},
+				error : function(res, error) {
+					$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+						+ ";error=" + error});
+				}
+			});
+			$('#sim_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		});
+	}
+	
+	function privateservice_reset(){
+		document.sim_form.reset();
+	}
+
+	function searchcust(){
+		var cust_id = $('#cust_id').val();
+		var vehicle_id = $('#vehicle_id').val();
+		var unit_id = $('#unit_id').val();
+		if(cust_id==''){
+			$(document).sgPup({message:'message_alert',text: "必须选择客户!"});
+			return false;
+		}
+		$.ajax({
+			type : 'post',
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : '../../getCustInfo',
+			data : JSON.stringify({
+				cust_id : cust_id,
+				vehicle_id : vehicle_id,
+				unit_id : unit_id
+			}),
+			success : function(data) {
+				if (data) {
+					$('#customer_name').val(data.customer.customer_name);
+					$('#number_plate').val(data.vehicle.plate_no);
+					if(data.collection){
+						$('#account').val(data.collection.ac_no);	
+					}
+					$('#state').val(data.unit.reg_status);
+					$('#cust_id_value').val(data.customer.customer_id);
+					$('#unit_id_value').val(data.unit.unit_id);
+					$('#vehicle_id_value').val(data.vehicle.vehicle_id);
+					//SIM卡费
+					if(data.simfeeInfo){
+						$('#price').val(data.simfeeInfo.ac_amount);
+						$('#service_start_time2').val(data.simfeeInfo.fee_date.substring(0,10));
+					}
+					if(data.servicetime){
+						$('#service_end_time2').val(data.servicetime.sim_edate.substring(0,10));
+					}
+				}
+			},
+			error : function(res, error) {
+				$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+					+ ";error=" + error});
+			}
+		});
+	}
+
+	(function($){
+		var checkUser = function(){
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.opname = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getOrgOperators',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#agent_name","#sim_form");
+						  						  
+						  userList = {};
+						  if(manager){
+							  if(data.items.length>0){
+								  $("#userList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.opname);
+								  $("#userList").append(op);
+								  
+								  userList[v.opname] = v.opid;
+		 				  	 }); 
+							}
+					  }else{
+					  	alert(data);
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	 alert("responseText="+res.responseText+";error="+error);     
+				  }    
+				});
+		}
+		
+	  //填充员工
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getOrgOperators',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#agent_name","#sim_form");
+				  userList = {};
+				  if(manager){
+					  if(data.items.length>0){
+						  $("#userList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userList").append(op);
+						  
+						  userList[v.opname] = v.opid;
+					  	 }); 
+					  manager.on('keyup',checkUser);
+					  manager.on('change',function(){
+						  	var strs = this.value.split(" ");
+							$(this).val(strs[strs.length-1]);
+							$("#agent_id","#sim_form").val(userList[strs[strs.length-1]]);
+							if($("#agent_id","#sim_form").val().length==0){
+								$("#agent_name","#sim_form").val("");
+							}
+						});
+
+					};
+			  }else{
+			  	alert(data);
+			  }
+		  },     
+		  error : function(res,error) { 
+		  	 alert("responseText="+res.responseText+";error="+error);     
+		  }    
+		});
+		
+	    var checkCustomer = function(){
+			var text=this.value;
+			text = text.replace(/\s/g,'');
+			if(text!=this.value){
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			}
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.customer_name = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: false,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getCustomers',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#custname");
+						  if(manager){
+							  if(data.items.length>0){
+								  customerList = {};
+								  $("#customerList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.customer_name);
+								  $("#customerList").append(op);
+								  
+								  customerList[v.customer_name] = v.customer_id;
+		 				  	 }); 
+							}
+					  }
+				  } ,     
+				  error : function(res,error) { 
+					  $(document).sgPup({message:'message_alert',text: res.responseText});  
+				  }    
+				});
+		};
+		
+	    //填充客户
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCustomers',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#custname");
+				  if(manager){
+					  if(data.items.length>0){
+						  customerList = {};
+						  $("#customerList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.customer_name);
+						  $("#customerList").append(op);
+						  
+						  customerList[v.customer_name] = v.customer_id;
+					  }); 
+					  manager.on('keyup',checkCustomer);
+					  manager.on('change',function(){
+						  var strs = this.value.split(" ");
+						  
+						    if(customerList[strs[strs.length-1]]){
+								$(this).val(strs[strs.length-1]);
+								$("#cust_id").val(customerList[strs[strs.length-1]]);
+						    }else{
+						    	$(this).val('');
+						    	$("#cust_id").val("");
+						    }
+						});
+
+					}
+			  }
+		  },     
+		  error : function(res,error) {
+			  $(document).sgPup({message:'message_alert',text: res.responseText}); 
+		  }    
+		});
+	    
+	    var checkVehicle = function(){
+			var text=this.value;
+			text = text.replace(/\s/g,'');
+			if(text!=this.value){
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			}
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.plate_no = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getVehicles',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#searchnumber");
+						  if(manager){
+							  if(data.items.length>0){
+								  vehicleList = {};
+								  $("#vehicle_id").val();
+								  $("#vehicleList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.plate_no);
+								  $("#vehicleList").append(op);
+								  
+								  vehicleList[v.plate_no] = v.vehicle_id;
+		 				  	 }); 
+							}
+					  }
+				  } ,     
+				  error : function(res,error) { 
+					  $(document).sgPup({message:'message_alert',text: res.responseText});  
+				  }    
+				});
+		};
+		
+	    //填充车牌号
+	    $.ajax( {
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getVehicles',   
+		  data:JSON.stringify({pageNo:1,pageSize:10}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#searchnumber");
+				  if(manager){
+					  if(data.items.length>0){
+						  vehicleList = {};
+						  $("#vehicleList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.plate_no);
+						  $("#vehicleList").append(op);
+						  
+						  vehicleList[v.plate_no] = v.vehicle_id;
+					  	 }); 
+					  manager.on('keyup',checkVehicle);
+					  manager.on('change',function(){
+						  var strs = this.value.split(" ");
+						    if(vehicleList[strs[strs.length-1]]){
+								$(this).val(strs[strs.length-1]);
+								$("#vehicle_id").val(vehicleList[strs[strs.length-1]]);
+						    }else{
+						    	$(this).val('');
+						    	$("#vehicle_id").val("");
+						    }
+						});
+
+					}
+			  }
+		  },     
+		  error : function(res,error) {
+			  $(document).sgPup({message:'message_alert',text: res.responseText}); 
+		  }    
+		});
+		
+		var checkUnit = function(){
+			var text=this.value;
+			text = text.replace(/\s/g,'');
+			if(text!=this.value){
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			}
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.number_plate = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getUnits',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#searchcall");
+						  if(manager){
+							  if(data.items.length>0){
+								  unitList = {};
+								  $("#unit_id").val();
+								  $("#unitList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.call_letter);
+								  $("#unitList").append(op);
+								  
+								  unitList[v.call_letter] = v.unit_id;
+		 				  	 }); 
+							}
+					  }
+				  } ,     
+				  error : function(res,error) { 
+					  $(document).sgPup({message:'message_alert',text: res.responseText});  
+				  }    
+				});
+		};
+		
+	    //填充车牌号
+	    $.ajax( {
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getUnits',   
+		  data:JSON.stringify({pageNo:1,pageSize:10}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#searchcall");
+				  if(manager){
+					  if(data.items.length>0){
+						  unitList = {};
+						  $("#unitList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.call_letter);
+						  $("#unitList").append(op);
+						  
+						  unitList[v.call_letter] = v.unit_id;
+					  	 }); 
+					  manager.on('keyup',checkUnit);
+					  manager.on('change',function(){
+						  var strs = this.value.split(" ");
+						    if(unitList[strs[strs.length-1]]){
+								$(this).val(strs[strs.length-1]);
+								$("#unit_id").val(unitList[strs[strs.length-1]]);
+						    }else{
+						    	$(this).val('');
+						    	$("#unit_id").val("");
+						    }
+						});
+
+					}
+			  }
+		  },     
+		  error : function(res,error) {
+			  $(document).sgPup({message:'message_alert',text: res.responseText}); 
+		  }    
+		});
+	})(jQuery)
+</script>
+</html>

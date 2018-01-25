@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>排班</title>
+</head>
+<body>
+	<div id="som_scheduling_grid" class="datagird"></div>
+</body>
+<script type="text/javascript">
+	(function($){
+		var now =new Date().format('yyyy-MM-dd');
+		 
+		var editId=null;//编辑时选中行ID
+		var editobj = null; //编辑时选中的对象
+		
+		var toAdd = function(){
+    		//备忘保存
+		   	$('#som_scheduling_form').on('submit',function(e){
+		   		//做表单提交
+	            var params = {};
+
+	            params.content = $('#sys_memo_remark','#som_scheduling_form').val();
+	            params.isAlert= 1;
+
+	            //alert(JSON.stringify(params));
+	            $.ajax( {
+	    		  type : 'post', 
+	    		  async: false,   
+	    		  contentType : 'application/json',     
+	    		  dataType : 'json',     
+	    		  url : 'sys/addUserRemark',   
+	    		  data:JSON.stringify(params),
+	    		  success : function(data) {
+	    			  if(data){
+	       				  if(data.success){
+	       					  alert(data.msg);
+	       				  }else{
+	       					  alert("增加排班表失败！")
+	       				  }
+	       				 
+	       			  }else{
+	       				  alert(data);
+	       			  }
+	    		  } ,     
+	    		  error : function(res,error) { 
+	    		  	 alert("responseText="+res.responseText+";error="+error);     
+	    		  }    
+	    		});
+	            
+	            $(document).sgWindow('close',{id:'som_scheduling_window'}); 
+	            $('#som_scheduling_grid').sgDatagrid('reload','sgDatagrid');
+	   		    $("#som_scheduling_form").unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+			    e.stopPropagation();	
+			    return false;
+		   	});
+    	}
+		
+		var toClose = function(){
+	   		 $("#som_scheduling_window"+"_mask").remove();
+	   		 $("#som_scheduling_window").remove();
+	   	}
+		 
+		var addItem = function(){
+			var adddefaults = {
+	                title:'增加排班表',
+	                id:'som_scheduling_window',
+	                form:'som_scheduling_form',
+	                url:'web/som/scheduling_add_form.html',
+	                width: 900,
+	                height: 520,
+	                buttons : [
+	                           {name: '确定', type: 'submit', onpress : toAdd},
+	                           {name: '关闭', type: 'submit', onpress : toClose }
+	                       ]
+	            };
+	   		$(document).sgWindow(adddefaults);      	        
+		}
+		
+		var delItem = function(){
+	        var obj = $('#som_scheduling_grid');
+	        var bDiv = $('.bDiv',obj);
+
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            alert("请选择一个选项！");
+	        }else{
+	        	if(window.confirm('确定删除所选排班表?')){
+	        		var flag = false;
+	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){    
+		                	editId=this.value;
+		                	var params=[];
+							params.push(editId);
+		                	//打开窗口
+		                	$.ajax( {
+			            		  type : 'post', 
+			            		  async: false,   
+			            		  contentType : 'application/json',     
+			            		  dataType : 'json',     
+			            		  url : 'sys/deleteUserRemarks',   
+			            		  data:JSON.stringify(params),
+			            		  success : function(data) {
+			            			  if(data){
+			            				 if(data.success){
+			    	          		 		flag = true; 
+			            				 }else{
+			            					flag = false; 
+			            				 }
+			            			  }
+			            		  } ,     
+			            		  error : function(res,error) { 
+			            		  	 alert("responseText="+res.responseText+";error="+error);     
+			            		  }    
+			            		}); 
+		                }
+		            });
+	        		if(flag){
+	        			alert("删除成功！");
+	        		}else{
+	        			alert("删除不成功！");
+	        		}
+	        		$('#som_scheduling_grid').sgDatagrid('reload','sgDatagrid');
+	        	}	            
+	        }
+	    }
+		
+		var today = new Date().format('yyyy-MM-dd');
+	    var twoDayBefore = GetDateStr(-7);
+		
+		//初始化表格
+	   	 var defaults = {
+	   		        title: "排班列表",
+	   		     	width:  870,
+			        height: 420,
+	   		        url: '',
+		   		    usepager: true,
+		 	        rownumbers:true,
+		 	        useRp: true,
+		 	        exporturl:true,
+		 	        colid:'id',  //主键
+		 	        //query:{startDate:now,endDate:now},
+	   		        colModel : [
+	   		            {display: '排班表名', name : 'name', width : 120, sortable : true},
+	   		            {display: '营业处', name : 'sex', width : 120, sortable : false},
+	   		         	{display: '排班人', name : 'sno', width : 100, sortable : false},
+	   		         	{display: '排班时间', name : 'mobile', width : 120, sortable : false},
+	   		         	{display: '上班时间', name : 'email', width : 120, sortable : false},	   		              		            
+	   		            {display: '值班时间', name : 'stamp', width : 120, sortable : false}
+	   		        ],
+	   		     	buttons : [
+	   			            {name: '增加', bclass: 'add', onpress : addItem},
+	   			         	{separator: true},
+				            {name: '修改', bclass: 'edit', onpress : delItem},
+	   			            {separator: true},
+				            {name: '删除', bclass: 'delete', onpress : delItem}
+	   			        ],
+	   		        searchitems :[
+						{display:'排班表名',name:'name',type:'text',width:'65px'},
+	   		            {display:'排班人',name:'person',type:'text',width:'65px'},
+	   		         	{display:'开始时间',name:'startDate',type:'date',width:'125px',value:twoDayBefore},
+	   		      		{display:'结束时间',name:'endDate',type:'date',width:'125px',value:today}
+	   		        ],
+	   		     	order:true,
+	   		        sortname: "name",
+	   		        sortorder: "asc"
+	   		    };
+	   		    $('#som_scheduling_grid').sgDatagrid(defaults); 
+		})(jQuery)
+	</script>	
+	
+</html>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>销售合同</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+<div id="nw_document_all">
+	<div id="sel_main_grid" class="datagird"></div>
+	<datalist id="sel_channellist">
+    </datalist>
+     <datalist id="userDataList"></datalist>
+</div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script>
+	<script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+	(function($){
+		var lastMonthDay=new Date();//上个月的今天
+    	//lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+		lastMonthDay.setDate(1);
+    	lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+		 var now =new Date().format('yyyy-MM-dd');
+		
+		 var channelList = {};
+	     var userDataList = {};//销售经理 key:name,value:id
+		 var editId=null;//编辑时选中行ID
+		 var editobj = null; //编辑时选中的对象
+		 
+		 var toSubmit = function(){	
+			//先验证，再提交
+				//参数
+			 var existProductMap=[];//已选择的商品
+			//做表单提交
+             var params = {};
+			 var id=$('#id','#sel_contract_add_form').val();
+			 params.id =id;
+             params.code = $('#contractNo','#sel_contract_add_form').val();
+      	     params.name = $('#contractName','#sel_contract_add_form').val();
+             params.channelId = $('#contractChannelId','#sel_contract_add_form').val();
+             params.phone= $('#contractPhone','#sel_contract_add_form').val();
+             params.contractorId = $("#contractorId",'#sel_contract_add_form').val();
+             params.contractorName = $("#contractor",'#sel_contract_add_form').val();
+      	     params.signDate = $('#signDate','#sel_contract_add_form').val();	
+      	     params.matureDate= $('#matureDate','#sel_contract_add_form').val();
+      	     params.validDate= $('#validDate','#sel_contract_add_form').val();
+      	     //params.remark = $('#contractRemark','#sel_contract_add_form').val();
+      	   
+             var productIds = $('input[name=productId]','#sel_contract_add_form');
+             var productNames=$('input[name=productName]','#sel_contract_add_form');
+             var productNums= $('input[name=num]','#sel_contract_add_form');		               
+             var prices = $('input[name=price]','#sel_contract_add_form');
+             var fixFees = $('input[name=fixFee]','#sel_contract_add_form');	               
+             var remarks= $('input[name=remark]','#sel_contract_add_form');
+             
+             var details = new Array();
+             if(productIds.length==0){ 
+          	   $(document).sgPup({message:'message_info',text: '请添加商品！'});
+          	   //$('#sel_contract_add_form').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+				   //e.stopPropagation();
+          	   return false;
+             }
+             $.each(productIds,function(k,v){
+             	var obj = {};
+             	obj.productId = v.value;
+             	obj.num = productNums[k].value;
+             	obj.price = prices[k].value;
+             	obj.fixFee = fixFees[k].value;
+             	//obj.brokerage = brokerages[k].value;
+             	obj.remark = remarks[k].value;
+             	details.push(obj);
+             	
+             	if(v.value){
+    	       		productNames[k].setCustomValidity(''); 
+    		       	if(existProductMap[productIds[k].value]){ 
+    		        	productNames[k].setCustomValidity('此商品已添加!'); 
+    		       	   	return false;
+    		          }else{
+    		        	  productNames[k].setCustomValidity(''); 
+    		          	  existProductMap[productIds[k].value]=productIds[k].value;
+    		          }
+    		    }else{
+    		    	productNames[k].setCustomValidity('请输入商品名称/编码!'); 
+    		    }
+             });
+             params.salesProducts = details;
+             
+             var packs = new Array();
+             var packNames = $('input[name=packName]','#sel_contract_add_form');
+             var packLegends=$('input[name=packLegend]','#sel_contract_add_form');
+             //var packRemarks= $('input[name=packRemark]','#sel_contract_add_form');
+
+             $.each(packNames,function(k,v){
+	            	if(v.value.trim().length>0){
+	            		var obj = {};
+		               	obj.name = v.value;
+		               	obj.legend = packLegends[k].value;
+		               	//obj.remark = packRemarks[k].value;
+
+		               	packs.push(obj);
+	            	}		               	
+             });
+             params.salesPacks = packs;
+             
+			   $('#sel_contract_add_form').unbind('submit');
+			   $("#sel_contract_add_form").on('submit',function(e){
+				       var url='../../sell/addSalesContract';
+		               if(id){//编辑
+		            	   url='../../sell/updateSalesContract';
+		               }
+		              //$(document).sgPup({message:'message_info',text: JSON.stringify(params)})
+		              $(document).sgConfirm({text: '确定保存合同?',cfn:function(r){ 
+		    		     	if(r){
+		            	  $.ajax( {
+				       		  type : 'post', 
+				       		  async: false,   
+				       		  contentType : 'application/json',     
+				       		  dataType : 'json',     
+				       		  url : url,   
+				       		  data:JSON.stringify(params),
+				       		  success : function(data) {
+				       			  if(data){
+				       				  if(data.success){
+				       					  $(document).sgWindow('close',{id:'sel_contract_add_window'}); 
+				   	          		 	  $('#sel_main_grid').sgDatagrid('reload','sgDatagrid');
+				       				  }
+				       				 $(document).sgPup({message:'message_info',text: data.msg});
+				       				 if(data.code){//自动生成编号
+										 $('#contractNo','#sel_contract_add_form').val(data.code);
+									  }
+				       				 
+				       			  }else{
+				       				  $(document).sgPup({message:'message_info',text: data});
+				       			  }
+				       		  } ,     
+				       		  error : function(res,error) { 
+				       		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				       		  }    
+			       		}); 
+					   
+		              }	
+		          }});
+		              $('#sel_contract_add_form').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+					  e.stopPropagation();
+		              return false;
+		        });
+	 
+		   };
+		   
+		 var toClose = function(){
+			 //$("#sel_contract_add_window"+"_mask").remove();
+			 //$("#sel_contract_add_window").remove();
+			 $(document).sgWindow('close',{id:'sel_contract_add_window'});
+		 }
+		 
+		 var loadSuccess4Edit = function(){
+			 $('#id','#sel_contract_add_form').val(editobj['id']);
+			 $('#contractNo','#sel_contract_add_form').val(editobj['code']);
+			 $('#contractName','#sel_contract_add_form').val(editobj['name']);
+			 $('#contractChannelId','#sel_contract_add_form').val(editobj['channelId']);
+			 $('#contractChannelName','#sel_contract_add_form').val(editobj['channelName']);
+			 $("#contractPhone",'#sel_contract_add_form').val(editobj['phone']);	
+			 $('#contractorId','#sel_contract_add_form').val(editobj['contractorId']);
+			 $('#contractor','#sel_contract_add_form').val(editobj['contractorName']);
+			 $('#signDate','#sel_contract_add_form').val(editobj['signDate']);
+			 $("#validDate",'#sel_contract_add_form').val(editobj['validDate']);
+			 $("#matureDate",'#sel_contract_add_form').val(editobj['matureDate']);
+			 //$("#contractRemark",'#sel_contract_add_form').val(editobj['remark']);
+			 
+			 //商品明细
+         	$.ajax( {
+		       		  type : 'post', 
+		       		  async: false,   
+		       		  contentType : 'application/json',     
+		       		  dataType : 'json',     
+		       		  url : '../../sell/findSalesProducts',   
+		       		  data:JSON.stringify({contractId:editobj['id']}),
+		       		  success : function(data) {
+		       			  if(data){
+		 					 var products = data;
+		 					  //先删除原有的
+		 					  $('#sel_contract_detail_div').prevAll('div[id^=sel_contract_detail_div]').find('a').trigger('click');
+		 					  var divId=null;
+		 					  $.each(products, function(key,value){
+		 						 divId='#sel_contract_detail_div';
+		 						if(key>0){
+		 							 $("#sel_contract_detail_div a").trigger('click');
+		 							 key=key-1;
+		 							 divId=divId+"_"+key;
+		 						}
+		 						 $('input[name=productName]',divId).val(value.productName.replace(/\s/g,''));
+		 						 $('input[name=productCode]',divId).val(value.productCode.replace(/\s/g,''));
+		 						 $('input[name=productId]',divId).val(value.productId);
+		 						 $('input[name=productNorm]',divId).val(value.norm.replace(/\s/g,'-'));
+		 						 $('input[name=num]',divId).val(value.num);
+		 						 $('input[name=price]',divId).val(value.price);
+		 						 $('input[name=fixFee]',divId).val(value.fixFee);
+		 						 $('input[name=remark]',divId).val(value.remark);
+		 					 });
+
+		       			  }else{
+		       				  $(document).sgPup({message:'message_info',text: data});
+		       			  }
+		       		  } ,     
+		       		  error : function(res,error) { 
+		       		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		       		  }    
+	       		});
+			 
+         	 //套餐明细
+         	$.ajax( {
+		       		  type : 'post', 
+		       		  async: false,   
+		       		  contentType : 'application/json',     
+		       		  dataType : 'json',     
+		       		  url : '../../sell/findSalesPacks',   
+		       		  data:JSON.stringify({contractId:editobj['id']}),
+		       		  success : function(data) {
+		       			  if(data){
+		 					 var packs = data;
+		 					  //先删除原有的
+		 					  $('#sel_contract_pack_div').prevAll('div[id^=sel_contract_pack_div]').find('a').trigger('click');
+		 					  var divId=null;
+		 					  $.each(packs, function(key,value){
+		 						 divId='#sel_contract_pack_div';
+		 						if(key>0){
+		 							 $("#sel_contract_pack_div a").trigger('click');
+		 							 key=key-1;
+		 							 divId=divId+"_"+key;
+		 						}
+		 						 $('input[name=packName]',divId).val(value.name);
+		 						 $('input[name=packLegend]',divId).val(value.legend);
+		 					 });
+
+		       			  }else{
+		       				  $(document).sgPup({message:'message_info',text: data});
+		       			  }
+		       		  } ,     
+		       		  error : function(res,error) { 
+		       		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		       		  }    
+	       		});
+			 
+		 }
+		 var loadSuccess = function(){
+			 $('#code','#sel_contract_edit_form').val(editobj['code']);
+			 $('#name','#sel_contract_edit_form').val(editobj['name']);
+			 $('#channelName','#sel_contract_edit_form').val(editobj['channelName']);
+			 $("#phone",'#sel_contract_edit_form').val(editobj['phone']);	
+			 $('#contractorName','#sel_contract_edit_form').val(editobj['contractorName']);
+			 $('#signDate','#sel_contract_edit_form').val(editobj['signDate']);
+			 $("#validDate",'#sel_contract_edit_form').val(editobj['validDate']);
+			 $("#matureDate",'#sel_contract_edit_form').val(editobj['matureDate']);
+			 //$("#remark",'#sel_contract_edit_form').val(editobj['remark']);
+			 //初始化表格
+		   	 var detail_defaults = {
+		   		        width:  840,
+		   		        height: 200,
+		   		        url: '../../sell/findSalesProducts ',
+		   		        query:{contractId:editobj['id']},
+		   		        rownumbers:true,//序号
+		   		        colModel : [
+							{display: '商品编码', name : 'productCode', width : 100, sortable : false},
+		   		            {display: '商品名称', name : 'productName', width : 120, sortable : false},
+		   		            {display: '商品规格', name : 'norm', width : 160, sortable : false},
+		   		            {display: '数量', name : 'num', width : 60, sortable : false},
+		   		         	{display: '销售价格(元)', name : 'price', width : 80, sortable : false},
+		   		      		{display: '安装费(元)', name : 'fixFee', width : 80, sortable : false},
+		   		   			{display: '备注', name : 'remark', width : 140, sortable : false}
+		   		        ]
+		   		    };
+			   $('#sel_contract_detail_grid').sgDatagrid(detail_defaults); 
+			   
+			   var customer_defaults = {
+		   		        width:  840,
+		   		        height: 100,
+		   		        url: '../../sell/findSalesPacks',
+		   		        query:{contractId:editobj['id']},
+		   		        rownumbers:true,//序号
+		   		        colModel : [
+		   		            {display: '套餐名称', name : 'name', width : 200, sortable : false},
+		   		            {display: '套餐说明', name : 'legend', width : 500, sortable : false}
+		   		        ]
+		   		    };
+			   $('#sel_contract_pack_grid').sgDatagrid(customer_defaults);
+			   
+			   //editId=null;
+			   //editobj = null;
+		   }
+		 
+		 var checkItem = function(){
+			 var obj = $('#sel_main_grid');
+		        var bDiv = $('.bDiv',obj);
+
+		        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+		            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+		        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+		            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+		            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){
+		                	var params = {};
+		                	editId=this.value;
+		                	params.id = editId;
+		                	//$(document).sgPup({message:'message_info',text: JSON.stringify($(this).data('data')));
+		                	editobj = $(this).data('data');
+		                	if(editobj.status==0){
+		             $(document).sgConfirm({text: '审核后合同生效，将不能删除,确定审核通过?',cfn:function(r){ 
+		    		     	if(r){
+
+		                		//审核所选项
+			                	$.ajax( {
+						       		  type : 'post', 
+						       		  async: false,   
+						       		  contentType : 'application/json',     
+						       		  dataType : 'json',     
+						       		  url : '../../sell/updateSalesContractStatus',   
+						       		  data:JSON.stringify(params),
+						       		  success : function(data) {
+						       			  if(data){
+						       				  if(data.success){
+						       					  $(document).sgPup({message:'message_info',text: "审核成功！"})
+						       				  }else{
+						       					 $(document).sgPup({message:'message_info',text: data.msg})
+						       				  }
+						       				 
+						       			  }else{
+						       				  $(document).sgPup({message:'message_info',text: data});
+						       			  }
+						       		  } ,     
+						       		  error : function(res,error) { 
+						       		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+						       		  }    
+					       		});
+			                	$('#sel_main_grid').sgDatagrid('reload','sgDatagrid');
+		                	}	
+		                }});
+		                	}else{
+		                		$(document).sgPup({message:'message_info',text: "该合同已生效!"});
+		                	}
+		                }
+		            });
+		        }else{
+		            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		        }
+		 }
+		 
+		 var addItem = function(){
+			 editId=null;
+			 editobj=null;
+		        var defaults = {
+		                title:'增加合同',
+		                id:'sel_contract_add_window',
+		                form:'sel_contract_add_form',
+		                url:'contract_add_form.html',
+		                width: 1010,
+		                height: 560,
+		                buttons : [
+		                           {name: '确定', type: 'submit', onpress : toSubmit},
+		                           {name: '关闭', type: 'submit', onpress : toClose },
+		                           {name: '重置', type: 'reset', onpress : null}
+		                       ]
+		            };
+		        $(document).sgWindow(defaults);      	        
+		 }
+		 
+		 var toCloseContract = function(){
+			//$("#sel_contract_edit_window"+"_mask").remove();
+			//$("#sel_contract_edit_window").remove();
+			 $(document).sgWindow('close',{id:'sel_contract_edit_window'});
+		 }
+		 
+		 var editItem = function(){
+		        var obj = $('#sel_main_grid');
+		        var bDiv = $('.bDiv',obj);
+
+		        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+		            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+		        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+		            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+		            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){    
+		                	editId=this.value;
+		                	//$(document).sgPup({message:'message_info',text: JSON.stringify($(this).data('data')));
+		                	editobj = $(this).data('data');
+		                	if(editobj.status==0){
+			                	//打开窗口
+				                var defaults = {
+				    	                title:'销售合同编辑',
+				    	                id:'sel_contract_add_window',
+				    	                form:'sel_contract_add_form',
+				    	                url:'contract_add_form.html',
+				    	                success: loadSuccess4Edit,
+				    	                width: 1010,
+						                height: 560,
+				    	                buttons : [
+											{name: '确定', type: 'submit', onpress : toSubmit},
+											{name: '关闭', type: 'submit', onpress : toClose },
+											{name: '重置', type: 'reset', onpress : null}
+						                       ]
+				    	            };
+				    	        $(document).sgWindow(defaults);
+		                	}else{
+	 	                		$(document).sgPup({message:'message_info',text: "该合同已生效,不能编辑!"});
+	 	                	}
+		                }
+		            });
+		        }else{
+		            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		        }
+		    }
+		 
+		 var viewItem = function(){
+		        var obj = $('#sel_main_grid');
+		        var bDiv = $('.bDiv',obj);
+
+		        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+		            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+		        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+		            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+		            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){    
+		                	editId=this.value;
+		                	//$(document).sgPup({message:'message_info',text: JSON.stringify($(this).data('data')));
+		                	editobj = $(this).data('data');
+		                	//打开窗口
+			                var defaults = {
+			    	                title:'销售合同查看',
+			    	                id:'sel_contract_edit_window',
+			    	                form:'sel_contract_edit_form',
+			    	                url:'contract_edit_form.html',
+			    	                success: loadSuccess,
+			    	                width: 875,
+			    	                height: 580,
+			    	                buttons : [
+					                           {name: '关闭', type: 'submit', onpress : toCloseContract }
+					                       ]
+			    	            };
+			    	        $(document).sgWindow(defaults);
+		                }
+		            });
+		        }else{
+		            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		        }
+		    }
+		 
+		 var delItem = function(){
+		        var obj = $('#sel_main_grid');
+		        var bDiv = $('.bDiv',obj);
+
+		        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+		            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		        }else{
+		        	
+		        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+			                if($(this).attr("checked")){    
+			                	editId=this.value;
+			                	editobj = $(this).data('data');
+			                	if(editobj.status==1){
+			                		$(document).sgPup({message:'message_info',text: "销售合同号("+editobj.code+")已审核不能删除！"});
+			                	}else{
+			                		$(document).sgConfirm({text: '删除后不可恢复，确定删除吗?',cfn:function(r){ 
+		    		     				if(r){
+			                		
+				                		var params=[];
+										params.push(editId);
+					                	//打开窗口
+					                	$.ajax( {
+						            		  type : 'post', 
+						            		  async: false,   
+						            		  contentType : 'application/json',     
+						            		  dataType : 'json',     
+						            		  url : '../../sell/deleteSalesContracts',   
+						            		  data:JSON.stringify(params),
+						            		  success : function(data) {
+						            			  if(data){
+						            				 if(data.success){
+						            					 $('#sel_main_grid').sgDatagrid('reload','sgDatagrid');
+						            				 }
+						            				$(document).sgPup({message:'message_info',text: data.msg});
+						            			  }
+						            		  } ,     
+						            		  error : function(res,error) { 
+						            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+						            		  }    
+						            		}); 
+			                		}
+			                	}});
+			                	}
+			                	
+			                }
+			            });
+		        }
+		    }
+		 
+		//初始化表格
+	   	 var defaults = {
+	   		        title: "销售合同列表",
+	   		     	width:  '100%',
+			        height: 388,
+	   		        url: '../../sell/findSalesContracts',
+		   		    usepager: true,
+		 	        rownumbers:true,
+		 	        useRp: true,
+		 	        colid:'id',  //主键
+		 	        query:{startDate:lastMonthDay,endDate:now},
+	   		        colModel : [
+	   		            {display: '合同名称', name : 'name', width : 140, sortable : false},
+		   		        {display: '代理商名称', name : 'channelName', width : 140,sortable:false},
+	   		         	{display: '代理商联系电话', name : 'phone', width : 95,sortable:false},
+	   		            {display: '签约人', name : 'contractorName', width : 50, sortable : false},
+	   		            {display: '合同签订日期', name : 'signDate', width : 75, sortable : true},
+	   		            {display: '合同生效日期', name : 'validDate', width : 75, sortable : false},
+	   		            {display: '合同到期日期', name : 'matureDate', width : 75, sortable : false},
+	   		            {display: '是否生效', name : 'status', width : 50, sortable : false,formatter:function(value,row){
+	   		            	if(value==0){
+			                    value = '<font color="red">否</font>';
+			                }else if(value==1){
+			                    value = '<font color="green">是</font>';
+			                }else{
+	   		                	value ="否";
+	   		                }
+	   		                return value;
+	   		            }},
+	   		         {display: '是否归档', name : 'isFiling', width : 50, sortable : false,formatter:function(value,row){
+	   		            	if(value==0){
+			                    value = '<font color="red">否</font>';
+			                }else if(value==1){
+			                    value = '<font color="green">是</font>';
+			                }else{
+	   		                	value ="否";
+	   		                }
+	   		                return value;
+	   		            }},
+	   		           {display: '创建人', name : 'userName', width : 50, sortable : false}
+		   		        
+	   		        ],
+	   		     	buttons : [
+	   			            {name: '增加', bclass: 'add', onpress : addItem},
+	   			            {separator: true},
+	   			            {name: '编辑', bclass: 'edit', onpress : editItem},
+	   			            {separator: true},
+	   			            /* {name: '审核', bclass: 'check', onpress : checkItem},
+	   			            {separator: true}, */
+	   			            {name: '删除', bclass: 'delete', onpress : delItem},
+	   			        	 {separator: true},
+	   			            {name: '查看', bclass: 'view', onpress : viewItem}
+	   			        ],
+	   		        searchitems :[
+						{display:'代理商',name:'channelName',html:"<input type='text' id='channelName' name='channelName' style='width:140px;' list='sel_channellist' />"},
+						{display:'签约人',html:'<input type="text" id="contractorName" list="userDataList"/><input type="hidden"  name="contractorId" />'},
+						{display:'开始日期',name:'startDate',type:'date',value:lastMonthDay},
+				      	{display:'结束日期',name:'endDate',type:'date',value:now}
+	   		        ],
+	   		        exporturl:'../../sell/exportSalesContract',
+	   		     	order:true,
+	   		        sortname: "signDate",
+	   		        sortorder: "asc"
+	   		 };
+		
+	   		 $('#sel_main_grid').sgDatagrid(defaults);
+	   		 
+	   		 var checkChannel = function(){
+					var params = {};
+					params.pageNo = 1;
+					params.pageSize = 10;
+					params.filter = {};
+					params.filter.name = this.value;
+					var obj = $(this);
+					$.ajax({
+						  type : 'post', 
+						  async: true,   
+						  contentType : 'application/json',     
+						  dataType : 'json',     
+						  url : '../../sell/findChannels',   
+						  data:JSON.stringify(params),
+						  success : function(data) {
+							  if(data){
+								  var channels = data.items;
+								  $("#sel_channellist").empty();
+								  channelList = {};
+								  $.each( channels, function(key,value){
+									  var op = $("<option></option>");
+									  op.val(obj.val()+" "+value.name);
+									  $("#sel_channellist").append(op);
+									  
+									  channelList[value.name]=value.id;
+									});
+							  }else{
+								  $(document).sgPup({message:'message_info',text: data});
+							  }
+						  } ,     
+						  error : function(res,error) { 
+						  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+						  }    
+						});
+				};
+	   		    
+	   		 $.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../sell/findChannels',   
+				  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+				  success : function(data) {
+					  if(data){
+						  var channels = data.items;
+						  $("#sel_channellist").empty();
+						  channelList = {};
+						  $.each( channels, function(key,value){
+							  var op = $("<option></option>");
+							  op.val(value.name);
+							  $("#sel_channellist").append(op);
+							  channelList[value.name]=value.id;
+							});
+						  
+						  $("#channelName").on('keyup',checkChannel);
+						  $("#channelName").on('change',function(){
+							    var strs = this.value.split(" ");
+								$(this).val(strs[strs.length-1]);
+							});
+						  
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+			
+	   	//自动查询销售经理
+	   			var checkUser = function(){
+	   				/* var text=this.value;
+	   				text = text.replace(/\s/g,''); //去除空格
+	   				if(text!=this.value){//有空格
+	   					this.value=text;
+	   					$(this).trigger('change');
+	   					return false;
+	   				} */
+	   				var params = {};
+	   				params.pageNo = 1;
+	   				params.pageSize = 10;
+	   				params.filter = {};
+	   				params.filter.opname = this.value;
+	   				var obj = $(this);
+	   				$.ajax({
+	   					  type : 'post', 
+	   					  async: true,   
+	   					  contentType : 'application/json',     
+	   					  dataType : 'json',     
+	   					  url : '../../getCompanySaleManager',   
+	   					  data:JSON.stringify(params),
+	   					  success : function(data) {
+	   						  if(data){
+	   							  var manager = $("#contractorName");
+	   							  						  
+	   							  if(manager){
+	   								  if(data.items.length>0){
+	   									  userDataList = {};
+	   									  $("#userDataList").empty();
+	   								  }
+	   								  $.each(data.items,function(k,v){
+	   									  var op = $("<option></option>");
+	   									  op.val(obj.val()+" "+v.opname);
+	   									  $("#userDataList").append(op);
+	   									  
+	   									  userDataList[v.opname] = v.opid;
+	   			 				  	 }); 
+	   								}
+	   						  }else{
+	   						  	$(document).sgPup({message:'message_info',text: data});
+	   						  }
+	   					  } ,     
+	   					  error : function(res,error) { 
+	   					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	   					  }    
+	   					});
+	   			}
+	   			
+	   		  //填充销售经理
+	   		    $.ajax( {
+	   			  type : 'post', 
+	   			  async: true,   
+	   			  contentType : 'application/json',     
+	   			  dataType : 'json',     
+	   			  url : '../../getCompanySaleManager',   
+	   			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+	   			  success : function(data) {
+	   				  if(data){
+	   					  var manager = $("#contractorName");
+	   					  if(manager){
+	   						  if(data.items.length>0){
+	   					  		userDataList = {};
+	   							  $("#userDataList").empty();
+	   						  }
+	   						  $.each(data.items,function(k,v){
+	   							  var op = $("<option></option>");
+	   							  op.val(v.opname);
+	   							  $("#userDataList").append(op);
+	   							  
+	   							  userDataList[v.opname] = v.opid;
+	   						  	 }); 
+	   						  manager.on('keyup',checkUser);
+	   						  manager.on('change',function(){
+	   							  	var strs = this.value.split(" ");
+	   								$(this).val(strs[strs.length-1]);
+	   								$("input[name=contractorId]").val(userDataList[strs[strs.length-1]]);
+	   								if($("input[name=contractorId]").val().length==0){
+	   									$("#contractorName").val("");
+	   								}
+	   							});
+
+	   						};
+	   				  }else{
+	   				  	$(document).sgPup({message:'message_info',text: data});
+	   				  }
+	   			  },     
+	   			  error : function(res,error) { 
+	   			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	   			  }    
+	   			});
+	})(jQuery);
+</script>
+</html>

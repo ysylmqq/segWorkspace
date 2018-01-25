@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>上传原始单据</title>
+<script language="javascript"> 
+	function myreload(){
+		$('#documents').sgDatagrid('reload','sgDatagrid');
+	}
+</script>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" href="../../bslib/css/bootstrap-datetimepicker.css" /><!-- +++++ -->
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/sos.css">
+</head>
+<body>
+	<div id="monitoring">
+	<form id='search_form' name='search_form' method='post' class="form" style="width:100%" >
+		<div class='title'>上传原始单据></div>
+		<fieldset style="width:100%;">
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+		            	<span class="col-xs-4">车牌号码:</span>
+		            	<div class="col-xs-8" style="position:relative;">
+			            	<input type='text' id="searchnumber" name='searchnumber' class="form-control" />
+			            	<ul class="show_list" id="vehicleList">
+			            	</ul>
+		            	</div>
+		            </div>
+	            	
+	            	<div class="col-xs-4">
+		            	<span class="col-xs-4">车载电话:</span>
+		            	<div class="col-xs-8" style="position:relative;">
+			            	<input type='text' id="searchcall" name='searchcall' class="form-control" />
+			            	<ul class="show_list" id="unitList">
+			            	</ul>
+			            </div>
+		            </div>
+	            	
+	            	<!--  
+	            	<span>客户名称:</span>
+	            	<input type='text' id="custname" name='custname' style="width:150px;" list="customerList"/>
+            		<datalist id='customerList'></datalist>
+            		-->
+	        	</div>
+			</div>
+		</fieldset>
+	</form>
+	<form id='document_form' name='document_form' method='post' class="form" 
+	style="width:100%" action="../../document/fileUpLoad" enctype="multipart/form-data" target="uploadframe" >
+		<input type='hidden' id='cust_id' name='cust_id' />
+		<input type='hidden' id='vehicle_id' name='vehicle_id' />
+		<input type='hidden' id='unit_id' name='unit_id' />
+		<input type='hidden' id='url_tye' value='3' >
+		<fieldset style="width:100%;">
+            <div class="panel">
+            	<div class="row">
+                    <div class="col-xs-4">
+		                <span class="col-xs-4">客户名称:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id="customer_name" name='customer_name' class="form-control" />
+		                </span>
+                    </div>
+                    <div class="col-xs-4">
+		                <span class="col-xs-4" style="color:red;">入网状态:</span>
+		                <span class="col-xs-8">
+			                <select size="1" name="state" id="state" style="width:100%;" autocomplete="on">
+			                    <option value="0">在网</option>
+			                    <option value="1">离网</option>
+			                    <option value="2">欠费离网</option>
+			                    <option value="3">非入网</option>
+			                    <option value="4">研发测试</option>
+			                    <option value="5">电工测试</option>
+			                    <option value="6">重新开通</option>
+			                    <option value="7">不开通</option>
+			                </select>
+		                </span>
+                    </div>
+                    <div class="col-xs-4">
+		                <span class="col-xs-4">客户类型:</span>
+		                <span class="col-xs-8">
+			                <select size="1" name="type" id="type" style="width:100%;">
+			                	<option value="0">私家车客户</option>
+			                	<option value="1">集团客户</option>
+			                	<option value="2">担保公司</option>
+			                </select>
+		                </span>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+            	<div class="row">
+                    <div class="col-xs-4">
+		                <span class="col-xs-4">车牌号码:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id="number_plate" name='number_plate' class="form-control" />
+		                </span>
+                    </div>
+                    <div class="col-xs-4">
+		                <span class="col-xs-4">车载电话:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id="call_letter" name='call_letter' class="form-control" />
+		                </span>
+                    </div>
+                    <div class="col-xs-4">
+		                <span class="col-xs-4">购车时间:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' class="form-control form_datetime" id="buy_time" name='buy_time' />
+		                </span>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        
+        <div class='title'>原始单据</div>
+		<fieldset style="width:100%;">
+            <div class="panel" id="upload_panel">
+            	<div class="row">
+                    <div class="col-xs-12">
+		                <span class="col-xs-1" style="width:11%;">上传原始单据:</span>
+		                <span class="col-xs-1">
+			            	<select size="1" name="documenttype" id="documenttype" style="width:100px;" autocomplete="on" >
+			                    <option value="1">身份证</option>
+			                    <option value="2">行驶证</option>
+			                    <option value="3">入网证</option>
+			                    <option value="4">托收协议</option>
+			                    <option value="5">银行卡/存折</option>
+			                    <option value="6">保单</option>
+			                    <option value="7">保卡</option>
+			                    <option value="8">回单资料</option>
+			                    <option value="9">停止单</option>
+			                </select>
+			            </span>
+			            <span class="col-xs-3" style="margin-left:15px;">
+				            <input type="file" id="file" name="file" style="width:100%;height:24px;" />
+				        </span>
+				        <span class="col-xs-1" style="text-align:left;">
+				        	<a href="javascript:void(0);" style="margin:0px;padding:0px;padding-left:10px;padding-top:5px;"><img alt="增加单据" src="../../images/form_add.png" title="增加单据" style="vertical-align:middle"></a>
+				        </span>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset style="width:100%;border-top:0px;">	
+	        <div class='submit'> 
+	            <button id="document_submit" type="submit" class="btn btn-primary btn-xs" onclick="return checkField();" >保存</button> 
+	            <button id="document_cancel" type="button" class="btn btn-primary btn-xs" onclick="document_reset();" >重置</button>
+	        </div>
+        </fieldset>
+
+	</form>
+		<div id="documents" class="datagird"></div>
+	<form class="form">
+		<fieldset style="width:100%;border-top:0px;">
+			<div class='submit'> 
+	           	<button id="audit" type="button" class="btn btn-primary btn-xs" onclick="docaudit();" >审核通过</button> 
+	           	<button id="auditno" type="button" class="btn btn-primary btn-xs" onclick="docauditno();" style="width:100px">审核未通过</button>
+	           	<span style="width:10%;">审核状态:</span>
+	           	<span style="width:10%;vertical-align:middle;">
+	           		<input type='text' id="auditstate" name='auditstate' class="form-control" disabled="disabled"/>
+	           	</span>
+	           	<span style="width:10%;">审核备注:</span>
+	           	<span style="width:18%;vertical-align:middle;">
+                	<input type='text' id="auditremark" name='auditremark' class="form-control" disabled="disabled"/>
+	           	</span>
+	       	</div>
+       	</fieldset>
+    </form>
+	<iframe id="uploadframe" name="result_frame" style="visibility:hidden;"></iframe>
+	</div>
+	<div id="watermark"  style="position:absolute;left:300px;top:200px;display: none;">
+		<img src="../../images/offgrid.png" />
+	</div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../bslib/js/bootstrap-datetimepicker.js"></script><!-- ++++ -->
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/storage_vehicle.js" ></script>
+<script type="text/javascript">
+	document.onkeydown=function(event){
+		var e = event || window.event || arguments.callee.caller.arguments[0];
+		if(e && e.keyCode==13){
+			return false;
+		}
+	}
+</script>
+<script type="text/javascript">
+
+function delDoc(docid) {
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../document/delDoc',
+		data : JSON.stringify({
+			doc_id : docid,
+			unit_id : $('#unit_id').val()
+		}),
+		success : function(data) {
+			if (data) {
+				$('#documents').sgDatagrid('reload','sgDatagrid');
+			}
+		},
+		error : function(res, error) {
+			$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+				+ ";error=" + error});
+		}
+	});
+}
+
+function checkField(){
+	var cust_id = $('#cust_id').val();
+	var vehicle_id = $('#vehicle_id').val();
+	var unit_id = $('#unit_id').val();
+	if(cust_id=='' && vehicle_id=='' && unit_id==''){
+		$(document).sgPup({message:'message_alert',text: "请先查询车辆!"});
+		return false;
+	}
+	if($('#file').val()==''){
+		$(document).sgPup({message:'message_alert',text: "请选择上传文件."});
+		return false;
+	}
+	if(vehicle_id==''){
+		$('#vehicle_id').val('0');
+	}
+}
+
+function document_reset(){
+	document.document_form.reset();
+	$('#upload_panel0').remove();
+	$('#upload_panel1').remove();
+	$('#upload_panel2').remove();
+	$('#upload_panel3').remove();
+	$('#upload_panel4').remove();
+	$('#upload_panel5').remove();
+	$('#upload_panel6').remove();
+}
+
+function searchcust(){
+	var cust_id = $('#cust_id').val();
+	var vehicle_id = $('#vehicle_id').val();
+	var unit_id = $('#unit_id').val();
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../getdocumentCustEntry',
+		data : JSON.stringify({
+			cust_id : cust_id,
+			vehicle_id : vehicle_id,
+			unit_id : unit_id
+		}),
+		success : function(data) {
+			if (data) {
+				document.document_form.reset();
+				$('#upload_panel0').remove();
+				$('#upload_panel1').remove();
+				$('#upload_panel2').remove();
+				$('#upload_panel3').remove();
+				$('#upload_panel4').remove();
+				$('#upload_panel5').remove();
+				$('#upload_panel6').remove();
+				$('#watermark').hide();
+				$('#auditstate').val("");
+				$('#auditremark').val("");
+				if(data.customer){
+					$('#cust_id').val(data.customer.customer_id);
+					$('#customer_name').val(data.customer.customer_name);
+					$('#type').val(data.customer.cust_type);
+				}
+				if(data.unit){
+					$('#unit_id').val(data.unit.unit_id);
+					$('#state').val(data.unit.reg_status);
+					if(data.unit.reg_status==1||data.unit.reg_status==2){
+						$('#watermark').show();
+					}
+					$('#call_letter').val(data.unit.call_letter);
+				}
+				if(data.vehicle){
+					$('#vehicle_id').val(data.vehicle.vehicle_id);
+					$('#number_plate').val(data.vehicle.plate_no);
+					//最近操作车牌号码联系电话
+					addItem('storage_vehicle', {plateNo:data.vehicle.plate_no,callLetter:data.unit.call_letter});
+					if(data.vehicle.buy_date){
+						$('#buy_time').val(data.vehicle.buy_date.substring(0,10));
+					}
+				}
+				if(data.documents){
+					var flag = data.documents.flag;
+					var docremark = data.documents.remark;
+					if(flag==1){
+						$('#auditstate').val("审核已通过");
+					}else{
+						$('#auditstate').val("审核未通过");
+					}
+					if(data.documents.remark){
+						$('#auditremark').val(data.documents.remark.trim());
+					}
+				}
+				$('#documents').sgDatagrid('reload','sgDatagrid');
+			}
+		},
+		error : function(res, error) {
+			$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+				+ ";error=" + error});
+		}
+	});
+}
+
+function docaudit(){
+	var unit_id = $('#unit_id').val();
+	if(unit_id==""){
+		$(document).sgPup({message:'message_alert',text: "没有可供审核的单据!"});
+		return false;
+	}
+	//打开窗口
+	$(document).sgConfirm({
+		title:'提示',
+		text: '确认审核通过吗?',
+		cfn:function(r){
+			if(r){
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../document/audit',   
+					  data:JSON.stringify({unit_id : unit_id}),
+					  success : function(data) {
+						  $(document).sgPup({message:'message_alert',text: data.msg});
+						  $('#sunit_id').val(unit_id);
+						  searchdocument();;
+					  } ,     
+					  error : function(res,error) { 
+						  $(document).sgPup({message:'message_alert',text: res.responseText});  
+					  }    
+				});	
+			}
+		}});
+}
+
+function docauditno(){
+	var unit_id = $('#unit_id').val();
+	if(unit_id==""){
+		$(document).sgPup({message:'message_alert',text: "没有可供审核的单据!"});
+		return false;
+	}
+	var defaults = {
+   			title : '审核未通过请填写备注',
+   			id : 'remark_window',
+   			form : 'remark_form',
+   			url : 'remark.html',
+   			width : 340,
+   			height : 140,
+   			buttons : [ {
+   				name : '确定',
+   				onpress : setRemark
+   			}, {
+   				name : '取消',
+   				onpress : winClose
+   			} ]
+   		};
+     	$(document).sgWindow(defaults);
+}
+
+function setRemark(){
+	var unit_id = $('#unit_id').val();
+	var remark = $('#remark', '#remark_form').val()
+	//打开窗口
+	$(document).sgConfirm({
+		title:'提示',
+		text: '确认审核未通过吗?',
+		cfn:function(r){
+			if(r){
+				$.ajax({
+					  type : 'post', 
+					  async: true,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../document/auditno',   
+					  data:JSON.stringify({remark : remark, unit_id : unit_id}),
+					  success : function(data) {
+						  $(document).sgPup({message:'message_alert',text: data.msg});
+						  $('#sunit_id').val(unit_id);
+						  searchdocument();
+					  },     
+					  error : function(res,error) { 
+						  $(document).sgPup({message:'message_alert',text: res.responseText});  
+					  }    
+				});
+			}
+		}});
+	
+	$(document).sgWindow('close', {
+		id : 'remark_window'
+	});
+}
+
+function winClose(){
+	$(document).sgWindow('close', {
+		id : 'remark_window'
+	});
+}
+
+(function($){
+	
+	var height = 230;
+	var defaults = {
+	        title: "",
+	        width:  '100%',
+	        height: height,
+	        url: '../../document/list',
+		    rownumbers:true,
+		    isNotCheckall:true,
+	        colModel : [
+				{display: '单据名称', name : 'doc_name', width : 200},
+				{display: '单据类型', name : 'doc_type', width : 150, formatter:function(value,row){
+	            	if(value==1){
+	            		return '身份证';
+	            	}else if(value==2){
+	            		return '行驶证';
+	            	}else if(value==3){
+	            		return '入网证';
+	            	}else if(value==4){
+	            		return '托收协议';
+	            	}else if(value==5){
+	            		return '银行卡/存折';
+	            	}else if(value==6){
+	            		return '保单';
+	            	}else if(value==7){
+	            		return '保卡';
+	            	}else if(value==8){
+	            		return '回单资料';
+	            	}else if(value==9){
+	            		return '停止单';
+	            	}
+	            }},
+				{display: '上传时间', name : 'stamp', width : 150},
+				{display: '查看附件', name : 'doc_path', width : 120, formatter:function(value,row){
+	            	return "<a href='"+value+"' target='_blank'>查看</a>";
+	            }},
+	            {display: '操作', name : 'doc_id', width : 120, formatter:function(value,row){
+	            	return "<a href='javascript:void(0)' onclick='delDoc("+value+");'>删除</a>";
+	            }}
+	        ]
+	    };
+	    $('#documents').sgDatagrid(defaults);
+	
+	var flag = 0;
+	$("#upload_panel a").on('click',function(){
+		var detail_div = $("<div></div>");
+		var detail_id = "upload_panel"+flag;
+		detail_div.attr('id',detail_id);
+		detail_div.addClass("panel");
+		detail_div.append($("#upload_panel").html());
+		
+		$("#upload_panel").before(detail_div);
+		$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+		$("#"+detail_id+" img").attr('title','删除单据');
+		
+		$("#"+detail_id+" a").on('click',function(){
+			$("#"+detail_id).remove();
+		})
+		//$("#"+detail_id + " input[list=productList]").on('keyup',checkProduct);
+		flag=flag+1;
+	});
+	
+})(jQuery)
+
+$.fn.datetimepicker.dates['zh'] = {
+  days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+  daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+  daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+  months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+  monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+  meridiem : [ "上午", "下午" ],
+  today : "今天"
+ };
+ $(".form_datetime").datetimepicker({
+  language : "zh",
+  autoclose: true,
+  minView: "month",
+  format : 'yyyy-mm-dd'
+ });
+</script>
+<script type="text/javascript" src="../../jscript/web/vehicleList.js"></script>
+<script type="text/javascript" src="../../jscript/web/unitList.js"></script>
+</html>

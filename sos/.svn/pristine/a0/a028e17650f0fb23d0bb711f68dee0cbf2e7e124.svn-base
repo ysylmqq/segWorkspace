@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style type="text/css">
+.panel .col-xs-4{width: 30%;}
+</style>
+</head>
+<body>
+<form id="preload_add" method="post" class="form" name="preload_add" >
+	<div class="form">
+		<fieldset style="width: 700px;">
+		  	<input type='hidden' id='sim_id' name='sim_id'  />
+	   		<div class="panel">
+	   			<div class="row">
+	   				<div class="col-xs-6">
+						<span class="col-xs-4">呼号:</span>
+						<span class="col-xs-8">
+							<input type='text' id='call_letter' name='call_letter' class="form-control" />
+						</span>
+					</div>
+					<div class="col-xs-6">
+						<span class="col-xs-4">运营商:</span>
+						<span class="col-xs-8">
+							<select id="telco" name="telco" style="width:100%;">
+								<option value="3">中国电信</option>
+								<option value="1">中国移动</option>
+								<option value="2">中国联通</option>
+								<option value="4">其它</option>
+							</select>
+						</span>
+					</div>
+				</div>
+        	</div>
+			<div class="panel">
+				<div class="row">
+	   				<div class="col-xs-6">
+						<span class="col-xs-4">ICCID:</span>
+						<span class="col-xs-8">
+							<input type='text' id='iccid' name='iccid' class="form-control" />
+						</span>
+					</div>
+					<div class="col-xs-6">
+						<span class="col-xs-4">IMSI:</span>
+						<span class="col-xs-8">
+							<input type='text' id='imsi' name='imsi' class="form-control" />
+						</span>
+					</div>
+				</div>
+           	</div>
+            
+            <div class="panel">
+            	<div class="row">
+	   				<div class="col-xs-6">
+		                <span class="col-xs-4">AKEY:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id='akey' name='akey' class="form-control"/>
+		                </span>
+		            </div>
+		            <div class="col-xs-6">
+		                <span class="col-xs-4">ESN:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id='esn' name='esn' class="form-control" />
+		                </span>
+		            </div>
+		        </div>
+            </div>
+             
+            <div class="panel">
+            	<div class="row">
+	   				<div class="col-xs-6">
+		                <span class="col-xs-4">EVDO账号:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id='w_user' name='w_user' class="form-control" />
+		                </span>
+		            </div>
+		            <div class="col-xs-6">
+		                <span class="col-xs-4">EVDO密码:</span>
+		                <span class="col-xs-8">
+		                	<input type='password' id='w_password' name='w_password' class="form-control" />
+		                </span>
+		            </div>
+		        </div>
+            </div>
+            
+            <div class="panel">
+             	<div class="row">
+	   				<div class="col-xs-6">
+		                <span class="col-xs-4">IMEI/MEID:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id='imei' name='imei' class="form-control" />
+		                </span>
+		            </div>
+		            <div class="col-xs-6">
+		                <span class="col-xs-4">缴费开始时间:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id='s_date' name='s_date' class="form-control form_datetime" />
+		                </span>
+		            </div>
+		        </div>
+            </div>
+            
+           </fieldset>
+        <div class='title' style="width:695px;">终端信息&gt;</div>
+		 <fieldset style="width: 700px;"> 
+		 	<div class="panel">
+		 	 	<div class="row">
+	   				<div class="col-xs-6">
+		                <span class="col-xs-4">TBOX条码:</span>
+		                <span class="col-xs-8"> 
+		                	<input type='text' id='barcode' name=barcode  class="form-control" />
+		                </span>
+		            </div>
+		            <div class="col-xs-6">
+		                <span class="col-xs-4">终端类型:</span>
+		                <span class="col-xs-8">
+			                <input type='text' id="unittype" name='unittype' list="unittypeList" class="form-control" />
+			                <input type="hidden" id="unittype_id" name="unittype_id" />
+			                <datalist id='unittypeList'></datalist>
+		                </span>
+		            </div>
+		        </div>
+            </div>
+		 </fieldset>   
+       <div class='title' style="width:695px;">车辆信息&gt;</div>
+		 <fieldset style="width: 700px;">  
+		    <div class="panel">
+		  		<div class="row">
+	   				<div class="col-xs-6">
+		                <span class="col-xs-4">车架号:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id='vin' name='vin' class="form-control" />
+		                </span>
+		            </div>
+		            <div class="col-xs-6">
+		                <span class="col-xs-4">发动机号:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id='engine_no' name='engine_no' class="form-control" />
+		                </span>
+		            </div>
+		        </div>
+            </div>
+           <div class="panel">
+               	<div class="row">
+	   				<div class="col-xs-6">
+		                <span class="col-xs-4">车辆颜色:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id='color' name='color' class="form-control" />
+		                </span>
+		            </div>
+		            <div class="col-xs-6">
+		                <span class="col-xs-4">生产日期:</span>
+		                <span class="col-xs-8">
+		                	<input type='text' id='production_date' name='production_date' class="form-control form_datetime" />
+		                </span>
+		            </div>
+		        </div>
+            </div>
+            <div class="panel" >
+            	<div class="row">
+	   				<div class="col-xs-12">
+		                <span class="col-xs-2" style="width:15%;">备注:</span>
+		                <span class="col-xs-10">
+		                	<textarea id="remark" name="remark" class="form-control" rows="2"></textarea>
+		                </span>
+		            </div>
+		        </div>
+            </div>
+		 </fieldset>    
+		
+	</div>
+</form>
+
+</body>
+<script type="text/javascript">
+
+/* 
+$('#vin').bind("change", function()
+{
+	var value = $("#vin").val();
+	if (value && value.length != 17){
+   		 $(document).sgPup({message:'message_info',text: "请输入长度为17位的车架号！"});
+    }
+}); */
+
+//查询终端类型
+	var checkProduct = function(){
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {};
+		params.filter.unittype = this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../../unit/getUnitType',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#unittype");
+					  						  
+					  if(manager){
+						  if(data.items.length>0){
+							  unittypeList = {};
+							  $("#unittypeList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.unittype);
+							  $("#unittypeList").append(op);
+							  
+							  unittypeList[v.unittype] = v.unittype_id;
+	 				  	 }); 
+						}
+				  }
+			  } ,     
+			  error : function(res,error) { 
+				 $(document).sgPup({message:'message_alert',text: res.responseText});
+			  }    
+			});
+	};
+	
+	$("#unittype").on('click',function(){
+	    //填充终端类型
+	    $.ajax( {
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../../unit/getUnitType',   
+		  data:JSON.stringify({pageNo:1,pageSize:10}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#unittype");
+				  if(manager){
+					  if(data.items.length>0){
+						  unittypeList = {};
+						  $("#unittypeList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.unittype);
+						  $("#unittypeList").append(op);
+						  
+						  unittypeList[v.unittype] = v.unittype_id;
+					  	 }); 
+					  manager.on('keyup',checkProduct);
+					  manager.on('change',function(){
+						  var strs = this.value.split(" ");
+						  var unittype;
+						  if(strs.length==3){
+							  unittype = strs[1]+" "+strs[2];
+						  }else if(strs.length==4){
+							  unittype = strs[1]+" "+strs[2]+" "+strs[3];
+						  }else{
+							  unittype = strs[strs.length-1];
+						  }
+						  
+						    if(unittypeList[unittype]){
+								$(this).val(unittype);
+								$("#unittype_id").val(unittypeList[unittype]);
+								
+								if($("#unittype_id").val().length==0){
+									$("#unittype").val("");
+								}
+						    }else if(unittypeList[this.value]){
+						    	$("#unittype_id").val(unittypeList[this.value]);
+						    	
+						    	if($("#unittype_id").val().length==0){
+									$("#unittype").val("");
+								}
+						    }else{
+						    	$(this).val('');
+						    	$("#unittype_id").val("");
+						    }	
+						});
+	
+					}
+			  }
+		  },     
+		  error : function(res,error) { 
+			  $(document).sgPup({message:'message_alert',text: res.responseText});
+		  }    
+		});
+	});
+
+$(document).ready(function(){
+    $(".form_datetime").datetimepicker({
+        language : "zh",
+        autoclose: true,
+        minView: "month",
+        format : 'yyyy-mm-dd'
+    });
+});
+
+
+</script>
+</html>
