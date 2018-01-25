@@ -1,0 +1,18 @@
+package cc.chinagps.gps;
+
+import java.math.BigInteger;
+
+public class TestMain {
+
+	public static void main(String[] args) {
+		BigInteger temp = new BigInteger("23");
+		
+		BigInteger temp1 = new BigInteger("120");
+		
+		temp.add(temp1);
+		
+		System.out.println(temp.toString());
+		
+	}
+
+}

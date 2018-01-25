@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>升级</title>
+</head>
+
+<body>
+<form id="upgrade_add" method="post" class="form" name="upgrade_add" >
+	<div class="form">
+		<fieldset style="width: 300px; height:90px;">
+		  <div class="panel">
+                <span>升级文件名:</span>
+                <input type='text' id='ug_ver' name='ug_ver' list="fileDataList"   required="true" style="width:155px;" />
+                 <input type='hidden' id='id' name='id'  />
+                <datalist id='fileDataList'></datalist>
+            </div>
+			<div class="panel">
+                <span>服务器IP:</span>
+                <input type='text' id='ip' name='ip'  required="true" style="width:155px;" />
+           	 </div>
+            
+            <div class="panel">
+                <span>服务器端口:</span>
+                <input type='text' id='port' name='port' required="true" style="width:155px;" />
+            </div>
+           
+		</fieldset>
+	</div>
+</form>
+
+</body>
+<script type="text/javascript">
+$.ajax({
+	  type : 'post', 
+	  async: true,   
+	  contentType : 'application/json',     
+	  dataType : 'json',     
+	  url : '../../../upgradeFile/getUpgradeFileList',   
+	  data:JSON.stringify({}),
+	  success : function(data) {
+		  if(data){
+			  var companys = data;
+			  if(companys.length>0){
+				     $("#fileDataList").empty();
+			  		fileDataList = {};
+			   }
+			  $.each( companys, function(key,value){
+				  var op = $("<option></option>");
+				  op.val(value.filename);
+				  $("#fileDataList").append(op);
+				  
+				  fileDataList[value.filename]=value.id;
+				});
+			  
+			  //$("#companyName").on('keyup',stockCompany);
+			  $("#ug_ver").on('change',function(){
+				    var strs = this.value.split(" ");
+				    if(fileDataList[strs[strs.length-1]]){
+				    	$(this).val(strs[strs.length-1]);
+				    	
+						$("#id").val(fileDataList[strs[strs.length-1]]);
+								
+						 $("#ip").val("");
+						  $("#port").val("");
+						  
+									var id = $("#id").val();
+									 $.ajax( {
+										  type : 'POST', 
+										  async: false,  
+										  url : '../../../upgradeFile/getFile',   
+										  data:{id:id},
+										  success : function(data) {
+											  if(data){
+												  $("#ip").val(data.ip);
+												  $("#port").val(data.port);
+											  }
+										  } 
+									});
+						
+						if($("#id").val().length==0){
+							$("#ug_ver").val("");
+						}
+				    }else{
+				    	$(this).val('');
+				    	$("#id").val("");
+				   }
+				    
+				});
+			  
+		  }else{
+			  $(document).sgPup({message:'message_info',text: data});
+		  }
+	  } ,     
+	  error : function(res,error) { 
+	  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  }    
+	});
+	
+	
+	
+(function($){
+	 $("#id").val("");
+	 $("#ip").val("");
+	 $("#port").val("");
+
+})(jQuery)
+</script>
+</html>

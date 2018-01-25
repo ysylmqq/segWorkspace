@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: kohsuke
+Build-Jdk: 1.6.0_02-fastdebug
+Specification-Title: Java EE JMS API
+Specification-Version: 1.1-rev-1
+Specification-Vendor: Sun Microsystems, Inc.
+Implementation-Title: Java EE JMS API
+Implementation-Version: 1.1-rev-1
+Implementation-Vendor-Id: javax.jms
+Implementation-Vendor: Sun Microsystems, Inc.
+Extension-Name: javax.jms
+

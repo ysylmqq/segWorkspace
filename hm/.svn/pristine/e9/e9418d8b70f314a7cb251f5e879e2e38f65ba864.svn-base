@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="../../../js/jquery.table2excel.js"></script>
+</head>
+<style>
+	.window .window-body{overflow-x:hidden;}
+	/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/  
+::-webkit-scrollbar  
+{  
+    width: 8px;  
+    height: 16px;  
+}  
+  
+/*定义滚动条轨道 内阴影+圆角*/  
+::-webkit-scrollbar-track  
+{  
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);  
+    border-radius: 10px;  
+}  
+  
+/*定义滑块 内阴影+圆角*/  
+::-webkit-scrollbar-thumb  
+{  
+    border-radius: 10px;  
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);  
+} 
+.cmd-upload-btn{
+	 color: #fff; 
+	 background-color: #428bca; 
+	 border-color: #357ebd;
+	 padding: 1px 5px; 
+	 border-radius: 3px;
+	 width: 55px!important;
+	 font-weight:400;
+	 text-decoration: none;
+	 height: 50px;
+	 width: 40px;
+}
+</style>
+<body>
+
+<form  id="sim_importNew"  class="form" name="sim_import" enctype="multipart/form-data">
+	<div class="form">
+	<fieldset style="width: 100%;">
+            <div class="panel">
+	            <div class="row">
+	            	<span >模板下载:</span>
+	            	<span  style="text-align:left;width: 70px">
+		                <a href="../flowCtrl/HM_FC.xls" id="sim0" >导入卡模板</a>
+	                </span>
+	                <span style="width: 90px">批量操作指令:</span>
+	                <span style="text-align:left;">
+		                <select id="type" name="type" style="width:90px;" required="true">
+		                	<option value="1">省流量模式</option>
+		                	<option value="0">普通模式</option>
+		                </select>
+		            </span>
+		            <span class="col-sm-2" style="width: 100px" >上传批次:</span>
+		            <input type="text" id="batchSeq" name="batchSeq" style="width: 160px"  required="true">
+	            </div>
+            </div>
+			<div class="panel" >
+				<div class="row">
+	                <span class="col-sm-2">选择文件:</span>
+	                <span class="col-sm-4">
+	                	<input type='file' id='sim_file' name='sim_file' style="width:170px;" />
+	                </span>
+	                <span class="col-sm-2 " id="tipsInfo2" style="color: red;width: 150px;margin-left: 80px"></span>
+	            </div>
+           	</div>
+           	<div class="panel" >
+				<div class="col-xs-3 ">
+					<a href="javaScript:void(0)" class="cmd-upload-btn" onclick="subImportNew()" id="importSureBtn" style="margin-left: 23px">确定</a>
+					<a href="javaScript:void(0)" class="cmd-upload-btn" onclick="winClose_import()" style="margin-left: 15px;" >关闭</a>
+	            </div>
+	            <div class="col-xs-9 " id="tips" style="display: none;">
+	            	一共导入<span id="tips1" style="color: red"></span>条，导入成功<span id="tips2" style="color: red;width: 30px"></span>条，失败<span id="tips3" style="color: red;width: 30px"></span>条,总耗时<span id="tips4" style="color: red;width: 30px"></span>S.
+	            	<a href="javaScript:void(0);" class="btn btn-primary btn-xs" id="outPutErrorBtn" onclick="exportErrorData()" style="margin-left: 15px;line-height: 2;width: 85px;" >导出失败记录</a>
+	            </div>
+           	</div>
+           	<div style="height: 10px;clear: both; width: 100%"></div>
+           	<div class="panel" id="errorBorder" style="height: 318px;display: none;" >
+	           	<div style="height: 45px;margin-bottom:-8px">
+		           	<table class="table table-bordered"  style="width: 354px">
+			           	<tr>
+							<td style="width: 138px" >callLetter</td>
+							<td  style="width: 208px" >备注</td>
+						</tr>
+		           	</table>
+	           	</div>
+	           	<div style="height:275px;overflow-y:scroll;width:356px">
+				<table class="table table-bordered" id="dateTable" style="border-top: 0px" >
+				</table>
+				</div>
+			</div>
+         </fieldset>
+ 	</div>
+</form>
+</body>
+<script type="text/javascript">
+
+
+function callback(msg,flag){   
+	if(msg.indexOf('覆盖')>0){
+		rm({text: msg,cfn:function(r){
+			if(r){
+				//再次提交	
+				$('#isOverride').val(true);
+				$('input[type=submit]','#import_sim').trigger('click');
+				$('#isOverride').val(false);
+			}else{//取消
+				//移除遮罩层
+				$('div#imp_mask',window.document.body).remove();
+			}
+		}});
+	}else{
+		$(document).sgPup({message:'message_info',text: msg});
+	}
+//	if(flag) {
+		 //移除遮罩层
+		 $('div#imp_mask',window.document.body).remove();
+		 $(document).sgWindow('close',{id:'import_sim'});
+		 $('#monitoring').sgDatagrid('reload','sgDatagrid');
+//	}
+}   
+
+
+function isvalidatefile(obj){
+      var extend = obj.substring(obj.lastIndexOf(".") + 1);
+      //$(document).sgPup({message:'message_info',text: extend);
+      if (extend == "") {
+      } else {
+          if (!(extend.toLocaleLowerCase() == "xls")) {
+              $(document).sgPup({message:'message_info',text: "请上传后缀名为xls的文件!"});
+              return false;
+          }
+      }
+      return true;
+  }
+var resultData  = "";
+var flag = true;
+function subImportNew(){
+			if($("#batchSeq").val() == ''){
+			 	$(document).sgPup({message:'message_info',text: '上传批次必填!'});
+	            return false;
+			}else if ($('#sim_file').val() == '') {
+	            $(document).sgPup({message:'message_info',text: '请选择上传导入文件!'});
+	            $('#sim_file').focus();
+	            return false;
+	        }else{
+	            var file=$('#sim_file')[0];
+	            var files=file.files;
+	            if(files){
+	                var filesLength=files.length;
+	                if(filesLength>50){
+	                    $(document).sgPup({message:'message_info',text: '一次性最多上传50个文件!'});
+	                        $('#sim_file').focus();
+	                    return false;
+	                }
+	                var isGoOn=true;
+	                for(var i=0;i<filesLength;i++){
+	                    if(!isvalidatefile(files[i].name)){
+	                        isGoOn=false;
+	                        break;
+	                    }
+	                }
+	                if(!isGoOn){
+	                  return false;
+	                }
+
+	            }
+	        }
+	        if(isGoOn){
+		        if(!flag){
+					return;
+				}
+				flag = false;
+				$("#importSureBtn").unbind("click");
+		    	var form = $("#sim_importNew");
+		    	var formData = new FormData(form[0]);
+		    	formData.append("type",$("#type").val());
+		    	$("#tipsInfo2").text("正在导入请稍后...");
+		    	$.ajax({
+					url: "../../../fccmdManage/batchContrCmd",
+	                type: 'POST',
+	                enctype: 'multipart/form-data',
+	                data: formData,
+	                async: true,
+	                cache: false,
+	                contentType: false,
+	                processData: false,
+	                success: function (data) {
+	                	$("#importSureBtn").bind("click");
+	                	resultData = data;
+	                	flag = true;
+	                	if(data.success){
+	                	//一共导入条，导入成功条，失败条,总耗时S.
+                			$("#errorBorder,#outPutErrorBtn").hide();
+                			$("#tipsInfo2").text("");
+                			$("#tips").show();
+                			$("#tips1").text(data.totalCount);
+                			$("#tips2").text(data.successCount);
+                			$("#tips3").text(data.failCount);
+                			$("#tips4").text(data.totalTime);
+	                		var errorData = data.failData;
+	                		if( errorData.length > 0 ){
+	                			$("#errorBorder,#outPutErrorBtn").show();
+	                			var  html  ="";
+	                			for(var i = 0; i < errorData.length ;i++){
+	                				var obj = errorData[i];
+	                				if( i == 0){
+		                				html +="<tr style='border-bottom: 0px;'><td style='width: 138px'>"+obj.callLetter+"</td><td  style='width:200px'>"+obj.flag+"</td>/tr>";
+	                				}else{
+	                					html +="<tr><td style='width: 138px'>"+obj.callLetter+"</td><td style='width:200px'>"+obj.flag+"</td>/tr>";
+	                				}
+	                			}
+	                			$("#dateTable").html(html);
+	                		}else{
+		                		//$("#tips").hide();
+		                		$("#tipsInfo2").text("导入成功");
+	                		}
+	                	}else{
+	                		$("#tips").hide();
+	                		$("#tipsInfo2").text(data.msg);
+	                	}
+	                },
+	                error: function(data){
+	                		$("#tips").hide();
+	                		$("#tipsInfo2").text("导入时程序出错");
+	                }
+				});
+	        }
+	    }
+	    
+		var exportErrorData = function(){
+			if( resultData.failData != null && resultData.failData.length > 0 ){
+			 //js 导出错误table
+				$("#dateTable").table2excel({
+					  // 导出的Excel文档的名称
+					  name: "Excel Document Name",
+					  // Excel文件的名称
+					  filename: "省流量SIM卡导入失败记录"
+					});
+			}
+		}
+	    
+	    var winClose_import = function() {// 关闭添加页面
+			$(document).sgWindow('close', {
+				id : 'import_sim'
+			});
+		}
+</script>
+</html>

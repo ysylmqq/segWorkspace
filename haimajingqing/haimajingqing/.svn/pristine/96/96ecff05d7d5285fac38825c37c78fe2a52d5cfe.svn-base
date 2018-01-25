@@ -1,0 +1,32 @@
+package cc.chinagps.gps.util;
+
+import java.io.IOException;
+import java.io.Reader;
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.log4j.Logger;
+
+public class SqlSessionFactoryUtil {
+	private static SqlSessionFactoryBuilder sqlSessionFactoryBuilder;
+	private static SqlSessionFactory sqlSessionFactory;
+	private static final Logger log = Logger.getLogger(SqlSessionFactoryUtil.class);
+	
+	private static void init() {
+		String resource = "mybatis-config.xml";
+		try {
+			Reader reader = Resources.getResourceAsReader(resource);
+			sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
+			sqlSessionFactory = sqlSessionFactoryBuilder.build(reader);
+		} catch (IOException e) {
+			log.error(null, e);
+		}
+	}
+	
+	public static SqlSessionFactory getSqlSessionInstance(){
+		if (sqlSessionFactory == null) {
+			init();
+		}
+		return sqlSessionFactory;
+	}
+}

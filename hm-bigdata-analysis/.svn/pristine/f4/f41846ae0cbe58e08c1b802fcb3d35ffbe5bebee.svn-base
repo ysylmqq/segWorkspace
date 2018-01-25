@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+	<diskStore path="java.io.tmpdir" />
+ <!--  
+        name:cache唯一标识   
+        eternal：缓存是否永久有效   
+        maxElementsInMemory：内存中最大缓存对象数  
+        overflowToDisk(true,false)：缓存对象达到最大数后，将缓存写到硬盘中  
+        diskPersistent：硬盘持久化  
+        timeToIdleSeconds：缓存清除时间   
+        timeToLiveSeconds：缓存存活时间  
+        memoryStoreEvictionPolicy：缓存清空策略  
+        1.FIFO：first in first out 先讲先出  
+        2.LFU： Less Frequently Used 一直以来最少被使用的  
+        3.LRU：Least Recently Used  最近最少使用的  
+    -->  
+	<defaultCache maxElementsInMemory="10000" overflowToDisk="true" eternal="false"
+		memoryStoreEvictionPolicy="LRU" maxElementsOnDisk="10000000" diskExpiryThreadIntervalSeconds="600"
+		timeToIdleSeconds="3600" timeToLiveSeconds="100000" diskPersistent="false" >
+	</defaultCache>
+	
+	<cache name="net.sf.hibernate.cache.StandardQueryCache" 
+	maxElementsInMemory="50" eternal="false" timeToIdleSeconds="3600" 
+	timeToLiveSeconds="7200" overflowToDisk="true"/>
+	
+	<cache name="net.sf.hibernate.cache.UpdateTimestampsCache" 
+	maxElementsInMemory="5000" eternal="true" overflowToDisk="true"/> 
+
+	<cache name="mySql1Region" maxElementsInMemory="10" eternal="false"   
+	timeToIdleSeconds="3600"  timeToLiveSeconds="7200" overflowToDisk="true" />
+	<!-- EhCache RMI 集群配置  多播（ multicast）,由于正式环境下未联网，则用单播的方式进行-->
+     <cacheManagerPeerProviderFactory
+			    class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
+			    properties="peerDiscovery=automatic,hostName=127.0.0.1, multicastGroupAddress=230.0.0.1,
+			    multicastGroupPort=4446, timeToLive=255"
+		/> 
+		<!-- EhCache RMI 集群配置  单播  rmiUrls=//192.168.0.12:4567/oschina_cache|//192.168.0.13:4567/oschina_cache"
+		<cacheManagerPeerProviderFactory
+			    class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
+			    properties="hostName=localhost,
+						    port=4567,
+						    socketTimeoutMillis=2000,
+						    peerDiscovery=manual,
+						    rmiUrls=//192.110.10.214:4567/oschina_cache|//192.110.10.215:4567/oschina_cache"
+		/>-->
+</ehcache>

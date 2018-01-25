@@ -1,0 +1,12 @@
+.ba_menu {float:left;  width: 130px; height: 576px; border: solid #333 1px;background-color:#dfe6ef;border: 0px;}
+.ba_main {float:left;  width: 870px; height: 576px; border: solid #333 1px;border: 0px;}
+.ba_main_1 {float:left;  height: 576px; border: solid #333 1px;border: 0px;}
+.ba_left {float:left;  width: 192px; height: 576px; border: solid #333 1px;border: 0px;}
+.ba_left_left {float:left;  width: 310px; height: 576px; border: solid #333 1px;border: 0px;}
+.ba_content {float: left; width: 678px; height: 576px; border: solid #333 1px;border: 0px;}
+
+.bsp_left {float:left;  width: 670px; height: 576px; border: solid #333 1px;border: 0px;}
+.bsp_main {float:left;  width: 192px; height: 576px; border: solid #333 1px;border: 0px;}
+
+.cust_left {float:left;  width: 242px; height: 246px; border: solid #333 1px;border: 0px; background:#e2e5ec;}
+.cust_main {float:left;  width: 520px; border: solid #333 1px;border: 0px;}

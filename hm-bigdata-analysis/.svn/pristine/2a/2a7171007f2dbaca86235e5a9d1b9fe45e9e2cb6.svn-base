@@ -1,0 +1,17 @@
+log4j.rootLogger=INFO, stdout , logfile 
+#出错时显示sql
+#log4j.logger.org.hibernate.SQL=ERROR
+#log4j.logger.org.hibernate.HQL=ERROR
+
+#hql显示参数
+#log4j.category.org.hibernate.SQL=trace    
+#log4j.category.org.hibernate.type=trace   
+
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%d %p [%c] - %m%n
+
+log4j.appender.logfile=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.logfile.File=${catalina.base}/logs/fee/proccess.log
+log4j.appender.logfile.layout=org.apache.log4j.PatternLayout   
+log4j.appender.logfile.layout.ConversionPattern=%d{yyyy-MM-dd HH\:mm\:ss} %p [%c] - %m%n

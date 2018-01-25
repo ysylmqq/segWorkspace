@@ -1,0 +1,46 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
+<svg xmlns="http://www.w3.org/2000/svg">
+<metadata>
+Created by FontForge 20120731 at Wed Jun 21 15:59:07 2017
+ By admin
+</metadata>
+<defs>
+<font id="iconfont" horiz-adv-x="1024" >
+  <font-face 
+    font-family="iconfont"
+    font-weight="500"
+    font-stretch="normal"
+    units-per-em="1024"
+    panose-1="2 0 6 3 0 0 0 0 0 0"
+    ascent="896"
+    descent="-128"
+    x-height="792"
+    bbox="44 -126 969 857"
+    underline-thickness="0"
+    underline-position="0"
+    unicode-range="U+0078-E60D"
+  />
+<missing-glyph 
+ />
+    <glyph glyph-name=".notdef" 
+ />
+    <glyph glyph-name=".notdef" 
+ />
+    <glyph glyph-name=".null" horiz-adv-x="0" 
+ />
+    <glyph glyph-name="nonmarkingreturn" horiz-adv-x="341" 
+ />
+    <glyph glyph-name="x" unicode="x" horiz-adv-x="1001" 
+d="M281 543q-27 -1 -53 -1h-83q-18 0 -36.5 -6t-32.5 -18.5t-23 -32t-9 -45.5v-76h912v41q0 16 -0.5 30t-0.5 18q0 13 -5 29t-17 29.5t-31.5 22.5t-49.5 9h-133v-97h-438v97zM955 310v-52q0 -23 0.5 -52t0.5 -58t-10.5 -47.5t-26 -30t-33 -16t-31.5 -4.5q-14 -1 -29.5 -0.5
+t-29.5 0.5h-32l-45 128h-439l-44 -128h-29h-34q-20 0 -45 1q-25 0 -41 9.5t-25.5 23t-13.5 29.5t-4 30v167h911zM163 247q-12 0 -21 -8.5t-9 -21.5t9 -21.5t21 -8.5q13 0 22 8.5t9 21.5t-9 21.5t-22 8.5zM316 123q-8 -26 -14 -48q-5 -19 -10.5 -37t-7.5 -25t-3 -15t1 -14.5
+t9.5 -10.5t21.5 -4h37h67h81h80h64h36q23 0 34 12t2 38q-5 13 -9.5 30.5t-9.5 34.5q-5 19 -11 39h-368zM336 498v228q0 11 2.5 23t10 21.5t20.5 15.5t34 6h188q31 0 51.5 -14.5t20.5 -52.5v-227h-327z" />
+    <glyph glyph-name="tuichu" unicode="&#xe609;" 
+d="M309 552q-36 -25 -63.5 -57t-47.5 -69.5t-30 -79t-10 -83.5q0 -74 28 -138.5t76 -112t112.5 -76t137.5 -28.5t137.5 28.5t112.5 76t76 112t28 138.5q0 42 -10 82t-28 76.5t-45 68t-60 57.5q-18 12 -38 9t-33 -19.5t-9.5 -37t19.5 -33.5q50 -36 76.5 -89t26.5 -114
+q0 -52 -19.5 -98.5t-54 -81t-81 -54.5t-98.5 -20t-98.5 20t-80.5 54.5t-54.5 81t-20.5 98.5q0 61 28.5 116t80.5 91q17 12 20.5 32.5t-8.5 37.5t-32.5 20.5t-37.5 -8.5v0zM512 260q21 0 35.5 15t14.5 35v301q0 20 -14.5 35t-35.5 15t-35.5 -15t-14.5 -35v-301
+q0 -20 14.5 -35t35.5 -15v0z" />
+    <glyph glyph-name="denglu" unicode="&#xe60d;" 
+d="M513 591zM247 591q0 110 78 188t188 78t188 -78t78 -188t-78 -187.5t-188 -77.5t-188 77.5t-78 187.5zM77 -108q0 123 58.5 222.5t158.5 155t219 55.5t219 -55.5t158.5 -155t58.5 -222.5h-872zM98 -106q0 -9 -6 -14.5t-14.5 -5.5t-14.5 5.5t-6 14t6 14.5t14.5 6
+t14.5 -5.5t6 -14.5zM969 -106q0 -8 -5.5 -14t-13.5 -6q-9 0 -15.5 5.5t-6.5 13.5t7 14.5t15 6.5t13.5 -5.5t5.5 -14.5z" />
+  </font>
+</defs></svg>

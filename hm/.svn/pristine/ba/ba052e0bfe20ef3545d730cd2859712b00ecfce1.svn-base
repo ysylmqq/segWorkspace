@@ -1,0 +1,70 @@
+#log4j.rootLogger=DEBUG, stdout, logfile 
+log4j.rootLogger=info,File,error
+#log4j.logger.test=info  
+#log4j.logger.org.apache.jasper = DEBUG  
+#log4j.logger.org.apache.catalina.startup.TldConfig = DEBUG  
+#log4j.logger.org.apache.catalina.session.ManagerBase = DEBUG  
+  
+#log4j.logger.com.fiscal = DEBUG  
+#log4j.logger.com.system = DEBUG
+log4j.logger.sysLog = error, DB
+#log4j.logger.debugLog = DEBUG
+  
+#log4j.logger.com.ibatis = DEBUG  
+#log4j.logger.com.ibatis.common.jdbc.SimpleDataSource = DEBUG 
+#log4j.logger.org.springframework = DEBUG   
+#log4j.logger.com.ibatis.common.jdbc.ScriptRunner = DEBUG  
+#log4j.logger.com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate = DEBUG 
+#log4j.logger.com.mchange.v2.resourcepool.BasicResourcePool=DEBUG,C1  
+#log4j.appender.C1.layout=org.apache.log4j.PatternLayout  
+#log4j.appender.C1.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss,SSS} [%c]-[%p] %m%n
+#  
+
+log4j.logger.java.sql = DEBUG 
+#log4j.logger.java.sql.Connection = DEBUG  
+log4j.logger.java.sql.Statement = DEBUG  
+log4j.logger.java.sql.PreparedStatement = DEBUG 
+log4j.logger.java.sql.ResultSet = DEBUG  
+  
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%d %p [%c] - %m%n
+
+#log4j.appender.logfile=org.apache.log4j.RollingFileAppender
+#log4j.appender.logfile.File=${driverBookApp.root}/logs/log4j.log
+#log4j.appender.logfile.MaxFileSize=512KB
+# Keep three backup files.
+log4j.appender.logfile.MaxBackupIndex=3
+# Pattern to output: date priority [category] - message
+log4j.appender.logfile.layout=org.apache.log4j.PatternLayout
+log4j.appender.logfile.layout.ConversionPattern=%d %p [%c] - %m%n
+  
+
+#log4j.appender.DB=com.chinaGPS.driverBook.util.MyAppender
+# connection 
+#log4j.appender.DB.URL=jdbc:mysql://localhost:3306/driverbook
+#log4j.appender.DB.driver=com.mysql.jdbc.Driver
+#log4j.appender.DB.user=root
+#log4j.appender.DB.password=root
+# sql   
+#log4j.appender.DB.sql=INSERT INTO t_log (id,phonenumber,useroperator,operatorparams,logtime) VALUES('%X{id}','%X{phonenumber}','%X{useroperator}','%X{operatorparams}','%d{yyyy-MM-dd HH\:mm\:ss}')   
+#log4j.appender.DB.layout=org.apache.log4j.PatternLayout
+  
+
+log4j.appender.DB=com.gboss.util.MyAppender
+# connection 
+#log4j.appender.DB=org.apache.log4j.jdbc.JDBCAppender
+#log4j.appender.DB.URL=jdbc:oracle:thin:@192.168.3.62:1521:orcl
+#log4j.appender.DB.driver=oracle.jdbc.driver.OracleDriver
+#log4j.appender.DB.user=qfwpt
+#log4j.appender.DB.password=1
+# sql   
+log4j.appender.DB.sql=INSERT INTO T_SYS_OPERATELOG(ID,USER_ID,TYPE,REMARK,STAMP) VALUES('%X{logid}','%X{userid}','%X{type}','%X{remark}','%d{yyyy-MM-dd HH\:mm\:ss}')   
+log4j.appender.DB.layout=org.apache.log4j.PatternLayout
+
+log4j.appender.File=org.apache.log4j.DailyRollingFileAppender 
+log4j.appender.File.File=logs/flow_ctrl_log.log
+log4j.appender.File.MaxFileSize=10MB
+log4j.appender.File.Threshold=info
+log4j.appender.File.layout=org.apache.log4j.PatternLayout
+log4j.appender.File.layout.ConversionPattern=[%p][%d{yyyy-MM-dd HH\:mm\:ss,SSS}][%c]%m%n

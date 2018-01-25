@@ -1,0 +1,664 @@
+package com.gboss.controller;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.gboss.comm.SystemConfig;
+import com.gboss.comm.SystemConst;
+import com.gboss.comm.SystemException;
+import com.gboss.pojo.FankongCmdInfo;
+import com.gboss.pojo.FlowCtrolCmd;
+import com.gboss.pojo.FlowCtrolCmdHistory;
+import com.gboss.pojo.SimCardInfo;
+import com.gboss.service.FCCmdManageService;
+import com.gboss.util.PageSelect;
+import com.gboss.util.Utils;
+import com.gboss.util.excel.CreateExcel_PDF_CSV;
+import com.gboss.util.page.Page;
+
+@Controller
+@RequestMapping("/fccmdManage")
+public class FCCmdManageController extends BaseController {
+
+	@Autowired
+	private FCCmdManageService fcCmdManageService;
+	
+	@Autowired
+	private SystemConfig systemconfig;
+	
+	private static Logger logger = LoggerFactory.getLogger(FCCmdManageController.class);
+
+	/**
+	 * @Description:获取所有的sim卡信息
+	 * @Params:
+	 * @Return:Page
+	 * @Author:cj
+	 * @Date:2017年7月17日 上午10:34:32
+	 */
+	@RequestMapping(value = "/getAllSimPage")
+	@ResponseBody
+	public Page<HashMap<String, Object>> getAllSimPage(@RequestBody PageSelect<Map<String, Object>> pageSelect,
+			HttpServletRequest request) throws SystemException {
+
+		Page<HashMap<String, Object>> rePage = null;
+		try {
+			Long subno = Long.valueOf(SystemConst.HM_SUBCO_NO);
+
+			if (pageSelect != null) {
+				Map<String, Object> map = pageSelect.getFilter();
+				if (map == null) {
+					map = new HashMap<String, Object>();
+				}
+				pageSelect.setFilter(map);
+			}
+			rePage = fcCmdManageService.getAllSimPage(request, subno, pageSelect);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return rePage;
+	}
+
+	/**
+	 * @Description:更新反控指令状态;
+	 * @Params: simIds:1,3,4,5 opType:0--关闭；1--开启;
+	 * @Return:HashMap<String,Object>
+	 * @Author:cj
+	 * @Date:2017年7月17日 下午3:37:16
+	 */
+	@RequestMapping("/updateFankongCmd")
+	@ResponseBody
+	public HashMap<String, Object> updateFankongCmd(@RequestBody FankongCmdInfo params, HttpServletRequest request)
+			throws SystemException {
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		if (params == null || params.getSimIds() == null || params.getOpType() == null) {
+			result.put("success", false);
+			result.put("message", "参数为空");
+			return result;
+		}
+		String simIds = (String) params.getSimIds();
+		String opType = (String) params.getOpType();
+
+		try {
+			fcCmdManageService.updateFankongCmd(simIds, opType);
+			result.put("success", true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("success", false);
+		}
+		// 写日志
+		logger.info("updateFankongCmd >> Param:[simIds:" + simIds + " opType:" + opType + " result："
+				+ result.get("success"));
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Description:发送导航主机指令
+	 * @Params: simcarinfo optype:1--开启 ； 0--关闭
+	 * @Return:HashMap<String,Object>
+	 * @Author:cj
+	 * @Date:2017年7月19日 上午9:56:46
+	 */
+	@RequestMapping("/sendNaviHostCmd")
+	@ResponseBody
+	public HashMap<String, Object> sendNaviHostCmd(@RequestBody SimCardInfo simCard, HttpServletRequest request)
+			throws SystemException {
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		boolean isSucess = true;
+		String msgStr = "";
+
+		String[] callLettes = simCard.getCallLetters();
+		Integer opType = simCard.getOpType();
+
+		if (callLettes == null || opType == null) {
+			result.put(SystemConst.SUCCESS, false);
+			result.put(SystemConst.MSG, "发送导航主机指令,参数为空！");
+			return result;
+		}
+		try {
+			if (opType.intValue() == 1) {
+				for (String call_letter : callLettes) {
+					FlowCtrolCmd flowCtrolCmd = fcCmdManageService
+							.getFlowCtrolByCallLetter(SystemConst.NAVI_HOST_OPEN_CMD, call_letter);
+					SimCardInfo simCardInfo = fcCmdManageService.getSimByCallLetter(call_letter);
+					if (flowCtrolCmd != null) {
+						System.out.println("删除原来的记录:" + flowCtrolCmd);
+						fcCmdManageService.deleteObject(flowCtrolCmd);
+					}
+					// 新建记录
+					flowCtrolCmd = new FlowCtrolCmd();
+					flowCtrolCmd.setCmdId(SystemConst.NAVI_HOST_OPEN_CMD);
+					flowCtrolCmd.setCallLetter(call_letter);
+					flowCtrolCmd.setFlag(2);
+					flowCtrolCmd.setCurrNaviStatus(simCardInfo.getCurrNavihostStatus()==null ?1:simCardInfo.getCurrNavihostStatus().intValue());
+					flowCtrolCmd.setTosetNaviStatus(1);// 打开
+					flowCtrolCmd.setStamp(new Date());
+					flowCtrolCmd.setRemark("新增开启导航主机指令");
+					flowCtrolCmd.setOpId((String) request.getSession().getAttribute(SystemConst.ACCOUNT_ID));
+					fcCmdManageService.save(flowCtrolCmd);
+
+					// 写历史记录表
+					FlowCtrolCmdHistory fccHistory = fcCmdManageService.fcSendCmdTransHistory(flowCtrolCmd);
+					if (fccHistory != null) {
+						fcCmdManageService.saveOrUpdate(fccHistory);
+					}
+					// 把需要升级的指令加入到发送列表中
+					SystemConst.hm_navi_host_open_cmd.put(call_letter, flowCtrolCmd);
+
+					isSucess = true;
+					msgStr = SystemConst.OP_SUCCESS;
+				}
+			}
+			if (opType.intValue() == 0) {// 关闭
+				for (String call_letter : callLettes) {
+					FlowCtrolCmd flowCtrolCmd = fcCmdManageService
+							.getFlowCtrolByCallLetter(SystemConst.NAVI_HOST_CLOSE_CMD, call_letter);
+					if (flowCtrolCmd != null) {
+						System.out.println("删除原来的记录:" + flowCtrolCmd);
+						fcCmdManageService.deleteObject(flowCtrolCmd);
+					}
+					// 新建记录
+					flowCtrolCmd = new FlowCtrolCmd();
+					SimCardInfo simCardInfo = fcCmdManageService.getSimByCallLetter(call_letter);
+					flowCtrolCmd.setCallLetter(call_letter);
+					flowCtrolCmd.setCmdId(SystemConst.NAVI_HOST_CLOSE_CMD);
+					flowCtrolCmd.setFlag(2);
+					flowCtrolCmd.setCurrNaviStatus(simCardInfo.getCurrNavihostStatus() == null?1:simCardInfo.getCurrNavihostStatus().intValue());
+					flowCtrolCmd.setTosetNaviStatus(0);// 关闭
+					flowCtrolCmd.setStamp(new Date());
+					flowCtrolCmd.setRemark("新增关闭导航主机指令");
+					flowCtrolCmd.setOpId((String) request.getSession().getAttribute(SystemConst.ACCOUNT_ID));
+					fcCmdManageService.save(flowCtrolCmd);
+					// 写历史记录表
+					FlowCtrolCmdHistory fccHistory = fcCmdManageService.fcSendCmdTransHistory(flowCtrolCmd);
+					if (fccHistory != null) {
+						fcCmdManageService.saveOrUpdate(fccHistory);
+					}
+					// 把需要升级的指令加入到发送列表中
+					SystemConst.hm_navi_host_close_cmd.put(call_letter, flowCtrolCmd);
+
+					isSucess = true;
+					msgStr = SystemConst.OP_SUCCESS;
+
+					// 写日志
+					logger.info("sendNaviHostCmd >> Param:[flowCtrolCmd:" + flowCtrolCmd.toString() + " opType:"
+							+ opType + " result：" + isSucess);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			isSucess = false;
+			msgStr = SystemConst.OP_FAILURE;
+			// 写日志
+			logger.info("sendNaviHostCmd >> Param:[errMsg:" + msgStr + " opType:" + opType + " result：" + isSucess);
+		}
+
+		result.put(SystemConst.SUCCESS, isSucess);
+		result.put(SystemConst.MSG, msgStr);
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Description:
+	 * @Params:
+	 * @Return:HashMap<String,Object>
+	 * @Author:cj
+	 * @Date:2017年7月21日 下午2:54:05
+	 */
+	@RequestMapping("/cancleNaviHostCmd")
+	@ResponseBody
+	public HashMap<String, Object> cancleNaviHostCmd(@RequestBody SimCardInfo simCard, HttpServletRequest request)
+			throws SystemException {
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		boolean isSucess = true;
+		String msgStr = SystemConst.OP_SUCCESS;
+
+		String[] callLettes = simCard.getCallLetters();
+		Integer opType = simCard.getOpType();
+
+		if (callLettes == null || opType == null) {
+			result.put(SystemConst.SUCCESS, false);
+			result.put(SystemConst.MSG, "取消导航主机指令,参数为空！");
+			return result;
+		}
+
+		try {
+			FlowCtrolCmd flowCtrolCmd = null;
+			if (opType == 1) {// 取消开启导航主机指令
+				for (String call_letter : callLettes) {
+					// 首先查询表里面有没有可取消的指令；
+					flowCtrolCmd = fcCmdManageService.getFlowCtrolByCallLetter(SystemConst.NAVI_HOST_OPEN_CMD,
+							call_letter);
+					if (flowCtrolCmd != null && (flowCtrolCmd.getFlag() == 1 || flowCtrolCmd.getFlag() == 2
+							|| flowCtrolCmd.getFlag() == 3)) {// 存在即更新
+						// 设置指令状态为已取消
+						flowCtrolCmd.setFlag(8);
+						flowCtrolCmd.setRemark("取消");
+						// 更新取消队列里面的数据
+						fcCmdManageService.update(flowCtrolCmd);
+						SystemConst.hm_navi_host_cancle_open_cmd.put(call_letter, flowCtrolCmd);
+						// 写历史记录表
+						FlowCtrolCmdHistory fccHistory = fcCmdManageService.fcSendCmdTransHistory(flowCtrolCmd);
+						if (fccHistory != null) {
+							fcCmdManageService.saveOrUpdate(fccHistory);
+						}
+					}
+				}
+			}
+			if (opType == 0) {// 取消关闭导航主机指令
+				for (String call_letter : callLettes) {
+					// 首先查询表里面有没有可取消的指令；
+					flowCtrolCmd = fcCmdManageService.getFlowCtrolByCallLetter(SystemConst.NAVI_HOST_CLOSE_CMD,
+							call_letter);
+					if (flowCtrolCmd != null && (flowCtrolCmd.getFlag() == 1 || flowCtrolCmd.getFlag() == 2
+							|| flowCtrolCmd.getFlag() == 3)) {// 存在即更新
+						// 设置指令状态为已取消
+						flowCtrolCmd.setFlag(8);
+						flowCtrolCmd.setRemark("取消");
+						// 更新取消队列里面的数据
+						fcCmdManageService.update(flowCtrolCmd);
+						SystemConst.hm_navi_host_cancle_close_cmd.put(call_letter, flowCtrolCmd);
+						// 写历史记录表
+						FlowCtrolCmdHistory fccHistory = fcCmdManageService.fcSendCmdTransHistory(flowCtrolCmd);
+						if (fccHistory != null) {
+							fcCmdManageService.saveOrUpdate(fccHistory);
+						}
+					}
+				}
+			}
+			// 写日志
+			logger.info("cancleNaviHostCmd >> Param:[flowCtrolCmd:" + flowCtrolCmd.toString() + " opType:" + opType
+					+ " result：" + isSucess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			isSucess = false;
+			msgStr = SystemConst.OP_FAILURE;
+			// 写日志
+			logger.info("cancleNaviHostCmd >> Param:[errMsg:" + msgStr + " opType:" + opType + " result：" + isSucess);
+		}
+
+		result.put(SystemConst.SUCCESS, isSucess);
+		result.put(SystemConst.MSG, msgStr);
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Description:发送省流量指令
+	 * @Params: simcarinfo optype:1--开启 ； 0--关闭
+	 * @Return:HashMap<String,Object>
+	 * @Author:cj
+	 * @Date:2017年7月19日 上午9:56:46
+	 */
+	@RequestMapping("/sendSaveFlowCmd")
+	@ResponseBody
+	public HashMap<String, Object> sendSaveFlowCmd(@RequestBody SimCardInfo simCard, HttpServletRequest request)
+			throws SystemException {
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		boolean isSucess = true;
+		String msgStr = "";
+
+		String[] callLettes = simCard.getCallLetters();
+		Integer opType = simCard.getOpType();
+
+		if (callLettes == null || opType == null) {
+			result.put(SystemConst.SUCCESS, false);
+			result.put(SystemConst.MSG, "开启导航主机,参数为空");
+			return result;
+		}
+		try {
+			FlowCtrolCmd flowCtrolCmd = null;
+			if (opType.intValue() == 1) {// 开启
+				for (String call_letter : callLettes) {
+					flowCtrolCmd = fcCmdManageService.getFlowCtrolByCallLetter(SystemConst.SAVE_FLOW_OPEN_CMD,
+							call_letter);
+					if (flowCtrolCmd != null) {
+						System.out.println("删除原来的记录:" + flowCtrolCmd);
+						fcCmdManageService.deleteObject(flowCtrolCmd);
+					}
+					flowCtrolCmd = new FlowCtrolCmd();
+					SimCardInfo simCardInfo = fcCmdManageService.getSimByCallLetter(call_letter);
+					flowCtrolCmd.setCallLetter(call_letter);
+					flowCtrolCmd.setCmdId(SystemConst.SAVE_FLOW_OPEN_CMD);
+					flowCtrolCmd.setFlag(2);
+					flowCtrolCmd.setCurrFlowctrlStatus(simCardInfo.getCurrSaveflowStatus()==null?1:simCardInfo.getCurrSaveflowStatus().intValue());
+					flowCtrolCmd.setTosetFlowctrlStatus(1);// 打开
+					flowCtrolCmd.setStamp(new Date());
+					flowCtrolCmd.setRemark("新增开启省流量指令");
+					flowCtrolCmd.setOpId((String) request.getSession().getAttribute(SystemConst.ACCOUNT_ID));
+					fcCmdManageService.save(flowCtrolCmd);
+
+					// 写历史记录表
+					FlowCtrolCmdHistory fccHistory = fcCmdManageService.fcSendCmdTransHistory(flowCtrolCmd);
+					if (fccHistory != null) {
+						fcCmdManageService.saveOrUpdate(fccHistory);
+					}
+					// 把需要升级的指令加入到发送列表中
+					SystemConst.hm_save_flow_open_cmd.put(call_letter, flowCtrolCmd);
+
+					isSucess = true;
+					msgStr = SystemConst.OP_SUCCESS;
+					// 写日志
+					logger.info("cancleNaviHostCmd >> Param:[flowCtrolCmd:" + flowCtrolCmd.toString() + " opType:" + opType + " result：" + isSucess);
+				}
+			}
+			if (opType.intValue() == 0) {// 关闭
+				for (String call_letter : callLettes) {
+					flowCtrolCmd = fcCmdManageService.getFlowCtrolByCallLetter(SystemConst.SAVE_FLOW_CLOSE_CMD,
+							call_letter);
+					if (flowCtrolCmd != null) {
+						System.out.println("删除原来的记录:" + flowCtrolCmd);
+						fcCmdManageService.deleteObject(flowCtrolCmd);
+					}
+
+					flowCtrolCmd = new FlowCtrolCmd();
+					SimCardInfo simCardInfo = fcCmdManageService.getSimByCallLetter(call_letter);
+					flowCtrolCmd.setCallLetter(call_letter);
+					flowCtrolCmd.setCmdId(SystemConst.SAVE_FLOW_CLOSE_CMD);
+					flowCtrolCmd.setFlag(2);
+					flowCtrolCmd.setCurrFlowctrlStatus(simCardInfo.getCurrSaveflowStatus() == null ? 1:simCardInfo.getCurrSaveflowStatus().intValue());
+					flowCtrolCmd.setTosetFlowctrlStatus(0);// 关闭
+					flowCtrolCmd.setStamp(new Date());
+					flowCtrolCmd.setRemark("新增关闭省流量指令");
+					flowCtrolCmd.setOpId((String) request.getSession().getAttribute(SystemConst.ACCOUNT_ID));
+					fcCmdManageService.save(flowCtrolCmd);
+					// 写历史记录表
+					FlowCtrolCmdHistory fccHistory = fcCmdManageService.fcSendCmdTransHistory(flowCtrolCmd);
+					if (fccHistory != null) {
+						fcCmdManageService.saveOrUpdate(fccHistory);
+					}
+
+					// 把需要发送的指令加入到发送列表中
+					SystemConst.hm_save_flow_close_cmd.put(call_letter, flowCtrolCmd);
+					isSucess = true;
+					msgStr = SystemConst.OP_SUCCESS;
+
+					// 写日志
+					logger.info("cancleNaviHostCmd >> Param:[flowCtrolCmd:" + flowCtrolCmd.toString() + " opType:" + opType + " result：" + isSucess);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			isSucess = false;
+			msgStr = SystemConst.OP_FAILURE;
+			// 写日志
+			logger.info("cancleNaviHostCmd >> Param:[errMsg:" + msgStr + " opType:" + opType + " result：" + isSucess);
+		}
+
+		result.put(SystemConst.SUCCESS, isSucess);
+		result.put(SystemConst.MSG, msgStr);
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Description:取消省流量指令;
+	 * @Params:
+	 * @Return:HashMap<String,Object>
+	 * @Author:cj
+	 * @Date:2017年7月21日 下午2:54:05
+	 */
+	@RequestMapping("/cancleSaveFlowCmd")
+	@ResponseBody
+	public HashMap<String, Object> cancleSaveFlowCmd(@RequestBody SimCardInfo simCard, HttpServletRequest request)
+			throws SystemException {
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		boolean isSucess = true;
+		String msgStr = SystemConst.OP_SUCCESS;
+
+		String[] callLettes = simCard.getCallLetters();
+		Integer opType = simCard.getOpType();
+
+		if (callLettes == null || opType == null) {
+			result.put(SystemConst.SUCCESS, false);
+			result.put(SystemConst.MSG, "开启导航主机,参数为空");
+			return result;
+		}
+
+		try {
+			FlowCtrolCmd flowCtrolCmd = null;
+			if (opType == 1) {// 取消开启省流量指令
+				for (String call_letter : callLettes) {
+					// 首先查询表里面有没有可取消的指令；
+					flowCtrolCmd = fcCmdManageService.getFlowCtrolByCallLetter(SystemConst.SAVE_FLOW_OPEN_CMD,
+							call_letter);
+					if (flowCtrolCmd != null && (flowCtrolCmd.getFlag() == 1 || flowCtrolCmd.getFlag() == 2
+							|| flowCtrolCmd.getFlag() == 3)) {// 存在即更新
+						// 设置指令状态为已取消
+						flowCtrolCmd.setFlag(8);
+						flowCtrolCmd.setRemark("取消");
+						// 更新取消队列里面的数据
+						fcCmdManageService.update(flowCtrolCmd);
+						SystemConst.hm_save_flow_cancle_open_cmd.put(call_letter, flowCtrolCmd);
+					}
+				}
+			}
+			if (opType == 0) {// 取消关闭省流量指令
+				for (String call_letter : callLettes) {
+					// 首先查询表里面有没有可取消的指令；
+					flowCtrolCmd = fcCmdManageService.getFlowCtrolByCallLetter(SystemConst.SAVE_FLOW_CLOSE_CMD,
+							call_letter);
+					if (flowCtrolCmd != null && (flowCtrolCmd.getFlag() == 1 || flowCtrolCmd.getFlag() == 2
+							|| flowCtrolCmd.getFlag() == 3)) {// 存在即更新
+						// 设置指令状态为已取消
+						flowCtrolCmd.setFlag(8);
+						flowCtrolCmd.setRemark("取消");
+						// 更新取消队列里面的数据
+						fcCmdManageService.update(flowCtrolCmd);
+						SystemConst.hm_save_flow_cancle_close_cmd.put(call_letter, flowCtrolCmd);
+					}
+				}
+			}
+			// 写日志
+			logger.info("cancleNaviHostCmd >> Param:[flowCtrolCmd:" + flowCtrolCmd.toString() + " opType:" + opType
+					+ " result：" + isSucess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			isSucess = false;
+			msgStr = SystemConst.OP_FAILURE;
+
+			// 写日志
+			logger.info("cancleNaviHostCmd >> Param:[errMsg:" + msgStr + " opType:" + opType + " result：" + isSucess);
+		}
+
+		result.put(SystemConst.SUCCESS, isSucess);
+		result.put(SystemConst.MSG, msgStr);
+		return result;
+	}
+
+	/**
+	 * @Description:获取所有的sim卡信息
+	 * @Params:
+	 * @Return:Page
+	 * @Author:cj
+	 * @Date:2017年7月17日 上午10:34:32
+	 */
+	@RequestMapping(value = "/getAllCmdLogInfo")
+	@ResponseBody
+	public Page<HashMap<String, Object>> getAllCmdLogInfo(@RequestBody PageSelect<Map<String, Object>> pageSelect,
+			HttpServletRequest request) throws SystemException {
+
+		Page<HashMap<String, Object>> rePage = null;
+		try {
+			Long subno = Long.valueOf(SystemConst.HM_SUBCO_NO);
+
+			if (pageSelect != null) {
+				Map<String, Object> map = pageSelect.getFilter();
+				if (map == null) {
+					map = new HashMap<String, Object>();
+				}
+				pageSelect.setFilter(map);
+			}
+			rePage = fcCmdManageService.getAllCmdLogInfo(request, subno, pageSelect);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return rePage;
+	}
+	
+	
+	/**
+	 * 批量操作
+	 * @param sim_file
+	 * @param isOverride
+	 * @param type
+	 * @param telcoV
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws SystemException
+	 * @throws IOException
+	 */
+	@RequestMapping(value = "/batchContrCmd",method = RequestMethod.POST)
+	public @ResponseBody Map<String, Object> batchContrCmd(@RequestParam("sim_file") MultipartFile sim_file,
+			@RequestParam(required = false) Boolean isOverride,Integer type, Integer telcoV,
+			HttpServletRequest request, HttpServletResponse response)
+			throws SystemException, IOException {
+		Map<String, Object> map = new HashMap<String, Object>();
+		long size = sim_file.getSize();
+		String batchSeq = request.getParameter("batchSeq");
+		if("".equals(batchSeq)){
+			map.put("success", false);
+			map.put("msg", "上传批次必填");
+			return map;
+		}
+		//判断上传批次是否已经存在 
+		if(fcCmdManageService.isExistBatchSeq(batchSeq)){
+			map.put("success", false);
+			map.put("msg", "上传批次已存在");
+			return map;
+		}
+		if (size > 10000000) {
+			map.put("success", false);
+			map.put("msg", "上传文件不能超过10M");
+			return map;
+		} else {
+			// excel上传保存路径
+			String path = systemconfig.getExcelUploadPath();
+			File fileDir = new File(path);
+			if (!fileDir.exists()) { //判断路径是否存在，不存在则创建
+				fileDir.mkdirs();
+			}
+			// 保存文件和数据
+			File descFile = new File(fileDir, sim_file.getOriginalFilename());
+			FileUtils.copyInputStreamToFile(sim_file.getInputStream(), descFile);
+			List<String[]> dataList = CreateExcel_PDF_CSV.getData(descFile);
+			String opId = (String) request.getSession().getAttribute(SystemConst.ACCOUNT_ID);
+			if(dataList == null || dataList.size() ==0){
+				map.put("success", false);
+				map.put("msg", "上传表格模板不对");
+				return map;
+			}
+			String []temp = dataList.get(0);
+			if(temp == null || temp.length ==0 || !temp[0].equalsIgnoreCase("callLetter")){
+				map.put("success", false);
+				map.put("msg", "上传表格模板不对");
+				return map;
+			}
+			map = fcCmdManageService.batchContrCmd(dataList, type,opId,batchSeq);
+			// 删除上传文件
+			descFile.delete();
+		}
+		return map;
+	}
+	
+	/**
+	 * 导出下发指令指令失败的记录
+	 * @param request
+	 * @param response
+	 * @throws SystemException
+	 */
+	@RequestMapping(value = "/exportExcelFailCmd")
+	public void exportExcelFailCmd(HttpServletRequest request,HttpServletResponse response)  {
+		try {
+			String batchSeq = request.getParameter("batchSeq");
+			String type = request.getParameter("type");
+			/*if("".equals(batchSeq)){
+				return ;
+			}*/
+			/*call_letter,
+	        cmd_id,
+	        cmd_params,
+	        send_time,
+	        resp_code,
+	        flag,
+	        remark */
+			List<HashMap<String, Object>> results = fcCmdManageService.exportExcelFailCmd(batchSeq,type);
+			String[][] title = {{"呼号","15"},{"cmdId","15"},{"cmdParams","15"},{"sendTime","15"},
+					{"respCode","10"},{"flag","20"},{"remark","50"},{"批次","30"}};
+			int columnIndex=0;
+			List valueList = new ArrayList();
+			HashMap<String, Object> valueData = null;
+			String[] values = null;
+			int listLenth=results.size();
+			int titleLength=title.length;
+			for(int i=0; i<listLenth; i++){
+				values = new String[titleLength];
+				valueData = results.get(i);
+				columnIndex=0;
+				values[columnIndex]  = Utils.clearNull(valueData.get("call_letter")).toString();
+				columnIndex++;
+				values[columnIndex]  = Utils.clearNull(valueData.get("cmd_id"));
+				columnIndex++;
+				values[columnIndex]  = Utils.clearNull(valueData.get("cmd_params"));
+				columnIndex++;
+				values[columnIndex] = Utils.clearNull(valueData.get("send_time"));
+				columnIndex++;
+				values[columnIndex]  =  Utils.clearNull(valueData.get("resp_code"));
+				columnIndex++;
+				String flag = Utils.clearNull(valueData.get("flag"));
+				//指令状态，1:初始值;2:要求下发;3:已发查车;4:已发指令;5:指令执行中;6:指令执行失败;7:指令执行成功;8:指令取消
+				if("1".equals(flag)){
+					flag = "初始值";
+				}else if("2".equals(flag)){
+					flag = "要求下发";
+				}else if("3".equals(flag)){
+					flag = "已发查车";
+				}else if("4".equals(flag)){
+					flag = "已发指令";
+				}else if("5".equals(flag)){
+					flag = "指令执行中";
+				}else if("6".equals(flag)){
+					flag = "指令执行失败";
+				}else if("7".equals(flag)){
+					flag = "指令执行成功";
+				}else if("8".equals(flag)){
+					flag = "指令取消";
+				}
+				values[columnIndex]  = flag;
+				columnIndex++;
+				values[columnIndex]  = Utils.clearNull(valueData.get("remark"));
+				columnIndex++;
+				values[columnIndex] = Utils.clearNull(valueData.get("batch_seq"));
+				valueList.add(values);
+			}
+			//获得分公司中英文名称
+			CreateExcel_PDF_CSV.createExcel(valueList, response, "指令执行结果表", title,"","",false);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			e.printStackTrace();
+		}
+	}
+	
+}

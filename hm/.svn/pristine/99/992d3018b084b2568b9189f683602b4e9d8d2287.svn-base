@@ -1,0 +1,354 @@
+package com.gboss.service.impl;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.gboss.comm.SystemConst;
+import com.gboss.comm.SystemException;
+import com.gboss.dao.FCCmdManageDao;
+import com.gboss.pojo.FlowCtrolCmd;
+import com.gboss.pojo.FlowCtrolCmdHistory;
+import com.gboss.pojo.Preload;
+import com.gboss.pojo.SimCardInfo;
+import com.gboss.service.FCCmdManageService;
+import com.gboss.util.PageSelect;
+import com.gboss.util.ReflectUtils;
+import com.gboss.util.StringUtils;
+import com.gboss.util.page.Page;
+import com.gboss.util.page.PageUtil;
+
+@Service("fcCmdManageService")
+@Transactional
+public class FCCmdManageServiceImpl extends BaseServiceImpl implements FCCmdManageService {
+
+	@Autowired
+	@Qualifier("cmdManageDao")
+	private FCCmdManageDao cmdManageDao;
+
+	@Override
+	public Page<HashMap<String, Object>> getAllSimPage(HttpServletRequest request, Long companyId,
+			PageSelect<Map<String, Object>> pageSelect) throws SystemException {
+		int total = cmdManageDao.countAllSim(companyId, pageSelect.getFilter());
+
+		List<HashMap<String, Object>> list = cmdManageDao.getAllSimPage(companyId, pageSelect.getFilter(),
+				pageSelect.getOrder(), pageSelect.getIs_desc(), pageSelect.getPageNo(), pageSelect.getPageSize());
+		
+		return PageUtil.getPage(total, pageSelect.getPageNo(), list, pageSelect.getPageSize());
+	}
+
+	@Override
+	public void updateFankongCmd(String simIds,String opType) {
+		cmdManageDao.updateRemoteCtrlStatus(simIds,opType);
+	}
+
+	@Override
+	public boolean openNaviHostCmd(String[] callLettes) {
+		boolean reSult = true;
+		//1.需要发送查车指令
+		HashMap<String, Object> reMap = sendSearchCmd(callLettes);
+		if(((String)reMap.get("success")).equals("false")){
+			return false;
+		}
+		//2.更新状态
+		
+		//2.发送导航主机开启指令；
+		
+		
+		
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @Description:下发查车指令;
+	 * @Params:
+	 * @Return:boolean
+	 * @Author:cj
+	 * @Date:2017年7月19日 上午11:19:21
+	 */
+	public HashMap<String, Object> sendSearchCmd(String[] callLeArr){
+		HashMap<String, Object> reMap = new HashMap<String, Object>();
+		boolean reSult = true;
+		
+		for (String call_letter : callLeArr) {
+			ArrayList<String> callLetters = new ArrayList<String>();
+			callLetters.add(call_letter);
+			String cmdSn = SystemConst.clienthandler.SendCommand(callLetters, 0x01, null, false);
+			
+			if(cmdSn.equals("")){
+				reSult = false;
+				System.out.println("查车指令下发失败!sn=" + cmdSn);
+			}else{
+				reSult = true;
+				System.out.println("查车指令下发成功!sn=" + cmdSn);
+			}
+			reMap.put("success", reSult);
+			reMap.put("cmdSn", cmdSn);
+		}
+		
+		return reMap;
+	}
+
+	@Override
+	public List<FlowCtrolCmd> getFlowCtrlList(Integer cmdId) {
+		return cmdManageDao.getFlowCtrlList(cmdId);
+	}
+
+	@Override
+	public List<FlowCtrolCmd> getFlowCtrlAllList(Integer cmdId) {
+		return cmdManageDao.getFlowCtrlAllList(cmdId);
+	}
+
+	@Override
+	public FlowCtrolCmd getFlowCtrolByCallLetter(Integer cmdId, String call_letter) {
+		return cmdManageDao.getFlowCtrolByCallLetter(cmdId,call_letter);
+	}
+
+	@Override
+	public SimCardInfo getSimByCallLetter(String call_letter) {
+		return cmdManageDao.getSimByCallLetter(call_letter);
+	}
+
+	@Override
+	public FlowCtrolCmdHistory fcSendCmdTransHistory(FlowCtrolCmd flowCtrolCmd) {
+		if(flowCtrolCmd == null ||flowCtrolCmd.getId() == null){
+			return null;
+		}
+		FlowCtrolCmdHistory flowCtrolCmdHistory = new FlowCtrolCmdHistory();
+				
+		if(flowCtrolCmd.getId() != null){
+			flowCtrolCmdHistory.setId(flowCtrolCmd.getId());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getCallLetter())){
+			flowCtrolCmdHistory.setCallLetter(flowCtrolCmd.getCallLetter());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getCmdId())){
+			flowCtrolCmdHistory.setCmdId(flowCtrolCmd.getCmdId());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getCmdSn())){
+			flowCtrolCmdHistory.setCmdSn(flowCtrolCmd.getCmdSn());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getCmdParams())){
+			flowCtrolCmdHistory.setCmdParams(flowCtrolCmd.getCmdParams());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getSendTime())){
+			flowCtrolCmdHistory.setSendTime(flowCtrolCmd.getSendTime());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getRespTime())){
+			flowCtrolCmdHistory.setRespTime(flowCtrolCmd.getRespTime());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getRespCode())){
+			flowCtrolCmdHistory.setRespCode(flowCtrolCmd.getRespCode());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getFlag())){
+			flowCtrolCmdHistory.setFlag(flowCtrolCmd.getFlag());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getCurrNaviStatus())){
+			flowCtrolCmdHistory.setCurrNaviStatus(flowCtrolCmd.getCurrNaviStatus());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getTosetNaviStatus())){
+			flowCtrolCmdHistory.setTosetNaviStatus(flowCtrolCmd.getTosetNaviStatus());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getCurrFlowctrlStatus())){
+			flowCtrolCmdHistory.setCurrFlowctrlStatus(flowCtrolCmd.getCurrFlowctrlStatus());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getTosetFlowctrlStatus())){
+			flowCtrolCmdHistory.setTosetFlowctrlStatus(flowCtrolCmd.getTosetFlowctrlStatus());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getStamp())){
+			flowCtrolCmdHistory.setStamp(flowCtrolCmd.getStamp());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getRemark())){
+			flowCtrolCmdHistory.setRemark(flowCtrolCmd.getRemark());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getOpId())){
+			flowCtrolCmdHistory.setOpId(flowCtrolCmd.getOpId());
+		}
+		return flowCtrolCmdHistory;
+	}
+
+	@Override
+	public Page<HashMap<String, Object>> getAllCmdLogInfo(HttpServletRequest request, Long companyId,
+			PageSelect<Map<String, Object>> pageSelect) throws SystemException {
+		int total = cmdManageDao.countAllLogInfo(companyId, pageSelect.getFilter());
+
+		List<HashMap<String, Object>> list = cmdManageDao.getAllCmdLogInfo(companyId, pageSelect.getFilter(),
+				pageSelect.getOrder(), pageSelect.getIs_desc(), pageSelect.getPageNo(), pageSelect.getPageSize());
+		
+		return PageUtil.getPage(total, pageSelect.getPageNo(), list, pageSelect.getPageSize());
+	}
+
+	@Override
+	public ConcurrentHashMap<String, ArrayList<FlowCtrolCmd>> getAllSendSearchMap() {
+		
+		return cmdManageDao.getAllSendSearchMap();
+	}
+
+	// 从excel取值列设置
+	private Map<String, String> colsMap = new HashMap<String, String>();
+	{
+		colsMap.put("callLetter", "2");
+	}
+	
+	// 读取excel时默认设置值
+	private Map<String, Object> defValMap = new HashMap<String, Object>();
+	{
+
+	}
+
+	private Map<String, Map<String, String>> transfMap = new HashMap<String, Map<String, String>>();
+	{
+	}
+	@Override
+	public Map<String, Object> batchContrCmd(List<String[]> dataList, Integer type,String opId,String batchSeq) {
+		Map<String,Object> map = new HashMap<String,Object>();
+		List<Map<String,Object>> resultList = new ArrayList<Map<String,Object>>();
+		long startTime = System.currentTimeMillis();
+		//开启指令
+		if(type == 1){
+			for (int i = 1; i < dataList.size(); i++) {
+				String [] temp = dataList.get(i);
+				if(temp != null && temp.length> 0){
+					String call_letter = temp[0];
+					if(call_letter == null || "".equals(call_letter)){
+						continue;
+					}
+					FlowCtrolCmd flowCtrolCmd = this.getFlowCtrolByCallLetter(SystemConst.SAVE_FLOW_OPEN_CMD,call_letter);
+					try {
+						if (flowCtrolCmd != null) {
+							this.deleteObject(flowCtrolCmd);
+						}
+						flowCtrolCmd = new FlowCtrolCmd();
+						SimCardInfo simCardInfo = this.getSimByCallLetter(call_letter);
+						if(simCardInfo == null){
+							Map<String,Object> errorMap = new HashMap<String,Object>();
+							errorMap.put("callLetter", call_letter);
+							errorMap.put("flag", "sim卡表当中不存在该呼号");
+							resultList.add(errorMap);
+							continue;
+						}
+						flowCtrolCmd.setCallLetter(call_letter);
+						flowCtrolCmd.setCmdId(SystemConst.SAVE_FLOW_OPEN_CMD);
+						flowCtrolCmd.setFlag(2);
+						flowCtrolCmd.setCurrFlowctrlStatus(simCardInfo.getCurrSaveflowStatus()==null?1:simCardInfo.getCurrSaveflowStatus().intValue());
+						flowCtrolCmd.setTosetFlowctrlStatus(1);// 打开
+						flowCtrolCmd.setStamp(new Date());
+						flowCtrolCmd.setRemark("新增开启省流量指令");
+						flowCtrolCmd.setOpId(opId);
+						this.save(flowCtrolCmd);
+						
+						// 写历史记录表
+						FlowCtrolCmdHistory fccHistory = this.fcSendCmdTransHistory(flowCtrolCmd);
+						if (fccHistory != null) {
+							fccHistory.setBatchSeq(batchSeq);
+							this.saveOrUpdate(fccHistory);
+						}
+						// 把需要升级的指令加入到发送列表中
+						SystemConst.hm_save_flow_open_cmd.put(call_letter, flowCtrolCmd);
+					} catch (Exception e) {
+						e.printStackTrace();
+						Map<String,Object> errorMap = new HashMap<String,Object>();
+						errorMap.put("callLetter", call_letter);
+						errorMap.put("flag", "开启省流量指令失败");
+						resultList.add(errorMap);
+					}
+				}
+			}
+		}else if(type == 0){
+			for (int i = 1; i < dataList.size(); i++) {
+				String [] temp = dataList.get(i);
+				if(temp != null && temp.length> 0){
+					String call_letter = temp[0];
+					if(call_letter == null || "".equals(call_letter)){
+						continue;
+					}
+					FlowCtrolCmd flowCtrolCmd = this.getFlowCtrolByCallLetter(SystemConst.SAVE_FLOW_OPEN_CMD,call_letter);
+					try {
+						if (flowCtrolCmd != null) {
+							this.deleteObject(flowCtrolCmd);
+						}
+						flowCtrolCmd = new FlowCtrolCmd();
+						SimCardInfo simCardInfo = this.getSimByCallLetter(call_letter);
+						if(simCardInfo == null){
+							Map<String,Object> errorMap = new HashMap<String,Object>();
+							errorMap.put("callLetter", call_letter);
+							errorMap.put("flag", "sim卡表当中不存在该呼号");
+							resultList.add(errorMap);
+							continue;
+						}
+						flowCtrolCmd.setCallLetter(call_letter);
+						flowCtrolCmd.setCmdId(SystemConst.SAVE_FLOW_OPEN_CMD);
+						flowCtrolCmd.setFlag(2);
+						flowCtrolCmd.setCurrFlowctrlStatus(simCardInfo.getCurrSaveflowStatus()==null?1:simCardInfo.getCurrSaveflowStatus().intValue());
+						flowCtrolCmd.setTosetFlowctrlStatus(1);// 打开
+						flowCtrolCmd.setStamp(new Date());
+						flowCtrolCmd.setRemark("新增开启省流量指令");
+						flowCtrolCmd.setOpId(opId);
+						this.save(flowCtrolCmd);
+
+						// 写历史记录表
+						FlowCtrolCmdHistory fccHistory = this.fcSendCmdTransHistory(flowCtrolCmd);
+						if (fccHistory != null) {
+							fccHistory.setBatchSeq(batchSeq);
+							this.saveOrUpdate(fccHistory);
+						}
+						// 把需要升级的指令加入到发送列表中
+						SystemConst.hm_save_flow_open_cmd.put(call_letter, flowCtrolCmd);
+					} catch (Exception e) {
+						e.printStackTrace();
+						Map<String,Object> errorMap = new HashMap<String,Object>();
+						errorMap.put("callLetter", call_letter);
+						errorMap.put("reason", "关闭省流量指令失败");
+						resultList.add(errorMap);
+					}
+				}
+			}
+		}
+		long endTime = System.currentTimeMillis();
+		map.put("totalTime", (endTime-startTime)/1000+1);
+		map.put("totalCount", dataList.size()-1);
+		map.put("successCount", dataList.size()-1-resultList.size());
+		map.put("failCount",resultList.size());
+		map.put("failData",resultList.size());
+		map.put("success",true);
+		return map;
+	}
+
+	@Override
+	public List<HashMap<String, Object>> exportExcelFailCmd(String batchSeq) {
+		return cmdManageDao.exportExcelFailCmd(batchSeq);
+	}
+
+	@Override
+	public boolean isExistBatchSeq(String batchSeq) {
+		return cmdManageDao.isExistBatchSeq(batchSeq);
+	}
+	
+}

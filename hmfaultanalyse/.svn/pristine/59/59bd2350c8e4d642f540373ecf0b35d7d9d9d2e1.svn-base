@@ -1,0 +1,66 @@
+log4j.rootCategory=stdout
+
+##DEBUG, INFO, WARN, ERROR, FATAL
+log4j.rootLogger=INFO
+
+## loggers
+##下发指令存储logger
+log4j.logger.recvData=DEBUG,receiveData
+##异常信息logger
+log4j.logger.nameException=INFO,appenderException
+##其他logger
+log4j.logger.nameOthers=INFO,appenderOthers
+##调试logger
+log4j.logger.nameDebug=DEBUG,appenderDebug
+##第三方软件
+log4j.logger.com.meetup.memcached=ERROR,appenderThird
+log4j.logger.org.apache.activemq=ERROR,appenderThird
+log4j.logger.org.eclipse.jetty=ERROR,appenderThird
+log4j.logger.org.apache.zookeeper=ERROR,appenderThird
+log4j.logger.org.apache.hadoop=INFO,appenderThird
+
+## appenders
+##输出到控制台
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%d %-5p [%t] %-17c{2} (%13F:%L) %3x - %m%n
+
+##输出到指令日志文件目录
+log4j.appender.receiveData=org.apache.log4j.RollingFileAppender
+log4j.appender.receiveData.File=logs/recv/recvData.log
+log4j.appender.receiveData.MaxFileSize=200MB
+log4j.appender.receiveData.MaxBackupIndex=5
+log4j.appender.receiveData.layout=org.apache.log4j.PatternLayout
+log4j.appender.receiveData.layout.ConversionPattern=%d{yyyy-MM-dd HH\:mm\:ss} - %m%n
+
+##输出到异常信息日志文件目录
+log4j.appender.appenderException=org.apache.log4j.RollingFileAppender
+log4j.appender.appenderException.File=logs/exception/exception.log
+log4j.appender.appenderException.MaxFileSize=200MB
+log4j.appender.appenderException.MaxBackupIndex=5
+log4j.appender.appenderException.layout=org.apache.log4j.PatternLayout
+log4j.appender.appenderException.layout.ConversionPattern=%d{yyyy-MM-dd HH\:mm\:ss} - %m%n
+
+##输出到其他日志文件目录
+log4j.appender.appenderOthers=org.apache.log4j.RollingFileAppender
+log4j.appender.appenderOthers.File=logs/others.log
+log4j.appender.appenderOthers.MaxFileSize=200MB
+log4j.appender.appenderOthers.MaxBackupIndex=5
+log4j.appender.appenderOthers.layout=org.apache.log4j.PatternLayout
+log4j.appender.appenderOthers.layout.ConversionPattern=%d{yyyy-MM-dd HH\:mm\:ss} - %m%n
+
+##输出到调试信息日志文件目录
+log4j.appender.appenderDebug=org.apache.log4j.RollingFileAppender
+log4j.appender.appenderDebug.File=logs/debug/debug.log
+log4j.appender.appenderDebug.MaxFileSize=200MB
+log4j.appender.appenderDebug.MaxBackupIndex=5
+log4j.appender.appenderDebug.layout=org.apache.log4j.PatternLayout
+log4j.appender.appenderDebug.layout.ConversionPattern=%d{yyyy-MM-dd HH\:mm\:ss} - %m%n
+
+##第三方软件
+log4j.appender.appenderThird=org.apache.log4j.RollingFileAppender
+log4j.appender.appenderThird.File=logs/third/third.log
+log4j.appender.appenderThird.MaxFileSize=200MB
+log4j.appender.appenderThird.MaxBackupIndex=1
+log4j.appender.appenderThird.layout=org.apache.log4j.PatternLayout
+log4j.appender.appenderThird.layout.ConversionPattern=%d{yyyy-MM-dd HH\:mm\:ss} - %m%n

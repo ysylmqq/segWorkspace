@@ -1,0 +1,267 @@
+.l-tab.l-tab-custom {
+  font-size: 12px; }
+  .l-tab.l-tab-custom .l-tab-links-item-close {
+    display: none;
+    width: 10px;
+    height: 10px;
+    overflow: hidden;
+    position: absolute;
+    top: 50%;
+    margin-top: -5px;
+    right: 18px;
+    z-index: 12;
+    background: url(../../images/ligerUI/icon-selected-close.png);
+    cursor: pointer; }
+  .l-tab.l-tab-custom .l-tab-links-item-close-over {
+    background: url(../../images/ligerUI/icon-selected-close.png) 0 -19px; }
+  .l-tab.l-tab-custom .l-tab-itemswitch {
+    width: 40px; }
+  .l-tab.l-tab-custom .l-tab-links-left,
+  .l-tab.l-tab-custom .l-tab-links-right {
+    display: block; }
+  .l-tab.l-tab-custom .l-tab-links {
+    height: 40px;
+    border: none;
+    background: none;
+    background: #4395db;
+    width: 100% !important;
+    box-shadow: inset 0 2px 1px 0 #80c0f6; }
+    .l-tab.l-tab-custom .l-tab-links .l-tab-itemswitch a {
+      background: none;
+      width: 0;
+      height: 0;
+      padding: 0;
+      margin-left: -4px;
+      top: 50%;
+      margin-top: -3px;
+      left: 50%;
+      border: 5px solid #4295dd;
+      border-width: 8px 6px;
+      border-top: 8px solid #2a3244; }
+    .l-tab.l-tab-custom .l-tab-links ul {
+      top: auto;
+      bottom: 0;
+      height: 40px; }
+    .l-tab.l-tab-custom .l-tab-links li {
+      height: 40px;
+      line-height: 40px;
+      background: none;
+      margin: 0;
+      position: relative;
+      top: 0px;
+      padding-right: 10px;
+      margin-left: -12px; }
+      .l-tab.l-tab-custom .l-tab-links li:not(.l-tab-itemswitch):after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 1px;
+        bottom: 0px;
+        left: -11px;
+        border-top: 1px solid #3376b2; }
+      .l-tab.l-tab-custom .l-tab-links li a {
+        padding: 0 22px 0 22px;
+        margin: 0;
+        color: #fff;
+        display: inline-block; }
+      .l-tab.l-tab-custom .l-tab-links li:hover .l-tab-links-item-close {
+        display: block; }
+      .l-tab.l-tab-custom .l-tab-links li.l-selected {
+        top: 0;
+        height: 40px;
+        line-height: 40px; }
+        .l-tab.l-tab-custom .l-tab-links li.l-selected a {
+          background: #3889cf;
+          color: #fff;
+          height: 40px;
+          border-radius: 5px 5px 0 0; }
+        .l-tab.l-tab-custom .l-tab-links li.l-selected .l-tab-links-item-right {
+          background: url(../../images/ligerUI/tab_right_selected.png) no-repeat; }
+        .l-tab.l-tab-custom .l-tab-links li.l-selected .l-tab-links-item-left {
+          background: url(../../images/ligerUI/tab_right.png) no-repeat; }
+  .l-tab.l-tab-custom .l-tab-links-item-left {
+    height: 40px;
+    background: none;
+    width: 12px;
+    display: inline-block; }
+  .l-tab.l-tab-custom .l-tab-links-item-right {
+    height: 40px;
+    background: url(../../images/ligerUI/tab_right.png) no-repeat;
+    width: 12px;
+    display: inline-block; }
+  .l-tab.l-tab-custom .l-tab-switch {
+    height: 40px;
+    background: none;
+    border: 1px solid #dae0e9;
+    top: 0px;
+    width: 26px;
+    border-radius: 0 5px 5px 0; }
+    .l-tab.l-tab-custom .l-tab-switch:after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 0;
+      border: 6px solid transparent;
+      border-top-color: #4c637b;
+      top: 20px;
+      left: 6px; }
+
+.l-grid-custom {
+  color: #32393d;
+  border: none; }
+  .l-grid-custom .l-grid-row-cell-checkbox span, .l-grid-custom .l-grid-hd-cell-checkbox .l-grid-hd-cell-inner div {
+    background: url("../../images/ligerUI/checkbox.png") no-repeat;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px; }
+  .l-grid-custom .l-selected .l-grid-row-cell-checkbox span, .l-grid-custom .l-selected .l-grid-hd-cell-checkbox .l-grid-hd-cell-inner div, .l-grid-custom .l-grid-hd-row.l-checked .l-grid-hd-cell-btn-checkbox {
+    background-position: 0px -20px; }
+  .l-grid-custom .l-grid td div {
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap; }
+  .l-grid-custom .l-grid-hd-row td div {
+    font-size: 14px; }
+  .l-grid-custom .l-grid-hd-cell-checkbox .l-grid-hd-cell-inner div {
+    margin-top: 16px; }
+  .l-grid-custom .l-grid-hd-cell,
+  .l-grid-custom .l-grid-header,
+  .l-grid-custom .l-grid-row-cell {
+    border-right: 1px solid #ebecef; }
+  .l-grid-custom .l-grid-hd-cell-checkbox {
+    border-right: none; }
+  .l-grid-custom .l-grid-row-cell {
+    border-bottom: 1px solid #ebecef; }
+  .l-grid-custom .l-grid-header {
+    background: #f2f3f6;
+    border-bottom: 1px solid #ced0d3; }
+  .l-grid-custom .l-grid-row-cell-rownumbers {
+    background: none; }
+  .l-grid-custom .l-selected .l-grid-row-cell, .l-grid-custom .l-selected,
+  .l-grid-custom .l-grid-row-alt .l-grid-row-cell {
+    background: none; }
+  .l-grid-custom .l-grid-row.l-selected,
+  .l-grid-custom .l-grid-row.l-selected a {
+    background: #1eb0da;
+    color: #fff; }
+  .l-grid-custom .l-grid-hd-cell-text {
+    margin-top: 15px;
+    display: inline-block; }
+  .l-grid-custom .l-grid-row-cell-inner {
+    padding-top: 8px; }
+  .l-grid-custom .l-bar-group {
+    margin-right: 20px; }
+  .l-grid-custom .l-panel-bar {
+    background: #f2f6fa;
+    border-top: 1px solid #c1c2c4; }
+  .l-grid-custom.panel-bar-split .l-panel-bar {
+    margin: 0 -20px; }
+  .l-grid-custom .l-grid-body {
+    background: #fff; }
+  .l-grid-custom .l-grid1 .l-grid-body-table {
+    border-left: 1px solid #e3eaf3;
+    border-bottom: 1px solid #e3eaf3; }
+  .l-grid-custom .l-grid2 .l-grid-body-table {
+    border-right: 1px solid #e3eaf3;
+    border-bottom: 1px solid #e3eaf3; }
+  .l-grid-custom .l-grid2 {
+    margin-left: -1px; }
+  .l-grid-custom .l-panel-bwarp {
+    border: 1px solid #e1e1e1;
+    border-top: none;
+    border-top-color: #fff;
+    box-shadow: -2px 0 4px #e1e1e1,0 1px 1px #fff,2px 0 4px #e1e1e1,0 2px 4px #e1e1e1; }
+
+.l-tree.l-tree-custom {
+  font-size: 12px;
+  font-weight: lighter;
+  background: none; }
+  .l-tree.l-tree-custom .l-tree-icon.l-tree-icon-folder-open,
+  .l-tree.l-tree-custom .l-tree-icon.l-tree-icon-folder,
+  .l-tree.l-tree-custom .l-tree-icon.l-tree-icon-leaf {
+    background: none;
+    position: relative;
+    width: 10px;
+    height: 10px;
+    background: #959eb2;
+    border-radius: 50%;
+    top: 6px;
+    margin-right: 8px;
+    margin-left: 5px; }
+  .l-tree.l-tree-custom .l-selected .l-tree-icon.l-tree-icon-folder-open,
+  .l-tree.l-tree-custom .l-selected .l-tree-icon.l-tree-icon-folder,
+  .l-tree.l-tree-custom .l-selected .l-tree-icon.l-tree-icon-leaf {
+    background: #1bb5db; }
+  .l-tree.l-tree-custom li .l-body {
+    overflow: visible; }
+  .l-tree.l-tree-custom .l-box.l-expandable-open,
+  .l-tree.l-tree-custom .l-box.l-expandable-close {
+    background: none;
+    position: relative;
+    overflow: visible; }
+    .l-tree.l-tree-custom .l-box.l-expandable-open:before,
+    .l-tree.l-tree-custom .l-box.l-expandable-close:before {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #959eb2;
+      border-radius: 50%;
+      left: 5px;
+      top: 6px; }
+    .l-tree.l-tree-custom .l-box.l-expandable-open:after,
+    .l-tree.l-tree-custom .l-box.l-expandable-close:after {
+      content: '';
+      position: absolute;
+      width: 22px;
+      height: 1px;
+      overflow: hidden;
+      float: left;
+      background: url("../../images/ligerUI/tree.gif");
+      background-position: 0px -209px;
+      top: 10px;
+      left: 6px; }
+  .l-tree.l-tree-custom a, .l-tree.l-tree-custom span {
+    color: #fff;
+    padding: 2px 8px; }
+  .l-tree.l-tree-custom .l-selected span,
+  .l-tree.l-tree-custom .l-selected a {
+    background: #1bb5db;
+    color: #fff;
+    border: none;
+    box-shadow: 3px 3px 5px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 8px; }
+
+.l-panel-topbar {
+  height: 31px !important;
+  border-left: 1px solid #e1e1e1;
+  border-right: 1px solid #e1e1e1;
+  font-size: 14px;
+  background-color: #fff;
+  box-shadow: -2px 0 4px  #e1e1e1,2px 0 4px #e1e1e1; }
+  .l-panel-topbar .l-panel-topbarinner {
+    height: 31px;
+    line-height: 31px; }
+  .l-panel-topbar .l-panel-btn {
+    height: 23px;
+    line-height: 23px;
+    margin-top: 4px;
+    padding-right: 8px; }
+  .l-panel-topbar .l-icon {
+    width: 18px;
+    height: 18px;
+    overflow: hidden;
+    left: 4px; }
+  .l-panel-topbar .l-toolbar-item-hasicon {
+    padding-left: 26px; }
+  .l-panel-topbar .l-toolbar-item {
+    margin-left: 14px; }
+  .l-panel-topbar .l-icon-add {
+    background: url(../../images/add.png) no-repeat; }
+  .l-panel-topbar .l-icon-delete {
+    background: url(../../images/delete.png) no-repeat; }
+  .l-panel-topbar .l-icon-xiugai {
+    background: url(../../images/xiugai.png) no-repeat; }
+  .l-panel-topbar .l-icon-chakan {
+    background: url(../../images/carGIS/chaxun.png) no-repeat; }
+/*# sourceMappingURL=ligerui-custom.css.map */

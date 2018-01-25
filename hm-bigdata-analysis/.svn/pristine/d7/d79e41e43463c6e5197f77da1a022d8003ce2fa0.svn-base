@@ -1,0 +1,176 @@
+html{
+	height:100%;
+}
+body{
+	height:100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+#searchForm dl{
+    display: inline-block;
+}
+#searchForm a{
+    vertical-align: text-top;
+}
+#searchForm{
+    margin: 9px 0px 9px 9px;
+}
+#main-grid .l-panel-bar{
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+.btn-topbar{
+	line-height: 24px;
+	padding-top: 0px;
+    padding-bottom: 0px;
+    margin-top: -5px;
+}
+.btn-primary{
+    background-color: #3679d0;
+    border-color: #3679d0;
+}
+.l-grid-hd-cell-inner {
+	line-height: 28px;
+	font-size: 14px;
+}
+
+.l-toolbar{
+	height: 30px;
+}
+.l-toolbar-item img{
+	top:4px !important;
+}
+.l-grid-row-cell-inner{
+	line-height:28px;
+}
+
+.gridtoolbar{
+    border-bottom: 1px solid #D6D6D6;
+    position: relative;
+    /*background: linear-gradient(to bottom,rgba(255,255,255,1) 0%,rgba(224,224,224,1) 100%);
+    box-shadow: inset 0 -22px 44px #e6e6e6;*/
+    height: 44px;
+    border-bottom: 1px solid #d4d4d4;
+    background: url(../images/top1.png) repeat-x;
+ }
+ .dib{
+ 	display: inline-block;
+ }
+ .gridtoolbar .toolbar {
+    border: 0 none;
+    background: transparent;
+    margin-bottom: -3px;
+}
+
+.l-panel-btn {
+    color: #000;
+    cursor: pointer;
+    line-height: 22px;
+    text-align: center;
+}
+
+/*.l-icon {
+    width: 14px;
+    height: 15px;
+    overflow: hidden;
+}*/
+.l-icon {
+    width: 16px;
+    height: 16px;
+    overflow: hidden;
+}
+.l-grid-row-cell-checkbox span, .l-grid-hd-cell-checkbox .l-grid-hd-cell-inner div{
+    margin-top: 6px !important;
+}
+
+.l-dialog-content{
+   overflow-y:hidden;
+   overflow-x:auto;
+}
+
+.l-dialog .dn .l-panel-bar{
+    position: relative;
+}
+
+.l-panel-topbar{
+    background-color: #e5e5e5;
+    height: 36px !important;
+    line-height: 36px;
+    padding-top:6px; 
+    padding-bottom: 6px;
+}
+.l-panel-topbar .l-panel-btn{
+    line-height: 22px !important;
+    height: 22px !important;
+}
+.l-toolbar-item .l-icon{
+    top:3px !important;
+    /*top:7px;*/
+}
+
+.l-panel-topbar .l-panel-topbarinner-left .l-panel-btn-over{
+    height: 22px !important;
+    line-height: 22px !important;
+}
+.l-panel-btn-over .l-panel-btn-l,.l-panel-btn-over{
+
+}
+
+.l-grid-header{
+    background: none !important;
+    background-color: #eeeeee !important;
+}
+.l-grid-row-cell,.l-grid-hd-cell{
+    border-right: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
+}
+.l-panel{
+    border: none !important;
+    border-top: 1px solid #d4d4d4;
+}
+#searchForm a:nth-of-type(1){
+    margin-left: 10px;
+}
+.refresh{
+    background: url(../images/refreshBg.png) no-repeat left;
+    width: 50px;
+    display: inline-block;
+    margin-left: 10px;
+    cursor:pointer;
+    text-decoration: none;
+    margin-top: -3px;
+    color:#000;
+    padding-left: 18px;
+}
+#searchForm a:hover{
+    text-decoration: none;
+    color:#3679d0;
+}
+.btn{
+    padding: 0px 4px !important;
+}
+.l-grid-row-cell-rownumbers{
+    background: none;
+}
+.l-grid-row-alt .l-grid-row-cell-rownumbers{
+    background: #f5f5f5;
+}
+#detail-dialog th{
+    text-align: right;
+}
+.l-trigger,.l-trigger-hover,.l-trigger-pressed{
+    width: 18px;
+    height: 18px;
+    top:2px;
+    right: 4px;
+}
+.l-grid-row-cell-checkbox span,.l-grid-hd-cell-checkbox .l-grid-hd-cell-inner div{
+    width: 13px;
+    height: 13px;
+}
+
+.l-selected .l-grid-row-cell-checkbox span{
+    background-position: 0 -13px;
+}

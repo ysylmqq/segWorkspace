@@ -1,0 +1,300 @@
+package com.gboss.dao.impl;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.gboss.comm.SystemConst;
+import com.gboss.comm.SystemException;
+import com.gboss.dao.FCCmdManageDao;
+import com.gboss.pojo.FlowCtrolCmd;
+import com.gboss.pojo.SimCardInfo;
+import com.gboss.util.StringUtils;
+import com.gboss.util.page.PageUtil;
+
+
+@Repository("cmdManageDao")  
+
+public class FCCmdManageDaoImpl extends BaseDaoImpl implements FCCmdManageDao {
+
+	@Override
+	@Transactional
+	public List<HashMap<String, Object>> getAllSimPage(Long companyId,Map<String, Object> conditionMap, String order,boolean isDesc,int pn, int pageSize) throws SystemException{
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT tbs.sim_id,tbs.imei,tbs.call_letter AS callLetter,tbs.unittype_id AS unittypeId,tbut.unittype AS unitType,  tbs.remote_ctrl_status AS remoteCtrlStatus,tbs.curr_navihost_status AS currNavihostStatus,tbs.curr_saveflow_status AS currSaveflowStatus");
+		sb = getConditionHql(companyId,sb,conditionMap);
+		sb.append(" ORDER BY tbs.sim_id ");
+		
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sb.toString());
+		query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+		if (pn > 0 && pageSize > 0) {
+			query.setFirstResult(PageUtil.getPageStart(pn, pageSize));
+			query.setMaxResults(pageSize);
+		}
+		return query.list();
+	}
+
+	@Override
+	@Transactional
+	public int countAllSim(Long companyId,Map<String, Object> conditionMap)throws SystemException {		
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT COUNT(*) ");
+		sb = getConditionHql(companyId,sb,conditionMap);
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sb.toString());
+		return ((BigInteger)query.uniqueResult()).intValue();
+	}
+	
+	/**
+	 * @Description:过滤查询条件，组装查询语句；
+	 * @Params:
+	 * @Return:StringBuffer
+	 * @Author:cj
+	 * @Date:2017年7月17日 上午10:18:53
+	 */
+	public StringBuffer getConditionHql(Long id, StringBuffer sb,Map<String, Object> conditionMap){
+		sb.append(" FROM t_ba_sim tbs");
+		sb.append(" LEFT JOIN t_ba_unittype tbut ON tbs.unittype_id = tbut.unittype_id");
+		sb.append(" WHERE tbs.subco_no = ").append(id);
+		
+		if(StringUtils.isNotNullOrEmpty(conditionMap.get("imei"))){
+			sb.append(" AND tbs.imei like '%").append(conditionMap.get("imei")).append("%'");
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(conditionMap.get("callLetter"))){
+			sb.append(" AND tbs.call_letter like '%").append(conditionMap.get("callLetter")).append("%'");
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(conditionMap.get("unitTypeId"))){
+			sb.append(" AND tbs.unittype_id like '%").append(conditionMap.get("unitTypeId")).append("%'");
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(conditionMap.get("remoteCtrlStatus"))){
+			sb.append(" AND tbs.remote_ctrl_status = ").append(conditionMap.get("remoteCtrlStatus"));
+		}
+		
+		return sb;
+	}
+
+	@Override
+	@Transactional
+	public void updateRemoteCtrlStatus(String simIds, String opType) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("UPDATE SimCardInfo SET remoteCtrlStatus = ").append(opType);
+		sb.append(" WHERE simId IN (").append(simIds).append(")");
+		Query query = sessionFactory.getCurrentSession().createQuery(sb.toString());
+		query.executeUpdate();
+	}
+
+	@Override
+	public List<FlowCtrolCmd> getFlowCtrlList(Integer cmdId) {
+		if(cmdId == null || cmdId.intValue() < 0){
+			System.out.println("getFlowCtrlList>>:the param:cmdId is null!");
+			return null;
+		}
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(FlowCtrolCmd.class);
+		//2:要求下发;3:已发查车;
+		criteria.add( Restrictions.or(Restrictions.eq("flag", 2),Restrictions.eq("flag", 3)));
+		criteria.add(Restrictions.and(Restrictions.eq("cmdId", cmdId)));
+		List<FlowCtrolCmd> list = criteria.list();
+		if (list != null && list.size() > 0) {
+			return list;
+		}		
+		return null;
+	}
+
+	@Override
+	public List<FlowCtrolCmd> getFlowCtrlAllList(Integer cmdId) {
+		if(cmdId == null || cmdId.intValue() < 0){
+			System.out.println("getFlowCtrlAllList>>:the param:cmdId is null!");
+			return null;
+		}
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(FlowCtrolCmd.class);
+		criteria.add(Restrictions.and(Restrictions.eq("cmdId", cmdId)));
+		List<FlowCtrolCmd> list = criteria.list();
+		if (list != null && list.size() > 0) {
+			return list;
+		}
+		return null;
+	}
+
+	@Override
+	public FlowCtrolCmd getFlowCtrolByCallLetter(Integer cmdId, String call_letter) {
+		if(cmdId == null || call_letter == null){
+			return null;
+		}
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(FlowCtrolCmd.class);
+		criteria.add(Restrictions.eqOrIsNull("callLetter", call_letter));
+		criteria.add(Restrictions.eqOrIsNull("cmdId", cmdId));
+		List<FlowCtrolCmd>  list = criteria.list();
+		if(criteria.list().size() > 0){
+			return list.get(0);
+		}
+		return null;
+	}
+
+	@Override
+	public SimCardInfo getSimByCallLetter(String call_letter) {
+		if(call_letter == null || call_letter.equals("")){
+			return null;
+		}
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(SimCardInfo.class);
+		criteria.add(Restrictions.eq("callLetter", call_letter));
+		criteria.add(Restrictions.eq("subcoNo", Integer.parseInt(SystemConst.HM_SUBCO_NO)));
+		List<SimCardInfo>  list = criteria.list();
+		if(criteria.list().size() > 0){
+			return list.get(0);
+		}
+		return null;
+	}
+	
+	@Override
+	public List<HashMap<String, Object>> getAllCmdLogInfo(Long companyId, Map conditionMap, String order, boolean is_desc,
+			int pageNo, int pageSize) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT  tfcs.call_letter AS callLetter, "
+				+ "tfcs.cmd_id AS cmdId, "
+				+ "tfcs.curr_navi_status AS currNaviStatus,	"
+				+ "tfcs.curr_flowctrl_status AS currFlowCtrlStatus, "
+				+ "tfcs.flag,tfcs.stamp,tfcs.remark, "
+				+ "tfcs.toset_navi_status AS toNaviStatus, "
+				+ "tfcs.toset_flowctrl_status AS tosetFlowCtrlStatus "
+				+ "FROM t_flow_cmd_send_history tfcs "
+				+ "INNER JOIN t_ba_sim tbs ON tfcs.call_letter = tbs.call_letter ");
+		
+		if(StringUtils.isNotNullOrEmpty(conditionMap.get("callLetter"))){
+			sb.append(" AND tfcs.call_letter like '%").append(conditionMap.get("callLetter")).append("%'");
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(conditionMap.get("cmdId"))){
+			if( Integer.parseInt((String)conditionMap.get("cmdId")) == 240){//开启导航指令
+				sb.append(" AND tfcs.cmd_id = 240");
+			}
+			if( Integer.parseInt((String)conditionMap.get("cmdId")) == 241){//开启导航指令
+				sb.append(" AND tfcs.cmd_id = 241");
+			}
+			if( Integer.parseInt((String)conditionMap.get("cmdId")) == 211){//开启导航指令
+				sb.append(" AND tfcs.cmd_id = 211");
+			}
+			if( Integer.parseInt((String)conditionMap.get("cmdId")) == 212){//开启导航指令
+				sb.append(" AND tfcs.cmd_id = 212");
+			}
+		}
+		sb.append(" ORDER BY tfcs.stamp DESC ");
+		
+		
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sb.toString());
+		query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+		if (pageNo > 0 && pageSize > 0) {
+			query.setFirstResult(PageUtil.getPageStart(pageNo, pageSize));
+			query.setMaxResults(pageSize);
+		}
+		return query.list();
+	}
+
+	@Override
+	public int countAllLogInfo(Long companyId, Map conditionMap) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT COUNT(*) "
+				+ " FROM t_flow_cmd_send_history tfcs "
+				+ " INNER JOIN t_ba_sim tbs ON tfcs.call_letter = tbs.call_letter ");
+		if(StringUtils.isNotNullOrEmpty(conditionMap.get("callLetter"))){
+			sb.append(" AND tfcs.call_letter like '%").append(conditionMap.get("callLetter")).append("%'");
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(conditionMap.get("cmdId"))){
+			if( Integer.parseInt((String)conditionMap.get("cmdId")) == 240){//开启导航指令
+				sb.append(" AND tfcs.cmd_id = 240");
+			}
+			if( Integer.parseInt((String)conditionMap.get("cmdId")) == 241){//开启导航指令
+				sb.append(" AND tfcs.cmd_id = 241");
+			}
+			if( Integer.parseInt((String)conditionMap.get("cmdId")) == 211){//开启导航指令
+				sb.append(" AND tfcs.cmd_id = 211");
+			}
+			if( Integer.parseInt((String)conditionMap.get("cmdId")) == 212){//开启导航指令
+				sb.append(" AND tfcs.cmd_id = 212");
+			}
+		}
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sb.toString());
+		return ((BigInteger)query.uniqueResult()).intValue();
+	}
+
+	@Override
+	public ConcurrentHashMap<String, ArrayList<FlowCtrolCmd>> getAllSendSearchMap() {
+		ConcurrentHashMap<String, ArrayList<FlowCtrolCmd>> resultMap = new ConcurrentHashMap<String, ArrayList<FlowCtrolCmd>>();
+		ArrayList<String> callList =  getDiffCallLetterList();
+		
+		for (String callLetter : callList) {
+			ArrayList<FlowCtrolCmd> tempList = getFlowCmdByCallLetter(callLetter);
+			resultMap.put(callLetter, tempList);
+		}
+		return resultMap;
+	}
+
+	@Override
+	public ArrayList<String> getDiffCallLetterList() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT DISTINCT tfcs.call_letter AS callLetter ");
+		sb.append(" FROM t_flow_cmd_send tfcs ");
+		sb.append(" WHERE tfcs.flag = 2 OR tfcs.flag = 3 ");
+		
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sb.toString());
+		return (ArrayList<String>) query.list();
+	}
+	
+	@Override
+	public ArrayList<FlowCtrolCmd> getFlowCmdByCallLetter(String callLetter){
+		if(callLetter == null || callLetter.equals("")){
+			System.out.println("getFlowCtrlList>>:the param:callLetter is null!");
+			return null;
+		}
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(FlowCtrolCmd.class);
+		criteria.add(Restrictions.and(Restrictions.eq("callLetter", callLetter)));
+		ArrayList<FlowCtrolCmd> list = (ArrayList<FlowCtrolCmd>) criteria.list();
+		if (list != null && list.size() > 0) {
+			return list;
+		}		
+		return null;
+	}
+
+	@Override
+	public List<HashMap<String, Object>> exportExcelFailCmd(String batchSeq) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT call_letter,cmd_id,cmd_params,send_time,resp_code,flag,remark FROM t_flow_cmd_send WHERE cmd_id = 211 and flag != 7 ");
+		
+		if(StringUtils.isNotNullOrEmpty(batchSeq)){
+			sb.append(" AND batch_seq = '").append(batchSeq).append("'");
+		}
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sb.toString());
+		query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+		return query.list();
+	}
+
+	@Override
+	public boolean isExistBatchSeq(String batchSeq) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT call_letter from t_flow_cmd_send_history WHERE 1=1  ");
+		
+		if(StringUtils.isNotNullOrEmpty(batchSeq)){
+			sb.append(" AND batch_seq = '").append(batchSeq).append("'");
+		}
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sb.toString());
+		query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+		if(query.list().size() == 0){
+			return false;
+		}else{
+			return true;
+		}
+	}
+}
+

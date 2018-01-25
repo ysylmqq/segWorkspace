@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+<form id="bind_file" method="post" class="form" name="bind_file" >
+</form>
+		<div id="filerecord" class="datagrid"></div>
+
+</body>
+<script type="text/javascript">
+(function($) {
+	
+	var height = 230;
+ 	//初始化表格
+ 	var defaults = {
+ 		        title: "",
+ 		        width:  '660',
+ 		        height: height,
+ 		       isNotCheckall: true,
+ 		        rownumbers:true,
+ 		        usepager: true,
+ 		        url:'../../../upgradeFile/findUpgradeFileByPage',
+ 		        useRp: true,
+ 		        colid:'id',  //主键
+ 		        colModel : [
+ 		                {display: '升级文件名', name : 'filename', width : '80', sortable : false},
+						{display: '升级服务器IP', name : 'ip', width : '110', sortable : false},
+						{display: '升级服务器端口', name : 'port', width : '90', sortable : false},
+						{display: '上传时间', name : 'stamp', width : '120', sortable : false}
+ 		        ],
+ 		        searchitems :[
+ 		                      {display:'文件名',name:'filename',type:'text',width:'120'}
+ 		    		        ]
+ 		      		     
+ 		    };
+ 		    $('#filerecord').sgDatagrid(defaults);
+ 	
+	
+})(jQuery);
+</script>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- 启用360浏览器的极速模式(webkit) -->
+    <meta name="renderer" content="webkit">
+    <!-- 避免IE使用兼容模式 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>海马大数据平台</title>
+    <link rel="stylesheet" href="../vendor/bootstrap/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../vendor/ligerUI/skins/Aqua/css/ligerui-all.css"/>
+    <link rel="stylesheet" href="../css/public/ligerui-custom.css"/>
+    <link rel="stylesheet" href="../css/public/search-list-grid-tree.css"/>
+    <!-- 添加 foundation-datepicker 支持-->
+    <link rel="stylesheet" href="../vendor/foundation-datepicker/css/foundation-datepicker.min.css"/>
+    <link rel="stylesheet" href="../vendor/font-awesome/css/font-awesome.min.css"/>
+    <style>
+        a:hover{
+            text-decoration: none;
+        }
+        .data-list{
+        	padding:20px 20px 20px 20px;
+        }
+        .tubiao{
+        	background:#fff;
+        }
+        .tubiao h3{
+        	text-align:center;
+        	padding:20px 0px;
+        }
+        .left{
+        	float:left;
+        	width:48%;
+        }
+        .mid{
+        	width:2%;
+        }
+        .right{
+        	float:right;
+        	width:48%;
+        }
+    </style>
+
+    <script>
+    function searchDate(){
+        var arr=[];
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = d.getMonth()+1;
+        m = m>=10?m:'0'+m;
+        var t = d.getDate();
+        t = t >= 10 ? t:'0'+t;
+        var e=y+'-'+m+'-'+t;
+        var swtzq=d-7*24*3600*1000;
+        var startYear=new Date(swtzq).getFullYear();
+        var startMonth=new Date(swtzq).getMonth()+1;
+        var startDate=new Date(swtzq).getDate();
+        startMonth = startMonth>=10?startMonth:'0'+startMonth;
+        startDate = startDate >= 10 ? startDate:'0'+startDate;
+        var sczqrq=startYear+'-'+startMonth+'-'+startDate;
+        arr.push(sczqrq,e);
+        return arr;
+    }
+   //查询 
+   function alarmCountSearch(){
+	   var start_date =$('#start_date').val();
+	   var end_date =$('#end_date').val();
+	   var d1=new Date(start_date);
+	   var d2=new Date(end_date);
+	   var distance=(d2-d1)/(1000*60*60);
+	   if(distance<0){
+	   		$.ligerDialog.warn('结束时间不能早于开始时间!');
+	   		return false;
+	   }
+       loadAlarmCount();
+    }
+    </script>
+</head>
+<body>
+    <div class="data-list">
+        <form class="form-inline data-list-search" id="searchForm">
+        	<div class="form-group has-feedback" style="margin-top:3px;">
+                <label>开始时间:</label>
+                <input type="text" class="form-control" id="start_date" name="start_date" style="width:140px">
+                <span class="glyphicon glyphicon-calendar form-control-feedback" aria-hidden="true"></span>
+            </div>
+            <div class="form-group has-feedback" style="margin-top:3px;">
+                <label>结束时间:</label>
+                <input type="text" class="form-control" id="end_date" name="end_date" style="width:140px">
+                <span class="glyphicon glyphicon-calendar form-control-feedback" aria-hidden="true"></span>
+            </div>
+            <div class="form-group" style="margin-top:3px;">
+                <button type="button" class="btn btn-search"  onclick="alarmCountSearch();return false;"><i class="icon icon-search"></i>查询</button>
+            </div>
+        </form>
+	<div class="tubiao">
+			<h3>警情统计汇总表</h3>
+			<div class="divdatabox">
+				<div class="left">
+					<div id="column_surface"></div>
+				</div>
+				<div class="mid"></div>
+				<div class="right">
+					<div id="cake_surface"></div>
+				</div>
+			</div>
+	</div>
+    </div>
+    <script src="../vendor/jquery/dist/jquery.js"></script>
+	<script src="../js/AlarmToView.js"></script>
+    <script src="../vendor/ligerUI/js/ligerui.all.js"></script>
+    <script src="../js/ligerui.other.js"></script>
+    <script src="../vendor/foundation-datepicker/js/foundation-datepicker.min.js"></script>
+    <script src="../vendor/foundation-datepicker/js/locales/foundation-datepicker.zh-CN.js"></script>
+    <script src="../js/echarts.js"></script>      
+    <script>
+    function getHeight() {
+        return $(window).height() - $('.tubiao h3').outerHeight(true) - 105;
+    }
+    $("document").ready(function(){
+    	 $('#start_date').fdatepicker({
+             language:'zh-CN',
+             format: 'yyyy-mm-dd'
+         });
+         $('#end_date').fdatepicker({
+             language:'zh-CN',
+             format: 'yyyy-mm-dd'
+         });
+ 		$('#start_date').val(searchDate()[0]);
+	     $('#end_date').val(searchDate()[1]);
+    	$(".divdatabox").height(getHeight());
+    	$("#column_surface").height(getHeight());
+    	$("#cake_surface").height(getHeight());
+    	loadAlarmCount();
+    });
+    
+    
+    function loadAlarmCount (){
+    	var xData=[],yData=[],data,countVehicle = 0;
+    	$.ajax({
+    		url:"../alarm/getAlarmAccount",
+    		type:"GET",
+    		async:false,
+    		data:{start_date:$("#start_date").val(),end_date:$("#end_date").val()},
+    		success:function(result){
+    			data = result;
+    			countVehicle = data[0].value;
+    			data.splice(0,1);
+    			for(var i =0;i<data.length;i++){
+    				xData.push(data[i].name);
+    				yData.push(data[i].value);
+    			}
+    		}
+    	});
+    	//柱状图
+    	 var driver_cChart = echarts.init(document.getElementById('column_surface'));
+    	 driver_cChart_option = {
+	    			 title: {
+	 			        text: '海马'+countVehicle+'辆车的部分警情统计',
+	 			        left: 'center'
+	 			    },
+	 			   label:{ 
+	 				  normal:{ 
+	 				  show: true, 
+	 				  position: 'outside'} 
+	 				  },
+    			    color: ['#3398DB'],
+    			    tooltip : {
+    			        trigger: 'axis',
+    			        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+    			            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+    			        }
+    			    },
+    			    grid: {
+    			        left: '3%',
+    			        right: '4%',
+    			        bottom: '3%',
+    			        containLabel: true
+    			    },
+    			    xAxis : [
+    			        {
+    			            type : 'category',
+    			            data : xData,
+    			            axisTick: {
+    			                alignWithLabel: true
+    			            }
+    			        }
+    			    ],
+    			    yAxis : [
+    			        {
+    			            type : 'value'
+    			        }
+    			    ],
+    			    series : [
+    			        {
+    			            name:'报警次数',
+    			            type:'bar',
+    			            barWidth: '60%',
+    			            data:yData
+    			        }
+    			    ]
+    			};
+    	 driver_cChart.setOption(driver_cChart_option);
+    	//饼图
+    	 var cake_surface = echarts.init(document.getElementById('cake_surface'));
+    	 cake_surface_option = {
+    			    title: {
+    			        text: '饼状图统计',
+    			        left: 'center'
+    			    },
+    			    tooltip : {
+    			        trigger: 'item',
+    			        formatter: "{a} <br/>{b} : {c} ({d}%)"
+    			    },
+    			    legend: {
+    			        // orient: 'vertical',
+    			        // top: 'middle',
+    			        bottom: 10,
+    			        left: 'center',
+    			        data: xData
+    			    },
+    			    label: {
+    	                normal: {
+    	                	show: true, 
+                            formatter: '{b} : {c} ({d}%)' 
+    	                }
+    			    },
+    			    series : [
+    			        {
+    			            type: 'pie',
+    			            radius : '65%',
+    			            center: ['50%', '50%'],
+    			            selectedMode: 'single',
+    			            data:data,
+    			            itemStyle: {
+    			                emphasis: {
+    			                    shadowBlur: 10,
+    			                    shadowOffsetX: 0,
+    			                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+    			                }
+    			            }
+    			        }
+    			    ]
+    			};
+    	 cake_surface.setOption(cake_surface_option);
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>上传升级文件</title>
+</head>
+
+<body>
+<form id="upgradeFile_addForm" method="post"  action="../../../upgradeFile/upload" class="form" name="upgradeFile_addForm"  enctype="multipart/form-data"  target="uploadupgradeframe">
+	<div class="form">
+		<fieldset style="width: 300px; height:90px;">
+			<div class="panel">
+                <span>服务器IP:</span>
+                <input type='text' id='ip' name='ip' required="true" style="width:155px;" />
+           	 </div>
+            
+            <div class="panel">
+                <span>服务器端口:</span>
+                <input type='text' id='port' name='port'   required="true" style="width:155px;" />
+            </div>
+            
+             <div class="panel">
+                <span>升级文件名:</span>
+                <input type='file' id='upgradeFile' name='upgradeFile'   required="true" style="width:155px;" />
+            </div>
+		</fieldset>
+	</div>
+</form>
+<iframe id="uploadupgradeframe" name="uploadupgradeframe" style="display:none;"></iframe>
+</body>
+<script type="text/javascript">
+
+function callback(flag){
+	if(flag){
+		 $('#monitoring').sgDatagrid('reload', 'sgDatagrid');
+		 $(document).sgPup({message:'message_info',text: "操作成功！"});
+		 $(document).sgWindow('close',{id:'add_upgradeFile'});
+	}else{
+		$(document).sgPup({message:'message_info',text: "操作失败，请检查数据名称是否重复或异常！"});
+	}
+}
+</script>
+</html>

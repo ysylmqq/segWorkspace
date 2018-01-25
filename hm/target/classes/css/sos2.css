@@ -1,0 +1,424 @@
+@charset "utf-8";
+/*---------修改bootstrap样式---------*/
+.form-inline{
+    position: relative;
+    margin: 5px 0;
+    padding-left: 15px;
+    text-align: left;
+}
+.modal-body-p .form-control,.form-inline .form-control,form .form-control{
+    height: 24px;
+    padding: 3px 10px;
+    font-size: 12px;
+    border-radius: 0;
+    line-height: 16px;
+}
+.form-inline .tm{
+    margin-bottom: 10px;
+}
+.form-inline .baman{
+    width: 6em;
+    margin-left: -15px;
+    padding: 0;
+    line-height: 24px;
+}
+.form-inline .sbaman{
+    width: 6em;
+    padding: 0;
+    font-family: "Arial", "Microsoft Yahei", "SimHei", "黑体", sans-serif;
+    font-size: 14px;
+    line-height: 24px;
+}
+.form-inline .tbaman{
+    font-weight: 500;
+}
+.form-inline .sbaman2{
+    font-family: "Arial", "Microsoft Yahei", "SimHei", "黑体", sans-serif;
+    font-size: 14px;
+}
+.form-inline .fnmline{
+    display: inline-block;
+}
+.sbaman2 input{
+    vertical-align: text-bottom;
+}
+.sbaman3{
+    margin-bottom: 8px;
+    font-family: "Arial", "Microsoft Yahei", "SimHei", "黑体", sans-serif;
+    font-size: 14px;
+}
+
+
+/*---------修改sgeUI样式----------*/
+.window{
+    overflow: visible;
+}
+
+
+/*---------追加sageUI样式---------*/
+body{
+    font-size: 12px;
+}
+label{
+    font-weight: normal;
+}
+.form-bg{
+    margin: 15px auto;
+    padding: 10px 0;
+    background-color: #f3f3f3;
+}
+.inputr{
+    margin: 15px 0;
+    padding-left: 15px;
+}
+.btn-center{
+    margin-top: 30px;
+    text-align: center;
+}
+.numDis{
+    display: none;
+    position: absolute;
+    top: 26px;
+    width: 180px;
+    height: 36px;
+    border: 1px solid #4791D2;
+    font: 20px/36px verdana,arial;
+    letter-spacing: 0.0125em;
+    color: #4791D2;
+    background: #fff;
+    z-index: 9999;
+    overflow: hidden;
+}
+input[name="idcard"] + span{
+    width: 240px;
+}
+.redfont:before{
+    content: "*";
+    font-size: 14px;
+    color: #FF0000;
+    vertical-align: middle;
+}
+/*---模态框--*/
+.mb-extend{
+    border-top: 3px solid #4791D2;
+    border-bottom: 3px solid #4791D2;
+    overflow: hidden;
+    overflow-y: auto;
+}
+.mb8-exd{
+    margin: -20px 0;
+}
+.modal-body-p{
+    margin: 5px 0;
+}
+.modal-body-pl{
+    margin: 10px 0;
+    padding-left: 30px;
+}
+.modal-header{
+    padding: 10px 15px;
+}
+.modal-header h4{
+    font-family: 'Arial','Microsoft Yahei','微软雅黑',sans-serif;
+}
+.table-thead{
+    margin-bottom: 0;
+    border: none;
+}
+.btn-sm{
+    height: 24px;
+    vertical-align: middle;
+    padding: 0 10px;
+}
+.clbd-h5{
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+}
+
+
+/*------日期时间控件样式------*/
+.laydate_box, .laydate_box *{margin:0; padding:0;}
+.laydate-icon,
+.laydate-icon-default,
+.laydate-icon-danlan,
+.laydate-icon-dahong,
+.laydate-icon-molv{ padding-right:20px;height:22px; outline:0; border:1px solid #C6C6C6;background:#fff right -26px no-repeat; line-height:22px;}
+.laydate-icon-default{ background-position: 0 0; }
+.laydate-icon-danlan{ border:1px solid #B1D2EC; background-position: 0 -26px; }
+.laydate-icon-dahong{ background-position: 0 -54px; }
+.laydate-icon-molv{ background-position: 0 -79px; }
+
+.laydate_box,.laydate_box *{margin:0;padding:0}
+.laydate_box{z-index:99999999;width:240px;background-color:#fff;font:12px '\5B8B\4F53';*margin:-2px 0 0 -2px;*overflow:hidden;_margin:0;_position:absolute!important}
+.laydate_box li{list-style:none}
+.laydate_box .laydate_void{cursor:text!important}
+.laydate_box a,.laydate_box a:hover{text-decoration:none;blr:expression(this.onFocus=this.blur());cursor:pointer}
+.laydate_box a:hover{text-decoration:none}
+.laydate_box cite,.laydate_box label{position:absolute;width:0;height:0;border-width:5px;border-style:dashed;border-color:transparent;overflow:hidden;cursor:pointer}
+.laydate_box .laydate_yms,.laydate_box .laydate_time{display:none}
+.laydate_box .laydate_show{display:block;box-sizing: content-box;}
+.laydate_box input{outline:0;font-size:14px;background-color:#fff}
+.laydate_top{position:relative;height:26px;padding:5px;*width:100%;z-index:99;box-sizing: content-box;}
+.laydate_ym{position:relative;float:left;height:24px;cursor:pointer}
+.laydate_ym input{float:left;height:24px;line-height:24px;text-align:center;border:0;cursor:pointer}
+.laydate_ym .laydate_yms{position:absolute;left:-1px;top:24px;height:181px}
+.laydate_y{width:121px;margin-right:6px}
+.laydate_y input{width:64px;margin-right:15px}
+.laydate_y .laydate_yms{width:121px;text-align:center}
+.laydate_y .laydate_yms a{position:relative;display:block;height:20px}
+.laydate_y .laydate_yms ul{height:139px;padding:0;*overflow:hidden}
+.laydate_y .laydate_yms ul li{float:left;width:60px;height:20px;line-height:20px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap}
+.laydate_m{width:99px}
+.laydate_m .laydate_yms{width:99px;padding:0}
+.laydate_m input{width:42px;margin-right:15px}
+.laydate_m .laydate_yms span{display:block;float:left;width:42px;margin:5px 0 0 5px;line-height:24px;text-align:center;_display:inline}
+.laydate_choose{display:block;float:left;position:relative;width:20px;height:24px}
+.laydate_choose cite,.laydate_tab cite{left:50%;top:50%}
+.laydate_chtop cite{margin:-7px 0 0 -5px;border-bottom-style:solid}
+.laydate_chdown cite,.laydate_ym label{top:50%;margin:-2px 0 0 -5px;border-top-style:solid}
+.laydate_chprev cite{margin:-5px 0 0 -7px}
+.laydate_chnext cite{margin:-5px 0 0 -2px}
+.laydate_ym label{right:28px}
+.laydate_table{width:230px;margin:0 5px;border-collapse:collapse;border-spacing:0}
+.laydate_table td{width:31px;height:19px;line-height:19px;text-align:center;cursor:pointer;font-size:12px}
+.laydate_table thead{height:22px;line-height:22px}
+.laydate_table thead th{font-weight:400;font-size:12px;text-align:center}
+.laydate_bottom{position:relative;height:22px;line-height:20px;padding:5px;font-size:12px;box-sizing: content-box}
+.laydate_bottom #laydate_hms{position:relative;z-index:1;float:left}
+.laydate_time{position:absolute;left:5px;bottom:26px;width:129px;height:125px;*overflow:hidden}
+.laydate_time .laydate_hmsno{padding:5px 0 0 5px}
+.laydate_time .laydate_hmsno span{display:block;float:left;width:24px;height:19px;line-height:19px;text-align:center;cursor:pointer;*margin-bottom:-5px}
+.laydate_time1{width:228px;height:154px}
+.laydate_time1 .laydate_hmsno{padding:6px 0 0 8px}
+.laydate_time1 .laydate_hmsno span{width:21px;height:20px;line-height:20px}
+.laydate_msg{left:49px;bottom:67px;width:141px;height:auto;overflow:hidden}
+.laydate_msg p{padding:5px 10px}
+.laydate_bottom li{float:left;height:20px;line-height:20px;border-right:0;font-weight:900}
+.laydate_bottom .laydate_sj{width:33px;text-align:center;font-weight:400}
+.laydate_bottom input{float:left;width:21px;height:20px;line-height:20px;border:0;text-align:center;cursor:pointer;font-size:12px;font-weight:400}
+.laydate_bottom .laydte_hsmtex{height:20px;line-height:20px;text-align:center}
+.laydate_bottom .laydte_hsmtex span{position:absolute;width:20px;top:0;right:0;cursor:pointer}
+.laydate_bottom .laydte_hsmtex span:hover{font-size:14px}
+.laydate_bottom .laydate_btn{position:absolute;right:5px;top:5px}
+.laydate_bottom .laydate_btn a{float:left;height:20px;padding:0 6px;_padding:0 5px}
+.laydate_bottom .laydate_v{position:absolute;left:10px;top:6px;font-family:Courier;z-index:0}
+.laydate-icon{border:1px solid #ccc;}
+.laydate_bottom #laydate_hms,.laydate_time{border:1px solid #ccc}
+.laydate_box,.laydate_ym .laydate_yms,.laydate_time{box-shadow:2px 2px 5px rgba(0,0,0,.1)}
+.laydate_box{border-top:0;border-bottom:0;background-color:#fff;color:#34AADC}
+.laydate_box input{background:none!important;color:#fff}
+.laydate_box .laydate_void{color:#c0cebb!important}
+.laydate_box a:hover{color:#666}
+.laydate_click{background-color:#34AADC!important;color:#fff!important}
+.laydate_top{border-top:1px solid #34AADC;background-color:#34AADC}
+.laydate_ym{border:1px solid #34AADC;background-color:#34AADC}
+.laydate_ym .laydate_yms{border:1px solid #34AADC;background-color:#34AADC;color:#fff}
+.laydate_y .laydate_yms a{border-bottom:1px solid #34AADC}
+.laydate_y .laydate_yms .laydate_chdown{border-top:1px solid #34AADC;border-bottom:0}
+.laydate_choose{border-left:1px solid #34AADC}
+.laydate_choose cite{border: 5px solid transparent}
+.laydate_chprev{border-right:1px solid #34AADC;border-left:none}
+.laydate_choose:hover,.laydate_y .laydate_yms a:hover{background-color:#87CBE9}
+.laydate_chtop cite{ border: 5px solid transparent;border-bottom-color: #fff }
+.laydate_chdown cite{ border: 5px solid transparent;border-top-color:#fff }
+.laydate_ym label{border: 5px solid transparent;border-top-color: #fff;}
+.laydate_chprev cite{border-right-color:#fff}
+.laydate_chnext cite{border-left-color:#fff}
+.laydate_table{margin:0!important;width:240px!important;border:1px solid #ccc;border-top:0;border-bottom:0}
+.laydate_table td{height:21px!important;border:0;background-color:#fff;color:#34AADC;line-height:21px!important}
+.laydate_table .laydate_nothis{color:#999}
+.laydate_table thead{height:21px!important;border-bottom:1px solid #ccc;line-height:21px!important}
+.laydate_bottom{border:1px solid #ccc;border-top:0}
+.laydate_bottom #laydate_hms{background-color:#fff}
+.laydate_time{background-color:#fff}
+.laydate_time1{width:226px!important;height:152px!important}
+.laydate_bottom .laydate_sj{width:31px!important;border-right:1px solid #ccc;background-color:#fff}
+.laydate_bottom input{background-color:#fff;color:#4b7c03}
+.laydate_bottom .laydte_hsmtex{border-bottom:1px solid #ccc}
+.laydate_bottom .laydate_v{color:#999}
+.laydate_bottom .laydate_btn a{display:block;margin-right:2px;border:1px solid #34AADC;background-color:#fff}
+.laydate_bottom .laydate_btn a:hover{background-color:#87CBE9;color:#fff;border:1px solid #87CBE9}
+.laydate_m .laydate_yms span:hover,.laydate_time .laydate_hmsno span:hover,.laydate_y .laydate_yms ul li:hover,.laydate_table td:hover{background-color:#87CBE9;color:#fff}
+
+
+
+/*------搜索框自动补全样式------*/
+.searchDis{
+    display: inline-block;
+    position: relative;
+}
+.searchDis .show_list{
+    position: absolute;
+    left: 94px;
+    top: 25px;
+    width: 154px;
+    background: #fff;
+}
+.searchDis .show_list li{
+    line-height: 20px;
+    padding: 0 6px;
+}
+.show_list li.current{
+    color: #fff;
+    background: #0059b3;
+}
+
+
+/*公共表单改造*/
+h4.panel-title{
+    font-family: 'Arial','Microsoft Yahei','微软雅黑',sans-serif;
+    font-size: 16px;
+}
+.zxfb{
+    margin-bottom: 15px;
+    padding: 5px 0 20px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+.tareachange{
+    position:relative;
+}
+.placeholder{
+    position: absolute;
+    left: 50%;
+    top: 45%;
+}
+.placeholder span{
+    position: relative;
+    top:-50%;
+    left: -50%;
+    font-size: 16px;
+    font-family: arial, "Microsoft YaHei", SimHei, "\9ed1\4f53";
+    color: #aeaeae;
+}
+
+
+/*手机预览*/
+.mobile-outborder{
+    position: relative;
+    margin: 0 auto;
+    width: 285px;
+    font-family: "Segoe UI", "Lucida Grande", Helvetica, Arial, "Microsoft YaHei", FreeSans, Arimo, "Droid Sans","wenquanyi micro hei","Hiragino Sans GB", "Hiragino Sans GB W3", Arial, sans-serif;
+}
+.mobile-outborder img{
+    max-width: 100%;
+    height: auto;
+}
+.mobile-inborder{
+    position: absolute;
+    left: 19px;
+    top: 60px;
+    width: 247px;
+    height: 449px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: #FFF;
+    box-sizing: border-box;
+}
+.mobile-inborder h4{
+    margin: 10px 0 0;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0 15px;
+    line-height: 20px;
+}
+.mobile-inborder .sm_title{
+    margin-top: 4px;
+    text-indent: 0;
+}
+.mobile-inborder img{
+    display: block;
+    margin: 15px 0;
+    max-height: 304px;
+    overflow: hidden;
+}
+.mobile-inborder p{
+    margin-top: 0px !important;
+    margin-bottom: 10px !important;
+    line-height: 20px !important;
+    color: #000 !important;
+    font-family: inherit !important;
+    white-space: normal !important;
+}
+.lefTopMagr{
+    margin-top: 35px;
+}
+.lefTopMagr2{
+    margin-top: 15px;
+}
+
+
+/*常用标题样式*/
+.s3-title{
+    margin-top: 20px;
+    margin-bottom: 0;
+    padding: 10px 15px;
+    font-family: consolas, "Microsoft YaHei", "\9ed1\4f53";
+    font-size: 18px;
+    border-left: 5px solid #ddd;
+    background-color: #fff;
+}
+.s3-title2{
+    margin-top: 20px;
+    margin-bottom: 0;
+    padding: 10px 15px;
+    font-family: consolas, "Microsoft YaHei", "\9ed1\4f53";
+    font-size: 24px;
+    border-left: 5px solid #4791D2;
+    background-color: #fff;
+}
+.s5-title{
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-family: consolas, "Microsoft YaHei", "\9ed1\4f53";
+}
+.s5-title > h5{
+    font-size: 14px;
+    color:#333;
+}
+
+/*常用颜色样式*/
+.foc-black1{ color: #333; }
+.foc-blue1{ color: #4791D2 }
+
+.bco-f2{  background-color: #f2f2f2;  }
+.bco-blue1{  background-color: #4791d2;  }
+
+/*常用字体样式*/
+.foc-heiti{ font-family: consolas, "Microsoft YaHei", "\9ed1\4f53"; }
+
+
+/*校正sageUI之window.css篇*/
+.window .window-body{ background: #fff; }
+.sDiv .pGroup input{
+    height: 24px;
+    line-height: normal;
+}
+.sDiv .label{
+    color: #333;
+    font-weight: normal;
+}
+.sDiv .pSearch {
+    padding-left: 5px;
+}
+.tDiv{ padding:0 }
+.tDiv .fbutton{ padding: 3px 8px 5px; }
+.tDiv div.fbutton span{
+    padding-left: 0;
+    font-size: 12px;
+    line-height: 18px;
+    vertical-align: middle;
+}
+.tDiv div.fbutton span::before{
+    position: relative;
+    top: -1px;
+    margin-right: 2px;
+    vertical-align: middle;
+}
+.tDiv div.btnseparator{ margin: 4px 0;height: 21px }
+.pup_tool{ right: 10px; }
+.pup_body{ padding: 5px 0;text-align: center }
+.pup_content{ display: inline-block;margin-top: 20px }
+.message_info{ display:inline-block;float: none;vertical-align: middle }
+.pup_text{ display: inline-block;float: none;width:auto;vertical-align: middle }

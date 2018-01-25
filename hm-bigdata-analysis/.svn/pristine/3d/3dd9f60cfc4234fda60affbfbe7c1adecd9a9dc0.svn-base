@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- 启用360浏览器的极速模式(webkit) -->
+    <meta name="renderer" content="webkit">
+    <!-- 避免IE使用兼容模式 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>海马大数据平台</title>
+    <link rel="stylesheet" href="../../vendor/bootstrap/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../vendor/ligerUI/skins/Aqua/css/ligerui-all.css"/>
+    <link rel="stylesheet" href="../../css/public/ligerui-custom.css"/>
+    <link rel="stylesheet" href="../../css/public/search-list-grid-tree.css"/>
+    <!-- 添加 foundation-datepicker 支持-->
+    <link rel="stylesheet" href="../../vendor/foundation-datepicker/css/foundation-datepicker.min.css"/>
+    <link rel="stylesheet" href="../../vendor/font-awesome/css/font-awesome.min.css"/>
+    <style>
+        a:hover{
+            text-decoration: none;
+        }
+        .data-list{
+        	padding:20px 20px 20px 20px;
+        }
+        .tubiao{
+        	background:#fff;
+        }
+        .tubiao h3{
+        	text-align:center;
+        	padding:20px 0px;
+        }
+        .left{
+        	float:left;
+        	width:48%;
+        }
+        .mid{
+        	width:2%;
+        }
+        .right{
+        	float:right;
+        	width:48%;
+        }
+    </style>
+
+    <script>
+    function searchDate(){
+        var arr=[];
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = d.getMonth()+1;
+        m = m>=10?m:'0'+m;
+        var t = d.getDate();
+        t = t >= 10 ? t:'0'+t;
+        var e=y+'-'+m+'-'+t;
+        var swtzq=d-7*24*3600*1000;
+        var startYear=new Date(swtzq).getFullYear();
+        var startMonth=new Date(swtzq).getMonth();
+        var startDate=new Date(swtzq).getDate();
+        startMonth = startMonth>=10?startMonth:'0'+startMonth;
+        startDate = startDate >= 10 ? startDate:'0'+startDate;
+        var sczqrq=startYear+'-'+startMonth;
+        arr.push(sczqrq,e);
+        return arr;
+    }
+   //查询 
+   function alarmCountSearch(){
+       loadAlarmCount();
+    }
+    </script>
+</head>
+<body>
+    <div class="data-list">
+        <form class="form-inline data-list-search" id="searchForm">
+        	<div class="form-group has-feedback" style="margin-top:3px;">
+                <label>时间:</label>
+                <input size="16" type="text" id="dpMonths" class="form-control" style="width:120px" data-date-format="yyyy-mm" data-start-view="year" data-min-view="year">
+                <span class="glyphicon glyphicon-calendar form-control-feedback" aria-hidden="true"></span>
+            </div>
+            <div class="form-group" style="margin-top:3px;">
+                <button type="button" class="btn btn-search"  onclick="alarmCountSearch();return false;"><i class="icon icon-search"></i>查询</button>
+            </div>
+        </form>
+	<div class="tubiao">
+			<div class="divdatabox">
+				<div class="left">
+					<div id="column_surface"></div>
+				</div>
+				<div class="mid"></div>
+				<div class="right">
+					<div id="cake_surface"></div>
+				</div>
+			</div>
+	</div>
+    </div>
+    <script src="../../vendor/jquery/dist/jquery.js"></script>
+	<script src="../../js/AlarmToView.js"></script>
+    <script src="../../vendor/ligerUI/js/ligerui.all.js"></script>
+    <script src="../../js/ligerui.other.js"></script>
+    <script src="../../vendor/foundation-datepicker/js/foundation-datepicker.min.js"></script>
+    <script src="../../vendor/foundation-datepicker/js/locales/foundation-datepicker.zh-CN.js"></script>
+    <script src="../../js/echarts.js"></script>      
+    <script>
+    function getHeight() {
+        return $(window).height() - $('.tubiao h3').outerHeight(true) - 105;
+    }
+    $("document").ready(function(){
+    	 $('#dpMonths').fdatepicker({
+             language:'zh-CN'
+         });
+ 		$('#dpMonths').val(searchDate()[0]);
+    	$(".divdatabox").height(getHeight());
+    	$("#column_surface").height(getHeight());
+    	$("#cake_surface").height(getHeight());
+    	loadAlarmCount();
+    });
+    
+    
+    function loadAlarmCount (){
+    	var xData1=[],yData1=[],data1;
+    	var xData2=[],yData2=[],data2;
+    	var dateNow = new Date($("#dpMonths").val());
+    	var year = dateNow.getYear();
+    	var month = dateNow.getMonth();
+    	$.ajax({
+    		url:"../../chart/getChartData/czxg",
+    		type:"POST",
+    		async:false,
+    		data:{year:year+1900,month:month+1,type:6},
+    		success:function(result){
+    			data1 = result[0];
+    			for(var i =0;i<data1.length;i++){
+    				xData1.push(data1[i].name);
+    				yData1.push(data1[i].count);
+    			} 
+    			data2 = result[1];
+    			for(var i =0;i<data2.length;i++){
+    				xData2.push(data2[i].name);
+    				yData2.push(data2[i].count);
+    			} 
+    		}
+    	});
+    	//饼图
+   	 var column_surface = echarts.init(document.getElementById('column_surface'));
+   	 column_surface_option = {
+ 			    title: {
+ 			        text: '月度常用功能占比',
+ 			        left: 'center'
+ 			    },
+ 			    tooltip : {
+ 			        trigger: 'item',
+ 			        formatter: "{a} <br/>{b} : {c} ({d}%)"
+ 			    },
+ 			    legend: {
+ 			        // orient: 'vertical',
+ 			        // top: 'middle',
+ 			        bottom: 10,
+ 			        left: 'center',
+ 			        data: xData1
+ 			    },
+ 			    label: {
+ 	                normal: {
+ 	                	show: true, 
+                         formatter: '{b} : {c} ({d}%)' 
+ 	                }
+ 			    },
+ 			    series : [
+ 			        {
+ 			            type: 'pie',
+ 			            radius : '65%',
+ 			            center: ['50%', '50%'],
+ 			            selectedMode: 'single',
+ 			            data:data1,
+ 			            itemStyle: {
+ 			                emphasis: {
+ 			                    shadowBlur: 10,
+ 			                    shadowOffsetX: 0,
+ 			                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+ 			                }
+ 			            }
+ 			        }
+ 			    ]
+ 			};
+   		column_surface.setOption(column_surface_option);
+    	
+    	//饼图
+    	 var cake_surface = echarts.init(document.getElementById('cake_surface'));
+    	 cake_surface_option = {
+  			    title: {
+  			        text: '月度用户活跃频次',
+  			        left: 'center'
+  			    },
+  			    tooltip : {
+  			        trigger: 'item',
+  			        formatter: "{a} <br/>{b} : {c} ({d}%)"
+  			    },
+  			    legend: {
+  			        // orient: 'vertical',
+  			        // top: 'middle',
+  			        bottom: 10,
+  			        left: 'center',
+  			        data: xData2
+  			    },
+  			    label: {
+  	                normal: {
+  	                	show: true, 
+                          formatter: '{b} : {c} ({d}%)' 
+  	                }
+  			    },
+  			    series : [
+  			        {
+  			            type: 'pie',
+  			            radius : '65%',
+  			            center: ['50%', '50%'],
+  			            selectedMode: 'single',
+  			            data:data2,
+  			            itemStyle: {
+  			                emphasis: {
+  			                    shadowBlur: 10,
+  			                    shadowOffsetX: 0,
+  			                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+  			                }
+  			            }
+  			        }
+  			    ]
+  			};
+    	 cake_surface.setOption(cake_surface_option);
+    }
+    </script>
+</body>
+</html>

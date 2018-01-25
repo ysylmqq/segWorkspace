@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>快速入网</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+	<form id='nw_fast_form' name='nw_fast_form' method='post' class="form">
+		<input type="hidden" id="companyno" name="companyno" />
+		<input type="hidden" id="opid" name="opid" />
+		<div class='title'>快速入网></div>
+		<fieldset style="width:850px;height:300px;">
+			<div class="panel">
+				<span>客户类型:</span>
+				<label style="float:none" >
+                <input type='radio' id="customer_type" name='customer_type' value="0" onclick="seltype(this)" checked="checked" style='vertical-align:middle;' />私家车
+                </label>
+                <label style="float:none" >
+                <input type='radio' id="customer_type" name='customer_type' value="1" onclick="seltype(this)" style='vertical-align:middle;' />集团客户
+				</label>
+			</div>
+			<hr>
+            <div class="panel" id="divObj1" style="float:left;">
+                <span>用户姓名:</span>
+                <input type='text' id="customer_name" name='customer_name' required="true"  style="width:200px;" onblur='fillLinkman()' />
+            </div>
+            <div class="panel" id="divObj2" style="display:none;float:left;">
+				<span>公司名称:</span>
+				<input type='text' id="custname" name='custname' value='custname' required="true" style="width:200px;" list="customerList"/>
+            	<input type="hidden" name="cust_id" id="cust_id" />
+            	<datalist id='customerList'></datalist>
+			</div>
+			<div class="panel">
+				<span style="padding-left:54px;">销售经理:</span>
+                <input name="managerName" id="managerName" list="userDataList" style="width:200px;height:20px;vertical-align:top;" autocomplete="on" />
+                <input type="hidden" name="managerId" id="managerId" />
+                <datalist id="userDataList"></datalist>
+			</div>
+            <div class="panel">    
+                <span>车牌号码:</span>
+                <input type='text' id="number_plate" name='number_plate' required="true"  style="width:200px;" placeholder="注意格式.例:粤B12345"/>
+                
+                <span style="padding-left:50px;">车载电话:</span>
+                <input type='text' id="call_letter" name='call_letter' required="true" style="width:200px;" />
+            </div>
+            <div class="panel">
+                <span>终端类型:</span>
+                <input type='text' id="unittype" name='unittype' required="true" list="unittypeList" style="width:200px;" />
+                <input type="hidden" id="unittype_id" name="unittype_id" />
+                <datalist id='unittypeList'></datalist>
+                
+                <span style="padding-left:48px;">安装时间:</span>
+                <input type='date' id="time" name='time'  style="width:200px;" onblur="checkdate(this)"/>
+            </div>
+            <div class="panel">    
+                <span>通信模式:</span>
+                <label style="float:none" >
+                <input type='radio' name='mode' checked="checked" style='vertical-align:middle;' value='2' onclick='hideSmsnode();'/>数据流量
+                </label>
+                <label style="float:none" >
+                <input type='radio' name='mode' style='vertical-align:middle;' value='1' onclick='showSmsnode();'/>短信
+                </label>
+                <label style="float:none" >
+                <input type='radio' name='mode' style='vertical-align:middle;' value='3' onclick='showSmsnode();'/>数据流量+短信
+                </label>
+                
+                <span style="padding-left: 9px">短信通道:</span>
+                <select size="1" name="node_name" id="node_name" style="width:204px;" autocomplete="on" >
+                </select>
+            </div>
+            <div class="panel" id="pwd_panel">    
+                <span>服务密码:</span>
+                <input type='password' id="server_pwd" name='server_pwd' style="width:200px;" onblur="checknum()"/>
+            </div>
+            <div class="panel" id="phone_panel">
+            	<span>联系人:</span>
+                <input type='text' id="linkman" name='linkman'  style="width:80px;" />
+              
+            	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;电话号码:
+                <input type='text' id="phone" name='phone'  style="width:90px;" />
+                
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;类型:
+                <select size="1" name="phone_type" id="phone_type" style="width:90px;">
+                	<option value="1">第一联系人</option>
+                	<option value="2">第二联系人</option>
+                	<option value="3">第三联系人</option>
+                	<option value="4">第四联系人</option>
+                	<option value="5">第五联系人</option>
+                	<option value="6">第六联系人</option>
+                	<option value="7">第七联系人</option>
+                	<option value="8">第八联系人</option>
+                	<option value="9">第九联系人</option>
+                	<option value="10">第十联系人</option>
+                	<option value="99">其他联系人</option>
+                </select>
+                
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;备注:
+                <input type='text' id="remark" name='remark'  style="width:140px;" />
+                
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;APP登录
+                <input type='radio' id="app" name="app" style='vertical-align:middle;' onclick="checkapp()"/>
+                <a href="javascript:void(0);" style="margin:0px;padding:0px;padding-left:10px;padding-top:5px;"><img alt="增加电话号码" src="../../images/form_add.png" title="增加电话号码" style="vertical-align:middle"></a>
+            </div>
+        </fieldset>
+
+        <fieldset style="width:850px;border-top:0px;">	
+	        <div class='submit'>
+	        	<button id="nw_fast_submit" type="submit" style="width:100px;" onclick="saveAndreset();">保存并新增</button>
+	            <button id="nw_fast_submit" type="submit" onclick="fast_save();">保存</button> 
+	            <button id="nw_fast_cancel" type="button" onclick="fast_reset();">重置</button>
+	        </div>
+        </fieldset>
+
+	</form>
+</body>
+	<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/storage_vehicle.js" ></script>
+	<script type="text/javascript">  
+	(function($) {
+		// 手机输入框格式化 
+		$.fn.telInput = function(options) {
+			var defaults = {
+				min: 10, // 最少输入字数 
+				max: 25, // 最多输入字数 
+				deimiter: ' ', // 账号分隔符 
+				onlyNumber: true, // 只能输入数字 
+				copy: true // 允许复制 
+			};
+			var obj = $(this);
+			var opts = $.extend({}, defaults, options);
+
+			obj.css({
+				'width':'90px',
+				'color': '#000',
+			}).attr('maxlength', opts.max);
+			obj.bind('keyup', function(event) {
+				if (opts.onlyNumber) {
+					if (!(event.keyCode >= 48 && event.keyCode <= 57)) {
+						this.value = this.value.replace(/\D/g, '');
+					}
+				}
+				if(this.value.length="12"){
+				var objValue = this.value.replace(/\s/g, '').replace(/(\d{3})(\d{4})(\d{4})(\d{1})/g, "$1" + opts.deimiter+"$2" + opts.deimiter+"$3"+opts.deimiter+"$4");
+				}
+				if(this.value.length="11"){
+				var objValue = this.value.replace(/\s/g, '').replace(/(\d{3})(\d{4})(\d{4})/g, "$1" + opts.deimiter+"$2" + opts.deimiter+"$3");
+				}
+				
+				obj.val(objValue);
+			}).bind('dragenter', function() {
+				return false;
+			}).bind('onpaste', function() {
+				return !clipboardData.getData('text').match(/\D/);
+			}).bind('blur', function() {
+				if (this.value.length < opts.min && this.value.length != 0) {
+					obj.focus();
+				}
+			});
+		}
+	})(jQuery);
+		
+	</script>
+	<script type="text/javascript">
+		document.onkeydown=function(event){
+			var e = event || window.event || arguments.callee.caller.arguments[0];
+			if(e && e.keyCode==13){
+				return false;
+			}
+		}
+	</script>
+	<script type="text/javascript">
+	var submitkey = true;
+	
+	function checknum(){
+		var server_pwd = $('#server_pwd').val();
+		if(!/^[0-9]*$/.test(server_pwd)){
+	        $(document).sgPup({message:'message_alert',text: "密码必须为数字!"});
+	        $('#server_pwd').val("");
+	    }
+	}
+	
+	function hideSmsnode(){
+		$('#node_name').attr("required",false);
+	}
+	
+	function showSmsnode(){
+		$('#node_name').attr("required",true);
+	}
+	
+	function fillLinkman(){
+		var customer_name = $('#customer_name').val();
+		$('#linkman').val(customer_name);
+	}
+	
+	function checkinfo(){
+		var call_letter=$('#call_letter').val();
+		if(call_letter==''){
+			return true;
+		}
+		if(!call_letter.match(/^1[3|4|5|8][0-9]\d{4,8}$/)){
+			$(document).sgPup({message:'message_alert',text: "请填写正确的SIM卡号!"});
+			$('#call_letter').val("");
+		}
+	}
+	
+	function checkdate(obj){
+		var datetime = $(obj).val();
+		var first = datetime.charAt(0);
+		if(first!=1&&first!=2){
+			$(document).sgPup({message:'message_alert',text: "日期输入格式不正确,请重新输入."});
+			$(obj).val("");
+		}
+	}
+	
+	function checkapp(){
+		var phone;
+		var phones = $('input[name=phone]');
+		var apps = $('input[name=app]');
+		var key = false;
+		$(apps).each(function(k,v){
+			if(apps[k].checked==true){
+				key = true;
+				phone = phones[k].value;
+			}
+		});
+		if(!key){
+			return true;
+		}
+		$.ajax( {
+		  	  type : 'post', 
+		  	  async: false,   
+		  	  contentType : 'application/json',     
+		  	  dataType : 'json',     
+		  	  url : '../../getCustomerByPhone',   
+		  	  data:JSON.stringify({parameter:phone}),
+		  	  success : function(data) {
+		  		  if(data){
+		  			  if(data.success==true){
+		  				  $(document).sgConfirm({
+		  					  title:'提示',
+		  					  text: '该手机号码在系统中已绑定客户,是否为同一客户?',
+		  					  cfn:function(r){
+		  						  if(r){
+		  							$('#opid').val(data.operator.opid);
+		  							$('#cust_id').val(data.customer.customer_id);
+		  							if(data.customer.service_pwd){
+		  								$('#server_pwd').val(data.customer.service_pwd);
+		  							}
+		  							$('#customer_name').val(data.customer.customer_name);
+		  							$('#customer_type').val(data.customer.cust_type);
+		  							
+		  							var custphones = data.custphones;
+		  							$('#phone_panel0').remove();
+		  							$('#phone_panel1').remove();
+		  							$('#phone_panel2').remove();
+		  							$('#phone_panel3').remove();
+		  							$('#phone_panel4').remove();
+		  							$('#phone_panel5').remove();
+		  							var flag = 0;
+		  							$(custphones).each(function(k,v){
+		  								if(k>0){
+		  									var detail_div = $("<div></div>");
+		  									var detail_id = "phone_panel"+flag;
+		  									detail_div.attr('id',detail_id);
+		  									detail_div.addClass("panel");
+		  									detail_div.append($("#phone_panel").html());
+		  									if(k==1){
+		  										$("#phone_panel").before(detail_div);
+		  									}else{
+		  										$("#phone_panel"+(k-2)).before(detail_div);
+		  									}
+		  									$("#"+detail_id+" #phone_id").val(custphones[k].linkman_id);
+		  									$("#"+detail_id+" #phone").val(custphones[k].phone);
+		  									$("#"+detail_id+" #phone_type").val(custphones[k].linkman_type);
+		  									$("#"+detail_id+" #remark").val(custphones[k].title);
+		  									$("#"+detail_id+" #linkman").val(custphones[k].linkman);
+		  									if(phone==custphones[k].phone){
+		  										$("#"+detail_id+" #app").attr("checked","checked");
+		  									}
+		  									$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+		  									$("#"+detail_id+" img").attr('title','删除电话号码');
+		  									
+		  									$("#"+detail_id+" a").on('click',function(){
+		  										$("#"+detail_id).remove();
+		  									})
+		  									//$("#"+detail_id + " input[list=productList]").on('keyup',checkProduct);
+		  									flag=flag+1;
+		  								}else{
+		  									$('#phone_panel #phone_id').val(custphones[k].linkman_id);
+		  									$('#phone_panel #phone').val(custphones[k].phone);
+		  									$('#phone_panel #phone_type').val(custphones[k].linkman_type);
+		  									$('#phone_panel #remark').val(custphones[k].title);
+		  									$('#phone_panel #linkman').val(custphones[k].linkman);
+		  									if(phone==custphones[k].phone){
+		  										$("#"+detail_id+" #app").attr("checked","checked");
+		  									}
+		  								}
+		  							});
+		  					      }else{
+		  					    	$(obj).val('');  
+		  					      }
+		  				  	  }
+		  				  });
+		  			  }
+		  		  }
+		  	  } ,     
+		  	  error : function(res,error) { 
+		  	  	 alert("responseText="+res.responseText+";error="+error);     
+		  	  }    
+		  	});
+		
+	}
+
+	function seltype(obj){
+		if(obj.value==0){
+			$("#divObj1").show();
+    		$("#divObj2").hide();
+    		$("#custname").val("custname");
+    		$("#phone_panel").show();
+			$("#customer_name").val("");
+			$("#managerName").val("");
+			$("#number_plate").val("");
+			$("#call_letter").val("");
+			$("#unittype").val("");
+			$("#server_pwd").val("");
+			$("#node_name").val("");
+			$("input[name='mode'][value='2']").attr("checked","checked");
+    		$("input[name='mode'][value='2']").get(0).checked=true;
+		}else if(obj.value==1){
+			$("#divObj1").hide();
+			$("#customer_name").val("customer_name");
+    		$("#divObj2").show();
+    		$("#phone_panel").hide();
+    		$("#phone_panel0").remove();
+    		$("#phone_panel1").remove();
+    		$("#phone_panel2").remove();
+    		$("#phone_panel3").remove();
+    		$("#phone_panel4").remove();
+    		$("#custname").val("");
+    		$("#managerName").val("");
+			$("#number_plate").val("");
+			$("#call_letter").val("");
+			$("#unittype").val("");
+			$("#server_pwd").val("");
+			$("#node_name").val("");
+			$("input[name='mode'][value='2']").attr("checked","checked");
+    		$("input[name='mode'][value='2']").get(0).checked=true;
+		}
+		$('#type').val(obj.value);
+	}
+	
+	function fast_save(){
+		$("#nw_fast_form").on('submit',
+				function(e){
+			if(!submitkey){
+				return false;
+			}
+			var linkmans = $('input[name=linkman]');
+			var phones = $('input[name=phone]');
+			var remarks = $('input[name=remark]');
+			var app = $('input[name=app]');
+			var custphones = new Array();
+			$("select[name=phone_type]").each(function(k,v){
+				var obj = {};
+				var phonevalue = phones[k].value;
+				while(phonevalue.indexOf(" ")!=-1){
+					phonevalue = phonevalue.replace(" ","");
+				}
+				obj.linkman = linkmans[k].value;
+	        	obj.phone = phonevalue;
+	        	obj.linkman_type = $(this).val();
+	       		obj.appsign = app[k].checked==true?1:0;
+	        	obj.title = remarks[k].value;
+	        	custphones.push(obj);
+			});
+			var customer = {};
+			var unit = {};
+			var vehicle = {};
+			customer.cust_type = $("input[name='customer_type']:checked").val();
+			customer.customer_name = $('#customer_name').val();
+			customer.customer_id = $('#cust_id').val();
+			customer.service_pwd = $('#server_pwd').val()==''?'123456':$('#server_pwd').val();
+			vehicle.plate_no = $('#number_plate').val();
+			unit.sales = $('#managerName').val();
+			unit.sales_id = $('#managerId').val()==''?0:$('#managerId').val();
+			unit.call_letter = $('#call_letter').val();
+			unit.unittype_id = $('#unittype_id').val();
+			unit.mode = $("input[name='mode']:checked").val();
+			unit.fix_time = $('#time').val();
+			unit.sms_node = $('#node_name').val()==null?0:$('#node_name').val();
+			//最近操作车牌号码联系电话
+			window.gbossLocalStorage.addItem('storage_vehicle',
+					{plateNo:$('#number_plate').val(),callLetter:$('#call_letter').val()});
+			$.ajax({
+				type : 'post',
+				async : false,
+				contentType : 'application/json',
+				dataType : 'json',
+				url : '../../fastNetwork',
+				data : JSON.stringify({
+					opid : $('#opid').val(),
+					customer : customer,
+					unit : unit,
+					vehicle : vehicle,
+					custphones : custphones
+				}),
+				success : function(data) {
+					if (data) {
+						submitkey=false;
+						setTimeout(function(){
+							submitkey=true;
+						},3000);
+						$('#opid').val();
+						$('#cust_id').val();
+						$(document).sgPup({message:'message_alert',text: data.msg});
+					}
+				},
+				error : function(res, error) {
+					$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+						+ ";error=" + error});
+				}
+			});
+			$('#nw_fast_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		});
+	}
+	
+	function fast_reset(){
+		var type = $("input[name='customer_type']:checked").val();
+		if(type==0){
+			document.nw_fast_form.reset();
+			var today=new Date().format('yyyy-MM-dd');
+		   	$("#time").val(today);
+			$("#customer_name").trigger("focus");
+			$("#phone_panel0").remove();
+    		$("#phone_panel1").remove();
+    		$("#phone_panel2").remove();
+    		$("#phone_panel3").remove();
+    		$("#phone_panel4").remove();
+		}else if(type==1){
+			$("#custname").val("");
+			$("#custname").trigger("focus");
+			$("#cust_id").val("");
+			$("#managerName").val("");
+			$("#managerId").val("");
+			$("#number_plate").val("");
+			$("#call_letter").val("");
+			$("#unittype").val("");
+			$("#unittype_id").val("");
+		}
+	}
+	
+	function saveAndreset(){
+		$("#nw_fast_form").on('submit',
+				function(e){
+			if(!submitkey){
+				return false;
+			}
+			var linkmans = $('input[name=linkman]');
+			var phones = $('input[name=phone]');
+			var remarks = $('input[name=remark]');
+			var app = $('input[name=app]');
+			var custphones = new Array();
+			$("select[name=phone_type]").each(function(k,v){
+				var obj = {};
+				var phonevalue = phones[k].value;
+				while(phonevalue.indexOf(" ")!=-1){
+					phonevalue = phonevalue.replace(" ","");
+				}
+				obj.linkman = linkmans[k].value;
+	        	obj.phone = phonevalue;
+	        	obj.linkman_type = $(this).val();
+	       		obj.appsign = app[k].checked==true?1:0;
+	        	obj.title = remarks[k].value;
+	        	custphones.push(obj);
+			});
+			var customer = {};
+			var unit = {};
+			var vehicle = {};
+			customer.cust_type = $("input[name='customer_type']:checked").val();
+			customer.customer_name = $('#customer_name').val();
+			customer.customer_id = $('#cust_id').val();
+			customer.service_pwd = $('#server_pwd').val()==''?'123456':$('#server_pwd').val();
+			vehicle.plate_no = $('#number_plate').val();
+			unit.sales = $('#managerName').val();
+			unit.sales_id = $('#managerId').val()==''?0:$('#managerId').val();
+			unit.call_letter = $('#call_letter').val();
+			unit.unittype_id = $('#unittype_id').val();
+			unit.mode = $("input[name='mode']:checked").val();
+			unit.fix_time = $('#time').val();
+			unit.sms_node = $('#node_name').val()==null?0:$('#node_name').val();
+			//最近操作车牌号码联系电话
+			window.gbossLocalStorage.addItem('storage_vehicle',
+					{plateNo:$('#number_plate').val(),callLetter:$('#call_letter').val()});
+			$.ajax({
+				type : 'post',
+				async : false,
+				contentType : 'application/json',
+				dataType : 'json',
+				url : '../../fastNetwork',
+				data : JSON.stringify({
+					opid : $('#opid').val(),
+					customer : customer,
+					unit : unit,
+					vehicle : vehicle,
+					custphones : custphones
+				}),
+				success : function(data) {
+					if (data) {
+						if(data.success){
+							var type = $("input[name='customer_type']:checked").val();
+							if(type==0){
+								document.nw_fast_form.reset();
+								var today=new Date().format('yyyy-MM-dd');
+							   	$("#time").val(today);
+								$("#customer_name").trigger("focus");
+							}else if(type==1){
+								$("#number_plate").val("");
+								$("#call_letter").val("");
+								$("#custname").trigger("focus");
+							}
+							submitkey=false;
+							setTimeout(function(){
+								submitkey=true;
+							},3000);
+							$(document).sgPup({message:'message_alert',text: data.msg});
+						}else{
+							submitkey=false;
+							setTimeout(function(){
+								submitkey=true;
+							},3000);
+							$(document).sgPup({message:'message_alert',text: data.msg});
+						}
+					}
+				},
+				error : function(res, error) {
+					$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+						+ ";error=" + error});
+				}
+			});
+			$('#nw_fast_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		});
+	}
+
+	(function($){
+		
+		//默认安装时间
+		var today=new Date().format('yyyy-MM-dd');
+   		$("#time").val(today);
+		
+		var flag = 0;
+		var userDataList = {};//销售经理 key:name,value:id
+		var customerList = {};
+		var unittypeList = {};
+		$("#phone_panel a").on('click',function(){
+			var detail_div = $("<div></div>");
+			var detail_id = "phone_panel"+flag;
+			detail_div.attr('id',detail_id);
+			detail_div.addClass("panel");
+			detail_div.append($("#phone_panel").html());  
+			
+			$("#phone_panel").before(detail_div);
+			$("#linkman").trigger("focus");
+			$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+			$("#"+detail_id+" img").attr('title','删除电话号码');
+			
+			$("#"+detail_id+" a").on('click',function(){
+				$("#"+detail_id).remove();
+			})
+			//$("#"+detail_id + " input[list=productList]").on('keyup',checkProduct);
+			flag=flag+1;
+		});
+		
+		$("#managerName").one('click',function(){
+		    //填充销售经理
+		    $.ajax( {
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../getCompanySaleManager',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#managerName");
+					  if(manager){
+						  if(data.items.length>0){
+							  userDataList = {};
+							  $("#userDataList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(v.opname);
+							  $("#userDataList").append(op);
+							  
+							  userDataList[v.opname] = v.opid;
+						  	 }); 
+						}
+				  }
+			  },     
+			  error : function(res,error) { 
+			  }    
+			});
+		});
+	    
+	    var checkCustomer = function(){
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {nocust_type : 0};
+			params.filter.customer_name = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getCustomers',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#custname");
+						  if(manager){
+							  if(data.items.length>0){
+								  customerList = {};
+								  $("#customerList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.customer_name);
+								  $("#customerList").append(op);
+								  
+								  customerList[v.customer_name] = v.customer_id;
+		 				  	 }); 
+							}
+					  }
+				  } ,     
+				  error : function(res,error) {   
+				  }    
+				});
+		};
+		
+		$("#custname").one('click',function(){
+		    //填充客户
+		    $.ajax( {
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../getCustomers',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{nocust_type : 0}}),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#custname");
+					  if(manager){
+						  if(data.items.length>0){
+							  customerList = {};
+							  $("#customerList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(v.customer_name);
+							  $("#customerList").append(op);
+							  
+							  customerList[v.customer_name] = v.customer_id;
+						  	 }); 
+						}
+				  }
+			  },     
+			  error : function(res,error) {
+				  
+			  }    
+			});
+		});
+	    
+	    $("#node_name").one('click',function(){
+		  //填充短信通道
+			var node_name = $('#node_name');
+		    $.ajax( {
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../sys/findSysNode',   
+			  data:JSON.stringify({nodetype_id : 1, flag : 1}),
+			  success : function(data) {
+				  if(data){
+					  if(node_name){
+						  node_name.append("<option value='0'></option>");
+						  $.each(data,function(k,v){
+							  node_name.append("<option value='" +v.node_num+"'>" + v.node_name+"</option>");
+						  }); 
+					  }
+				  }
+			  } ,     
+			  error : function(res,error) {      
+			  }    
+			});
+	    });
+	    
+	  //查询终端类型
+		var checkProduct = function(){
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.unittype = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../unit/getUnitType',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#unittype");
+						  						  
+						  if(manager){
+							  if(data.items.length>0){
+								  unittypeList = {};
+								  $("#unittypeList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.unittype);
+								  $("#unittypeList").append(op);
+								  
+								  unittypeList[v.unittype] = v.unittype_id;
+		 				  	 }); 
+							}
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  }    
+				});
+		};
+		
+		$("#unittype").one('click',function(){
+		    //填充终端类型
+		    $.ajax( {
+	    	  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../unit/getUnitType',   
+			  data:JSON.stringify({pageNo:1,pageSize:10}),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#unittype");
+					  if(manager){
+						  if(data.items.length>0){
+							  unittypeList = {};
+							  $("#unittypeList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(v.unittype);
+							  $("#unittypeList").append(op);
+							  
+							  unittypeList[v.unittype] = v.unittype_id;
+						  	 }); 
+						}
+				  }
+			  },     
+			  error : function(res,error) { 
+			  }    
+			});
+		});
+		
+		$("#managerName").keyup(function(event){
+			if(event.keyCode == 32){ //按了空格
+				var params = {};
+				params.pageNo = 1;
+				params.pageSize = 10;
+				params.filter = {};
+				params.filter.opname = this.value.trim();
+				var obj = $(this);
+				$.ajax({
+					  type : 'post', 
+					  async: false,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../getCompanySaleManager',   
+					  data:JSON.stringify(params),
+					  success : function(data) {
+						  if(data){
+							  var manager = $("#managerName");
+							  						  
+							  if(manager){
+								  if(data.items.length>0){
+									  userDataList = {};
+									  $("#userDataList").empty();
+								  }
+								  $.each(data.items,function(k,v){
+									  var op = $("<option></option>");
+									  op.val(obj.val()+" "+v.opname);
+									  $("#userDataList").append(op);
+									  
+									  userDataList[v.opname] = v.opid;
+			 				  	 }); 
+								}
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  }    
+					});
+            }
+		});
+		$("#managerName").on('change',function(){
+			  var strs = this.value.split(" ");
+			  if(userDataList[strs[strs.length-1]]){
+					$(this).val(strs[strs.length-1]);
+					$("#managerId").val(userDataList[strs[strs.length-1]]);
+					
+					if($("#managerId").val().length==0){
+						$("#managerName").val("");
+					}
+			    }else{
+			    	$(this).val('');
+			    	$("#managerId").val("");
+			    }	
+			});
+		
+		$("#custname").on('keyup',checkCustomer);
+		$("#custname").on('change',function(){
+			  var strs = this.value.split(" ");
+			  if(customerList[strs[strs.length-1]]){
+					$(this).val(strs[strs.length-1]);
+					$("#cust_id").val(customerList[strs[strs.length-1]]);
+					$.ajax({
+						  type : 'post', 
+						  async: true,   
+						  contentType : 'application/json',     
+						  dataType : 'json',     
+						  url : '../../getlargeCustMngEntry',   
+						  data:JSON.stringify({cust_id:customerList[strs[strs.length-1]]}),
+						  success : function(data) {
+							  if(data){
+								  $('#custname').val("");
+								  $('#cust_id').val("");
+								  var cust_id = data.cust_id;
+								  var custname = data.customer_name;
+								  if(cust_id){
+									  $('#custname').val(custname);
+									  $('#cust_id').val(cust_id);
+								  }
+							  }
+						  } ,     
+						  error : function(res,error) { 
+							  $(document).sgPup({message:'message_alert',text: res.responseText});  
+						  }    
+						});
+			    }else{
+			    	$(this).val('');
+			    	$("#cust_id").val("");
+			    }
+			});
+		
+		$("#unittype").on('keyup',checkProduct);
+		$("#unittype").on('change',function(){
+			  var strs = this.value.split(" ");
+			  var unittype;
+			  if(strs.length==3){
+				  unittype = strs[1]+" "+strs[2];
+			  }else if(strs.length==4){
+				  unittype = strs[1]+" "+strs[2]+" "+strs[3];
+			  }else{
+				  unittype = strs[strs.length-1];
+			  }
+			  
+			    if(unittypeList[unittype]){
+					$(this).val(unittype);
+					$("#unittype_id").val(unittypeList[unittype]);
+					
+					if($("#unittype_id").val().length==0){
+						$("#unittype").val("");
+					}
+			    }else if(unittypeList[this.value]){
+			    	$("#unittype_id").val(unittypeList[this.value]);
+			    	
+			    	if($("#unittype_id").val().length==0){
+						$("#unittype").val("");
+					}
+			    }else{
+			    	$(this).val('');
+			    	$("#unittype_id").val("");
+			    }	
+			});
+	})(jQuery)
+
+</script>
+</html>

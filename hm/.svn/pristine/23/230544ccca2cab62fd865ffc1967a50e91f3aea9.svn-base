@@ -1,0 +1,56 @@
+package com.gboss.comm;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+@Service("SystemConfig")
+public class SystemConfig {
+
+	@Value("${excelUploadPath}")
+    private String excelUploadPath;
+	
+	@Value("${obdconnectUrl}")
+    private String obdconnectUrl;
+	
+	@Value("${obdconnectIp}")
+    private String obdconnectIp;
+	
+	@Value("${obdconnectPort}")
+    private String obdconnectPort;
+	
+	@Value("${obdlinuxUrl}")
+    private String obdlinuxUrl;
+
+	public String getExcelUploadPath() {
+		return excelUploadPath;
+	}
+	public void setExcelUploadPath(String excelUploadPath) {
+		this.excelUploadPath = excelUploadPath;
+	}
+	
+	public String getObdconnectUrl() {
+		return obdconnectUrl;
+	}
+	public void setObdconnectUrl(String obdconnectUrl) {
+		this.obdconnectUrl = obdconnectUrl;
+	}
+	public String getObdconnectIp() {
+		return obdconnectIp;
+	}
+	public void setObdconnectIp(String obdconnectIp) {
+		this.obdconnectIp = obdconnectIp;
+	}
+	public String getObdconnectPort() {
+		return obdconnectPort;
+	}
+	public void setObdconnectPort(String obdconnectPort) {
+		this.obdconnectPort = obdconnectPort;
+	}
+	public String getObdlinuxUrl() {
+		return obdlinuxUrl;
+	}
+	public void setObdlinuxUrl(String obdlinuxUrl) {
+		this.obdlinuxUrl = obdlinuxUrl;
+	}
+	
+}

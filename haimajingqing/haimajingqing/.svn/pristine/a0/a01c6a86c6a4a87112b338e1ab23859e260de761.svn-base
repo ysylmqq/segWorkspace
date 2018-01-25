@@ -1,0 +1,185 @@
+package cc.chinagps.gps.pojo;
+
+import java.util.Date;
+
+public class GpsTempInfo {
+	private long travelRecordId;
+	private String callLetter;  //呼号
+	private long vehicleId; //车辆ID
+	private Date gpsTime;			//GPS时间(从1970-1-1 0:0:0开始的毫秒数), 为了提高处理速度,不用字符串
+	private int loc;				//是否定位
+	private int lat;				//纬度(单位：百万分之一度，北正南负）
+	private int lng;				//经度(单位：百万分之一度，东正西负）
+	private int speed;			//速度（单位：百米每小时）
+	private int course;			//方向（单位：度，正北0，顺时针增加）
+	private int totalDistance;	//总里程（单位：米）
+	private int oil;			//油箱中油量（单位：十分之一升）
+	private int oilPercent;		//油箱中油量千分比
+	private int temperature1;	//温度1（单位：十分之一摄氏度）
+	private int temperature2;	//温度2（单位：十分之一摄氏度）
+	private String status;
+	
+	//加上地理位置详细信息
+	private String formattedAddress;
+	private String street;
+	private String province;
+	private String city;
+	private String district;
+	private String posType;
+	private String sematicDescription;
+	private String streetNumber;
+	
+	
+	
+	public long getTravelRecordId() {
+		return travelRecordId;
+	}
+	public void setTravelRecordId(long travelRecordId) {
+		this.travelRecordId = travelRecordId;
+	}
+	public String getFormattedAddress() {
+		return formattedAddress;
+	}
+	public void setFormattedAddress(String formattedAddress) {
+		this.formattedAddress = formattedAddress;
+	}
+	public String getStreet() {
+		return street;
+	}
+	public void setStreet(String street) {
+		this.street = street;
+	}
+	public String getProvince() {
+		return province;
+	}
+	public void setProvince(String province) {
+		this.province = province;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public String getDistrict() {
+		return district;
+	}
+	public void setDistrict(String district) {
+		this.district = district;
+	}
+	public String getPosType() {
+		return posType;
+	}
+	public void setPosType(String posType) {
+		this.posType = posType;
+	}
+	public String getSematicDescription() {
+		return sematicDescription;
+	}
+	public void setSematicDescription(String sematicDescription) {
+		this.sematicDescription = sematicDescription;
+	}
+	public String getStreetNumber() {
+		return streetNumber;
+	}
+	public void setStreetNumber(String streetNumber) {
+		this.streetNumber = streetNumber;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String getCallLetter() {
+		return callLetter;
+	}
+	public void setCallLetter(String callLetter) {
+		this.callLetter = callLetter;
+	}
+	public long getVehicleId() {
+		return vehicleId;
+	}
+	public void setVehicleId(long vehicleId) {
+		this.vehicleId = vehicleId;
+	}
+	
+	public Date getGpsTime() {
+		return gpsTime;
+	}
+	public void setGpsTime(Date gpsTime) {
+		this.gpsTime = gpsTime;
+	}
+	public int getLoc() {
+		return loc;
+	}
+	public void setLoc(int loc) {
+		this.loc = loc;
+	}
+	public int getLat() {
+		return lat;
+	}
+	public void setLat(int lat) {
+		this.lat = lat;
+	}
+	public int getLng() {
+		return lng;
+	}
+	public void setLng(int lng) {
+		this.lng = lng;
+	}
+	public int getSpeed() {
+		return speed;
+	}
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+	public int getCourse() {
+		return course;
+	}
+	public void setCourse(int course) {
+		this.course = course;
+	}
+	public int getTotalDistance() {
+		return totalDistance;
+	}
+	public void setTotalDistance(int totalDistance) {
+		this.totalDistance = totalDistance;
+	}
+	public int getOil() {
+		return oil;
+	}
+	public void setOil(int oil) {
+		this.oil = oil;
+	}
+	public int getOilPercent() {
+		return oilPercent;
+	}
+	public void setOilPercent(int oilPercent) {
+		this.oilPercent = oilPercent;
+	}
+	public int getTemperature1() {
+		return temperature1;
+	}
+	public void setTemperature1(int temperature1) {
+		this.temperature1 = temperature1;
+	}
+	public int getTemperature2() {
+		return temperature2;
+	}
+	public void setTemperature2(int temperature2) {
+		this.temperature2 = temperature2;
+	}
+	@Override
+	public String toString() {
+		return "GpsTempInfo [travelRecordId=" + travelRecordId + ", callLetter=" + callLetter + ", vehicleId="
+				+ vehicleId + ", gpsTime=" + gpsTime + ", loc=" + loc + ", lat=" + lat + ", lng=" + lng + ", speed="
+				+ speed + ", course=" + course + ", totalDistance=" + totalDistance + ", oil=" + oil + ", oilPercent="
+				+ oilPercent + ", temperature1=" + temperature1 + ", temperature2=" + temperature2 + ", status="
+				+ status + ", formattedAddress=" + formattedAddress + ", street=" + street + ", province=" + province
+				+ ", city=" + city + ", district=" + district + ", posType=" + posType + ", sematicDescription="
+				+ sematicDescription + ", streetNumber=" + streetNumber + "]";
+	}
+	
+	
+}

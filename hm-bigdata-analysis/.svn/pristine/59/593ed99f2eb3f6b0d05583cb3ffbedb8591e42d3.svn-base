@@ -1,0 +1,18 @@
+#mysql1 
+jdbc_mysql1.driverClassName=com.mysql.jdbc.Driver
+jdbc_mysql1.url=jdbc:mysql://90.0.25.7:3306/gboss?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&amp;autoReconnect=true
+#jdbc_mysql1.url=jdbc:mysql://90.0.7.198:3306/gboss?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&amp;autoReconnect=true
+jdbc_mysql1.username=gboss
+jdbc_mysql1.password=123456
+jdbc_mysql1.alias=gboss_db
+jdbc_mysql1.maximum.connection.count=300
+jdbc_mysql1.minimum.connection.count=5
+jdbc_mysql1.statistics=1m,15m,1h,1d
+jdbc_mysql1.simultaneous.build.throttle=20
+jdbc_mysql1.houseKeepingSleepTime = 20000
+jdbc_mysql1.houseKeepingTestSql=select 1 from dual
+jdbc_mysql1.prototypeCount=5
+jdbc_mysql1.trace=true
+jdbc_mysql1.verbose=true
+jdbc_mysql1.maximumActiveTime = 9000000
+

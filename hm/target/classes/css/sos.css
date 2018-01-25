@@ -1,0 +1,24 @@
+@charset "utf-8";
+
+/*------搜索框自动补全样式------*/
+.searchDis{
+    display: inline-block;
+    position: relative;
+}
+.searchDis .show_list{
+    position: absolute;
+    left: 94px;
+    top: 25px;
+    width: 154px;
+    background: #fff;
+    z-index: 999;
+}
+.searchDis .show_list li{
+    line-height: 20px;
+    padding: 0 6px;
+}
+.show_list li.current{
+    color: #fff;
+    background: #0059b3;
+}
+

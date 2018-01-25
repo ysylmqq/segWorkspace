@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+  <property>
+    <name>dfs.replication</name>
+    <value>3</value>
+  </property>
+  <property> 
+    <name>dfs.datanode.data.dir</name>
+    <value>/media/HBASE/hadoop/data</value>
+  </property>
+  <property>
+    <name>dfs.namenode.name.dir</name>  
+    <value>/media/HBASE/hadoop/namedir</value> 
+  </property>
+  <property>
+    <name>dfs.journalnode.edits.dir</name>
+    <value>/media/HBASE/hadoop/journal</value>
+  </property>
+  <property>
+    <name>dfs.webhdfs.enabled</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>dfs.namenode.hosts</name>
+    <value>HBASE01,HBASE02</value>
+  </property>
+  <property>
+    <name>dfs.nameservices</name>
+    <value>HBASEDB</value>
+  </property>
+  <property>
+    <name>dfs.ha.namenodes.HBASEDB</name>
+    <value>nn1,nn2</value>
+  </property>
+  <property>
+    <name>dfs.namenode.rpc-address.HBASEDB.nn1</name>
+    <value>HBASE01:8020</value>
+  </property>
+  <property>
+    <name>dfs.namenode.rpc-address.HBASEDB.nn2</name>
+    <value>HBASE02:8020</value>
+  </property>
+  <property>
+    <name>dfs.namenode.http-address.HBASEDB.nn1</name>
+    <value>HBASE01:50070</value>
+  </property>
+  <property>
+    <name>dfs.namenode.http-address.HBASEDB.nn2</name>
+    <value>HBASE02:50070</value>
+  </property>
+  <property>
+    <name>dfs.namenode.shared.edits.dir</name>
+    <value>qjournal://HBASE01:8485;HBASE02:8485;HBASE03:8485;HBASE04:8485;HBASE05:8485/HBASEDB</value>
+  </property>
+  <property>
+    <name>dfs.client.failover.proxy.provider.HBASEDB</name>
+    <value>org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider</value>
+  </property>
+  <property>
+    <name>dfs.ha.fencing.methods</name>
+    <value>sshfence</value>
+  </property>
+  <property>
+    <name>dfs.ha.fencing.ssh.private-key-files</name>
+    <value>/root/.ssh/id_rsa</value>
+  </property>
+  <property>
+    <name>dfs.ha.fencing.ssh.connect-timeout</name>
+    <value>30000</value>
+  </property>
+  <property>
+    <name>dfs.ha.automatic-failover.enabled</name>
+    <value>true</value>
+  </property>
+</configuration>

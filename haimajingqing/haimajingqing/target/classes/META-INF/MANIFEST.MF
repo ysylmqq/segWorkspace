@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Built-By: ysy
+Class-Path: libs/mybatis-3.2.8.jar libs/mysql-connector-java-5.1.34.ja
+ r libs/hbase-client-0.98.2-hadoop2.jar libs/commons-codec-1.7.jar lib
+ s/commons-io-2.4.jar libs/commons-lang-2.6.jar libs/guava-12.0.1.jar 
+ libs/jsr305-1.3.9.jar libs/protobuf-java-2.5.0.jar libs/netty-3.6.6.F
+ inal.jar libs/htrace-core-2.04.jar libs/jetty-util-6.1.26.jar libs/ja
+ ckson-mapper-asl-1.8.8.jar libs/jackson-core-asl-1.8.8.jar libs/hadoo
+ p-common-2.2.0.jar libs/commons-cli-1.2.jar libs/xmlenc-0.52.jar libs
+ /commons-net-3.1.jar libs/jetty-6.1.26.jar libs/commons-el-1.0.jar li
+ bs/commons-configuration-1.6.jar libs/commons-digester-1.8.jar libs/c
+ ommons-beanutils-1.7.0.jar libs/commons-beanutils-core-1.8.0.jar libs
+ /hadoop-auth-2.2.0.jar libs/hadoop-mapreduce-client-core-2.2.0.jar li
+ bs/hadoop-yarn-common-2.2.0.jar libs/hadoop-yarn-api-2.2.0.jar libs/g
+ uice-3.0.jar libs/javax.inject-1.jar libs/aopalliance-1.0.jar libs/je
+ rsey-server-1.9.jar libs/asm-3.1.jar libs/jersey-guice-1.9.jar libs/h
+ base-common-0.98.2-hadoop2.jar libs/commons-collections-3.2.1.jar lib
+ s/hbase-protocol-0.98.2-hadoop2.jar libs/log4j-1.2.17.jar libs/common
+ s-logging-1.1.3.jar libs/zookeeper-3.4.6.jar libs/slf4j-api-1.6.1.jar
+  libs/slf4j-log4j12-1.6.1.jar libs/jline-0.9.94.jar libs/junit-3.8.1.
+ jar
+Build-Jdk: 1.8.0_144
+Created-By: Maven Integration for Eclipse
+Main-Class: cc.chinagps.gps.GPSMain
+

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="hadoopTest"
+  id="myeclipse.1494329250432"
+  context-root="/hadoopTest"
+  j2ee-spec="5.0"
+  archive="hadoopTest.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

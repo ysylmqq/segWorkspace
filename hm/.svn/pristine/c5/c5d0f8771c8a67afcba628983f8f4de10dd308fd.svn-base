@@ -1,0 +1,119 @@
+package com.gboss.service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.gboss.comm.SystemException;
+import com.gboss.pojo.FlowCtrolCmd;
+import com.gboss.pojo.FlowCtrolCmdHistory;
+import com.gboss.pojo.SimCardInfo;
+import com.gboss.util.PageSelect;
+import com.gboss.util.page.Page;
+
+public interface FCCmdManageService extends BaseService {
+
+	/**
+	 * 
+	 * @Description:分页查询sim的数据;
+	 * @Params:
+	 * @Return:Page<HashMap<String,Object>>
+	 * @Author:cj
+	 * @Date:2017年7月17日 上午10:30:07
+	 */
+	Page<HashMap<String, Object>> getAllSimPage(HttpServletRequest request,Long companyId,PageSelect<Map<String, Object>> pageSelect)throws SystemException;
+
+	/**
+	 * @Description:根据call_letter获取sim信息;
+	 * @Params:
+	 * @Return:SimCardInfo
+	 * @Author:cj
+	 * @Date:2017年7月21日 上午11:45:40
+	 */
+	SimCardInfo getSimByCallLetter(String call_letter);
+	
+	/**
+	 * @Description:批量更新sim卡的反控指令状态;
+	 * @Params:
+	 * @Return:void
+	 * @Author:cj
+	 * @Date:2017年7月17日 下午3:19:41
+	 */
+	void updateFankongCmd(String simIds,String opType);
+
+	/**
+	 * 
+	 * @Description:开启导航主机指令;
+	 * @Params:
+	 * @Return:boolean
+	 * @Author:cj
+	 * @Date:2017年7月19日 上午11:16:46
+	 */
+	boolean openNaviHostCmd(String[] callLettes);
+	
+	/**
+	 * 
+	 * @Description:根据指令码获取指令列表；
+	 * @Params:
+	 * @Return:List<FlowCtrolCmd>
+	 * @Author:cj
+	 * @Date:2017年7月19日 下午4:35:15
+	 */
+	public List<FlowCtrolCmd> getFlowCtrlList(Integer cmdId);
+	
+	/**
+	 * 
+	 * @Description:根据指令码获取所有指令数据;
+	 * @Params:
+	 * @Return:List<FlowCtrolCmd>
+	 * @Author:cj
+	 * @Date:2017年7月19日 下午4:35:49
+	 */
+	public List<FlowCtrolCmd> getFlowCtrlAllList(Integer cmdId);
+	
+	/**
+	 * 
+	 * @Description:根据call_letter获取对应的流量控制指令
+	 * @Params:
+	 * @Return:FlowCtrolCmd
+	 * @Author:cj
+	 * @Date:2017年7月19日 下午4:37:06
+	 */
+	public FlowCtrolCmd getFlowCtrolByCallLetter(Integer cmdId,String call_letter);
+
+	/**
+	 * 
+	 * @Description:
+	 * @Params:FlowSendCmd转化为FlowSendCmdHistory实体
+	 * @Return:void
+	 * @Author:cj
+	 * @Date:2017年7月24日 下午5:26:06
+	 */
+	public FlowCtrolCmdHistory fcSendCmdTransHistory(FlowCtrolCmd flowCtrolCmd);
+
+	Page<HashMap<String, Object>> getAllCmdLogInfo(HttpServletRequest request, Long subno,
+			PageSelect<Map<String, Object>> pageSelect)throws SystemException;
+
+	ConcurrentHashMap<String, ArrayList<FlowCtrolCmd>> getAllSendSearchMap();
+
+	public  Map<String, Object> batchContrCmd(List<String[]> dataList, Integer type,String opId,String batchSeq);
+	
+	/**
+	 * 导出执行指令失败的记录
+	 * @param batchSeq
+	 * @return
+	 */
+	public List<HashMap<String, Object>> exportExcelFailCmd(String batchSeq);
+	/**
+	 * 上传批次是否存在
+	 * @param batchSeq
+	 * @return
+	 */
+	public boolean isExistBatchSeq(String batchSeq);
+}
+
+

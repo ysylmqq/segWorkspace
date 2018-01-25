@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+
+<body>
+	<form id="pay_fee" method="post" class="form" name="pay_fee">
+		<div class="form">
+			<div class='title' style="width: 595px;">套餐明细></div>
+			<fieldset style="width: 580px;">
+				<input type='hidden' id='sim_id' name='sim_id' /> <input
+					type='hidden' id='unit_id' name='unit_id' /> <input type='hidden'
+					id='combo_id' name='combo_id' />
+				<div class="panel">
+					<span style="width: 100px">套餐名:</span> <input type='text'
+						id='combo_name' name='combo_name' disabled="disabled"
+						style="width: 130px;" /> <span
+						style="padding-left: 40px; width: 100px">套餐价格(元):</span> <input
+						type='text' id='month_fee' name='month_fee' disabled="disabled"
+						style="width: 130px;" />
+				</div>
+				<div class="panel">
+					<span style="width: 100px">总通话时长(min):</span> <input type='text'
+						id='voice_time' name='voice_time' disabled="disabled"
+						style="width: 130px;" /> <span
+						style="padding-left: 40px; width: 100px">总流量(M):</span> <input
+						type='text' id='data' name='data' disabled="disabled"
+						style="width: 130px;" />
+				</div>
+
+				<div class="panel">
+					<span style="width: 100px">服务开始时间:</span> <input type='date'
+						id='s_date' name='s_date' disabled="disabled"
+						style="width: 130px;" /> <span
+						style="padding-left: 40px; width: 100px">服务结束时间:</span> <input
+						type='date' id='e_date' name='e_date' disabled="disabled"
+						style="width: 130px;" />
+				</div>
+			</fieldset>
+
+			<div class='title' style="width: 595px;">车辆信息></div>
+			<fieldset style="width: 580px;">
+				<div class="panel">
+					<span style="width: 100px">缴费(月):</span> <input type='number'
+						id='s_months' name='s_months' style="width: 130px;" /> <span
+						style="padding-left: 40px; width: 100px">缴费(天):</span> <input
+						type='text' id='s_days' name='s_days' style="width: 130px;" />
+				</div>
+				<div class="panel">
+					<span style="width: 100px">合计应缴:</span> <input type='number'
+						id='ac_amount' name='ac_amount' value="0" style="width: 130px;" />
+					<span style="padding-left: 40px; width: 100px">备注:</span> <input
+						type='text' id='remark' name='remark' style="width: 130px;" />
+				</div>
+			</fieldset>
+		</div>
+		 <fieldset style="width:580px;border-top:0px;">	
+	        <div class="submit">
+	            <button type="button" id="savesimFee" onclick="savePayFee();" >确定</button> 
+	            <button type="button" onclick="cleardate();" >重置</button>
+	        </div>
+     <div class='title' style="width: 575px;">缴费历史记录></div>
+     </fieldset>
+	</form>
+	
+		<div id="records" class="datagird"  style="width: 603px;"></div>
+</body>
+<script type="text/javascript">
+
+
+
+var cleardate = function() {
+	$('#s_months').val('');
+	$('#s_days').val('');
+	$('#ac_amount').val('');
+	$('#remark').val('');
+};
+
+var savePayFee = function() {
+	// 保存服务项
+	var params = {};
+	var url = '../../../paymentSim/add';
+	var sim_id = $('#sim_id', '#pay_fee').val();
+	params.sim_id = $('#sim_id', '#pay_fee').val();
+	params.combo_id = $('#combo_id', '#pay_fee').val();
+	params.unit_id = $('#unit_id', '#pay_fee').val();
+	params.s_date = $('#s_date', '#pay_fee').val();
+	params.e_date = $('#e_date', '#pay_fee').val();
+	params.s_months= $('#s_months', '#pay_fee').val();
+	params.s_days= $('#s_days', '#pay_fee').val();
+	params.ac_amount= $('#ac_amount', '#pay_fee').val();
+	params.remark= $('#remark', '#pay_fee').val();
+	if(!params.s_date){
+		 $(document).sgPup({message:'message_info',text: "SIM卡没有缴费开始时间，不能缴费！"});
+		 	return false;
+	}
+	if(!params.sim_id){
+		 $(document).sgPup({message:'message_info',text: "请检查数据正确性！"});
+		 	return false;
+	}
+	if(params.s_date && !params.e_date){
+		params.e_date = params.s_date;
+	}
+	
+	if(!params.s_months && !params.s_days ){
+		 $(document).sgPup({message:'message_info',text: "请输入缴费时间！"});
+		 	return false;
+	 }
+	
+	$(document).sgConfirm(
+			{
+				text : '确定保存吗?',
+				cfn : function(r) {
+					if (r) {
+						$.ajax({
+							type : 'post',
+							async : false,
+							contentType : 'application/json',
+							dataType : 'json',
+							url : url,
+							data : JSON.stringify(params),
+							success : function(data) {
+								if (data) {
+									if (data.success) {
+										$('#records').sgDatagrid('reload', 'sgDatagrid');
+										 if(sim_id){
+											  $.ajax( {
+												  type : 'POST', 
+												  async: false,  
+												  url : "../../../preload/getSimMsg",   
+												  data:{sim_id:sim_id},
+												  success : function(data) {
+													  if(data){
+														  $("#s_date","#pay_fee").val(data.s_date);
+														  $("#e_date","#pay_fee").val(data.e_date);
+													  }
+												  } 
+											});
+										 }
+										
+									}
+									$(document).sgPup({
+										message : 'message_alert',
+										text : data.msg
+									});
+								}
+							},
+							error : function(res, error) {
+								alert(res.responseText);
+							}
+						});
+					}
+				}
+			});
+	$('#savesimFee').unbind(); // 以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	return false;
+};
+(function($){
+	
+	$('#s_months').bind("change", function()
+	{
+			var fee = $("#month_fee").val();
+			var month_number =  $("#s_months").val();
+			var day_number =  $("#s_days").val();
+			if(month_number == null || month_number == "" ){
+				month_number ='0';
+			}
+			 if(day_number == null || day_number == "" ){
+				day_number ='0';
+			} 
+			var total =   parseInt(fee * parseInt(day_number)/30) + parseInt(fee) * parseInt(month_number);
+			 $("#ac_amount").val(total);
+		
+	});
+	
+	$('#s_days').bind("change", function()
+	{
+			var fee = $("#month_fee").val();
+			var month_number =  $("#s_months").val();
+			var day_number =  $("#s_days").val();
+			if(month_number == null || month_number == "" ){
+				month_number ='0';
+			}
+			 if(day_number == null || day_number == "" ){
+				day_number ='0';
+			} 
+			var total =   parseInt(fee * parseInt(day_number)/30) + parseInt(fee) * parseInt(month_number);
+			 $("#ac_amount").val(total);
+		
+	});
+	
+	
+
+	
+	
+	
+	//初始化表格
+ 	var defaults = {
+ 		    title: "",
+	        width:  '520px',
+	        url:'',
+		    usepager: true,
+		    rownumbers:true,
+		    useRp: true,
+	        colModel : [
+	          {display: '套餐名称', name : 'combo_name', width : 80, sortable : false},
+  	          {display: '缴费金额', name : 'ac_amount', width : 80, sortable : false},
+	          {display: '缴费月数', name : 's_months', width : 60, sortable : false},
+	          {display: '缴费天数', name : 's_days', width : 60, sortable : false},
+	          {display: '开始日期', name : 's_date', width : 80, sortable : false},
+	          {display: '结束日期', name : 'e_date', width : 80, sortable : false},
+	          {display: '缴费日期', name : 'stamp', width : 80, sortable : false}
+	        ]
+	    };
+	    $('#records').sgDatagrid(defaults);
+						 
+})(jQuery)
+
+</script>
+</html>

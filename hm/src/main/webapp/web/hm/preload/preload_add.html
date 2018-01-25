@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+<form id="preload_add" method="post" class="form" name="preload_add" >
+	<div class="form">
+		<fieldset style="width: 680px;">
+		  <input type='hidden' id='sim_id' name='sim_id'  />
+		   <div class="panel">
+            	  <span >呼号:</span>
+                <input type='text' id='call_letter' name='call_letter'  style="width:200px;" />
+            	 <span style="padding-left:40px;">运营商:</span>
+                <select id="telco" name="telco" style="width:202px;">
+                	<option value="3">中国电信</option>
+                	<option value="1">中国移动</option>
+                	<option value="2">中国联通</option>
+                </select>
+            </div>
+			<div class="panel">
+                <span>ICCID:</span>
+                <input type='text' id='iccid' name='iccid'  style="width:200px;" />
+                 <span style="padding-left:40px;">IMSI:</span>
+                <input type='text' id='imsi' name='imsi'  style="width:200px;" />
+           	 </div>
+            
+            <div class="panel">
+                <span>AKEY:</span>
+                <input type='text' id='akey' name='akey'    style="width:200px;" />
+                <span style="padding-left:40px;">ESN:</span>
+                <input type='text' id='esn' name='esn'    style="width:200px;" />
+            </div>
+             
+            <div class="panel">
+                <span>EVDO账号:</span>
+                <input type='text' id='w_user' name='w_user'  style="width:200px;" />
+                <span style="padding-left:40px;">EVDO密码:</span>
+                <input type='password' id='w_password' name='w_password'    style="width:200px;" />
+            </div>
+            
+             <div class="panel">
+                <span>IMEI/MEID:</span>
+                <input type='text' id='imei' name='imei'   style="width:200px;" />
+                <span style="padding-left:40px;">缴费开始时间:</span>
+                <input type='date' id='s_date' name='s_date'   style="width:200px;" />
+            </div>
+            
+            
+            
+           </fieldset>
+        <div class='title' style="width:695px;">终端信息></div>
+		 <fieldset style="width: 680px;"> 
+		 	 <div class="panel">
+                <span>TBOX条码:</span>    
+                <input type='text' id='barcode' name=barcode   style="width:200px;" />
+                <span style="padding-left:40px;">终端类型:</span>
+                <input type='text' id="unittype" name='unittype'  list="unittypeList" style="width:200px;" />
+                <input type="hidden" id="unittype_id" name="unittype_id" />
+                <datalist id='unittypeList'></datalist>
+            </div>
+		 </fieldset>   
+       <div class='title' style="width:695px;">车辆信息></div>
+		 <fieldset style="width: 680px;">  
+		  <div class="panel">
+                <span>车架号:</span>
+                <input type='text' id='vin' name='vin'   style="width:200px;" />
+                <span style="padding-left:40px;">发动机号:</span>
+                <input type='text' id='engine_no' name='engine_no'  style="width:200px;" />
+            </div>
+               <div class="panel">
+                <span>车辆颜色:</span>
+                <input type='text' id='color' name='color'    style="width:200px;" />
+                <span style="padding-left:40px;">生产日期:</span>
+                <input type='date' id='production_date' name='production_date'   style="width:200px;" />
+            </div>
+                <div class="panel" >
+                <span style="vertical-align:top;">备注:</span>
+                <textarea id="remark" name="remark" style="width:545px;" rows="2"></textarea>
+             
+            </div>
+		 </fieldset>    
+		
+	</div>
+</form>
+
+</body>
+<script type="text/javascript">
+
+/* 
+$('#vin').bind("change", function()
+{
+	var value = $("#vin").val();
+	if (value && value.length != 17){
+   		 $(document).sgPup({message:'message_info',text: "请输入长度为17位的车架号！"});
+    }
+}); */
+
+//查询终端类型
+	var checkProduct = function(){
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {};
+		params.filter.unittype = this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../../unit/getUnitType',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#unittype");
+					  						  
+					  if(manager){
+						  if(data.items.length>0){
+							  unittypeList = {};
+							  $("#unittypeList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.unittype);
+							  $("#unittypeList").append(op);
+							  
+							  unittypeList[v.unittype] = v.unittype_id;
+	 				  	 }); 
+						}
+				  }
+			  } ,     
+			  error : function(res,error) { 
+				 $(document).sgPup({message:'message_alert',text: res.responseText});
+			  }    
+			});
+	};
+	
+	$("#unittype").on('click',function(){
+	    //填充终端类型
+	    $.ajax( {
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../../unit/getUnitType',   
+		  data:JSON.stringify({pageNo:1,pageSize:10}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#unittype");
+				  if(manager){
+					  if(data.items.length>0){
+						  unittypeList = {};
+						  $("#unittypeList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.unittype);
+						  $("#unittypeList").append(op);
+						  
+						  unittypeList[v.unittype] = v.unittype_id;
+					  	 }); 
+					  manager.on('keyup',checkProduct);
+					  manager.on('change',function(){
+						  var strs = this.value.split(" ");
+						  var unittype;
+						  if(strs.length==3){
+							  unittype = strs[1]+" "+strs[2];
+						  }else if(strs.length==4){
+							  unittype = strs[1]+" "+strs[2]+" "+strs[3];
+						  }else{
+							  unittype = strs[strs.length-1];
+						  }
+						  
+						    if(unittypeList[unittype]){
+								$(this).val(unittype);
+								$("#unittype_id").val(unittypeList[unittype]);
+								
+								if($("#unittype_id").val().length==0){
+									$("#unittype").val("");
+								}
+						    }else if(unittypeList[this.value]){
+						    	$("#unittype_id").val(unittypeList[this.value]);
+						    	
+						    	if($("#unittype_id").val().length==0){
+									$("#unittype").val("");
+								}
+						    }else{
+						    	$(this).val('');
+						    	$("#unittype_id").val("");
+						    }	
+						});
+	
+					}
+			  }
+		  },     
+		  error : function(res,error) { 
+			  $(document).sgPup({message:'message_alert',text: res.responseText});
+		  }    
+		});
+	});
+
+
+
+
+</script>
+</html>

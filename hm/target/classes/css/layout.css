@@ -1,0 +1,43 @@
+/* CSS Document */
+@charset "utf-8"; 
+
+#container {
+	width:1000px;
+	margin-left: auto;
+	margin-right: auto;
+	background-color:rgb(255,255,255);
+}
+#header {
+	height:50px;
+	background-color:#4791d2;
+	background-image:url(../images/logo.png) ;
+	background-repeat:no-repeat;
+}
+#welcome {
+	height:50px;
+	width:240px;
+	line-height:50px;
+	text-align:center;	
+	float:right;
+	color:#fff;
+}
+
+#main {
+	height:576px;
+	margin-top:0px;
+	margin-bottom:0px;
+	background-color:rgb(252,251,244);
+}
+#mainframe {
+	width:100%;
+	height:100%;
+	border:none;
+	background-color:rgb(252,251,244);
+}
+#footer {
+	text-align:center;	
+	height:40px;
+	line-height:40px;
+	background-color:#4791d2;
+	color:#fff;
+}

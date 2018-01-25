@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+<form id="upgrade_importForm" method="post" class="form" name="upgrade_importForm"  action="../../../upgrade/importUpgrade" target="import_imp" enctype="multipart/form-data">
+	<div class="form">
+		  
+		    <div class="panel" >
+                <span></span>
+            </div>
+             <div class="panel" >
+                <span>模板下载:</span>
+                <a href="../../../excelFile/空中升级导入模板.xls" id="sim0" >空中升级模板</a>
+            
+            </div>
+             <div class="panel">
+                <span>服务器IP:</span>
+                <input type='text' id='ip' name='ip'  required="true" value="58.250.47.120" style="width:155px;" />
+           	 </div>
+            
+            <div class="panel">
+                <span>服务器端口:</span>
+                <input type='text' id='port' name='port' required="true" value="10000" style="width:155px;" />
+            </div>
+			<div class="panel" >				
+				<input type="hidden" id="isOverride" name="isOverride" value="false"/>
+                <span>选择文件:</span>
+                <input type='file'  id='upgrade_file' name='upgrade_file'  style="width:150px;" />
+           	 </div>
+	</div>
+</form>
+<iframe name='import_imp' id="import_imp" style="display:none;" ></iframe> 
+</body>
+</html>
+<script type="text/javascript">
+function callback(msg,flag){ 
+		$(document).sgPup({message:'message_info',text: msg});
+		 //移除遮罩层
+		 $('div#imp_mask',window.document.body).remove();
+		 $(document).sgWindow('close',{id:'import_upgrade'});
+		 $('#monitoring').sgDatagrid('reload','sgDatagrid');
+
+}   
+</script>

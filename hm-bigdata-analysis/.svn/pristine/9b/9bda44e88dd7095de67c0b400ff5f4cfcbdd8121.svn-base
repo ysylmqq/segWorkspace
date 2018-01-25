@@ -1,0 +1,201 @@
+package com.hm.bigdata.dao.impl;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.hibernate.Query;
+import org.hibernate.transform.Transformers;
+import org.springframework.stereotype.Repository;
+
+import com.hm.bigdata.dao.AlarmDao;
+import com.hm.bigdata.entity.po.Alarm;
+import com.hm.bigdata.util.PageSelect;
+import com.hm.bigdata.util.StringUtils;
+import com.hm.bigdata.util.Utils;
+import com.hm.bigdata.util.page.Page;
+import com.hm.bigdata.util.page.PageUtil;
+
+/**
+ * @Package:com.gboss.dao.impl
+ * @ClassName:VehicleDaoImpl
+ * @Description:TODO
+ * @author:xiaoke
+ * @date:2014-3-24 下午3:01:56
+ */
+
+@Repository("AlarmDao")
+public class AlarmDaoImpl extends BaseDaoImpl implements AlarmDao {
+
+
+	@Override
+	public Page<HashMap<String, Object>> search(PageSelect<Alarm> pageSelect, Long subco_no) {
+		StringBuffer sbQuery =new StringBuffer( " SELECT an.*,veh.`plate_no`,cust.`customer_name`,cust.`address`   ");
+		StringBuffer sbCount =new StringBuffer( " SELECT count(1)  ");
+
+		StringBuffer sb =new StringBuffer();
+		sb.append(" FROM t_hm_alarm_analysis  an LEFT JOIN t_ba_unit unit ON an.call_letter = unit.call_letter ");
+		sb.append(" LEFT JOIN t_ba_vehicle veh ON veh.vehicle_id = unit.vehicle_id ");
+		sb.append(" LEFT JOIN t_ba_customer cust ON unit.customer_id = cust.customer_id  WHERE 1=1 ");
+		
+		if (Utils.isNotNullOrEmpty(subco_no)) {
+			sb.append(" and veh.subco_no = ").append(subco_no.toString());
+		}
+		
+		Map filter = pageSelect.getFilter();
+		String callLetter = (String) filter.get("call_letter");
+		if (StringUtils.isNotBlank(callLetter)) {
+			sb.append(" and an.call_letter like  '%").append(callLetter).append("%' ");
+		}
+		
+		String analysis_type = (String) filter.get("analysis_type");
+		if (StringUtils.isNotBlank(analysis_type)) {
+			if(!"0".equals(analysis_type)){
+				sb.append(" and an.analysis_type = ").append(analysis_type);
+			}
+		}
+		
+		String plate_no = (String) filter.get("plate_no");
+		if (StringUtils.isNotBlank(plate_no)) {
+			sb.append(" and veh.plate_no like  '%").append(plate_no).append("%' ");
+		}
+		
+		String customer_name = (String) filter.get("customer_name");
+		if (StringUtils.isNotBlank(customer_name)) {
+			sb.append(" and cust.customer_name like  '%").append(plate_no).append("%' ");
+		}
+		
+		String start_date = (String) filter.get("start_date");
+		if (StringUtils.isNotBlank(start_date)) {
+			start_date = start_date+" 00:00:00";
+			sb.append(" and an.gps_time >  '").append(start_date).append("' ");
+		}
+		
+		String end_date = (String) filter.get("end_date");
+		if (StringUtils.isNotBlank(end_date)) {
+			end_date = end_date+" 00:00:00";
+			sb.append(" and an.gps_time < '").append(end_date).append("' ");
+		}
+		
+		if (StringUtils.isNotBlank(pageSelect.getOrder())) {
+			sb.append(" order by ").append(pageSelect.getOrder());
+			if (pageSelect.getIs_desc()) {
+				sb.append(" desc");
+			} else {
+				sb.append(" asc");
+			}
+		}else{
+			sb.append(" order by an.analysis_id desc");
+		}
+		Query query = mysql1SessionFactory.getCurrentSession().createSQLQuery(sbQuery.append(sb).toString());  
+		query.setFirstResult(PageUtil.getPageStart(pageSelect.getPageNo(), pageSelect.getPageSize()));
+		query.setMaxResults(pageSelect.getPageSize());
+		query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+		List list=query.list();
+		
+		int count =((BigInteger)mysql1SessionFactory.getCurrentSession().createSQLQuery(sbCount.append(sb).toString()).uniqueResult()).intValue();//countAll(sb);
+	    return PageUtil.getPage(count, pageSelect.getPageNo(), list, pageSelect.getPageSize());
+	}
+
+	@Override
+	public List<Map<String, Object>> findAllAlarms(Map<String, Object> map) {
+		StringBuffer sb =new StringBuffer( " SELECT an.*,veh.`plate_no`,cust.`customer_name`,cust.`address`   ");
+		sb.append(" FROM t_hm_alarm_analysis  an LEFT JOIN t_ba_unit unit ON an.call_letter = unit.call_letter ");
+		sb.append(" LEFT JOIN t_ba_vehicle veh ON veh.vehicle_id = unit.vehicle_id ");
+		sb.append(" LEFT JOIN t_ba_customer cust ON unit.customer_id = cust.customer_id  WHERE 1=1 ");
+		
+		String subcoNo = (String) map.get("subcoNo");
+		if (StringUtils.isNotBlank(subcoNo)) {
+			sb.append(" and veh.subco_no = ").append(subcoNo);
+		}
+		
+		String callLetter = (String) map.get("call_letter");
+		if (StringUtils.isNotBlank(callLetter)) {
+			sb.append(" and an.call_letter like  '%").append(callLetter).append("%' ");
+		}
+		
+		String analysis_type = (String) map.get("analysis_type");
+		if (StringUtils.isNotBlank(analysis_type)) {
+			if( !"0".equals(analysis_type) ){
+				sb.append(" and an.analysis_type = ").append(analysis_type);
+			}
+		}
+		
+		String plate_no = (String) map.get("plate_no");
+		if (StringUtils.isNotBlank(plate_no)) {
+			sb.append(" and veh.plate_no like  '%").append(plate_no).append("%' ");
+		}
+		
+		String start_date = (String) map.get("start_date");
+		if (StringUtils.isNotBlank(start_date)) {
+			start_date = start_date+" 00:00:00";
+			sb.append(" and an.gps_time >  '").append(start_date).append("' ");
+		}
+		
+		String end_date = (String) map.get("end_date");
+		if (StringUtils.isNotBlank(end_date)) {
+			end_date = end_date+" 00:00:00";
+			sb.append(" and an.gps_time < '").append(end_date).append("' ");
+		}
+		String customer_name = (String) map.get("customer_name");
+		if (StringUtils.isNotBlank(customer_name)) {
+			sb.append(" and cust.customer_name like  '%").append(plate_no).append("%' ");
+		}
+		sb.append(" order by an.analysis_id desc");
+		Query query = mysql1SessionFactory.getCurrentSession().createSQLQuery(sb.toString());  
+		query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+		List list=query.list();
+		return list;
+	}
+
+	@Override
+	public List<Map<String, Object>> alarmCount(Map<String, Object> map) {
+		
+		StringBuffer sbCount1 =new StringBuffer( " SELECT count(1)  FROM t_hm_alarm_analysis an WHERE 1=1  ");
+		StringBuffer sbCount2 =new StringBuffer( " SELECT COUNT(DISTINCT(call_letter)) as count FROM t_hm_alarm_analysis an WHERE 1=1  ");
+
+		String start_date = (String) map.get("start_date");
+		if (StringUtils.isNotBlank(start_date)) {
+			start_date = start_date+" 00:00:00";
+			sbCount1.append(" and an.gps_time >  '").append(start_date).append("' ");
+			sbCount2.append(" and an.gps_time >  '").append(start_date).append("' ");
+		}
+		
+		String end_date = (String) map.get("end_date");
+		if (StringUtils.isNotBlank(end_date)) {
+			end_date = end_date+" 23:59:59";
+			sbCount1.append(" and an.gps_time < '").append(end_date).append("' ");
+			sbCount2.append(" and an.gps_time < '").append(end_date).append("' ");
+		}
+		
+		sbCount1.append(" and an.analysis_type  = ");
+		
+		List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+		int countVehicle = ((BigInteger)mysql1SessionFactory.getCurrentSession().createSQLQuery(sbCount2.toString()).uniqueResult()).intValue();  
+		Map<String, Object> countVehicleMap = new HashMap<String,Object>();
+		countVehicleMap.put("value", countVehicle);
+		list.add(countVehicleMap);
+
+		int type1 = ((BigInteger)mysql1SessionFactory.getCurrentSession().createSQLQuery(sbCount1.toString()+" 1 ").uniqueResult()).intValue();  
+		Map<String, Object> result1 = new HashMap<String,Object>();
+		result1.put("value", type1);
+		result1.put("name", "侧翻");
+
+		int type2 = ((BigInteger)mysql1SessionFactory.getCurrentSession().createSQLQuery(sbCount1.toString()+" 2 ").uniqueResult()).intValue();  
+		Map<String, Object> result2 = new HashMap<String,Object>();
+		result2.put("value", type2);
+		result2.put("name", "碰撞");
+		
+		int type3 = ((BigInteger)mysql1SessionFactory.getCurrentSession().createSQLQuery(sbCount1.toString()+" 3 ").uniqueResult()).intValue();  
+		Map<String, Object> result3 = new HashMap<String,Object>();
+		result3.put("value", type3);
+		result3.put("name", "主电切断");
+		list.add(result1);
+		list.add(result2);
+		list.add(result3);
+		return list;
+	}
+
+}

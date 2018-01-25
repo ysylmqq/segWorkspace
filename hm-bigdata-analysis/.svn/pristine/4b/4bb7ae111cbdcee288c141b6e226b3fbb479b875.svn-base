@@ -1,0 +1,220 @@
+package com.hm.bigdata.util.hbase;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+
+import org.apache.hadoop.hbase.KeyValue;
+import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.HTableInterface;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import com.hm.bigdata.comm.SystemConfig;
+import com.hm.bigdata.entity.po.Alarm;
+import com.hm.bigdata.entity.po.Fault;
+import com.hm.bigdata.entity.po.GBossDataBuff;
+import com.hm.bigdata.entity.po.GBossDataBuff.FaultDefine;
+import com.hm.bigdata.entity.po.GBossDataBuff.FaultInfo;
+import com.hm.bigdata.entity.po.GBossDataBuff.GpsBaseInfo;
+import com.hm.bigdata.service.VehicleService;
+import com.hm.bigdata.util.StringUtils;
+
+
+
+/**
+ * 从hbase当中过了查询出侧翻,碰撞,主电切断，故障
+ * @author ysy
+ *
+ */
+@Service
+public class AlarmFilterHbase {
+	
+	final static Logger logger = Logger.getLogger(AlarmFilterHbase.class);
+	private static byte[] family = "gps".getBytes();
+	private static byte[] qualifier_base = "baseinfo".getBytes();
+	private static final SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	/**
+	 * 线程安全的并发队列
+	 */
+	public static Queue<Alarm> alarmQueue = new ConcurrentLinkedQueue<Alarm>();
+	public static Queue<Fault> faultQueue = new ConcurrentLinkedQueue<Fault>();
+	
+	/**
+	 * 警情表
+	 */
+	final private  static String  alarmTableName = "t_history";
+	
+	/**
+	 * 故障表
+	 */
+	final private  static String  faultTableName = "t_fault";
+	
+	
+	@Autowired
+	@Qualifier("vehicleService")
+	private VehicleService vehicleService;
+	
+	@Autowired
+	@Qualifier("SystemConfig")
+	private SystemConfig systemConfig;
+	
+	public void scanAlarmTable() throws IOException{
+		HTableInterface alarmTable = HbaseUtils.getHConnection().getTable(alarmTableName);
+
+		List<Map<String,Object>> list = vehicleService.findHmVehicles(null);
+		long endTime = System.currentTimeMillis();
+		for (int i = 0; i < list.size(); i++) {
+			Map<String,Object> map = list.get(i);
+			String callLetter = (String) map.get("callLetter");
+			logger.info(callLetter);
+			if (StringUtils.isNotBlank(callLetter)) {
+				//2017-07-01 23:59:59 1498924799000   2017-12-05 23:59:59 1512489599000
+				
+				//byte[] startKey = HBaseKeyUtil.getKey(callLetter, endTime - 1000*60*60*24*1);	
+				byte[] startKey = HBaseKeyUtil.getKey(callLetter, 1498924799000L);	
+				byte[] endKey = HBaseKeyUtil.getKey(callLetter, 1512489599000L); 
+				//byte[] endKey = HBaseKeyUtil.getKey(callLetter, endTime); 
+				Scan scan = new Scan(startKey, endKey);
+				scan.setReversed(true);
+				ResultScanner resultScanner = alarmTable.getScanner(scan);
+				boolean flag1 = false;
+				for (Result result : resultScanner) {
+					flag1 = false;
+					byte[] data = result.getValue(family, qualifier_base);
+					if (data != null) {
+						GpsBaseInfo gpsBaseInfo = GBossDataBuff.GpsBaseInfo.parseFrom(data);
+						gpsBaseInfo.getObdInfo().getAverageOil();
+						Alarm alarm = new Alarm();
+						StringBuilder sb = new StringBuilder();
+						List<Integer> status = gpsBaseInfo.getStatusList();
+						// 4  主电切断    12 碰撞报警    78侧翻报警;警情类型.1侧翻,2碰撞,3主电切断
+						if(status.contains(78)){
+							sb.append("1");
+							flag1 = true;
+						}
+						if(status.contains(12)){
+							sb.append("2");
+							flag1 = true;
+						}
+						if(status.contains(4)){
+							sb.append("3");
+							flag1 = true;
+						}
+						//4  主电切断    12 碰撞报警    78侧翻报警; 这三类警情 并且定位成功
+						if(flag1 && gpsBaseInfo.getLoc()){
+							alarm.setCall_letter(callLetter);
+							alarm.setGps_time(new Date(gpsBaseInfo.getGpsTime()));
+							alarm.setCourse(gpsBaseInfo.getCourse());
+							alarm.setIs_location( gpsBaseInfo.getLoc()? 1:0);
+							alarm.setLat(gpsBaseInfo.getLat());
+							alarm.setLng(gpsBaseInfo.getLng());
+							alarm.setOil(gpsBaseInfo.getObdInfo().getAverageOil()); //平均油耗
+							alarm.setOil_percent(gpsBaseInfo.getOilPercent());
+							alarm.setSpeed(gpsBaseInfo.getSpeed());
+							alarm.setStatus(status.toString());
+							alarm.setTemperature1(gpsBaseInfo.getObdInfo().getWaterTemperature()); // 冷却液温度
+							alarm.setTemperature2(gpsBaseInfo.getTemperature2());
+							alarm.setTotal_distance(gpsBaseInfo.getObdInfo().getTotalDistance());  // 总里程
+							alarm.setAnalysis_type(sb.toString());
+							logger.info("callLetter "+callLetter+"  "+gpsBaseInfo.getGpsTime()+" gpsTime =  "+datetimeFormat.format(new Date(gpsBaseInfo.getGpsTime()))
+								+" status = "+gpsBaseInfo.getStatusList().toString()
+							);
+							alarmQueue.offer(alarm);
+						}
+					}
+				}
+			}
+		}
+		alarmTable.close();
+	}
+	
+	public void scanFaultTable() throws IOException{
+		HTableInterface falutTable = HbaseUtils.getHConnection().getTable(faultTableName);
+
+		List<Map<String,Object>> list = vehicleService.findHmVehicles(null);
+		long endTime = System.currentTimeMillis();
+		for (int i = 0; i < list.size(); i++) {
+			Map<String,Object> map = list.get(i);
+			String callLetter = (String) map.get("callLetter");
+			logger.info(callLetter);
+			if (StringUtils.isNotBlank(callLetter)) {
+				//byte[] startKey = HBaseKeyUtil.getKey(callLetter, endTime - 1000*60*60*24*1);	//2016-12-31 23:59:59 1483199999000
+				byte[] startKey = HBaseKeyUtil.getKey(callLetter, 1498924799000L);
+				byte[] endKey = HBaseKeyUtil.getKey(callLetter, 1512489599000L); 
+				//byte[] endKey = HBaseKeyUtil.getKey(callLetter, endTime);
+				Scan scan = new Scan(startKey, endKey);
+				scan.setReversed(true);	
+				ResultScanner resultScanner = falutTable.getScanner(scan);
+				for (Result result : resultScanner) {
+					byte[] data = result.getValue("fault".getBytes(), "data".getBytes());
+					if (data != null) {
+						FaultInfo faultInfo = GBossDataBuff.FaultInfo.parseFrom(data);
+						List<FaultDefine> listFaultDefine = faultInfo.getFaultsList();
+						for (int j = 0; j < listFaultDefine.size(); j++) {
+							FaultDefine faultDefine = listFaultDefine.get(j);
+							int faultType = faultDefine.getFaultType();
+							List<String> faultCodelist =  faultDefine.getFaultCodeList();
+							for (int k = 0; k < faultCodelist.size(); k++) {
+								String faultCode = faultCodelist.get(k);
+								Fault fault = new Fault();
+								fault.setCall_letter(callLetter);
+								fault.setStarttime(new Date(faultInfo.getFaultTime()));
+								fault.setFaultcode(faultCode);
+								fault.setSubco_no(201);
+								fault.setFaulttypeid(faultType);
+								logger.info("callLetter "+callLetter+"  "+new Date(faultInfo.getFaultTime())
+								+" faultCode = "+fault.getFaultcode()+" faultTypeId = "+faultType);
+								faultQueue.offer(fault);
+							}
+						}
+					}
+				}
+			}
+		}
+		falutTable.close();
+	}
+	
+	int isContains(List<Integer> status){
+		String  alarmType = systemConfig.getAlarmfaultType();
+		String[] strArray = alarmType.trim().split(",");
+		List<Integer> list = new ArrayList<Integer>();
+		for (int i = 0; i < strArray.length; i++) {
+			list.add(Integer.parseInt(strArray[i]));
+		}
+		list.retainAll(status);
+		if(list.isEmpty()){
+			return 0;
+		}else{
+			return list.get(0);
+		}
+	}
+	
+	public static void main(String[] args) {
+		Date date =	new Date(117, 6, 1, 23, 59, 59);
+		SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String str = datetimeFormat.format(date); 
+		
+		Date date1 = new Date(117, 11, 5, 23, 59, 59);
+		String str1 = datetimeFormat.format(date1); 
+		
+		System.err.println(str+" "+date.getTime() );
+		System.err.println(str1+" "+date1.getTime() );
+	}
+}

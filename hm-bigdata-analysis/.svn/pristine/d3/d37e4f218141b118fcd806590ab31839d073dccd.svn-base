@@ -1,0 +1,122 @@
+/**
+ * 该文件定义 数据库到视图的字段映射
+ */
+~function(){
+	var DataToView = {};
+	// Example:
+	/**
+	 * @param {String}
+	 *            id 列ID
+	 * @param {Object}
+	 *            totalSummary 汇总
+	 * @param {String}
+	 *            field 数据库字段名称
+	 * @param {String}
+	 *            show 前端显示的列名称
+	 * @param {String}
+	 *            align 缩进方式
+	 * @param {String}
+	 *            render 单元格渲染方法名
+	 * @param {Boolean}
+	 *            isSort 是否允许排序
+	 * @param {Number}
+	 *            span 详情表格-占据几行
+	 */
+	void	{	
+	 			id:'id',
+	 			field:'database_field',
+	 			show:'对应列的标题名称',
+	 			align:'right',
+	 			render:'cellRenderFunction',
+	 			isSort:false,
+	 			span: 2,
+	 			func: '详情表格方法名'
+			}
+
+	// 示例代码
+	DataToView.grid = [
+		{field:'CustomerID', show:'主键', align:'right'},
+		{field:'CompanyName', show:'公司名', width:140}
+	];
+	DataToView.gridAll = [
+		{show: '主键', field: 'CustomerID', align: 'left', width: 120 } ,
+        { show: '公司名', field: 'CompanyName', minWidth: 60 },
+        { show: '联系名', field: 'ContactName', width: 50, align: 'left' },
+        { show: '联系名', field: 'ContactName', minWidth: 140 }, 
+        { show: '城市', field: 'City', span: 2, func:'infoDialogColumnRender' }
+	];
+	/*************************首页各种统计数据点击展示页面*********************************/
+	/*DataToView.qjdbjxqURL = {
+			query:'../twgCount/queryCollectAlarmDetail'
+	}
+	DataToView.qjdbjxq = [
+	    {show:'车牌号码', field:'numberPlate', width:140,align:'center'}
+	];*/
+	DataToView.carcheckURL = {
+			query:'../alarm/getFaults.page'
+	}
+	DataToView.carcheck = [
+	    {show:'客户名', field:'customer_name', width:140,align:'center'},
+	    {show:'车牌号码', field:'plate_no', width:140,align:'center'},
+	    {show:'呼号', field:'call_letter', width:140,align:'center'},
+	    {show:'故障类型',field:'fault_type',width:160,align:'center',render:'renderOpt'},
+	    {show:'定位时间', field:'gps_time', width:140,align:'center'},
+	    {show:'是否定位', field:'is_location', width:140,align:'center'},
+	    {show:'纬度', field:'lat', width:140,align:'center'},
+	    {show:'经度', field:'lng', width:140,align:'center'},
+	    {show:'速度', field:'speed', width:140,align:'center'},
+	    {show:'方向', field:'course', width:140,align:'center'},
+	    {show:'总里程', field:'speed', width:140,align:'center'},
+	    {show:'油耗', field:'speed', width:140,align:'center'},
+	    {show:'温度', field:'speed', width:140,align:'center'}
+	];
+	
+	window.D2V = DataToView;
+}();
+function renderOpt(rowdata,index,value){
+	if(value=="2"){
+		return "申请故障服务";
+	}else if(value=="9"){
+		return "手柄故障";
+	}else if(value=="20"){
+		return "遥控器故障";
+	}else if(value=="34"){
+		return "发动机故障";
+	}else if(value=="37"){
+		return "备电故障";
+	}else if(value=="45"){
+		return "CAN通讯故障";
+	}else if(value=="46"){
+		return "碰撞检测故障";
+	}else if(value=="47"){
+		return "通讯模块故障";
+	}else if(value=="48"){
+		return "三轴向加速度传感器故障";
+	}else if(value=="50"){
+		return "GSM故障";
+	}else if(value=="51"){
+		return "LCD故障";
+	}else if(value=="52"){
+		return "键盘故障";
+	}else if(value=="53"){
+		return "计价器故障";
+	}else if(value=="66"){
+		return "GPS天线故障";
+	}else if(value=="96"){
+		return "总线故障";
+	}else if(value=="97"){
+		return "锁车电路故障";
+	}else if(value=="161"){
+		return "远程诊断读故障报警";
+	}else if(value=="185"){
+		return "远程诊断模块故障";
+	}else if(value=="207"){
+		return "故障灯上报";
+	}else if(value=="212"){
+		return "OBD故障码上报";
+	}else if(value=="231"){
+		return "绝缘故障";
+	}else{
+		return "-";
+	}
+}

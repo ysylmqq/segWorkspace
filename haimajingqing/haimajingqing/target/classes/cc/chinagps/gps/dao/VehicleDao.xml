@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.chinagps.gps.dao.VehicleDao">
+	<!-- <select id="selectHaimaCars" resultType="carInfo">
+		SELECT v.vehicle_id as vehicleId,v.color as color,u.call_letter  as callLetter,
+			bc.id_no as id,bc.customer_name as customerName
+		FROM t_ba_cust_vehicle cv 
+		JOIN t_ba_customer bc ON bc.customer_id=cv.customer_id
+		JOIN t_ba_vehicle v ON cv.vehicle_id=v.vehicle_id
+		JOIN t_ba_unit u ON v.vehicle_id=u.vehicle_id  
+		WHERE v.subco_no=201 AND (u.service_date between DATE_FORMAT(#{startTime},"%Y-%m-%d %H:%i:%s") AND  DATE_FORMAT(#{endTime},"%Y-%m-%d %H:%i:%s")) 
+		ORDER BY RAND() LIMIT 10
+		
+	</select> -->
+	
+	<select id="selectHaimaCars" resultType="carInfo">
+		SELECT u.call_letter as callLetter,v.vehicle_id as vehicleId
+		FROM t_ba_cust_vehicle cv 
+		JOIN t_ba_customer bc ON bc.customer_id=cv.customer_id
+		JOIN t_ba_vehicle v ON cv.vehicle_id=v.vehicle_id
+		JOIN t_ba_unit u ON v.vehicle_id=u.vehicle_id  
+		WHERE v.subco_no=201 and u.reg_status!=4	
+	</select>
+	
+	<select id="selectEnterNetHaimaCars" resultType="carInfo">
+		SELECT v.vehicle_id as vehicleId,v.color as color,u.call_letter  as callLetter,
+			bc.id_no as id,bc.customer_name as customerName
+		FROM t_ba_cust_vehicle cv 
+		JOIN t_ba_customer bc ON bc.customer_id=cv.customer_id
+		JOIN t_ba_vehicle v ON cv.vehicle_id=v.vehicle_id
+		JOIN t_ba_unit u ON v.vehicle_id=u.vehicle_id
+		WHERE v.subco_no=201 AND (u.create_date between DATE_FORMAT("2016-01-01","%Y-%m-%d") AND  DATE_FORMAT("2016-11-01","%Y-%m-%d")) 
+	</select>
+	
+	<update id="saveTempHaimaGps" parameterType="java.util.List">
+		insert into t_gps_pengzhuangbaojing(call_letter,gps_time,loc,lat,lng,speed,
+		course,total_distance,oil,oil_percent,temperature1,temperature2,status) values
+		<foreach collection="list" item="item" index="index" separator="," >
+			(#{item.callLetter},#{item.gpsTime},#{item.loc},#{item.lat},#{item.lng},#{item.speed},
+			#{item.course},#{item.totalDistance},#{item.oil},#{item.oilPercent},#{item.temperature1},#{item.temperature2},#{item.status})
+			<!-- ON DUPLICATE KEY UPDATE 
+			call_letter=#{item.callLetter},vehicle_id=#{item.vehicleId},gps_time=#{item.gpsTime},
+			loc=#{item.loc},lat=#{item.lat},lng=#{item.lng},speed=#{item.speed},
+			course=#{item.course},total_distance=#{item.totalDistance},
+			oil=#{item.oil},oil_percent=#{item.oilPercent},
+			temperature1=#{item.temperature1},temperature2=#{item.temperature2},status=#{item.status} -->
+		</foreach>
+	</update>
+	
+</mapper>

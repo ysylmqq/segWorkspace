@@ -1,0 +1,52 @@
+/* CSS Document */
+@charset "utf-8";
+
+.tab_container {
+	margin: 2px;
+	padding: 0px;
+}
+ul.tabs {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	height: 32px; /* 选项卡标签高度*/
+	border-bottom: 1px solid #cbcbd5;
+	border-left: 1px solid #cbcbd5;
+}
+ul.tabs li {
+	float: left;
+	margin: 0;
+	padding: 0;
+	height: 31px;
+	line-height: 31px;
+	border: 1px solid #cbcbd5;
+	border-left: none;
+	background: #e2e5ec;
+	overflow: hidden;
+}
+ul.tabs li a {
+	text-decoration: none;
+	color: #000;
+	display: block;
+	font-size: 12px;;
+	padding: 0 20px;
+}
+ul.tabs li a:hover {
+	background: #ecf1f7;
+}
+/* 激活的选项卡标签显示方式*/	
+html ul.tabs li.active, html ul.tabs li.active a:hover  {
+	background: #fff;
+	border-bottom: 1px solid #fff; /* 隐藏激活的选项卡标签下边框*/	
+}
+.tab_div_container {
+	border: 1px solid #cbcbd5;
+	border-top: none;/* 无上边框*/
+	width: 100%;
+	background: #fff;
+}
+.tab_content {
+	padding: 5px;
+	font-size: 12px;
+    overflow: auto;
+}

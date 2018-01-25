@@ -1,0 +1,47 @@
+package com.hm.bigdata.dao;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.hm.bigdata.entity.po.Alarm;
+import com.hm.bigdata.entity.po.Vehicle;
+import com.hm.bigdata.util.PageSelect;
+import com.hm.bigdata.util.page.Page;
+
+/**
+ * @Package:com.gboss.dao
+ * @ClassName:VehicleDao
+ * @Description:TODO 从门店copy过来，以后可能会改成静态数据（搜索引擎）
+ * @author:xiaoke
+ * @date:2014-3-24 下午2:56:45
+ */
+public interface AlarmDao extends BaseDao {
+	
+	
+	public Page<HashMap<String, Object>> search(PageSelect<Alarm> pageSelect, Long subco_no);
+	
+	/**
+	 *查询所有的警情
+	 * @param map
+	 * @return
+	 */
+	public List<Map<String, Object>> findAllAlarms(Map<String, Object> map);
+
+	/**
+	 * 警情报表统计
+	 * @param map
+	 * @return
+	 */
+	public  List<Map<String, Object>> alarmCount(Map<String, Object> map);
+
+	/**
+	 * 故障报表统计
+	 * @param map
+	 * @return
+	 */
+	public List<Map<String, Object>> faultCount(Map<String, Object> map);
+	
+	
+}
+

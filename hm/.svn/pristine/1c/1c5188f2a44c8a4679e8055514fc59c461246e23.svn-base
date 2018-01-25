@@ -1,0 +1,211 @@
+package com.gboss.service.impl;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.gboss.comm.SystemConst;
+import com.gboss.comm.SystemException;
+import com.gboss.dao.FCCmdManageDao;
+import com.gboss.pojo.FlowCtrolCmd;
+import com.gboss.pojo.FlowCtrolCmdHistory;
+import com.gboss.pojo.SimCardInfo;
+import com.gboss.service.FCCmdManageService;
+import com.gboss.util.PageSelect;
+import com.gboss.util.StringUtils;
+import com.gboss.util.page.Page;
+import com.gboss.util.page.PageUtil;
+
+@Service("fcCmdManageService")
+@Transactional
+public class FCCmdManageServiceImpl extends BaseServiceImpl implements FCCmdManageService {
+
+	@Autowired
+	@Qualifier("cmdManageDao")
+	private FCCmdManageDao cmdManageDao;
+
+	@Override
+	public Page<HashMap<String, Object>> getAllSimPage(HttpServletRequest request, Long companyId,
+			PageSelect<Map<String, Object>> pageSelect) throws SystemException {
+		int total = cmdManageDao.countAllSim(companyId, pageSelect.getFilter());
+
+		List<HashMap<String, Object>> list = cmdManageDao.getAllSimPage(companyId, pageSelect.getFilter(),
+				pageSelect.getOrder(), pageSelect.getIs_desc(), pageSelect.getPageNo(), pageSelect.getPageSize());
+		
+		return PageUtil.getPage(total, pageSelect.getPageNo(), list, pageSelect.getPageSize());
+	}
+
+	@Override
+	public void updateFankongCmd(String simIds,String opType) {
+		cmdManageDao.updateRemoteCtrlStatus(simIds,opType);
+	}
+
+	@Override
+	public boolean openNaviHostCmd(String[] callLettes) {
+		boolean reSult = true;
+		//1.需要发送查车指令
+		HashMap<String, Object> reMap = sendSearchCmd(callLettes);
+		if(((String)reMap.get("success")).equals("false")){
+			return false;
+		}
+		//2.更新状态
+		
+		//2.发送导航主机开启指令；
+		
+		
+		
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @Description:下发查车指令;
+	 * @Params:
+	 * @Return:boolean
+	 * @Author:cj
+	 * @Date:2017年7月19日 上午11:19:21
+	 */
+	public HashMap<String, Object> sendSearchCmd(String[] callLeArr){
+		HashMap<String, Object> reMap = new HashMap<String, Object>();
+		boolean reSult = true;
+		
+		for (String call_letter : callLeArr) {
+			ArrayList<String> callLetters = new ArrayList<String>();
+			callLetters.add(call_letter);
+			String cmdSn = SystemConst.clienthandler.SendCommand(callLetters, 0x01, null, false);
+			
+			if(cmdSn.equals("")){
+				reSult = false;
+				System.out.println("查车指令下发失败!sn=" + cmdSn);
+			}else{
+				reSult = true;
+				System.out.println("查车指令下发成功!sn=" + cmdSn);
+			}
+			reMap.put("success", reSult);
+			reMap.put("cmdSn", cmdSn);
+		}
+		
+		return reMap;
+	}
+
+	@Override
+	public List<FlowCtrolCmd> getFlowCtrlList(Integer cmdId) {
+		return cmdManageDao.getFlowCtrlList(cmdId);
+	}
+
+	@Override
+	public List<FlowCtrolCmd> getFlowCtrlAllList(Integer cmdId) {
+		return cmdManageDao.getFlowCtrlAllList(cmdId);
+	}
+
+	@Override
+	public FlowCtrolCmd getFlowCtrolByCallLetter(Integer cmdId, String call_letter) {
+		return cmdManageDao.getFlowCtrolByCallLetter(cmdId,call_letter);
+	}
+
+	@Override
+	public SimCardInfo getSimByCallLetter(String call_letter) {
+		return cmdManageDao.getSimByCallLetter(call_letter);
+	}
+
+	@Override
+	public FlowCtrolCmdHistory fcSendCmdTransHistory(FlowCtrolCmd flowCtrolCmd) {
+		if(flowCtrolCmd == null ||flowCtrolCmd.getId() == null){
+			return null;
+		}
+		FlowCtrolCmdHistory flowCtrolCmdHistory = new FlowCtrolCmdHistory();
+				
+		if(flowCtrolCmd.getId() != null){
+			flowCtrolCmdHistory.setId(flowCtrolCmd.getId());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getCallLetter())){
+			flowCtrolCmdHistory.setCallLetter(flowCtrolCmd.getCallLetter());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getCmdId())){
+			flowCtrolCmdHistory.setCmdId(flowCtrolCmd.getCmdId());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getCmdSn())){
+			flowCtrolCmdHistory.setCmdSn(flowCtrolCmd.getCmdSn());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getCmdParams())){
+			flowCtrolCmdHistory.setCmdParams(flowCtrolCmd.getCmdParams());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getSendTime())){
+			flowCtrolCmdHistory.setSendTime(flowCtrolCmd.getSendTime());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getRespTime())){
+			flowCtrolCmdHistory.setRespTime(flowCtrolCmd.getRespTime());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getRespCode())){
+			flowCtrolCmdHistory.setRespCode(flowCtrolCmd.getRespCode());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getFlag())){
+			flowCtrolCmdHistory.setFlag(flowCtrolCmd.getFlag());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getCurrNaviStatus())){
+			flowCtrolCmdHistory.setCurrNaviStatus(flowCtrolCmd.getCurrNaviStatus());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getTosetNaviStatus())){
+			flowCtrolCmdHistory.setTosetNaviStatus(flowCtrolCmd.getTosetNaviStatus());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getCurrFlowctrlStatus())){
+			flowCtrolCmdHistory.setCurrFlowctrlStatus(flowCtrolCmd.getCurrFlowctrlStatus());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getTosetFlowctrlStatus())){
+			flowCtrolCmdHistory.setTosetFlowctrlStatus(flowCtrolCmd.getTosetFlowctrlStatus());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getStamp())){
+			flowCtrolCmdHistory.setStamp(flowCtrolCmd.getStamp());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getRemark())){
+			flowCtrolCmdHistory.setRemark(flowCtrolCmd.getRemark());
+		}
+		
+		if(StringUtils.isNotNullOrEmpty(flowCtrolCmd.getOpId())){
+			flowCtrolCmdHistory.setOpId(flowCtrolCmd.getOpId());
+		}
+		return flowCtrolCmdHistory;
+	}
+
+	@Override
+	public Page<HashMap<String, Object>> getAllCmdLogInfo(HttpServletRequest request, Long companyId,
+			PageSelect<Map<String, Object>> pageSelect) throws SystemException {
+		int total = cmdManageDao.countAllLogInfo(companyId, pageSelect.getFilter());
+
+		List<HashMap<String, Object>> list = cmdManageDao.getAllCmdLogInfo(companyId, pageSelect.getFilter(),
+				pageSelect.getOrder(), pageSelect.getIs_desc(), pageSelect.getPageNo(), pageSelect.getPageSize());
+		
+		return PageUtil.getPage(total, pageSelect.getPageNo(), list, pageSelect.getPageSize());
+	}
+
+	@Override
+	public ConcurrentHashMap<String, ArrayList<FlowCtrolCmd>> getAllSendSearchMap() {
+		
+		return cmdManageDao.getAllSendSearchMap();
+	}
+	
+}

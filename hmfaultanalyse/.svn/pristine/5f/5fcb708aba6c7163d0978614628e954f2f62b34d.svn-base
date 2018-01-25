@@ -1,0 +1,843 @@
+2016-11-11 11:00:09 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-11 11:00:09 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:41)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-11 11:00:11 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-11 11:00:11 - Process identifier=hconnection-0x3ca6a831 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-11 11:00:12 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-11 11:04:12 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-11 11:04:12 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:41)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-11 11:04:12 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-11 11:04:12 - Process identifier=hconnection-0x8bf290b connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-11 11:04:13 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-11 11:05:47 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-11 11:05:47 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-11 11:05:48 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-11 11:05:48 - Process identifier=hconnection-0x14c8c644 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-11 11:05:49 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-11 11:58:18 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-11 11:58:18 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-11 11:58:19 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-11 11:58:19 - Process identifier=hconnection-0x1b45c0e connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-11 11:58:20 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-11 13:01:11 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-11 13:01:11 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-11 13:01:12 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-11 13:01:12 - Process identifier=hconnection-0x11f0a5a1 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-11 13:01:13 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-11 13:02:52 - Call exception, tries=10, retries=13, started=38538 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:03:02 - Call exception, tries=11, retries=13, started=48628 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:03:29 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-11 13:03:29 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-11 13:03:30 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-11 13:03:30 - Process identifier=hconnection-0x68dc098b connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-11 13:03:30 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-11 13:04:58 - Call exception, tries=10, retries=13, started=38386 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:05:08 - Call exception, tries=11, retries=13, started=48445 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:05:29 - Call exception, tries=12, retries=13, started=68633 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:06:07 - Call exception, tries=10, retries=13, started=38388 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:06:17 - Call exception, tries=11, retries=13, started=48484 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:06:37 - Call exception, tries=12, retries=13, started=68542 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:07:16 - Call exception, tries=10, retries=13, started=38356 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:07:26 - Call exception, tries=11, retries=13, started=48393 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:07:46 - Call exception, tries=12, retries=13, started=68578 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:08:25 - Call exception, tries=10, retries=13, started=38394 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:08:35 - Call exception, tries=11, retries=13, started=48490 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:08:55 - Call exception, tries=12, retries=13, started=68591 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:09:34 - Call exception, tries=10, retries=13, started=38318 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:09:44 - Call exception, tries=11, retries=13, started=48422 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:10:04 - Call exception, tries=12, retries=13, started=68555 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:10:43 - Call exception, tries=10, retries=13, started=38378 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:10:53 - Call exception, tries=11, retries=13, started=48473 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:11:14 - Call exception, tries=12, retries=13, started=68612 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:11:54 - Call exception, tries=10, retries=13, started=38375 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:12:04 - Call exception, tries=11, retries=13, started=48409 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:12:24 - Call exception, tries=12, retries=13, started=68568 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:13:07 - Call exception, tries=10, retries=13, started=38421 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:13:17 - Call exception, tries=11, retries=13, started=48441 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:13:37 - Call exception, tries=12, retries=13, started=68488 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:14:25 - Call exception, tries=10, retries=13, started=38257 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:14:35 - Call exception, tries=11, retries=13, started=48322 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:14:55 - Call exception, tries=12, retries=13, started=68365 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:15:44 - Call exception, tries=10, retries=13, started=38387 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:15:54 - Call exception, tries=11, retries=13, started=48451 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:16:14 - Call exception, tries=12, retries=13, started=68618 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:17:02 - Call exception, tries=10, retries=13, started=38419 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:17:12 - Call exception, tries=11, retries=13, started=48458 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:17:32 - Call exception, tries=12, retries=13, started=68478 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:18:21 - Call exception, tries=10, retries=13, started=38318 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:18:31 - Call exception, tries=11, retries=13, started=48329 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-11 13:18:51 - Call exception, tries=12, retries=13, started=68371 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-14 08:50:26 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 08:50:26 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-14 08:50:27 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 08:50:27 - Process identifier=hconnection-0x1b45c0e connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 08:50:28 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 08:52:20 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 08:52:20 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-14 08:52:20 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 08:52:20 - Process identifier=hconnection-0x1b45c0e connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 08:52:20 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 08:53:02 - Call exception, tries=10, retries=13, started=38531 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-14 08:53:12 - Call exception, tries=11, retries=13, started=48578 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-14 08:53:32 - Call exception, tries=12, retries=13, started=68750 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-14 08:54:02 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 08:54:02 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-14 08:54:02 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 08:54:02 - Process identifier=hconnection-0x1fb19a0 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 08:54:02 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 09:19:27 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 09:19:27 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-14 09:19:28 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 09:19:28 - Process identifier=hconnection-0x6e005dc9 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 09:19:28 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 09:20:22 - Call exception, tries=10, retries=13, started=38468 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-14 09:20:32 - Call exception, tries=11, retries=13, started=48515 ms ago, cancelled=false, msg=row 't_fault,e7 7�v�������,99999999999999' on table 'hbase:meta' at region=hbase:meta,,1.1588230740, hostname=hbase05,16020,1476675418713, seqNum=0
+2016-11-14 09:22:03 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 09:22:03 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-14 09:22:03 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 09:22:04 - Process identifier=hconnection-0x6e005dc9 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 09:22:04 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 11:33:36 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 11:33:36 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at hbase.HbaseManager.main(HbaseManager.java:60)
+2016-11-14 11:33:37 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 11:33:37 - Process identifier=hconnection-0x48aca48b connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 11:33:38 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 11:34:31 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 11:34:31 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at hbase.HbaseManager.main(HbaseManager.java:60)
+2016-11-14 11:34:31 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 11:34:31 - Process identifier=hconnection-0x4efac082 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 11:34:32 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 11:53:41 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 11:53:41 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at hbase.HbaseManager.main(HbaseManager.java:60)
+2016-11-14 11:53:41 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 11:53:42 - Process identifier=hconnection-0x4efac082 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 11:53:42 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 12:02:59 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 12:02:59 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at hbase.HbaseManager.main(HbaseManager.java:60)
+2016-11-14 12:02:59 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 12:02:59 - Process identifier=hconnection-0x4efac082 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 12:03:00 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 12:04:46 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 12:04:46 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at hbase.HbaseManager.main(HbaseManager.java:60)
+2016-11-14 12:04:47 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 12:04:48 - Process identifier=hconnection-0x48aca48b connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 12:04:48 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 12:12:31 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 12:12:31 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-14 12:12:32 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 12:12:32 - Process identifier=hconnection-0x4eaf3684 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 12:12:32 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 12:17:05 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 12:17:05 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-14 12:17:05 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 12:17:05 - Process identifier=hconnection-0x4eaf3684 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 12:17:06 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 12:17:38 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 12:17:38 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-14 12:17:38 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 12:17:38 - Process identifier=hconnection-0x40317ba2 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 12:17:38 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 12:22:00 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 12:22:00 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-14 12:22:01 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 12:22:01 - Process identifier=hconnection-0x4eaf3684 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 12:22:01 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 12:23:08 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 12:23:08 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:225)
+	at org.apache.hadoop.hbase.security.UserProvider.<clinit>(UserProvider.java:56)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:214)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at hbase.HbaseManager.main(HbaseManager.java:60)
+2016-11-14 12:23:09 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 12:23:09 - Process identifier=hconnection-0x4efac082 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 12:23:09 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 14:47:12 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 14:47:12 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.UserGroupInformation.initialize(UserGroupInformation.java:257)
+	at org.apache.hadoop.security.UserGroupInformation.ensureInitialized(UserGroupInformation.java:234)
+	at org.apache.hadoop.security.UserGroupInformation.loginUserFromSubject(UserGroupInformation.java:749)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:734)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:607)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:286)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:282)
+	at org.apache.hadoop.hbase.security.User.getCurrent(User.java:185)
+	at org.apache.hadoop.hbase.security.UserProvider.getCurrent(UserProvider.java:88)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:215)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at hbase.HbaseManager.main(HbaseManager.java:60)
+2016-11-14 14:47:12 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 14:47:13 - Process identifier=hconnection-0x49912c99 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 14:47:13 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 14:47:42 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 14:47:42 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.UserGroupInformation.initialize(UserGroupInformation.java:257)
+	at org.apache.hadoop.security.UserGroupInformation.ensureInitialized(UserGroupInformation.java:234)
+	at org.apache.hadoop.security.UserGroupInformation.loginUserFromSubject(UserGroupInformation.java:749)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:734)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:607)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:286)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:282)
+	at org.apache.hadoop.hbase.security.User.getCurrent(User.java:185)
+	at org.apache.hadoop.hbase.security.UserProvider.getCurrent(UserProvider.java:88)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:215)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-14 14:47:42 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 14:47:42 - Process identifier=hconnection-0x1cb346ea connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 14:47:43 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 14:49:03 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 14:49:03 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.UserGroupInformation.initialize(UserGroupInformation.java:257)
+	at org.apache.hadoop.security.UserGroupInformation.ensureInitialized(UserGroupInformation.java:234)
+	at org.apache.hadoop.security.UserGroupInformation.loginUserFromSubject(UserGroupInformation.java:749)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:734)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:607)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:286)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:282)
+	at org.apache.hadoop.hbase.security.User.getCurrent(User.java:185)
+	at org.apache.hadoop.hbase.security.UserProvider.getCurrent(UserProvider.java:88)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:215)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:45)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-14 14:49:03 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 14:49:03 - Process identifier=hconnection-0x1cb346ea connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 14:49:03 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 14:52:34 - For hints related to the following exception, please try taking a look at: https://hbase.apache.org/book.html#trouble.client.scantimeout
+2016-11-14 14:53:07 - Ignore, probably already closed
+org.apache.hadoop.hbase.UnknownScannerException: org.apache.hadoop.hbase.UnknownScannerException: Name: 8206, already closed?
+	at org.apache.hadoop.hbase.regionserver.RSRpcServices.scan(RSRpcServices.java:2238)
+	at org.apache.hadoop.hbase.protobuf.generated.ClientProtos$ClientService$2.callBlockingMethod(ClientProtos.java:32385)
+	at org.apache.hadoop.hbase.ipc.RpcServer.call(RpcServer.java:2117)
+	at org.apache.hadoop.hbase.ipc.CallRunner.run(CallRunner.java:104)
+	at org.apache.hadoop.hbase.ipc.RpcExecutor.consumerLoop(RpcExecutor.java:133)
+	at org.apache.hadoop.hbase.ipc.RpcExecutor$1.run(RpcExecutor.java:108)
+	at java.lang.Thread.run(Thread.java:745)
+
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.apache.hadoop.ipc.RemoteException.instantiateException(RemoteException.java:106)
+	at org.apache.hadoop.ipc.RemoteException.unwrapRemoteException(RemoteException.java:95)
+	at org.apache.hadoop.hbase.protobuf.ProtobufUtil.getRemoteException(ProtobufUtil.java:326)
+	at org.apache.hadoop.hbase.client.ScannerCallable.close(ScannerCallable.java:358)
+	at org.apache.hadoop.hbase.client.ScannerCallable.call(ScannerCallable.java:196)
+	at org.apache.hadoop.hbase.client.ScannerCallableWithReplicas.call(ScannerCallableWithReplicas.java:145)
+	at org.apache.hadoop.hbase.client.ScannerCallableWithReplicas.call(ScannerCallableWithReplicas.java:60)
+	at org.apache.hadoop.hbase.client.RpcRetryingCaller.callWithoutRetries(RpcRetryingCaller.java:210)
+	at org.apache.hadoop.hbase.client.ClientScanner.call(ClientScanner.java:326)
+	at org.apache.hadoop.hbase.client.ClientScanner.close(ClientScanner.java:744)
+	at hbase.HbaseHistoryInfo.GetHistoryInfo(HbaseHistoryInfo.java:67)
+	at analyse.AnalyseThread.run(AnalyseThread.java:67)
+Caused by: org.apache.hadoop.hbase.ipc.RemoteWithExtrasException(org.apache.hadoop.hbase.UnknownScannerException): org.apache.hadoop.hbase.UnknownScannerException: Name: 8206, already closed?
+	at org.apache.hadoop.hbase.regionserver.RSRpcServices.scan(RSRpcServices.java:2238)
+	at org.apache.hadoop.hbase.protobuf.generated.ClientProtos$ClientService$2.callBlockingMethod(ClientProtos.java:32385)
+	at org.apache.hadoop.hbase.ipc.RpcServer.call(RpcServer.java:2117)
+	at org.apache.hadoop.hbase.ipc.CallRunner.run(CallRunner.java:104)
+	at org.apache.hadoop.hbase.ipc.RpcExecutor.consumerLoop(RpcExecutor.java:133)
+	at org.apache.hadoop.hbase.ipc.RpcExecutor$1.run(RpcExecutor.java:108)
+	at java.lang.Thread.run(Thread.java:745)
+
+	at org.apache.hadoop.hbase.ipc.RpcClientImpl.call(RpcClientImpl.java:1235)
+	at org.apache.hadoop.hbase.ipc.AbstractRpcClient.callBlockingMethod(AbstractRpcClient.java:222)
+	at org.apache.hadoop.hbase.ipc.AbstractRpcClient$BlockingRpcChannelImplementation.callBlockingMethod(AbstractRpcClient.java:323)
+	at org.apache.hadoop.hbase.protobuf.generated.ClientProtos$ClientService$BlockingStub.scan(ClientProtos.java:32831)
+	at org.apache.hadoop.hbase.client.ScannerCallable.close(ScannerCallable.java:356)
+	... 8 more
+2016-11-14 15:57:32 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 15:57:32 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.UserGroupInformation.initialize(UserGroupInformation.java:257)
+	at org.apache.hadoop.security.UserGroupInformation.ensureInitialized(UserGroupInformation.java:234)
+	at org.apache.hadoop.security.UserGroupInformation.loginUserFromSubject(UserGroupInformation.java:749)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:734)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:607)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:286)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:282)
+	at org.apache.hadoop.hbase.security.User.getCurrent(User.java:185)
+	at org.apache.hadoop.hbase.security.UserProvider.getCurrent(UserProvider.java:88)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:215)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:46)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-14 15:57:32 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 15:57:32 - Process identifier=hconnection-0x1cb346ea connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 15:57:32 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 16:08:10 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 16:08:10 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.UserGroupInformation.initialize(UserGroupInformation.java:257)
+	at org.apache.hadoop.security.UserGroupInformation.ensureInitialized(UserGroupInformation.java:234)
+	at org.apache.hadoop.security.UserGroupInformation.loginUserFromSubject(UserGroupInformation.java:749)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:734)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:607)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:286)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:282)
+	at org.apache.hadoop.hbase.security.User.getCurrent(User.java:185)
+	at org.apache.hadoop.hbase.security.UserProvider.getCurrent(UserProvider.java:88)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:215)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:46)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-14 16:08:10 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 16:08:10 - Process identifier=hconnection-0x1cb346ea connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 16:08:10 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 16:20:19 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 16:20:19 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.UserGroupInformation.initialize(UserGroupInformation.java:257)
+	at org.apache.hadoop.security.UserGroupInformation.ensureInitialized(UserGroupInformation.java:234)
+	at org.apache.hadoop.security.UserGroupInformation.loginUserFromSubject(UserGroupInformation.java:749)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:734)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:607)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:286)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:282)
+	at org.apache.hadoop.hbase.security.User.getCurrent(User.java:185)
+	at org.apache.hadoop.hbase.security.UserProvider.getCurrent(UserProvider.java:88)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:215)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:46)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-14 16:20:19 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-14 16:20:19 - Process identifier=hconnection-0x1cb346ea connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-14 16:20:19 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 09:31:37 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-15 09:31:37 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.UserGroupInformation.initialize(UserGroupInformation.java:257)
+	at org.apache.hadoop.security.UserGroupInformation.ensureInitialized(UserGroupInformation.java:234)
+	at org.apache.hadoop.security.UserGroupInformation.loginUserFromSubject(UserGroupInformation.java:749)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:734)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:607)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:286)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:282)
+	at org.apache.hadoop.hbase.security.User.getCurrent(User.java:185)
+	at org.apache.hadoop.hbase.security.UserProvider.getCurrent(UserProvider.java:88)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:215)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:46)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-15 09:31:37 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 09:31:37 - Process identifier=hconnection-0x58ee7d10 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-15 09:31:38 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 09:57:18 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-15 09:57:18 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.UserGroupInformation.initialize(UserGroupInformation.java:257)
+	at org.apache.hadoop.security.UserGroupInformation.ensureInitialized(UserGroupInformation.java:234)
+	at org.apache.hadoop.security.UserGroupInformation.loginUserFromSubject(UserGroupInformation.java:749)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:734)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:607)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:286)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:282)
+	at org.apache.hadoop.hbase.security.User.getCurrent(User.java:185)
+	at org.apache.hadoop.hbase.security.UserProvider.getCurrent(UserProvider.java:88)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:215)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:46)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-15 09:57:19 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 09:57:19 - Process identifier=hconnection-0x1abb314f connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-15 09:57:19 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 10:04:26 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-15 10:04:26 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.UserGroupInformation.initialize(UserGroupInformation.java:257)
+	at org.apache.hadoop.security.UserGroupInformation.ensureInitialized(UserGroupInformation.java:234)
+	at org.apache.hadoop.security.UserGroupInformation.loginUserFromSubject(UserGroupInformation.java:749)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:734)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:607)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:286)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:282)
+	at org.apache.hadoop.hbase.security.User.getCurrent(User.java:185)
+	at org.apache.hadoop.hbase.security.UserProvider.getCurrent(UserProvider.java:88)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:215)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:46)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-15 10:04:26 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 10:04:26 - Process identifier=hconnection-0x7daa2420 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-15 10:04:26 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 10:04:29 - Closing zookeeper sessionid=0x257d0b4f5740071
+2016-11-15 10:05:05 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-15 10:05:05 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.UserGroupInformation.initialize(UserGroupInformation.java:257)
+	at org.apache.hadoop.security.UserGroupInformation.ensureInitialized(UserGroupInformation.java:234)
+	at org.apache.hadoop.security.UserGroupInformation.loginUserFromSubject(UserGroupInformation.java:749)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:734)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:607)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:286)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:282)
+	at org.apache.hadoop.hbase.security.User.getCurrent(User.java:185)
+	at org.apache.hadoop.hbase.security.UserProvider.getCurrent(UserProvider.java:88)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:215)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:46)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-15 10:05:05 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 10:05:05 - Process identifier=hconnection-0x1bf02cf8 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-15 10:05:05 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 10:05:08 - Closing zookeeper sessionid=0x157d0b4f5300067
+2016-11-15 10:05:58 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-15 10:05:58 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.UserGroupInformation.initialize(UserGroupInformation.java:257)
+	at org.apache.hadoop.security.UserGroupInformation.ensureInitialized(UserGroupInformation.java:234)
+	at org.apache.hadoop.security.UserGroupInformation.loginUserFromSubject(UserGroupInformation.java:749)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:734)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:607)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:286)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:282)
+	at org.apache.hadoop.hbase.security.User.getCurrent(User.java:185)
+	at org.apache.hadoop.hbase.security.UserProvider.getCurrent(UserProvider.java:88)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:215)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.<init>(AnalyseThread.java:46)
+	at analyse.hmfaultanalyse.main(hmfaultanalyse.java:57)
+2016-11-15 10:05:58 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 10:05:58 - Process identifier=hconnection-0xd69c3e2 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-15 10:05:59 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 10:06:01 - Closing zookeeper sessionid=0x257d0b4f5740072
+2016-11-15 10:37:24 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-15 10:37:24 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.UserGroupInformation.initialize(UserGroupInformation.java:257)
+	at org.apache.hadoop.security.UserGroupInformation.ensureInitialized(UserGroupInformation.java:234)
+	at org.apache.hadoop.security.UserGroupInformation.loginUserFromSubject(UserGroupInformation.java:749)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:734)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:607)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:286)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:282)
+	at org.apache.hadoop.hbase.security.User.getCurrent(User.java:185)
+	at org.apache.hadoop.hbase.security.UserProvider.getCurrent(UserProvider.java:88)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:215)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.run(AnalyseThread.java:70)
+2016-11-15 10:37:24 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 10:37:24 - Process identifier=hconnection-0xd69c3e2 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-15 10:37:25 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 10:38:50 - Closing zookeeper sessionid=0x157d0b4f5300068
+2016-11-15 15:37:53 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-15 15:37:53 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.UserGroupInformation.initialize(UserGroupInformation.java:257)
+	at org.apache.hadoop.security.UserGroupInformation.ensureInitialized(UserGroupInformation.java:234)
+	at org.apache.hadoop.security.UserGroupInformation.loginUserFromSubject(UserGroupInformation.java:749)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:734)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:607)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:286)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:282)
+	at org.apache.hadoop.hbase.security.User.getCurrent(User.java:185)
+	at org.apache.hadoop.hbase.security.UserProvider.getCurrent(UserProvider.java:88)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:215)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.run(AnalyseThread.java:70)
+2016-11-15 15:37:53 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 15:37:53 - Process identifier=hconnection-0x1bf02cf8 connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-15 15:37:53 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 15:39:09 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-15 15:39:09 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:355)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:370)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:363)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:78)
+	at org.apache.hadoop.security.Groups.parseStaticMapping(Groups.java:93)
+	at org.apache.hadoop.security.Groups.<init>(Groups.java:77)
+	at org.apache.hadoop.security.Groups.getUserToGroupsMappingService(Groups.java:240)
+	at org.apache.hadoop.security.UserGroupInformation.initialize(UserGroupInformation.java:257)
+	at org.apache.hadoop.security.UserGroupInformation.ensureInitialized(UserGroupInformation.java:234)
+	at org.apache.hadoop.security.UserGroupInformation.loginUserFromSubject(UserGroupInformation.java:749)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:734)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:607)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:286)
+	at org.apache.hadoop.hbase.security.User$SecureHadoopUser.<init>(User.java:282)
+	at org.apache.hadoop.hbase.security.User.getCurrent(User.java:185)
+	at org.apache.hadoop.hbase.security.UserProvider.getCurrent(UserProvider.java:88)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:215)
+	at org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(ConnectionFactory.java:119)
+	at analyse.AnalyseThread.run(AnalyseThread.java:70)
+2016-11-15 15:39:09 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 15:39:10 - Process identifier=hconnection-0x78236c8b connecting to ZooKeeper ensemble=HBASE01:2181,HBASE02:2181,HBASE03:2181
+2016-11-15 15:39:10 - hbase.regionserver.global.memstore.upperLimit is deprecated by hbase.regionserver.global.memstore.size
+2016-11-15 15:40:48 - Closing zookeeper sessionid=0x357d0b4fa240075

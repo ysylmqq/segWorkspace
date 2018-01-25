@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- 启用360浏览器的极速模式(webkit) -->
+    <meta name="renderer" content="webkit">
+    <!-- 避免IE使用兼容模式 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>海马大数据平台</title>
+    <link rel="stylesheet" href="../vendor/bootstrap/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../vendor/ligerUI/skins/Aqua/css/ligerui-all.css"/>
+    <link rel="stylesheet" href="../css/public/ligerui-custom.css"/>
+    <link rel="stylesheet" href="../css/public/search-list-grid-tree.css"/>
+    <script src="../vendor/jquery/dist/jquery.js"></script>
+	<script src="../js/FaultToView.js"></script>
+    <script src="../vendor/ligerUI/js/ligerui.all.js"></script>
+    <script src="../js/ligerui.other.js"></script>
+	
+    <!-- 添加 foundation-datepicker 支持-->
+    <link rel="stylesheet" href="../vendor/foundation-datepicker/css/foundation-datepicker.min.css"/>
+    <link rel="stylesheet" href="../vendor/font-awesome/css/font-awesome.min.css"/>
+    <script src="../vendor/foundation-datepicker/js/foundation-datepicker.min.js"></script>
+    <script src="../vendor/foundation-datepicker/js/locales/foundation-datepicker.zh-CN.js"></script>
+    <style>
+        a:hover{
+            text-decoration: none;
+        }
+        .data-list{
+        	padding:20px 20px 20px 20px;
+        }
+    </style>
+
+    <script>
+    
+    function searchDate(){
+        var arr=[];
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = d.getMonth()+1;
+        m = m>=10?m:'0'+m;
+        var t = d.getDate();
+        t = t >= 10 ? t:'0'+t;
+        var e=y+'-'+m+'-'+t;
+        var swtzq=d-7*24*3600*1000;
+        var startYear=new Date(swtzq).getFullYear();
+        var startMonth=new Date(swtzq).getMonth()+1;
+        var startDate=new Date(swtzq).getDate();
+        startMonth = startMonth>=10?startMonth:'0'+startMonth;
+        startDate = startDate >= 10 ? startDate:'0'+startDate;
+        var sczqrq=startYear+'-'+startMonth+'-'+startDate;
+        arr.push(sczqrq,e);
+        return arr;
+    }
+   //查询 
+   function saveSearch(){
+	   var start_date =$('#start_date').val();
+	   var end_date =$('#end_date').val();
+	   var d1=new Date(start_date);
+	   var d2=new Date(end_date);
+	   var distance=(d2-d1)/(1000*60*60);
+	   if(distance<0){
+	   		$.ligerDialog.warn('结束时间不能早于开始时间!');
+	   		return false;
+	   }
+	   var searchData={};
+       var formParam = getFormDataAll('searchForm');
+       for(var k in formParam){
+          var newdata;
+          newdata=$.trim(formParam[k]);
+          if(newdata!=''){
+              searchData[k]=newdata;
+              mainGrid.setParm(k,newdata);
+          }/* else{
+              mainGrid.removeParm(k);
+              delete formParam[k];
+          } */
+      } 
+       
+       formParam.pageNo = 1;
+       var rp_value = $("select[name='rp']").val();
+       formParam.pageSize = rp_value;
+       mainGrid.setOptions({ newPage: 1 });
+      $("#main-grid").ligerGetGridManager().loadServerData(formParam);
+			$('.btn').attr('disabled','true');
+    }
+    </script>
+    <script>
+	    $(function () {
+	    	$.ajax({
+    			url:'../alarm/getFaultType',
+    			method:"GET",
+    			async:false,
+    			success:function(data){
+    				var html = "<option value='0'>所有</option>";
+    				for(var i = 0; i < data.length; i++){
+    					var obj = data[i];
+    					html += "<option value='"+obj.faulttypeid+"'>"+obj.faulttypename+"</option>";
+    				}
+    				$("#fault_type").html(html);
+    			}
+    		});
+	    	
+	    	 $('#start_date').fdatepicker({
+	                language:'zh-CN',
+	                format: 'yyyy-mm-dd'
+	            });
+	            $('#end_date').fdatepicker({
+	                language:'zh-CN',
+	                format: 'yyyy-mm-dd'
+	            });
+	    	$('#start_date').val(searchDate()[0]);
+		     $('#end_date').val(searchDate()[1]);
+	    	var grams =[];
+	    	grams.push({name:"customer_name",value:$("#customer_name").val()});
+	    	grams.push({name:"plate_no",value:$("#plate_no").val()});
+	    	grams.push({name:"call_letter",value:$("#call_letter").val()});
+	    	grams.push({name:"fault_type",value:$("#fault_type").val()});
+	    	grams.push({name:"start_date",value:$("#start_date").val()});
+	    	grams.push({name:"end_date",value:$("#end_date").val()});
+	    	grams.push({name:"fault_type",value:$("#fault_type").val()});
+	    	window.gridParms = {
+	               	url:D2V.carcheckURL.query,
+	                width: '100%',
+	                parms: grams,
+	                height: '100%',
+	                rownumbers :false,
+	                //delayLoad:true,
+	                pageSizeOptions: [5, 10, 15, 20],
+	                selectable:false,
+	                //checkbox :true,
+					onLoaded:function(){
+	                	$('.btn').removeAttr('disabled');
+	                	$("#main-grid .l-grid-loading").css("display","none");
+                	}
+	         };
+	        //添加操作选项
+	        var optcol = [];
+	        window.mainGrid = initMainGrid('main-grid', gridParms, optcol.concat(D2V.carcheck));
+	    });
+      //导出
+      	function exportFile(){
+		 	var call_letter = $("#call_letter").val();
+		 	var plate_no = $("#plate_no").val();
+		 	var customer_name = $("#customer_name").val();
+		 	var fault_type = $("#fault_type").val();
+		 	var start_date =$('#start_date').val();
+			var end_date =$('#end_date').val();
+		 	window.location.href = "../alarm/exportFaultInfos?call_letter="+call_letter+"&plate_no="+plate_no
+		 			+"&customer_name="+customer_name+"&fault_type="+fault_type+"&start_date="+start_date+"&end_date="+end_date;
+        } 
+    </script>
+</head>
+<body>
+    <div class="data-list">
+        <form class="form-inline data-list-search" id="searchForm">
+        	<div class="form-group has-feedback" style="margin-top:3px;">
+                <label>开始时间:</label>
+                <input type="text" class="form-control" id="start_date" name="start_date" style="width:140px">
+                <span class="glyphicon glyphicon-calendar form-control-feedback" aria-hidden="true"></span>
+            </div>
+            <div class="form-group has-feedback" style="margin-top:3px;">
+                <label>结束时间:</label>
+                <input type="text" class="form-control" id="end_date" name="end_date" style="width:140px">
+                <span class="glyphicon glyphicon-calendar form-control-feedback" aria-hidden="true"></span>
+            </div>
+             <!-- <div class="form-group has-feedback" style="margin-top:3px;">
+                <label>客户名:</label>
+                <input type="text" class="form-control" id="customer_name" name="customer_name" style="width:200px">
+            </div>
+            <div class="form-group has-feedback" style="margin-top:3px;">
+                <label>车牌号:</label>
+                <input type="text" class="form-control" id="plate_no" name="plate_no" style="width:200px">
+            </div> -->
+            <div class="form-group has-feedback" style="margin-top:3px;">
+                <label>呼号:</label>
+                <input type="text" class="form-control" id="call_letter" name="call_letter" style="width:200px">
+            </div>
+            
+            <div class="form-group has-feedback" style="margin-top:3px;">
+                <label>故障类型:</label>
+                <select class="form-control" id="fault_type" name="fault_type" >
+                </select>
+            </div>
+             
+            <div class="form-group" style="margin-top:3px;">
+                <button type="button" class="btn btn-search" id="checkbtn"  onclick="saveSearch();return false;"><i class="icon icon-search"></i>查询</button>
+            </div>
+            <div class="form-group" style="margin-top:3px">
+                <button type="button" class="btn btn-search" onclick="exportFile();return false;" style="background-color:#3d8cd1;"><i class="icon icon-search"></i>导出</button>
+            </div>
+        </form>
+        <div id="main-grid" class="l-grid-custom panel-bar-split"></div>
+    </div>
+</body>
+</html>
