@@ -1,0 +1,66 @@
+Manifest-Version: 1.0
+Built-By: ysy
+Class-Path: . lib/bhz-com-0.0.1-SNAPSHOT.jar lib/bhz-sys-facade-0.0.1-
+ SNAPSHOT.jar lib/jetty-6.1.26.jar lib/jetty-util-6.1.26.jar lib/sprin
+ g-core-3.2.4.RELEASE.jar lib/spring-webmvc-3.2.4.RELEASE.jar lib/spri
+ ng-beans-3.2.4.RELEASE.jar lib/spring-context-3.2.4.RELEASE.jar lib/s
+ pring-expression-3.2.4.RELEASE.jar lib/spring-web-3.2.4.RELEASE.jar l
+ ib/spring-jdbc-3.2.4.RELEASE.jar lib/spring-tx-3.2.4.RELEASE.jar lib/
+ spring-orm-3.2.4.RELEASE.jar lib/aopalliance-1.0.jar lib/spring-aop-3
+ .2.4.RELEASE.jar lib/spring-aspects-3.2.4.RELEASE.jar lib/aspectjweav
+ er-1.7.2.jar lib/spring-context-support-3.2.4.RELEASE.jar lib/proxool
+ -0.9.1.jar lib/proxool-cglib-0.9.1.jar lib/avalon-framework-api-4.3.j
+ ar lib/avalon-logkit-2.1.jar lib/geronimo-spec-javamail-1.3.1-rc3.jar
+  lib/geronimo-spec-jms-1.1-rc4.jar lib/commons-fileupload-1.2.2.jar l
+ ib/commons-lang3-3.3.1.jar lib/commons-io-2.4.jar lib/commons-dbcp-1.
+ 4.jar lib/commons-pool-1.5.4.jar lib/commons-logging-1.1.3.jar lib/co
+ mmons-codec-1.6.jar lib/jackson-mapper-asl-1.9.11.jar lib/jackson-cor
+ e-asl-1.9.11.jar lib/fastjson-1.1.26.jar lib/slf4j-api-1.7.6.jar lib/
+ jul-to-slf4j-1.7.6.jar lib/jcl-over-slf4j-1.7.6.jar lib/log4j-1.2.15.
+ jar lib/mail-1.4.jar lib/mysql-connector-java-5.1.34.jar lib/jstl-1.2
+ .jar lib/rocketmq-client-3.2.6.jar lib/rocketmq-common-3.2.6.jar lib/
+ rocketmq-remoting-3.2.6.jar lib/netty-all-4.0.25.Final.jar lib/httpcl
+ ient-cache-4.3.1.jar lib/httpclient-4.3.1.jar lib/httpcore-4.3.1.jar 
+ lib/zookeeper-3.4.5.jar lib/slf4j-log4j12-1.6.1.jar lib/jline-0.9.94.
+ jar lib/netty-3.2.2.Final.jar lib/zkclient-0.7.jar lib/curator-framew
+ ork-2.5.0.jar lib/curator-client-2.5.0.jar lib/guava-16.0.1.jar lib/c
+ urator-recipes-2.4.2.jar lib/jedis-2.7.2.jar lib/commons-pool2-2.3.ja
+ r lib/dubbo-2.8.4.jar lib/netty-3.7.0.Final.jar lib/javax.servlet-api
+ -3.1.0.jar lib/tomcat-embed-core-8.0.11.jar lib/tomcat-embed-logging-
+ juli-8.0.11.jar lib/javassist-3.15.0-GA.jar lib/mina-core-1.1.7.jar l
+ ib/grizzly-core-2.1.4.jar lib/grizzly-framework-2.1.4.jar lib/gmbal-a
+ pi-only-3.0.0-b023.jar lib/management-api-3.0.0-b012.jar lib/grizzly-
+ portunif-2.1.4.jar lib/grizzly-rcm-2.1.4.jar lib/xstream-1.4.1.jar li
+ b/xmlpull-1.1.3.1.jar lib/xpp3_min-1.1.4c.jar lib/bsf-api-3.1.jar lib
+ /xmemcached-1.3.6.jar lib/cxf-rt-frontend-simple-2.6.1.jar lib/cxf-ap
+ i-2.6.1.jar lib/woodstox-core-asl-4.1.2.jar lib/stax2-api-3.1.1.jar l
+ ib/xmlschema-core-2.0.2.jar lib/geronimo-javamail_1.4_spec-1.7.1.jar 
+ lib/wsdl4j-1.6.2.jar lib/cxf-rt-core-2.6.1.jar lib/cxf-rt-bindings-so
+ ap-2.6.1.jar lib/cxf-rt-databinding-jaxb-2.6.1.jar lib/cxf-rt-transpo
+ rts-http-2.6.1.jar lib/libthrift-0.8.0.jar lib/commons-lang-2.5.jar l
+ ib/hessian-4.0.7.jar lib/validation-api-1.0.0.GA.jar lib/hibernate-va
+ lidator-4.3.1.Final.jar lib/jboss-logging-3.1.0.CR2.jar lib/cache-api
+ -0.4.jar lib/javax.ws.rs-api-2.0.jar lib/resteasy-jaxrs-3.0.7.Final.j
+ ar lib/jaxrs-api-3.0.7.Final.jar lib/jboss-annotations-api_1.1_spec-1
+ .0.1.Final.jar lib/activation-1.1.jar lib/jcip-annotations-1.0.jar li
+ b/resteasy-client-3.0.7.Final.jar lib/resteasy-netty-3.0.7.Final.jar 
+ lib/resteasy-jdk-http-3.0.7.Final.jar lib/resteasy-jackson-provider-3
+ .0.7.Final.jar lib/jackson-jaxrs-1.9.12.jar lib/jackson-xc-1.9.12.jar
+  lib/resteasy-jaxb-provider-3.0.7.Final.jar lib/jaxb-impl-2.2.7.jar l
+ ib/jaxb-core-2.2.7.jar lib/jaxb-api-2.2.7.jar lib/istack-commons-runt
+ ime-2.16.jar lib/FastInfoset-1.2.12.jar lib/jsr173_api-1.0.jar lib/kr
+ yo-2.24.0.jar lib/minlog-1.2.jar lib/objenesis-2.1.jar lib/kryo-seria
+ lizers-0.26.jar lib/fst-1.55.jar lib/cas-client-core-3.1.12.jar lib/h
+ ibernate-commons-annotations-4.0.1.Final.jar lib/hibernate-core-4.2.0
+ .Final.jar lib/antlr-2.7.7.jar lib/jboss-transaction-api_1.1_spec-1.0
+ .0.Final.jar lib/dom4j-1.6.1.jar lib/hibernate-jpa-2.0-api-1.0.1.Fina
+ l.jar lib/hibernate-proxool-4.2.0.Final.jar lib/proxool-0.8.3.jar lib
+ /hibernate-validator-annotation-processor-4.3.1.Final.jar lib/hiberna
+ te-ehcache-4.2.0.Final.jar lib/ehcache-core-2.4.3.jar lib/hibernate-e
+ ntitymanager-4.2.0.Final.jar lib/jxl-2.6.12.jar lib/xwork-core-2.1.6.
+ jar lib/ognl-2.7.3.jar lib/javassist-3.7.ga.jar lib/itext-1.3.jar lib
+ /druid-1.0.22.jar
+Build-Jdk: 1.8.0_144
+Created-By: Maven Integration for Eclipse
+Main-Class: com.alibaba.dubbo.container.Main
+

@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <!-- 继承父类 pom-->
+  <parent>
+  	<groupId>bhz</groupId>
+  	<artifactId>bhz-parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<!-- 设置父类的绝对路径 -->
+	<relativePath>../bhz-parent/pom.xml</relativePath>
+  </parent> 
+  <groupId>bhz</groupId>
+  <artifactId>bhz-sys-facade</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <!-- 
+  	这个项目当中包含了 服务提供者和服务消费者都会使用的接口和实体类  jar
+   -->
+   
+   <dependencies>
+	   	<dependency>
+	  		<groupId>bhz</groupId>
+	  		<artifactId>bhz-com</artifactId>
+	  		<version>0.0.1-SNAPSHOT</version>
+	  	</dependency> 
+   </dependencies>
+</project>

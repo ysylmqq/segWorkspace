@@ -1,0 +1,17 @@
+.icon-toggle-route {
+  display: inline-block;
+  background: url(../../images/icons/icons_toggle_route.png) no-repeat;
+  width: 17px;
+  height: 14px;
+  vertical-align: middle; }
+  .icon-toggle-route.active {
+    background: url(../../images/icons/icons_toggle_route_active.png) no-repeat; }
+
+.icon-map-close {
+  display: inline-block;
+  background: url(../../images/icons/icons_map_close.png) no-repeat;
+  vertical-align: middle;
+  width: 38px;
+  height: 38px; }
+
+/*# sourceMappingURL=icons.css.map */

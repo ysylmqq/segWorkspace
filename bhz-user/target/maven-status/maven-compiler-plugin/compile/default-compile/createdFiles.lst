@@ -1,0 +1,4 @@
+bhz\sys\controller\SysIndexController.class
+bhz\sys\controller\VehicleController.class
+bhz\sys\controller\AlarmController.class
+bhz\sys\controller\BaseController.class

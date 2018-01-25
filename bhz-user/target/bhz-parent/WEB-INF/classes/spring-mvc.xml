@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"  
+       xmlns:aop="http://www.springframework.org/schema/aop"  
+       xmlns:context="http://www.springframework.org/schema/context"  
+       xmlns:mvc="http://www.springframework.org/schema/mvc"  
+       xmlns:tx="http://www.springframework.org/schema/tx"  
+       xmlns:util="http://www.springframework.org/schema/util" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+       xmlns:p="http://www.springframework.org/schema/p"  
+       xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd  
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd   
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd   
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/util
+	   http://www.springframework.org/schema/util/spring-util-3.0.xsd">  
+  
+ 	<!-- 扫描controller（controller层注入） -->  
+     <context:component-scan base-package="bhz.sys.controller"/>
+     
+     <!-- 启动注解   用这个一个 相当于注册了DefaultAnnotationHandlerMapping和AnnotationMethodHandlerAdapter两个bean  http://www.myexception.cn/web/726685.html-->
+    <mvc:annotation-driven/>
+    
+    <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">  
+	    <property name="supportedMediaTypes">  
+	        <list>  
+	            <value>text/html;charset=UTF-8</value>  
+	        </list>  
+	    </property>  
+	</bean>
+    
+    <!-- 对模型视图添加前后缀 -->  
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"  
+        p:viewClass="org.springframework.web.servlet.view.JstlView"  p:prefix="/htmls/" p:suffix=".jsp"/>
+        
+    <!-- 静态资源处理器 -->  
+	<mvc:default-servlet-handler />
+</beans>  

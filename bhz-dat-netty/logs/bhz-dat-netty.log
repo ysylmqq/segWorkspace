@@ -1,0 +1,78 @@
+2018-01-09 13:53:02,706 INFO [com.alibaba.druid.pool.DruidDataSource] - {dataSource-1} inited
+2018-01-09 13:53:03,331 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x28157241] REGISTERED
+2018-01-09 13:53:03,334 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x28157241] BIND: 0.0.0.0/0.0.0.0:8765
+2018-01-09 13:53:03,335 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x28157241, /0:0:0:0:0:0:0:0:8765] ACTIVE
+2018-01-09 13:57:51,118 INFO [com.alibaba.druid.pool.DruidDataSource] - {dataSource-1} inited
+2018-01-09 13:57:51,788 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x03c3053a] REGISTERED
+2018-01-09 13:57:51,790 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x03c3053a] BIND: 0.0.0.0/0.0.0.0:8765
+2018-01-09 13:57:51,792 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x03c3053a, /0:0:0:0:0:0:0:0:8765] ACTIVE
+2018-01-09 13:58:42,511 INFO [com.alibaba.druid.pool.DruidDataSource] - {dataSource-1} inited
+2018-01-09 13:58:43,176 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x5928aef0] REGISTERED
+2018-01-09 13:58:43,178 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x5928aef0] BIND: 0.0.0.0/0.0.0.0:8765
+2018-01-09 13:58:43,179 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x5928aef0, /0:0:0:0:0:0:0:0:8765] ACTIVE
+2018-01-09 14:06:54,385 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x5928aef0, /0:0:0:0:0:0:0:0:8765] RECEIVED: [id: 0xad539f9a, /127.0.0.1:15836 => /127.0.0.1:8765]
+2018-01-09 14:06:54,892 ERROR [druid.sql.Statement] - {conn-10001, pstmt-20003} execute error.  INSERT INTO DAT_CHECK_DATA (CHECK_NO, CHECK_TYPE, SITE_ID, EQUIP_ID, LINE, VEHICLE_NO, VEHICLE_TYPE, AXLES, TYRES, CHECK_RESULT, CHECK_BY, CHECK_TIME, SPEED, LIMIT_TOTAL, OVER_TOTAL, TOTAL, DESC_INFO, CREATE_BY, CREATE_TIME, UPDATE_BY, UPDATE_TIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Unknown column 'LIMIT_TOTAL' in 'field list'
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:57)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:377)
+	at com.mysql.jdbc.Util.getInstance(Util.java:360)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:978)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3887)
+	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3823)
+	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2435)
+	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2582)
+	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2530)
+	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:1907)
+	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2141)
+	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2077)
+	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2062)
+	at com.alibaba.druid.filter.FilterChainImpl.preparedStatement_executeUpdate(FilterChainImpl.java:2723)
+	at com.alibaba.druid.filter.FilterAdapter.preparedStatement_executeUpdate(FilterAdapter.java:1069)
+	at com.alibaba.druid.filter.FilterEventAdapter.preparedStatement_executeUpdate(FilterEventAdapter.java:491)
+	at com.alibaba.druid.filter.FilterChainImpl.preparedStatement_executeUpdate(FilterChainImpl.java:2721)
+	at com.alibaba.druid.filter.FilterAdapter.preparedStatement_executeUpdate(FilterAdapter.java:1069)
+	at com.alibaba.druid.filter.FilterEventAdapter.preparedStatement_executeUpdate(FilterEventAdapter.java:491)
+	at com.alibaba.druid.filter.FilterChainImpl.preparedStatement_executeUpdate(FilterChainImpl.java:2721)
+	at com.alibaba.druid.proxy.jdbc.PreparedStatementProxyImpl.executeUpdate(PreparedStatementProxyImpl.java:158)
+	at com.alibaba.druid.pool.DruidPooledPreparedStatement.executeUpdate(DruidPooledPreparedStatement.java:253)
+	at org.springframework.jdbc.core.JdbcTemplate$2.doInPreparedStatement(JdbcTemplate.java:824)
+	at org.springframework.jdbc.core.JdbcTemplate$2.doInPreparedStatement(JdbcTemplate.java:818)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:589)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:818)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:874)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:882)
+	at bhz.dat.dao.DatCheckDataDao.insert(DatCheckDataDao.java:23)
+	at bhz.dat.netty.NettyServerHandler.channelRead(NettyServerHandler.java:36)
+	at io.netty.channel.ChannelHandlerInvokerUtil.invokeChannelReadNow(ChannelHandlerInvokerUtil.java:84)
+	at io.netty.channel.DefaultChannelHandlerInvoker.invokeChannelRead(DefaultChannelHandlerInvoker.java:153)
+	at io.netty.channel.PausableChannelEventExecutor.invokeChannelRead(PausableChannelEventExecutor.java:86)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:389)
+	at io.netty.handler.timeout.ReadTimeoutHandler.channelRead(ReadTimeoutHandler.java:149)
+	at io.netty.channel.ChannelHandlerInvokerUtil.invokeChannelReadNow(ChannelHandlerInvokerUtil.java:84)
+	at io.netty.channel.DefaultChannelHandlerInvoker.invokeChannelRead(DefaultChannelHandlerInvoker.java:153)
+	at io.netty.channel.PausableChannelEventExecutor.invokeChannelRead(PausableChannelEventExecutor.java:86)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:389)
+	at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:243)
+	at io.netty.channel.ChannelHandlerInvokerUtil.invokeChannelReadNow(ChannelHandlerInvokerUtil.java:84)
+	at io.netty.channel.DefaultChannelHandlerInvoker.invokeChannelRead(DefaultChannelHandlerInvoker.java:153)
+	at io.netty.channel.PausableChannelEventExecutor.invokeChannelRead(PausableChannelEventExecutor.java:86)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:389)
+	at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:956)
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:127)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:514)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:471)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:385)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:351)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$2.run(SingleThreadEventExecutor.java:116)
+	at io.netty.util.internal.chmv8.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1412)
+	at io.netty.util.internal.chmv8.ForkJoinTask.doExec(ForkJoinTask.java:280)
+	at io.netty.util.internal.chmv8.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:877)
+	at io.netty.util.internal.chmv8.ForkJoinPool.scan(ForkJoinPool.java:1706)
+	at io.netty.util.internal.chmv8.ForkJoinPool.runWorker(ForkJoinPool.java:1661)
+	at io.netty.util.internal.chmv8.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:126)
+2018-01-09 14:25:34,368 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x5928aef0, /0:0:0:0:0:0:0:0:8765] RECEIVED: [id: 0x12b5a0aa, /127.0.0.1:21261 => /127.0.0.1:8765]
+2018-01-09 14:35:04,616 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x5928aef0, /0:0:0:0:0:0:0:0:8765] RECEIVED: [id: 0xd7145130, /127.0.0.1:24001 => /127.0.0.1:8765]
+2018-01-09 14:40:05,677 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x5928aef0, /0:0:0:0:0:0:0:0:8765] RECEIVED: [id: 0x438401f7, /127.0.0.1:25449 => /127.0.0.1:8765]

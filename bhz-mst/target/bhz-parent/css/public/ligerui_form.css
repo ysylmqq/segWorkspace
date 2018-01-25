@@ -1,0 +1,97 @@
+button{
+    outline: none;
+}
+a:hover{
+    text-decoration: none;
+}
+.add,.update{
+    display: none;
+    font-size: 14px;
+    font-family: '微软雅黑';
+}
+/*add样式修改*/
+.l-dialog-tl{
+    height:42px;
+}
+.l-dialog-tc{
+    padding-left: 59px;
+    /*border-top: 2px solid #fff;*/
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background: none;
+    background-color: #efefef;
+}
+.l-dialog td div,#add-form label,#update-form label{
+    font-size: 14px;
+    font-family: '微软雅黑';
+    font-weight: normal;
+    color:#343f56;
+}
+.l-dialog-max,.l-dialog-collapse{
+    display: none;
+}
+.l-dialog-close{
+    background: url(../../images/close.png) no-repeat;
+    width: 22px;
+    height: 22px;
+    position: absolute;
+    top: -28px;
+    right: -22px;
+}
+.l-dialog-close:hover{
+    background: url(../../images/closeHover.png) no-repeat;
+}
+#add-dialog .form-group .form-control,#update-dialog .form-group .form-control{
+    width: 290px;
+    height: 30px;
+    display: inline-block;
+    padding: 4px 8px;
+}
+#add-form label,#update-form label{
+    margin-left: 54px;
+}
+#add-dialog,#update-dialog{
+    margin-top: 34px;
+}
+#add-dialog .form-group,#update-dialog .form-group{
+    margin-bottom: 26px;
+}
+.save{
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    height: 62px;
+    background-color: #efefef;
+    width: 100%;
+    text-align: center;
+}
+.save button{
+    margin-top: 15px;
+    width: 70px;
+    height: 30px;
+    border-color: #40c5e1;
+    background-color: #40c5e1;
+    line-height: 1;
+    outline: none;
+}
+#addSubmit,#updateSubmit{
+   /*  margin-right: 38px; */
+}
+.l-dialog-cc,.l-dialog-body{
+    border-bottom-left-radius:8px;
+    border-bottom-right-radius:8px;
+}
+.l-dialog-cc{
+    border-top: none;
+}
+.l-dialog-win,.l-dialog{
+    border: none;
+}
+.l-window-mask{
+    background: none;
+    background: url(../../images/Bgmask.png);
+    opacity: 1;
+}
+.data-list-search .btn{
+    outline: none;
+}

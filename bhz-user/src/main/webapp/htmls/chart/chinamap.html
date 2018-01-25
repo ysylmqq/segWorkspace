@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- 启用360浏览器的极速模式(webkit) -->
+    <meta name="renderer" content="webkit">
+    <!-- 避免IE使用兼容模式 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>海马大数据平台</title>
+    <link rel="stylesheet" href="../../vendor/bootstrap/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../vendor/ligerUI/skins/Aqua/css/ligerui-all.css"/>
+    <link rel="stylesheet" href="../../css/public/ligerui-custom.css"/>
+    <link rel="stylesheet" href="../../css/public/search-list-grid-tree.css"/>
+    <!-- 添加 foundation-datepicker 支持-->
+    <link rel="stylesheet" href="../../vendor/foundation-datepicker/css/foundation-datepicker.min.css"/>
+    <link rel="stylesheet" href="../../vendor/font-awesome/css/font-awesome.min.css"/>
+    <style>
+        a:hover{
+            text-decoration: none;
+        }
+        .data-list{
+        	padding:20px 20px 20px 20px;
+        }
+        .tubiao{
+        	background:#fff;
+        }
+        .tubiao h3{
+        	text-align:center;
+        	padding:20px 0px;
+        }
+        .left{
+        	float:left;
+        	width:48%;
+        }
+        .mid{
+        	width:2%;
+        }
+        .right{
+        	float:right;
+        	width:48%;
+        }
+    </style>
+
+    <script>
+    function searchDate(){
+        var arr=[];
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = d.getMonth()+1;
+        m = m>=10?m:'0'+m;
+        var t = d.getDate();
+        t = t >= 10 ? t:'0'+t;
+        var e=y+'-'+m+'-'+t;
+        var swtzq=d-7*24*3600*1000;
+        var startYear=new Date(swtzq).getFullYear();
+        var startMonth=new Date(swtzq).getMonth()+1;
+        var startDate=new Date(swtzq).getDate();
+        startMonth = startMonth>=10?startMonth:'0'+startMonth;
+        startDate = startDate >= 10 ? startDate:'0'+startDate;
+        var sczqrq=startYear+'-'+startMonth;
+        if(startMonth == 0){
+        	startMonth = 12;
+        	startYear = startYear-1;
+        }
+        arr.push(sczqrq,e);
+        return arr;
+    }
+   //查询 
+   function alarmCountSearch(){
+       loadAlarmCount();
+    }
+    </script>
+</head>
+<body>
+    <div class="data-list" style="height: auto;">
+     <form class="form-inline data-list-search" id="searchForm">
+     	<div class="form-group has-feedback" style="margin-top:3px;">
+             <label>时间:</label>
+             <input size="16" type="text" id="dpMonths" class="form-control" style="width:120px" data-date-format="yyyy-mm" data-start-view="year" data-min-view="year">
+             <span class="glyphicon glyphicon-calendar form-control-feedback" aria-hidden="true"></span>
+         </div>
+         <div class="form-group" style="margin-top:3px;">
+             <button type="button" class="btn btn-search"  onclick="alarmCountSearch();return false;"><i class="icon icon-search"></i>查询</button>
+         </div>
+     </form>
+	<div class="tubiao">
+		<div id="chinaMap" style="height: 400px; margin: 0"></div>
+	</div>
+	
+    </div>
+    <script src="../../vendor/jquery/dist/jquery.js"></script>
+	<script src="../../js/AlarmToView.js"></script>
+    <script src="../../vendor/ligerUI/js/ligerui.all.js"></script>
+    <script src="../../js/ligerui.other.js"></script>
+    <script src="../../vendor/foundation-datepicker/js/foundation-datepicker.min.js"></script>
+    <script src="../../vendor/foundation-datepicker/js/locales/foundation-datepicker.zh-CN.js"></script>
+    <script src="../../js/chart3-all.js"></script> 
+    <script src="../../js/china.js"></script>  
+ <script>
+    $("document").ready(function(){
+    	$('#dpMonths').fdatepicker({
+            language:'zh-CN'
+        });
+ 		$('#dpMonths').val(searchDate()[0]);
+    	loadAlarmCount();
+    });
+    
+    
+    function loadAlarmCount (){
+    	var xData=[],yData=[],data;
+    	var dateNow = new Date($("#dpMonths").val());
+    	var year = dateNow.getYear();
+    	var month = dateNow.getMonth();
+    	$.ajax({
+    		url:"../../chart/getChartData",
+    		type:"POST",
+    		async:false,
+    		data:{year:year+1900,month:month+1,type:2},
+    		success:function(result){
+    			data = result;
+    			for(var i =0;i<data.length;i++){
+    				xData.push(data[i].name);
+    				yData.push(data[i].value);
+    			}
+    		}
+    	});
+    	var dom = document.getElementById("chinaMap");
+    	var myChart = echarts.init(dom);
+    	var app = {};
+    	option = null;
+    	option = {
+    	    title : {
+    	        text: 'iphone销量',
+    	        subtext: '纯属虚构',
+    	        left: 'center'
+    	    },
+    	    tooltip : {
+    	        trigger: 'item'
+    	    },
+    	    legend: {
+    	        orient: 'vertical',
+    	        left: 'left',
+    	        data:['iphone5']
+    	    },
+    	     visualMap: {
+    	        min: 0,
+    	        max: 2500,
+    	        left: 'left',
+    	        top: 'bottom',
+    	        text:['高','低'],           // 文本，默认为数值文本
+    	        calculable : true,
+                color: ['#C8E49D', '#A3CCFF']
+    	    }, 
+    	    toolbox: {
+    	        show: true,
+    	        orient : 'vertical',
+    	        left: 'right',
+    	        top: 'center',
+    			label:{
+    				normal:{
+    					show:true
+    				}
+    			},
+    	        feature : {
+    	            mark : {show: false},
+    	            dataView : {show: false, readOnly: false},
+    	            restore : {show: false},
+    	            saveAsImage : {show: false}
+    	        }
+    	    },
+    	    series : [
+    	        {
+					roam:true,    	        	
+    	            name: 'iphone5',
+    	            type: 'map',
+    	            mapType: 'china',
+    	            zoom:1.2,
+    	            label: {
+    	                normal: {
+    	                    show: false
+    	                },
+    	                emphasis: {
+    	                    show: true
+    	                }
+    	            },
+    	            itemStyle:{
+    	            	/* normal:{
+    	            		areaColor:"#C8E49D",
+    	            		color:"#",
+    	            		borderColor:"A3CCFF",
+    	            		borderWidth:"1"
+    	            	} */
+    	            	/* emphasis:{
+    	            		borderColor:"#C8E49D",
+    	            		borderWidth:"1"
+    	            	} */
+    	            },
+    	            data:[
+    	            	 {name: '北京',value: Math.round(Math.random()*1000)},
+    	                 {name: '天津',value: Math.round(Math.random()*1000)},
+    	                 {name: '上海',value: Math.round(Math.random()*1000)},
+    	                 {name: '重庆',value: Math.round(Math.random()*1000)},
+    	                 {name: '河北',value: Math.round(Math.random()*1000)},
+    	                 {name: '河南',value: Math.round(Math.random()*1000)},
+    	                 {name: '云南',value: Math.round(Math.random()*1000)},
+    	                 {name: '辽宁',value: Math.round(Math.random()*1000)},
+    	                 {name: '黑龙江',value: Math.round(Math.random()*1000)},
+    	                 {name: '湖南',value: Math.round(Math.random()*1000)},
+    	                 {name: '安徽',value: Math.round(Math.random()*1000)},
+    	                 {name: '山东',value: Math.round(Math.random()*1000)},
+    	                 {name: '新疆',value: Math.round(Math.random()*1000)},
+    	                 {name: '江苏',value: Math.round(Math.random()*1000)},
+    	                 {name: '浙江',value: Math.round(Math.random()*1000)},
+    	                 {name: '江西',value: Math.round(Math.random()*1000)},
+    	                 {name: '湖北',value: Math.round(Math.random()*1000)},
+    	                 {name: '广西',value: Math.round(Math.random()*1000)},
+    	                 {name: '甘肃',value: Math.round(Math.random()*1000)},
+    	                 {name: '山西',value: Math.round(Math.random()*1000)},
+    	                 {name: '内蒙古',value: Math.round(Math.random()*1000)},
+    	                 {name: '陕西',value: Math.round(Math.random()*1000)},
+    	                 {name: '吉林',value: Math.round(Math.random()*1000)},
+    	                 {name: '福建',value: Math.round(Math.random()*1000)},
+    	                 {name: '贵州',value: Math.round(Math.random()*1000)},
+    	                 {name: '广东',value: Math.round(Math.random()*1000)},
+    	                 {name: '青海',value: Math.round(Math.random()*1000)},
+    	                 {name: '西藏',value: Math.round(Math.random()*1000)},
+    	                 {name: '四川',value: Math.round(Math.random()*1000)},
+    	                 {name: '宁夏',value: Math.round(Math.random()*1000)},
+    	                 {name: '海南',value: Math.round(Math.random()*1000)},
+    	                 {name: '台湾',value: Math.round(Math.random()*1000)},
+    	                 {name: '香港',value: Math.round(Math.random()*1000)},
+    	                 {name: '澳门',value: Math.round(Math.random()*1000)}
+    	            ]
+    	        }
+    	    ]
+    	};;
+    	if (option && typeof option === "object") {
+    	    myChart.setOption(option, true);
+    	}
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+CREATE TABLE `subscribe` (
+  `id` TINYINT(4) PRIMARY KEY AUTO_INCREMENT,
+  `proname` VARCHAR(50) COMMENT '系统名',
+  `url` VARCHAR(100)  COMMENT '分发消息的url',
+  `topic` VARCHAR(100)  COMMENT '订阅主题',
+  `tag` VARCHAR(100)  COMMENT '过滤的tag',
+  `gro` VARCHAR(100)  COMMENT '',
+  `consumeFromWhere` VARCHAR(100)  COMMENT '开始消费位置',
+  `consumeThreadMin` VARCHAR(100)  COMMENT '消费者最小线程',
+  `consumeThreadMax` VARCHAR(100)  COMMENT '消费者最大线程',
+  `pullThresholdForQueue` VARCHAR(100)  COMMENT '',
+  `consumeMessageBatchMaxSize` VARCHAR(100)  COMMENT '消费端每次消费最大数',
+  `pullBatchSize` VARCHAR(100)  COMMENT '',
+  `pullInterval` VARCHAR(100)  COMMENT '',
+  `businesskey` VARCHAR(100)  COMMENT '',
+  `STATUS` VARCHAR(100)  COMMENT '状态:0不可用,1可用',
+  `create_time` TIMESTAMP DEFAULT NOW(),
+  `update_time` TIMESTAMP DEFAULT NOW()
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
+
+insert  into `subscribe`(`id`,`proname`,`url`,`topic`,`tag`,`gro`,`consumeFromWhere`,`consumeThreadMin`,`consumeThreadMax`,`pullThresholdForQueue`,`consumeMessageBatchMaxSize`,`pullBatchSize`,`pullInterval`,`businesskey`,`STATUS`,`create_time`,`update_time`) values (1,'oa管理系统','http://localhost:8080/test2.html','topic2','tag2','g2','CONSUME_FROM_LAST_OFFSET','10','20','1000','1','32','0','{id:\"2\",name:\"bbb\"}','1','2018-01-08 16:38:42','2018-01-08 16:38:42'),(2,'crm管理系统','http://localhost:8080/test1.html','topic1','tag1','g1','CONSUME_FROM_LAST_OFFSET','10','20','1000','1','32','0','{id:\"1\",name:\"aaa\"}','1','2018-01-08 16:39:33','2018-01-08 16:39:33');
+
+SELECT * FROM subscribe

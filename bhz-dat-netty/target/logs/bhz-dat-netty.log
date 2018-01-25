@@ -1,0 +1,8 @@
+2018-01-09 14:57:45,270 INFO [com.alibaba.druid.pool.DruidDataSource] - {dataSource-1} inited
+2018-01-09 14:57:46,984 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x19dcc113] REGISTERED
+2018-01-09 14:57:46,987 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x19dcc113] BIND: 0.0.0.0/0.0.0.0:8765
+2018-01-09 14:57:46,991 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x19dcc113, /0:0:0:0:0:0:0:0:8765] ACTIVE
+2018-01-09 14:59:48,968 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x19dcc113, /0:0:0:0:0:0:0:0:8765] RECEIVED: [id: 0x82058ee1, /127.0.0.1:31358 => /127.0.0.1:8765]
+2018-01-09 15:02:18,046 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x19dcc113, /0:0:0:0:0:0:0:0:8765] RECEIVED: [id: 0xcce5fb68, /127.0.0.1:32058 => /127.0.0.1:8765]
+2018-01-09 15:09:49,393 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x19dcc113, /0:0:0:0:0:0:0:0:8765] RECEIVED: [id: 0xd7066f07, /127.0.0.1:34321 => /127.0.0.1:8765]
+2018-01-09 15:21:08,909 INFO [io.netty.handler.logging.LoggingHandler] - [id: 0x19dcc113, /0:0:0:0:0:0:0:0:8765] RECEIVED: [id: 0xab123844, /127.0.0.1:37730 => /127.0.0.1:8765]

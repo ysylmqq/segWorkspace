@@ -1,0 +1,12 @@
+bhz\sys\entity\Fault.class
+bhz\sys\entity\Alarm.class
+bhz\sys\entity\ChartData.class
+bhz\sys\entity\Vehicle.class
+bhz\sys\serial\SerializationOptimizerImpl.class
+bhz\sys\facade\VehicleService.class
+bhz\sys\facade\BaseService.class
+bhz\sys\entity\SysUser.class
+bhz\sys\facade\SysUserFacade.class
+bhz\sys\entity\BaseEntity.class
+bhz\sys\facade\AlarmService.class
+bhz\sys\facade\FaultService.class

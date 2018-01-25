@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+    <!-- 引入配置文件 -->
+    <context:property-placeholder location="classpath:config.properties" />
+
+	<!-- 消费服务名称 -->
+    <dubbo:application name="${dubbox.application}" owner="programmer" organization="dubbox"/>
+
+	<!-- zookeeper注册中心  zookeeper://192.168.1.111:2181 -->
+    <dubbo:registry address="${dubbox.registry.address}"/>
+    
+    <!-- kryo实现序列化  -->
+    <dubbo:protocol name="dubbo" serialization="kryo" optimizer="bhz.sys.serial.SerializationOptimizerImpl" />
+	
+	<!-- 生成远程服务代理，可以像使用本地bean。可以使用xml的形式配置，也可以使用注解的方式来实现  id 使用的时候调用-->
+  <!--    <dubbo:annotation package="com.service" />  -->
+  <!-- 消费方使用xml配置的方式  check="false"：启动的时候检测依赖的服务是否可用，为true依赖的服务没有启动时报错  -->
+	<!-- 生成远程服务接口配置 -->
+	<dubbo:reference interface="bhz.sys.facade.SysUserFacade" id="sysUserFacade" />
+	<dubbo:reference interface="bhz.sys.facade.AlarmService" id="alarmService" />
+	<dubbo:reference interface="bhz.sys.facade.VehicleService" id="vehicleService" />
+	<dubbo:reference interface="bhz.sys.facade.FaultService" id="faultService" />
+	
+</beans>

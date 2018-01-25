@@ -1,0 +1,13 @@
+bhz\sys\dao\impl\AlarmDaoImpl.class
+bhz\sys\dao\BaseDao.class
+bhz\sys\service\SysUserService.class
+bhz\sys\dao\impl\VehicleDaoImpl.class
+bhz\sys\service\VehicleServiceImpl.class
+bhz\sys\service\FaultServiceImpl.class
+bhz\sys\service\BaseServiceImpl.class
+bhz\sys\service\AlarmServiceImpl.class
+bhz\sys\dao\impl\BaseDaoImpl.class
+bhz\sys\dao\FaultDao.class
+bhz\sys\dao\AlarmDao.class
+bhz\sys\dao\impl\FaultDaoImpl.class
+bhz\sys\dao\VehicleDao.class

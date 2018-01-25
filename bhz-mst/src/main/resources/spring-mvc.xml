@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context" 
+    xmlns:tx="http://www.springframework.org/schema/tx"
+     xmlns:mvc="http://www.springframework.org/schema/mvc" 
+    xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    
+    <!-- 引入配置文件 -->
+     <context:property-placeholder location="classpath:config.properties" />
+     
+     	<!-- 扫描controller（controller层注入） -->  
+     <context:component-scan base-package="bhz.mst.controller"/>
+     
+     <!-- 启动注解   用这个一个 相当于注册了DefaultAnnotationHandlerMapping和AnnotationMethodHandlerAdapter两个bean  http://www.myexception.cn/web/726685.html-->
+    <mvc:annotation-driven/>
+    
+    <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">  
+	    <property name="supportedMediaTypes">  
+	        <list>  
+	            <value>text/html;charset=UTF-8</value>  
+	        </list>  
+	    </property>  
+	</bean>
+    <!-- 上传工具类 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="${env.defaultEncoding}" />
+        <property name="maxInMemorySize" value="${upload.maxMemSize}" />
+        <property name="maxUploadSize" value="${upload.maxFileSize}" />
+        <property name="uploadTempDir" value="${upload.tempDir}" />
+    </bean> 
+    
+	<!-- spring view过滤  -->
+    <bean id="pageResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+        <property name="prefix" value="/htmls/" />
+        <property name="suffix" value=".jsp" />
+        <property name="order" value="1" />
+    </bean>
+  
+    <!-- 静态资源处理器 -->  
+	<mvc:default-servlet-handler />
+</beans>

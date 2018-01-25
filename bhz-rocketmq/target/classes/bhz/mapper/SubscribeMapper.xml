@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="bhz.mapper.SubscribeMapper" >
+  <resultMap id="BaseResultMap" type="bhz.entity.Subscribe" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="proname" property="proname" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="topic" property="topic" jdbcType="VARCHAR" />
+    <result column="tag" property="tag" jdbcType="VARCHAR" />
+    <result column="gro" property="gro" jdbcType="VARCHAR" />
+    <result column="consumeFromWhere" property="consumefromwhere" jdbcType="VARCHAR" />
+    <result column="consumeThreadMin" property="consumethreadmin" jdbcType="VARCHAR" />
+    <result column="consumeThreadMax" property="consumethreadmax" jdbcType="VARCHAR" />
+    <result column="pullThresholdForQueue" property="pullthresholdforqueue" jdbcType="VARCHAR" />
+    <result column="consumeMessageBatchMaxSize" property="consumemessagebatchmaxsize" jdbcType="VARCHAR" />
+    <result column="pullBatchSize" property="pullbatchsize" jdbcType="VARCHAR" />
+    <result column="pullInterval" property="pullinterval" jdbcType="VARCHAR" />
+    <result column="businesskey" property="businesskey" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, proname, url, topic, tag, gro, consumeFromWhere, consumeThreadMin, consumeThreadMax, 
+    pullThresholdForQueue, consumeMessageBatchMaxSize, pullBatchSize, pullInterval, businesskey, 
+    status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from subscribe
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from subscribe
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="bhz.entity.Subscribe" >
+    insert into subscribe (id, proname, url, 
+      topic, tag, gro, consumeFromWhere, 
+      consumeThreadMin, consumeThreadMax, pullThresholdForQueue, 
+      consumeMessageBatchMaxSize, pullBatchSize, 
+      pullInterval, businesskey, status, 
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{proname,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, 
+      #{topic,jdbcType=VARCHAR}, #{tag,jdbcType=VARCHAR}, #{gro,jdbcType=VARCHAR}, #{consumefromwhere,jdbcType=VARCHAR}, 
+      #{consumethreadmin,jdbcType=VARCHAR}, #{consumethreadmax,jdbcType=VARCHAR}, #{pullthresholdforqueue,jdbcType=VARCHAR}, 
+      #{consumemessagebatchmaxsize,jdbcType=VARCHAR}, #{pullbatchsize,jdbcType=VARCHAR}, 
+      #{pullinterval,jdbcType=VARCHAR}, #{businesskey,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="bhz.entity.Subscribe" >
+    insert into subscribe
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="proname != null" >
+        proname,
+      </if>
+      <if test="url != null" >
+        url,
+      </if>
+      <if test="topic != null" >
+        topic,
+      </if>
+      <if test="tag != null" >
+        tag,
+      </if>
+      <if test="gro != null" >
+        gro,
+      </if>
+      <if test="consumefromwhere != null" >
+        consumeFromWhere,
+      </if>
+      <if test="consumethreadmin != null" >
+        consumeThreadMin,
+      </if>
+      <if test="consumethreadmax != null" >
+        consumeThreadMax,
+      </if>
+      <if test="pullthresholdforqueue != null" >
+        pullThresholdForQueue,
+      </if>
+      <if test="consumemessagebatchmaxsize != null" >
+        consumeMessageBatchMaxSize,
+      </if>
+      <if test="pullbatchsize != null" >
+        pullBatchSize,
+      </if>
+      <if test="pullinterval != null" >
+        pullInterval,
+      </if>
+      <if test="businesskey != null" >
+        businesskey,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="proname != null" >
+        #{proname,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="topic != null" >
+        #{topic,jdbcType=VARCHAR},
+      </if>
+      <if test="tag != null" >
+        #{tag,jdbcType=VARCHAR},
+      </if>
+      <if test="gro != null" >
+        #{gro,jdbcType=VARCHAR},
+      </if>
+      <if test="consumefromwhere != null" >
+        #{consumefromwhere,jdbcType=VARCHAR},
+      </if>
+      <if test="consumethreadmin != null" >
+        #{consumethreadmin,jdbcType=VARCHAR},
+      </if>
+      <if test="consumethreadmax != null" >
+        #{consumethreadmax,jdbcType=VARCHAR},
+      </if>
+      <if test="pullthresholdforqueue != null" >
+        #{pullthresholdforqueue,jdbcType=VARCHAR},
+      </if>
+      <if test="consumemessagebatchmaxsize != null" >
+        #{consumemessagebatchmaxsize,jdbcType=VARCHAR},
+      </if>
+      <if test="pullbatchsize != null" >
+        #{pullbatchsize,jdbcType=VARCHAR},
+      </if>
+      <if test="pullinterval != null" >
+        #{pullinterval,jdbcType=VARCHAR},
+      </if>
+      <if test="businesskey != null" >
+        #{businesskey,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="bhz.entity.Subscribe" >
+    update subscribe
+    <set >
+      <if test="proname != null" >
+        proname = #{proname,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="topic != null" >
+        topic = #{topic,jdbcType=VARCHAR},
+      </if>
+      <if test="tag != null" >
+        tag = #{tag,jdbcType=VARCHAR},
+      </if>
+      <if test="gro != null" >
+        gro = #{gro,jdbcType=VARCHAR},
+      </if>
+      <if test="consumefromwhere != null" >
+        consumeFromWhere = #{consumefromwhere,jdbcType=VARCHAR},
+      </if>
+      <if test="consumethreadmin != null" >
+        consumeThreadMin = #{consumethreadmin,jdbcType=VARCHAR},
+      </if>
+      <if test="consumethreadmax != null" >
+        consumeThreadMax = #{consumethreadmax,jdbcType=VARCHAR},
+      </if>
+      <if test="pullthresholdforqueue != null" >
+        pullThresholdForQueue = #{pullthresholdforqueue,jdbcType=VARCHAR},
+      </if>
+      <if test="consumemessagebatchmaxsize != null" >
+        consumeMessageBatchMaxSize = #{consumemessagebatchmaxsize,jdbcType=VARCHAR},
+      </if>
+      <if test="pullbatchsize != null" >
+        pullBatchSize = #{pullbatchsize,jdbcType=VARCHAR},
+      </if>
+      <if test="pullinterval != null" >
+        pullInterval = #{pullinterval,jdbcType=VARCHAR},
+      </if>
+      <if test="businesskey != null" >
+        businesskey = #{businesskey,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="bhz.entity.Subscribe" >
+    update subscribe
+    set proname = #{proname,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR},
+      topic = #{topic,jdbcType=VARCHAR},
+      tag = #{tag,jdbcType=VARCHAR},
+      gro = #{gro,jdbcType=VARCHAR},
+      consumeFromWhere = #{consumefromwhere,jdbcType=VARCHAR},
+      consumeThreadMin = #{consumethreadmin,jdbcType=VARCHAR},
+      consumeThreadMax = #{consumethreadmax,jdbcType=VARCHAR},
+      pullThresholdForQueue = #{pullthresholdforqueue,jdbcType=VARCHAR},
+      consumeMessageBatchMaxSize = #{consumemessagebatchmaxsize,jdbcType=VARCHAR},
+      pullBatchSize = #{pullbatchsize,jdbcType=VARCHAR},
+      pullInterval = #{pullinterval,jdbcType=VARCHAR},
+      businesskey = #{businesskey,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <!-- ******************************** 自定义SQL ************************************** -->
+  
+  <select id="findAllSubscribe" resultMap="BaseResultMap">
+  	SELECT * FROM SUBSCRIBE;
+  
+  </select>
+  
+  <select id="findByPage" resultType="map" resultMap="BaseResultMap">
+  	SELECT * FROM SUBSCRIBE S WHERE S.TOPIC LIKE CONCAT(#{TOPIC},"%");  
+  </select>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+</mapper>
