@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.ActiveReportMapper">
+
+	<select id="timesInPastDays" parameterType="map" resultType="map">
+		<![CDATA[
+		SELECT count(a.customer_id) y, CASE a.device_type WHEN 0 THEN 'Android' WHEN 1 THEN 'iOS' END name 
+			FROM (
+				SELECT customer_id, COUNT(customer_id) amount, device_type FROM t_app_login_info
+					WHERE stamp >= DATE_ADD(NOW(), INTERVAL -#{days} DAY)
+				GROUP BY customer_id, device_type
+			) a WHERE a.amount >= #{times} GROUP BY a.device_type
+		]]>
+	</select>
+	
+</mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.MaintainMapper">
+
+	<insert id="add" parameterType="Maintain">
+		INSERT INTO t_app_maintain
+			(vehicle_id, maintain_time, maintain_mileage, notice)
+		VALUES
+			(#{vehicleId}, DATE_ADD(NOW(), INTERVAL #{maintainTime} MONTH), #{maintainMileage}, #{notice})
+	</insert>
+
+	<select id="find" parameterType="Maintain" resultType="Maintain">
+		SELECT m.vehicle_id,
+			#{totalMileage} totalMileage,
+			m.maintain_mileage - #{totalMileage} maintainMileage,
+			DATEDIFF(m.maintain_time, NOW()) maintainTime, m.notice
+		FROM
+			t_app_maintain m
+  		WHERE
+  			m.vehicle_id = #{vehicleId}
+	</select>
+	
+	<update id="nextPeriod" parameterType="string">
+		UPDATE t_app_maintain SET
+			maintain_time = DATE_ADD(maintain_time, INTERVAL (SELECT interval_time FROM t_app_maintain_rule WHERE model = (SELECT model FROM t_ba_vehicle WHERE vehicle_id = #{vehicleId}) ) MONTH),
+			maintain_mileage = maintain_mileage + 
+			(SELECT interval_mileage FROM t_app_maintain_rule WHERE model = (SELECT model FROM t_ba_vehicle WHERE vehicle_id = #{vehicleId}))
+		WHERE vehicle_id = #{vehicleId}
+	</update>
+
+	<update id="edit" parameterType="Maintain">
+		UPDATE t_app_maintain SET notice = #{notice} WHERE vehicle_id = #{vehicleId}
+	</update>
+
+	<select id="findRuleByVehicleId" parameterType="string" resultType="MaintainRule">
+		SELECT * FROM t_app_maintain_rule WHERE model = (SELECT model FROM t_ba_vehicle WHERE vehicle_id = #{vehicleId})
+	</select>
+
+	<select id="findItemsByModel" parameterType="string" resultType="MaintainItems">
+		SELECT mr.first_service_mileage first, mr.second_service_mileage second, mr.interval_mileage `interval`,mi.*
+			FROM t_app_maintain_rule mr 
+				LEFT JOIN t_app_maintain_items mi ON mr.model = mi.model 
+			WHERE mr.model = #{model}
+	</select>
+	
+</mapper>

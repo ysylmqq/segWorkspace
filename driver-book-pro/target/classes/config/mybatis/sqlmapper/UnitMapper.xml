@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.UnitMapper">
+
+	<select id="findForRegister" parameterType="map" resultType="Unit">
+		SELECT u.* FROM t_ba_unit u LEFT JOIN t_ba_vehicle v ON u.vehicle_id = v.vehicle_id
+		WHERE u.call_letter = #{callLetter} AND v.service_pwd = #{servPwd}
+	</select>
+	
+	<select id="getCallLetterByBarcode" parameterType="string" resultType="string">
+		SELECT call_letter FROM t_ba_sim WHERE barcode = #{barcode}
+	</select>
+	
+	<select id="getUnitCallLetterSubcoNo" parameterType="string" resultType="java.lang.String">
+		SELECT call_letter FROM t_ba_unit WHERE subco_no = #{subco_no}
+	</select>
+	
+	<select id="getVinByBarcode" parameterType="string" resultType="string">
+		SELECT vin FROM t_ba_sim WHERE barcode = #{barcode}
+	</select>
+	
+	<select id="getCallLetterByVin" parameterType="string" resultType="string">
+		SELECT call_letter FROM t_ba_sim WHERE vin = #{vin}
+	</select>
+	
+	<select id="getBarcodeByVin" parameterType="string" resultType="string">
+		SELECT barcode FROM t_ba_sim WHERE vin = #{vin}
+	</select>
+	
+	<select id="findIsUsed" parameterType="string" resultType="Unit">
+		SELECT * FROM t_ba_unit WHERE call_letter = #{callLetter}
+	</select>
+	
+</mapper>

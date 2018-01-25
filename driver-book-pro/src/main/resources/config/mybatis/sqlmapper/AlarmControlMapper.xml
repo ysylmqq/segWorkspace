@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.AlarmControlMapper">
+  <resultMap id="BaseResultMap" type="com.chinagps.driverbook.pojo.AlarmControl">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="status_id" jdbcType="INTEGER" property="statusId" />
+    <result column="is_open" jdbcType="BIT" property="isOpen" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="stamp" jdbcType="TIMESTAMP" property="stamp" />
+    <result column="op_id" jdbcType="INTEGER" property="opId" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, status_id, is_open, remark, stamp, op_id
+  </sql>
+  <select id="selectByExample" parameterType="com.chinagps.driverbook.pojo.AlarmControlExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_alarm_control
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_alarm_control
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_alarm_control
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.chinagps.driverbook.pojo.AlarmControlExample">
+    delete from t_alarm_control
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.chinagps.driverbook.pojo.AlarmControl">
+    insert into t_alarm_control (id, status_id, is_open, 
+      remark, stamp, op_id
+      )
+    values (#{id,jdbcType=INTEGER}, #{statusId,jdbcType=INTEGER}, #{isOpen,jdbcType=BIT}, 
+      #{remark,jdbcType=VARCHAR}, #{stamp,jdbcType=TIMESTAMP}, #{opId,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.chinagps.driverbook.pojo.AlarmControl">
+    insert into t_alarm_control
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="statusId != null">
+        status_id,
+      </if>
+      <if test="isOpen != null">
+        is_open,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="stamp != null">
+        stamp,
+      </if>
+      <if test="opId != null">
+        op_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="statusId != null">
+        #{statusId,jdbcType=INTEGER},
+      </if>
+      <if test="isOpen != null">
+        #{isOpen,jdbcType=BIT},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="stamp != null">
+        #{stamp,jdbcType=TIMESTAMP},
+      </if>
+      <if test="opId != null">
+        #{opId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.chinagps.driverbook.pojo.AlarmControlExample" resultType="java.lang.Long">
+    select count(*) from t_alarm_control
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  
+  
+  <select id="selectAll"  resultType="com.chinagps.driverbook.pojo.AlarmControl">
+    select * from t_alarm_control
+  </select>
+  
+  <update id="updateByExampleSelective" parameterType="map">
+    update t_alarm_control
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.statusId != null">
+        status_id = #{record.statusId,jdbcType=INTEGER},
+      </if>
+      <if test="record.isOpen != null">
+        is_open = #{record.isOpen,jdbcType=BIT},
+      </if>
+      <if test="record.remark != null">
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stamp != null">
+        stamp = #{record.stamp,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.opId != null">
+        op_id = #{record.opId,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update t_alarm_control
+    set id = #{record.id,jdbcType=INTEGER},
+      status_id = #{record.statusId,jdbcType=INTEGER},
+      is_open = #{record.isOpen,jdbcType=BIT},
+      remark = #{record.remark,jdbcType=VARCHAR},
+      stamp = #{record.stamp,jdbcType=TIMESTAMP},
+      op_id = #{record.opId,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+    <update id="updateAlarmControl" parameterType="com.chinagps.driverbook.pojo.AlarmControl">
+    update t_alarm_control
+    set 
+      status_id = #{alarmControl.statusId,jdbcType=INTEGER},
+      is_open = #{alarmControl.isOpen,jdbcType=BIT},
+      stamp = current_timestamp
+     where  status_id = #{alarmControl.statusId,jdbcType=INTEGER}
+  </update>
+  
+    <update id="updateAlarmControlIsOpenTrue" parameterType="java.util.List">
+    update t_alarm_control
+    set 
+      is_open = true,
+      stamp = current_timestamp
+      <where>
+	    status_id in
+	 <foreach collection="statusIdList" item="item" index="index" 
+	 open="(" separator="," close=")">#{item}</foreach>
+	</where>
+  </update>
+   <update id="updateAlarmControlIsOpenFalse" parameterType="java.util.List">
+    update t_alarm_control
+    set 
+      is_open = false,
+      stamp = current_timestamp
+	 <where>
+	    status_id in
+	 <foreach collection="statusIdList" item="item" index="index" 
+	 open="(" separator="," close=")">#{item}</foreach>
+	</where>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.chinagps.driverbook.pojo.AlarmControl">
+    update t_alarm_control
+    <set>
+      <if test="statusId != null">
+        status_id = #{statusId,jdbcType=INTEGER},
+      </if>
+      <if test="isOpen != null">
+        is_open = #{isOpen,jdbcType=BIT},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="stamp != null">
+        stamp = #{stamp,jdbcType=TIMESTAMP},
+      </if>
+      <if test="opId != null">
+        op_id = #{opId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.chinagps.driverbook.pojo.AlarmControl">
+    update t_alarm_control
+    set status_id = #{statusId,jdbcType=INTEGER},
+      is_open = #{isOpen,jdbcType=BIT},
+      remark = #{remark,jdbcType=VARCHAR},
+      stamp = #{stamp,jdbcType=TIMESTAMP},
+      op_id = #{opId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

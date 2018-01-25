@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.NoticeHisMapper">
+
+	<sql id="condition">
+		<where>
+			<trim prefixOverrides="AND">
+				<if test="customerId != null">
+					AND customer_id = #{customerId}
+				</if>
+				<if test="callLetter != null">
+					AND call_letter = #{callLetter}
+				</if>
+				<if test="nType != null">
+					AND n_type = #{nType}
+				</if>
+				<if test="beginTime != null and endTime != null">
+					AND stamp BETWEEN #{beginTime} AND #{endTime}
+				</if>
+			</trim>
+		</where>
+	</sql>
+
+	<select id="countAll" parameterType="NoticeHis" resultType="integer">
+		SELECT COUNT(1) FROM t_app_notice_his
+		<include refid="condition"/>
+	</select>	
+	
+	<select id="findByPage" parameterType="NoticeHis" resultType="NoticeHis">
+		SELECT * FROM t_app_notice_his
+		<include refid="condition"/>
+		ORDER BY stamp DESC
+	</select>
+	
+	<insert id="add" parameterType="NoticeHis">
+		INSERT INTO t_app_notice_his
+			(call_letter, title, content)
+		VALUES
+			(#{callLetter}, #{title}, #{content})
+	</insert>
+	
+</mapper>

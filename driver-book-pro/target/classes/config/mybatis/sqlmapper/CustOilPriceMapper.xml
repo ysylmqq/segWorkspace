@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.CustOilPriceMapper">
+	<cache />
+	
+	<select id="find" parameterType="CustOilPrice" resultType="CustOilPrice">
+		SELECT cop.id, cop.customer_id, cop.vehicle_id, (SELECT v.oil_grade FROM t_ba_vehicle v WHERE v.vehicle_id = cop.vehicle_id) oilGrade, cop.price90, cop.price93, cop.price97, cop.price0, cop.stamp FROM t_app_cust_oil_price cop WHERE cop.customer_id = #{customerId} AND cop.vehicle_id = #{vehicleId}
+	</select>
+	
+	<insert id="add" parameterType="CustOilPrice">
+		INSERT INTO t_app_cust_oil_price
+			(customer_id, vehicle_id, price90, price93, price97, price0)
+		VALUES
+			(#{customerId}, #{vehicleId}, #{price90}, #{price93}, #{price97}, #{price0})
+	</insert>
+	
+	<update id="edit" parameterType="CustOilPrice">
+		UPDATE t_app_cust_oil_price
+			SET
+				price90 = #{price90},
+				price93 = #{price93},
+				price97 = #{price97},
+				price0 = #{price0}
+		WHERE
+			customer_id = #{customerId} AND vehicle_id = #{vehicleId}
+	</update>
+	
+</mapper>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.AppVersionMapper">
+
+	<select id="findLatest" parameterType="integer" resultType="AppVersion">
+		SELECT * FROM t_app_version WHERE origin = #{origin} ORDER BY stamp DESC LIMIT 1
+	</select>
+	
+	<sql id="queryParams">
+		<where>
+			<trim prefixOverrides="AND">
+				<if test="versionName != null and versionName != ''">
+					AND version_name LIKE '%${versionName}%'
+				</if>
+				<if test="origin != null">
+					AND origin = #{origin}
+				</if>
+			</trim>
+		</where>
+	</sql>
+	
+	<select id="countAll" parameterType="AppVersion" resultType="int">
+		SELECT COUNT(1) FROM t_app_version
+		<include refid="queryParams"/>
+	</select>
+	
+	<select id="findByPage" parameterType="AppVersion" resultType="AppVersion">
+		SELECT * FROM t_app_version 
+			<include refid="queryParams"/>
+		ORDER BY stamp DESC
+	</select>
+	
+	<insert id="add" parameterType="AppVersion">
+		INSERT INTO t_app_version
+			(origin, version_name, url, caption)
+		VALUES
+			(#{origin}, #{versionName}, #{url}, #{caption})
+	</insert>
+	
+	<delete id="removeById" parameterType="string">
+		DELETE FROM t_app_version WHERE id = #{id}
+	</delete>
+	
+</mapper>

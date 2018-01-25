@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.LinkmanMapper">
+	
+	<insert id="add" parameterType="Linkman">
+		INSERT INTO t_ba_linkman
+			(customer_id, vehicle_id, linkman_type, linkman, phone)
+		VALUES
+			(#{customerId}, #{vehicleId}, 1, #{linkman}, #{phone})
+	</insert>
+	
+	<update id="edit" parameterType="Linkman">
+		UPDATE t_ba_linkman SET
+			linkman = #{linkman},
+			phone = #{phone}
+		WHERE linkman_id = #{linkmanId}
+	</update>
+	
+	<select id="findById" parameterType="long" resultType="Linkman">
+		SELECT * FROM t_ba_linkman WHERE linkman_id = #{linkmanId}
+	</select>
+	
+	<select id="findByCustomerId" parameterType="long" resultType="Linkman">
+		SELECT * FROM t_ba_linkman WHERE customer_id = #{customerId} AND linkman_type = 1 AND appsign = 0 ORDER BY linkman_id LIMIT 1
+	</select>
+	
+</mapper>

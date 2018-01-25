@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.OrderVehicleMapper">
+	<cache eviction="LRU" flushInterval="1800000" />
+
+	<insert id="add" parameterType="OrderVehicle" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO t_app_order_vehicle
+			(order_id, vehicle_id, plate_no, call_letter)
+		VALUES
+			(#{orderId}, #{vehicleId}, #{plateNo}, #{callLetter})
+	</insert>
+	
+	<select id="findByOrderId" parameterType="string" resultType="OrderVehicle">
+		SELECT * FROM t_app_order_vehicle WHERE order_id = #{orderId}
+	</select>
+	
+</mapper>

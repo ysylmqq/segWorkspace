@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.NewsRecordMapper">
+	<cache/>
+	
+	<insert id="add" parameterType="NewsRecord">
+		INSERT INTO t_app_news_record
+			(news_id, customer_id, device)
+		VALUES
+			(#{newsId}, #{customerId}, #{device})
+	</insert>
+	
+	<select id="find" parameterType="NewsRecord" resultType="NewsRecord">
+		SELECT * FROM t_app_news_record WHERE news_id = #{newsId} AND customer_id = #{customerId}
+	</select>
+	
+</mapper>

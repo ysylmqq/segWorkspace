@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://code.alibabatech.com/schema/dubbo
+	http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+	http://www.springframework.org/schema/util 
+	http://www.springframework.org/schema/util/spring-util-3.0.xsd
+	http://www.springframework.org/schema/context  
+    http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	
+	<!-- 应用的名字  可以随便起 -->
+    <dubbo:application name="dubboProvider"/>
+    
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+	<!-- zookeeper注册中心   register="false" subscribe="false" 禁止服务注册到zookeeper中心-->
+    <dubbo:registry address="zookeeper://192.168.139.128:2181?backup=192.168.139.129:2181,192.168.139.130:2181" />
+
+    <!--  使用dubbo协议来暴露服务。可以配置多个协议来暴露服务。 报错是因为这个   kryo实现序列化  serialization="kryo" -->
+    <dubbo:protocol name="dubbo"  serialization="kryo"  extension="com.util.CacheControlFilter,com.util.CustomExceptionMapper" port="20880"/>
+    <!-- rest风格 -->
+    <!-- <dubbo:protocol name="rest" server="jetty" port="7777" contextpath="dubboProvider" accepts="500" />
+ 	  -->
+ 	  <!-- 可以为rest服务配置线程池大小;默认都是采用http长连接来访问 -->
+ 	   <dubbo:protocol name="rest" server="tomcat" port="7777" serialization="kryo"  extension="com.util.CacheControlFilter,com.util.CustomExceptionMapper" optimizer="com.util.SerializationOptimizerImpl" contextpath="dubboProvider" accepts="500" keepalive="false" dispatcher="all" threads="500"/> 
+ 
+     <context:component-scan base-package="com.service"/>
+ 	<!--  扫描dubbo注解,配置dubbo注解之后，会往zookeeper当中添加注册;可以使用注解的方式，也可以使用dubbo:service方式 -->
+     <dubbo:annotation package="com.service" />  
+     
+     
+     
+ <!-- 提供服务的一方使用注解的方式 -->
+    <!--  <dubbo:service interface="com.service.SimpleService" ref="simpleService" protocol="dubbo" />
+	 <bean id="simpleService" class="com.service.impl.SimpleServiceImpl"/>  -->
+	
+</beans>

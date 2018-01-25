@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.SigninReportMapper">
+
+	<select id="categories" parameterType="map" resultType="string">
+		
+		SELECT DISTINCT DATE_FORMAT(stamp, '%Y-%m') FROM t_app_login_info
+		<where>
+			<if test="beginTime != null and beginTime != ''">
+				DATE_FORMAT(stamp, '%Y-%m') >= #{beginTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				<![CDATA[ AND DATE_FORMAT(stamp, '%Y-%m') <= #{endTime} ]]>
+			</if>
+		</where>
+		ORDER BY DATE_FORMAT(stamp, '%Y-%m')
+	</select>
+	
+	<select id="loginInfo" parameterType="map" resultType="int">
+		SELECT COUNT(1) FROM t_app_login_info
+		<where>
+			<trim prefixOverrides="AND">
+				<if test="beginTime != null and beginTime != ''">
+					AND DATE_FORMAT(stamp, '%Y-%m') >= #{beginTime}
+				</if>
+				<if test="endTime != null and endTime != ''">
+					<![CDATA[ AND DATE_FORMAT(stamp, '%Y-%m') <= #{endTime} ]]>
+				</if>
+				<if test="deviceType != null and deviceType != ''">
+					AND device_type = #{deviceType} 
+				</if>
+			</trim>
+		</where>
+		GROUP BY DATE_FORMAT(stamp, '%Y-%m') ORDER BY DATE_FORMAT(stamp, '%Y-%m')
+	</select>
+	
+</mapper>

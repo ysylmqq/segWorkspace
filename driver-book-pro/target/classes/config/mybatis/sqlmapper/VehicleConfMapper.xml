@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.VehicleConfMapper">
+
+	<select id="findByCL" parameterType="string" resultType="VehicleConf">
+		<![CDATA[
+			select * from t_ba_vehicle_conf t where t.call_letter = #{call_letter}
+		]]>
+	</select>
+	
+</mapper>

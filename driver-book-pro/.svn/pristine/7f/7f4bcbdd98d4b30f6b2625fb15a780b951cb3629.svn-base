@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.AlipayLogMapper">
+	<cache />
+
+	<insert id="add" parameterType="AlipayLog">
+		INSERT INTO t_app_alipay_log
+			(customer_id, vehicle_id, order_id, payment_account, receive_account, amount, trade_no)
+		VALUES
+			(#{customerId}, #{vehicleId}, #{orderId}, #{paymentAccount}, #{receiveAccount}, #{amount}, #{tradeNo})
+		<selectKey order="AFTER" resultType="long" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+	</insert>
+	
+	<sql id="condition">
+		<where>
+			<trim prefixOverrides="AND">
+				<if test="customerId != null">
+					AND customer_id = #{customerId}
+				</if>
+				<if test="vehicleId != null">
+					AND vehicle_id = #{vehicleId}
+				</if>
+			</trim>
+		</where>
+	</sql>
+	
+	<select id="countAll" parameterType="AlipayLog" resultType="integer">
+		SELECT COUNT(1) FROM t_app_alipay_log
+		<include refid="condition"/>
+	</select>
+	
+	<select id="findByPage" parameterType="AlipayLog" resultType="AlipayLog">
+		SELECT * FROM t_app_alipay_log
+		<include refid="condition"/>
+	</select>
+	
+</mapper>

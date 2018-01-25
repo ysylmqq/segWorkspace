@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.DriverMapper">
+	<insert id="add" parameterType="Driver">
+		INSERT INTO t_ba_driver
+			(subco_no, customer_id, driver_name, idtype, dr_class, dr_bdate, dr_edate)
+		VALUES
+			(#{subcoNo}, #{customerId}, #{driverName}, #{idtype}, #{drClass}, #{drBdate}, #{drEdate})
+	</insert>
+	
+	<update id="edit" parameterType="Driver">
+		UPDATE t_ba_driver SET
+			dr_class = #{drClass},
+			dr_bdate = #{drBdate},
+			dr_edate = #{drEdate}
+		WHERE customer_id = #{customerId}
+	</update>
+	
+	<select id="findById" parameterType="long" resultType="Driver">
+		SELECT * FROM t_ba_driver WHERE driver_id = #{driverId}
+	</select>
+	
+	<select id="findByCustomerId" parameterType="long" resultType="Driver">
+		SELECT * FROM t_ba_driver WHERE customer_id = #{customerId} ORDER BY driver_id LIMIT 1
+	</select>
+</mapper>

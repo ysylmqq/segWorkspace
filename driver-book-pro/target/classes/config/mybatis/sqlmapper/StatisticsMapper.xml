@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.StatisticsMapper">
+
+	<select id="vehicleOilRank" parameterType="string" resultType="Score">
+		SELECT (SELECT COUNT(1) FROM t_app_statistics_7day) totalCount,
+			f_vehicle_rank(#{callLetter}) rank, oilcast
+		FROM t_app_statistics_7day WHERE call_letter = #{callLetter}
+	</select>
+	
+	<select id="weekSummary" parameterType="string" resultType="Statistics">
+		SELECT * FROM t_app_statistics_7day WHERE call_letter = #{callLetter}
+	</select>
+
+	<select id="monthSummary" parameterType="map" resultType="Statistics">
+		SELECT * FROM t_app_statistics_month WHERE call_letter = #{callLetter}
+		<choose>
+			<when test="month == null or month == ''">
+				AND date_format(month, '%Y-%m') = date_format(NOW(), '%Y-%m')
+			</when>
+			<otherwise>
+				AND date_format(month, '%Y-%m') = #{month}
+			</otherwise>
+		</choose>
+	</select>
+	
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.OpUnitMapper">
+
+	<insert id="add" parameterType="OpUnit">
+		INSERT INTO t_ba_op_unit
+			(op_id, vehicle_id, unit_id)
+		VALUES
+			(#{opId}, #{vehicleId}, #{unitId})
+	</insert>
+
+	<delete id="remove" parameterType="OpUnit">
+		DELETE FROM t_ba_op_unit WHERE op_id = #{opId} AND vehicle_id = #{vehicleId}
+	</delete>
+	
+	<select id="validateByOpidAndUnitId" parameterType="map" resultType="map">
+		SELECT (SELECT COUNT(1) FROM t_ba_op_unit WHERE unit_id = #{unitId}) isBind,
+				(SELECT COUNT(1) FROM t_ba_op_unit WHERE op_id = #{opId}) bindNum
+	</select>
+	
+</mapper>

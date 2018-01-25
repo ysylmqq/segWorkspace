@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.ContactsMapper">
+
+	<select id="findForSeatWithCallLetter" parameterType="map" resultType="map">
+		SELECT c.contact_name as contactName, c.contact_info as contactPhone,
+			(SELECT ct.name FROM t_app_contact_dict ct WHERE ct.type_id = c.type AND ct.pre_type_id = c.minitype) as contactType
+		FROM t_app_contacts c
+		WHERE
+			c.upload_version = (
+				SELECT cu.upload_version FROM t_app_contact_user cu WHERE cu.call_letter = #{callLetter} ORDER BY cu.id DESC LIMIT 1
+			)
+			<if test="contactName != null and contactName != ''">
+				AND c.contact_name LIKE '%${contactName}%' 
+			</if>
+			<if test="contactInfo != null and contactInfo != ''">
+				AND c.contact_info LIKE '%${contactInfo}%'
+			</if>
+	</select>
+
+	<select id="findForSeat" parameterType="map" resultType="map">
+		SELECT c.contact_name as contactName, c.contact_info as contactPhone, 
+			(SELECT ct.name FROM t_app_contact_dict ct WHERE ct.type_id = c.minitype AND ct.id = c.type) as contactType
+		FROM t_app_contacts c 
+		WHERE
+			c.upload_version = (
+				SELECT cu.upload_version FROM t_app_contact_user cu WHERE cu.customer_id = (
+					SELECT u.customer_id FROM t_ba_unit u WHERE u.call_letter = #{callLetter}
+				) ORDER BY cu.id DESC LIMIT 1
+			)
+		AND c.minitype = 5
+		<if test="contactName != null and contactName != ''">
+			AND c.contact_name LIKE #{contactName}
+		</if>
+		<if test="contactInfo != null and contactInfo != ''">
+			AND c.contact_info LIKE #{contactInfo}
+		</if>
+	</select>
+
+	<select id="findByCustomerIdAndCallLetter" parameterType="AddressBook" resultType="AddressBook">
+		SELECT cu.customer_id, cu.upload_version, cu.last_stamp, cu.device_type, cu.call_letter,
+			(SELECT COUNT(1) FROM (SELECT contact_key FROM t_app_contacts c 
+			WHERE c.upload_version = (SELECT upload_version FROM t_app_contact_user WHERE customer_id = #{customerId}
+			<choose>
+ 				<when test="callLetter != null and callLetter != ''">
+	 				AND call_letter = #{callLetter}
+ 				</when>
+ 				<otherwise>
+ 					AND call_letter IS NULL
+ 				</otherwise>
+ 			</choose>
+			ORDER BY last_stamp DESC LIMIT 1) GROUP BY c.contact_key) gc) totalCount
+ 		FROM t_app_contact_user cu WHERE customer_id = #{customerId}
+ 			<choose>
+ 				<when test="callLetter != null and callLetter != ''">
+	 				AND call_letter = #{callLetter}
+ 				</when>
+ 				<otherwise>
+ 					AND call_letter IS NULL
+ 				</otherwise>
+ 			</choose>
+ 		ORDER BY cu.last_stamp DESC LIMIT 1
+	</select>
+	
+	<select id="findContactKeys" parameterType="string" resultType="map">
+		SELECT contact_name n, upload_version v, contact_key k
+			FROM t_app_contacts
+		WHERE upload_version = #{uploadVersion} GROUP BY contact_key ORDER BY n
+	</select>
+
+	<select id="findContacts" parameterType="list" resultType="hashmap">
+		SELECT contact_info c, contact_key k, minitype m, `type` t, `label` l FROM t_app_contacts WHERE 
+		<foreach collection="list" item="item" separator="OR">
+			(upload_version = #{item.v} AND contact_key = #{item.k})
+		</foreach>
+	</select>
+	
+	<insert id="addUserContact" parameterType="AddressBook">
+		INSERT INTO t_app_contact_user
+			(customer_id, upload_version, device_type, call_letter)
+		VALUES
+			(#{customerId}, #{uploadVersion}, #{deviceType}, #{callLetter})
+	</insert>
+	
+	<insert id="addContactList" parameterType="list">
+		INSERT INTO t_app_contacts
+			(contact_name, contact_info, minitype, type, upload_version, contact_version, contact_key, label)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(#{item.contactName}, #{item.contactInfo}, #{item.minitype}, #{item.type}, #{item.uploadVersion}, #{item.contactVersion},#{item.contactKey}, #{item.label})
+		</foreach>
+	</insert>
+	
+	<delete id="removeUserContact" parameterType="AddressBook">
+		DELETE FROM t_app_contact_user WHERE customer_id = #{customerId} AND upload_version = #{uploadVersion}
+	</delete>
+	
+</mapper>

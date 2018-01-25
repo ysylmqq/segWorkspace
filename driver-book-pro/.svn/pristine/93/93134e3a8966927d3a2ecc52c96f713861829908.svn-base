@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.NoticeConfigMapper">
+	<cache />
+
+	<select id="findById" parameterType="long" resultType="NoticeConfig">
+		SELECT * FROM t_app_notice_config WHERE customer_id = #{customerId}
+	</select>
+	
+	<insert id="add" parameterType="NoticeConfig">
+		INSERT INTO t_app_notice_config
+			(customer_id, `maintain`, `charge`, `fault`, `illegal`, `offline`, `light`, `door`, `unlock`)
+		VALUES
+			(#{customerId}, #{maintain}, #{charge}, #{fault}, #{illegal}, #{offline}, #{light}, #{door}, #{unlock})
+	</insert>
+	
+	<update id="edit" parameterType="NoticeConfig">
+		UPDATE t_app_notice_config SET
+			<trim suffixOverrides=",">
+				<if test="maintain != null">
+					`maintain` = #{maintain},
+				</if>
+				<if test="charge != null">
+					`charge` = #{charge},
+				</if>
+				<if test="fault != null">
+					`fault` = #{fault},
+				</if>
+				<if test="illegal != null">
+					`illegal` = #{illegal},
+				</if>
+				<if test="offline != null">
+					`offline` = #{offline},
+				</if>
+				<if test="light != null">
+					`light` = #{light},
+				</if>
+				<if test="door != null">
+					`door` = #{door},
+				</if>
+				<if test="unlock != null">
+					`unlock` = #{unlock},
+				</if>
+			</trim>
+		WHERE customer_id = #{customerId}
+	</update>
+	
+</mapper>

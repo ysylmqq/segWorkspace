@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.OrderMapper">
+	<cache eviction="LRU" flushInterval="1800000" />
+
+	<resultMap id="orderMap" type="Order">
+		<id property="id" column="id"/>
+		<result property="customerId" column="customer_id"/>
+		<result property="subNo" column="sub_no"/>
+		<result property="orderName" column="order_name"/>
+		<result property="amount" column="amount"/>
+		<result property="payType" column="pay_type"/>
+		<result property="status" column="status"/>
+		<result property="stamp" column="stamp"/>
+		<collection property="vehicles" column="id" ofType="OrderVehicle" fetchType="eager" select="com.chinagps.driverbook.dao.OrderVehicleMapper.findByOrderId"/>
+	</resultMap>
+
+	<insert id="add" parameterType="Order">
+		INSERT INTO t_app_order
+			(id, customer_id, sub_no, order_name, amount, pay_type, is_pay, status)
+		VALUES
+			(#{id}, #{customerId}, #{subNo}, #{orderName}, #{amount}, #{payType}, 1, 1)
+	</insert>
+	
+	<select id="countAll" parameterType="Order" resultType="integer">
+		SELECT COUNT(1) FROM t_app_order
+	</select>
+	
+	<select id="findByPage" parameterType="Order" resultMap="orderMap">
+		SELECT * FROM t_app_order
+	</select>
+	
+	<update id="edit" parameterType="Order">
+		UPDATE t_app_order SET
+		<trim suffixOverrides=",">
+			<if test="isPay != null">
+				is_pay = #{isPay},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+		</trim>
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findByCustomerId" parameterType="long" resultType="Order">
+		SELECT * FROM t_app_order WHERE customer_id = #{customerId} AND is_pay = 1 AND DATE_ADD(stamp, INTERVAL 48 HOUR) >= NOW()
+		UNION ALL SELECT * FROM t_app_order WHERE customer_id = #{customerId} AND is_pay = 2
+		ORDER BY stamp DESC
+	</select>
+	
+	<select id="findById" parameterType="string" resultMap="orderMap">
+		SELECT * FROM t_app_order WHERE id = #{orderId}
+	</select>
+	
+</mapper>

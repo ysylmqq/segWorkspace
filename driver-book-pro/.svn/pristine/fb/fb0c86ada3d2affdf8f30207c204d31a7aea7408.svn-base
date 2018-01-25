@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.VehicleMapper">
+	
+	<select id="findById" parameterType="string" resultType="Vehicle">
+		SELECT v.vehicle_id, v.plate_no, v.brand, b.brand_name, v.series, s.series_name, v.model, m.model_name, v.register_date, v.oil_grade,
+		(CASE v.oil_grade
+				WHEN 190 THEN cop.price90
+				WHEN 193 THEN cop.price93
+				WHEN 197 THEN cop.price97
+				WHEN 200 THEN cop.price0
+				ELSE NULL 
+			END) AS price, v.4s_id AS fsId, v.insurance_id, ic.s_name AS insuranceName, v.vl_bdate, v.vin, v.service_pwd
+		 FROM t_ba_vehicle v
+			LEFT JOIN t_ba_brand b ON v.brand=b.brand_id
+			LEFT JOIN t_ba_series s ON v.series=s.series_id
+			LEFT JOIN t_ba_model m ON v.model=m.model_id
+			LEFT JOIN t_app_cust_oil_price cop ON v.vehicle_id = cop.vehicle_id
+			LEFT JOIN t_ba_ic ic ON v.insurance_id = ic.ic_id
+		WHERE v.vehicle_id = #{vehicleId}
+	</select>
+	
+	<update id="edit" parameterType="Vehicle">
+		UPDATE t_ba_vehicle
+			SET
+				<if test="brand != null and brand != ''">
+					brand = #{brand},
+				</if>
+				<if test="series != null and series != ''">
+					series = #{series},
+				</if>
+				<if test="model != null and model != ''">
+					model = #{model},
+				</if>
+				register_date = #{registerDate},
+				oil_grade = #{oilGrade},
+				insurance_id = #{insuranceId},
+				vl_bdate = #{vlBdate}
+		WHERE
+			vehicle_id = #{vehicleId}
+	</update>
+	
+	<select id="findListByCustomerId" parameterType="map" resultType="Vehicle">
+		SELECT
+			cv.customer_id, cv.vehicle_id, v.plate_no, u.call_letter, ut.unittype productCode, m.oil_volume,
+			v.brand, b.brand_name, v.series, s.series_name, v.model, m.model_name, v.register_date, v.oil_grade, 
+			(CASE v.oil_grade
+					WHEN 190 THEN cop.price90
+					WHEN 193 THEN cop.price93
+					WHEN 197 THEN cop.price97
+					WHEN 200 THEN cop.price0
+					ELSE NULL 
+				END) AS price, v.4s_id AS fsId, v.insurance_id, ic.s_name AS insuranceName, v.vl_bdate, v.vin, fi.fee_sedate
+		FROM t_ba_cust_vehicle cv 
+			JOIN t_ba_vehicle v ON cv.vehicle_id = v.vehicle_id
+			JOIN t_ba_unit u ON v.vehicle_id = u.vehicle_id and u.flag = 0
+			LEFT JOIN t_ba_unittype ut ON u.unittype_id = ut.unittype_id 
+			LEFT JOIN t_ba_brand b ON v.brand=b.brand_id
+			LEFT JOIN t_ba_series s ON v.series=s.series_id
+			LEFT JOIN t_ba_model m ON v.model=m.model_id
+			LEFT JOIN t_app_cust_oil_price cop ON v.vehicle_id = cop.vehicle_id
+			LEFT JOIN t_fee_info fi ON v.vehicle_id = fi.vehicle_id
+			<choose>
+				<when test="subcoNo != null and subcoNo == 201">
+					AND fi.feetype_id = 101
+				</when>
+				<otherwise>
+					AND fi.feetype_id = 1
+				</otherwise>
+			</choose>
+			LEFT JOIN t_ba_ic ic ON v.insurance_id = ic.ic_id
+		WHERE cv.customer_id = #{customerId}
+	</select>
+	
+	<select id="findByOpId" parameterType="map" resultType="Vehicle">
+		SELECT
+			ou.vehicle_id, v.plate_no, u.call_letter, ut.unittype productCode, m.oil_volume,
+			v.brand, b.brand_name, v.series, s.series_name, v.model, m.model_name, v.register_date, v.oil_grade, 
+			(CASE v.oil_grade
+					WHEN 190 THEN cop.price90
+					WHEN 193 THEN cop.price93
+					WHEN 197 THEN cop.price97
+					WHEN 200 THEN cop.price0
+					ELSE NULL 
+				END) AS price, v.4s_id AS fsId, v.insurance_id, ic.s_name AS insuranceName, v.vl_bdate, v.vin, fi.fee_sedate
+		FROM t_ba_op_unit ou 
+			JOIN t_ba_vehicle v ON ou.vehicle_id = v.vehicle_id
+			JOIN t_ba_unit u ON ou.unit_id = u.unit_id and u.flag = 0
+			LEFT JOIN t_ba_unittype ut ON u.unittype_id = ut.unittype_id
+			LEFT JOIN t_ba_brand b ON v.brand=b.brand_id
+			LEFT JOIN t_ba_series s ON v.series=s.series_id
+			LEFT JOIN t_ba_model m ON v.model=m.model_id
+			LEFT JOIN t_app_cust_oil_price cop ON v.vehicle_id = cop.vehicle_id
+			LEFT JOIN t_fee_info fi ON v.vehicle_id = fi.vehicle_id
+			<choose>
+				<when test="origin != null and origin == 2">
+					AND fi.feetype_id = 101
+				</when>
+				<otherwise>
+					AND fi.feetype_id = 1
+				</otherwise>
+			</choose>
+			LEFT JOIN t_ba_ic ic ON v.insurance_id = ic.ic_id
+		WHERE ou.op_id = #{opId}
+	</select>
+	
+	<select id="findByCallLetter" parameterType="string" resultType="Vehicle">
+		SELECT * FROM t_ba_vehicle WHERE vehicle_id = (SELECT vehicle_id FROM t_ba_unit WHERE call_letter = #{callLetter})
+	</select>
+	
+</mapper>

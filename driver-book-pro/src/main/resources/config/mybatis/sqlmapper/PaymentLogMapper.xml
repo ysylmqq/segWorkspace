@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.PaymentLogMapper">
+	<cache />
+
+	<insert id="add" parameterType="PaymentLog" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO t_app_payment_log
+			(order_id, pay_type, total_fee, buyer_account, trade_no, pay_time)
+		VALUES
+			(#{orderId}, #{payType}, #{totalFee}, #{buyerAccount}, #{tradeNo}, #{payTime})
+	</insert>
+	
+</mapper>

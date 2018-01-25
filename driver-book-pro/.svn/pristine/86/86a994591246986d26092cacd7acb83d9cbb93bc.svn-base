@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd">
+
+	<!-- 导入属性配置文件 -->
+	<context:property-placeholder location="classpath:jdbc.properties" file-encoding="UTF-8" order="1" ignore-unresolvable="true"/>
+
+	<bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+		<property name="driverClass" value="${jdbc.driver}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="idleConnectionTestPeriodInMinutes" value="240" />
+		<property name="idleMaxAgeInMinutes" value="60" />
+		<property name="maxConnectionsPerPartition" value="5" />
+		<property name="minConnectionsPerPartition" value="1" />
+		<property name="partitionCount" value="2" />
+		<property name="acquireIncrement" value="5" />
+		<property name="statementsCacheSize" value="10" />
+	</bean>
+
+	<bean id="paginationInterceptor" class="com.chinagps.driverbook.util.pagination.PaginationInterceptor" />
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.chinagps.driverbook.dao" />
+	</bean>
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="configLocation" value="classpath:config/mybatis/mybatis-config.xml" />
+		<property name="typeAliasesPackage" value="com.chinagps.driverbook.pojo" />
+		<property name="mapperLocations" value="classpath:config/mybatis/sqlmapper/*Mapper.xml" />
+		<property name="dataSource" ref="dataSource" />
+		<property name="plugins" ref="paginationInterceptor" />
+	</bean>
+	<bean  id ="schedulerTimer" class="java.util.Timer"></bean>
+
+<!-- 任务调度  spring3当总的timer  在spring4当中已经不存在了  -->
+   	 <!-- timeTask -->
+   	 <!--  <bean id="schedulerJob" class="com.chinagps.driverbook.util.SchedulerAlarmType"></bean>
+	  <bean id="timetask" class="org.springframework.scheduling.timer.MethodInvokingTimerTaskFactoryBean">
+	  	<property name="targetObject" ref="schedulerJob"></property>
+	  	<property name="targetMethod" value="refreshAlarmDate"></property>
+	  </bean>
+	  
+	  scheduledTask
+	  <bean id="scheduledTask" class="org.springframework.scheduling.timer.ScheduledTimerTask">
+	  	<property name="timerTask" ref="timetask"></property>
+	  	<property name="delay" value="10000"></property>
+	  	<property name="period" value="3000"></property>
+	  </bean>
+	  
+	  <bean id="timer" class="org.springframework.scheduling.timer.TimerFactoryBean">
+	  	<property name="scheduledTimerTasks">
+	  		<list>
+	  			<ref bean="scheduledTask"/>
+	  		</list>
+	  	</property>
+	  </bean> -->
+	  
+	  
+<!-- 任务调度  spring当总的quartz  -->
+	<bean id="schedulerJob" class="com.chinagps.driverbook.util.SchedulerAlarmType" />
+    <bean id="jobDetail"  
+        class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+        <property name="targetObject" ref="schedulerJob" />  
+        <property name="targetMethod" value="refreshAlarmDate" />  
+        <property name="concurrent" value="false" />  
+    </bean>  
+    <bean id="simpleTrigger"  
+        class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">  
+        <property name="jobDetail" ref="jobDetail" />  
+        <property name="startDelay" value="60000" />  
+        <property name="repeatInterval" value="300000" />  
+    </bean>  
+<!--  总调度用于启动Spring定时器  -->
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">  
+        <property name="triggers">  
+            <list>  
+                <ref bean="simpleTrigger" />  
+            </list>  
+        </property>  
+    </bean>    
+	
+
+	<!-- ================================= 事务控制相关 ============================================= -->
+	<bean name="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<tx:annotation-driven />
+	
+	<!-- 扫描除Controller以外的Bean（注解式事务重要配置） -->
+	<context:component-scan base-package="com.chinagps.driverbook">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.RestController" />
+	</context:component-scan>
+
+</beans>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.OilPriceMapper">
+	<cache />
+
+	<select id="findByProvince" parameterType="string" resultType="OilPrice">
+		SELECT * FROM t_app_oil_price WHERE province = #{province} ORDER BY stamp DESC limit 1
+	</select>
+	
+	<insert id="add" parameterType="OilPrice">
+		INSERT INTO t_app_oil_price
+			(province, price90, price93, price97, price0, stamp)
+		VALUES
+			(#{province}, #{price90}, #{price93}, #{price97}, #{price0}, NOW())
+	</insert>
+</mapper>

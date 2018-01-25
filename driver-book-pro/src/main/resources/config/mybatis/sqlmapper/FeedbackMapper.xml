@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.FeedbackMapper">
+	<cache/>
+
+	<insert id="add" parameterType="Feedback" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO t_app_feedback
+			(customer_id, version_name, device, origin, content, status)
+		VALUES
+			(#{customerId}, #{versionName}, #{device}, #{origin}, #{content}, 0)
+	</insert>
+	
+	<sql id="condition">
+		<where>
+			<trim prefixOverrides="AND">
+				<if test="customerId != null">
+					AND customer_id = #{customerId}
+				</if>
+			</trim>
+		</where>
+	</sql>
+	
+	<select id="countAll" parameterType="map" resultType="integer" useCache="false">
+		SELECT COUNT(1) FROM t_app_feedback
+		<include refid="condition"/>
+	</select>
+	
+	<select id="findByPage" parameterType="map" resultType="Feedback" useCache="false">
+		SELECT * FROM t_app_feedback
+		<include refid="condition"/>
+		ORDER BY stamp DESC
+	</select>
+	
+	<select id="findForFeedbackTask" resultType="Feedback" useCache="false">
+		SELECT * FROM t_app_feedback WHERE status = 1
+	</select>
+	
+	<update id="updateStatus" parameterType="long">
+		UPDATE t_app_feedback SET status = 2 WHERE id = #{id}
+	</update>
+	
+</mapper>

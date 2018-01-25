@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+	http://www.springframework.org/schema/context  
+    http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <dubbo:application name="dubbo-consumer"/>
+    
+    <dubbo:registry address="zookeeper://192.168.139.128:2181?backup=192.168.139.129:2181,192.168.139.130:2181" />
+    
+    <dubbo:protocol name="dubbo" serialization="kryo" optimizer="com.util.SerializationOptimizerImpl" />
+    
+    <!-- 生成远程服务代理，可以像使用本地bean。可以使用xml的形式配置，也可以使用注解的方式来实现  id 使用的时候调用-->
+  <!--    <dubbo:annotation package="com.service" />  -->
+  <!-- 消费方使用xml配置的方式  check="false"：启动的时候检测依赖的服务是否可用，为true依赖的服务没有启动时报错  -->
+	 <dubbo:reference interface="com.service.SimpleService" id="simpleService" check="false"/>
+	 <!--  url="dubbo://localhost:20880" cache="lru" -->
+	  
+</beans>

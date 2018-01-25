@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.AppBindMapper">
+	<!-- 
+		开启二级缓存 会影响bind结果 去掉二级缓存
+		<cache />
+ 	-->
+	<select id="find" parameterType="AppBind" resultType="AppBind">
+		SELECT * FROM t_app_bind WHERE customer_id = #{customerId}
+			<if test="origin != null">
+				AND origin = #{origin}
+			</if>
+			<choose>
+				<when test="callLetter != null and callLetter != ''">
+					AND call_letter = #{callLetter}
+				</when>
+				<otherwise>
+					AND call_letter IS NULL
+				</otherwise>
+			</choose>
+	</select>
+	
+	<insert id="add" parameterType="AppBind">
+		INSERT INTO t_app_bind
+			(customer_id, device_type, origin, app_id, channel_id, push_user_id, device_token, call_letter)
+		VALUES
+			(#{customerId}, #{deviceType}, #{origin}, #{appId}, #{channelId}, #{pushUserId}, #{deviceToken}, #{callLetter})
+	</insert>
+	
+	<update id="edit" parameterType="AppBind">
+		UPDATE t_app_bind SET
+			device_type = #{deviceType},
+			channel_id = #{channelId},
+			push_user_id = #{pushUserId},
+			device_token = #{deviceToken},
+			call_letter = #{callLetter}
+		WHERE
+			customer_id = #{customerId} AND origin = #{origin}
+			<if test="callLetter != null and callLetter != ''">
+				AND call_letter = #{callLetter}
+			</if>
+	</update>
+	
+	<select id="findByCustomerIdsAndOrigin" parameterType="map" resultType="AppBind">
+		SELECT * FROM t_app_bind WHERE origin = #{origin} AND customer_id IN (${customerIds}) 
+	</select>
+	
+	<select id="findByCallLetter" parameterType="string" resultType="AppBind">
+		SELECT * FROM t_app_bind WHERE customer_id = (SELECT customer_id FROM t_ba_unit WHERE call_letter = #{callLetter})
+	</select>
+	
+	<!-- ICE专用 -->
+	<select id="findForICE" parameterType="string" resultType="AppBind">
+		SELECT * FROM t_app_bind WHERE call_letter = #{callLetter}
+	</select>
+	
+</mapper>

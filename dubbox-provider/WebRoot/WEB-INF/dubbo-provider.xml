@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Copyright 1999-2011 Alibaba Group.
+ -  
+ - Licensed under the Apache License, Version 2.0 (the "License");
+ - you may not use this file except in compliance with the License.
+ - You may obtain a copy of the License at
+ -  
+ -      http://www.apache.org/licenses/LICENSE-2.0
+ -  
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS,
+ - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ - See the License for the specific language governing permissions and
+ - limitations under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+	
+	<!-- 引入zc-com通用类属性注入配置文件 -->
+	<util:properties id="zcparams" location="classpath:params.properties"></util:properties>
+
+
+    <dubbo:application name="provider" owner="programmer" organization="dubbox"/>
+
+    <dubbo:registry address="zookeeper://192.168.1.121:2181?backup=192.168.1.122:2181,192.168.1.123:2181"/>
+    
+    <!-- kryo实现序列化 -->
+    <dubbo:protocol name="dubbo" />
+
+    <dubbo:annotation package="bhz.service" />
+     
+    <dubbo:protocol name="rest" server="tomcat" port="8888" contextpath="provider" accepts="500" />
+    
+	<!-- 和本地bean一样实现服务 -->
+	<!-- 
+	<bean id="userService" class="bhz.service.impl.UserServiceImpl" />
+	<bean id="simpleService" class="bhz.service.impl.SimpleServiceImpl" />
+	 -->
+	
+	<!-- 声明需要暴露的服务接口 -->
+	<!--  
+	<dubbo:service interface="bhz.service.UserService" ref="userService" />
+	<dubbo:service interface="bhz.service.SimpleService" ref="simpleService" />
+	-->
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</beans>

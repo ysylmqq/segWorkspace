@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinagps.driverbook.dao.HealthHistoryMapper">
+
+	<select id="countAll" parameterType="HealthHistory" resultType="integer">
+		SELECT COUNT(1) FROM t_app_health_history WHERE call_letter = #{callLetter}
+	</select>
+	
+	<select id="findByPage" parameterType="HealthHistory" resultType="HealthHistory">
+		SELECT * FROM t_app_health_history WHERE call_letter = #{callLetter} ORDER BY stamp DESC
+	</select>
+	
+	<insert id="add" parameterType="HealthHistory" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO t_app_health_history
+			(call_letter, score)
+		VALUES
+			(#{callLetter}, #{score})
+	</insert>
+	
+</mapper>
