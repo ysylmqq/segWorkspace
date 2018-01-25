@@ -1,0 +1,7 @@
+org\com\springcloud\controller\UserController.class
+org\com\springcloud\service\UserService$1.class
+org\com\springcloud\entity\User.class
+org\com\springcloud\service\UserObserveCommand.class
+org\com\springcloud\service\UserService.class
+org\com\springcloud\service\UserCommand.class
+org\com\springcloud\SpringCloudConsumerMain.class

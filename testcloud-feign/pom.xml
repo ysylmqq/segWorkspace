@@ -1,0 +1,63 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.ysy.springcloud</groupId>
+  <artifactId>testcloud-feign</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <!-- 继承父类 -->
+  <parent>
+  	<groupId>com.ysy.springcloud</groupId>
+  	<artifactId>testcloud-parent</artifactId>
+  	<version>0.0.1-SNAPSHOT</version>
+	<!-- 设置父类的绝对路径 -->
+	<relativePath>../testcloud-parent/pom.xml</relativePath>
+  </parent> 
+  
+  <dependencies>
+  
+  		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		
+  		<!-- 客户端没有往eureka当中注册信息，是因为没有引入下面的eureka包，即使在配置文件当中配置了信息，也没有用 -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka</artifactId>
+			<version>1.3.4.RELEASE</version>
+		</dependency>
+  
+  		<!-- feign应用，是对ribbon和hystrix的高级封装 -->
+		<dependency>
+		    <groupId>org.springframework.cloud</groupId>
+		    <artifactId>spring-cloud-starter-feign</artifactId>
+		    <version>1.3.4.RELEASE</version>
+		</dependency>
+
+  </dependencies>
+  
+  <build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<classesDirectory>target/classes/</classesDirectory>
+					<archive>
+						<manifest>
+							<mainClass>org.com.springcloud.SpringCloudFeignMain</mainClass>
+							<!-- 打包时 MANIFEST.MF文件不记录的时间戳版本 -->
+							<useUniqueVersions>false</useUniqueVersions>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+						</manifest>
+						<manifestEntries>
+							<Class-Path>.</Class-Path>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+  
+</project>

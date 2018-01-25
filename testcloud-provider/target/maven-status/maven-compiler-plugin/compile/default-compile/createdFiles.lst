@@ -1,0 +1,7 @@
+org\com\springcloud\service\impl\UserServiceImpl.class
+org\com\springcloud\entity\User.class
+org\com\springcloud\service\UserService.class
+org\com\springcloud\controller\UserController.class
+org\com\springcloud\dao\UserDao.class
+org\com\springcloud\dao\impl\UserDaoImpl.class
+org\com\springcloud\SpringCloudProviderMain.class

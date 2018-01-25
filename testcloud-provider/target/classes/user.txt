@@ -1,0 +1,19 @@
+CREATE TABLE `user` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `name`  VARCHAR(255)  NOT NULL COMMENT '姓名',
+  `age`  VARCHAR(255)  NOT NULL COMMENT 'age',
+  `sex` VARCHAR(255) ,
+  PRIMARY KEY (`id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
+
+INSERT INTO USER(NAME,age,sex) VALUES('ysy1','26','m');
+INSERT INTO USER(NAME,age,sex) VALUES('ysy2','26','m');
+INSERT INTO USER(NAME,age,sex) VALUES('ysy3','26','m');
+INSERT INTO USER(NAME,age,sex) VALUES('ysy4','26','m');
+INSERT INTO USER(NAME,age,sex) VALUES('ysy5','26','m');
+INSERT INTO USER(NAME,age,sex) VALUES('ysy6','26','m');
+INSERT INTO USER(NAME,age,sex) VALUES('ysy7','26','m');
+INSERT INTO USER(NAME,age,sex) VALUES('ysy8','26','m');
+INSERT INTO USER(NAME,age,sex) VALUES('ysy9','26','m');
+INSERT INTO USER(NAME,age,sex) VALUES('ysy10','26','m');
+INSERT INTO USER(NAME,age,sex) VALUES('ysy11','26','m');

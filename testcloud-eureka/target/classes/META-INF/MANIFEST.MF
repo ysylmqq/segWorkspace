@@ -1,0 +1,76 @@
+Manifest-Version: 1.0
+Implementation-Title: testcloud-eureka
+Implementation-Version: 0.0.1-SNAPSHOT
+Built-By: ysy
+Implementation-Vendor-Id: com.ysy.springcloud
+Class-Path: . lib/spring-boot-starter-web-1.4.7.RELEASE.jar lib/spring
+ -boot-starter-1.4.7.RELEASE.jar lib/spring-boot-1.4.7.RELEASE.jar lib
+ /spring-boot-autoconfigure-1.4.7.RELEASE.jar lib/spring-boot-starter-
+ logging-1.4.7.RELEASE.jar lib/logback-classic-1.1.11.jar lib/logback-
+ core-1.1.11.jar lib/jcl-over-slf4j-1.7.25.jar lib/jul-to-slf4j-1.7.25
+ .jar lib/log4j-over-slf4j-1.7.25.jar lib/spring-core-4.3.9.RELEASE.ja
+ r lib/snakeyaml-1.17.jar lib/spring-boot-starter-tomcat-1.4.7.RELEASE
+ .jar lib/tomcat-embed-core-8.5.15.jar lib/tomcat-embed-el-8.5.15.jar 
+ lib/tomcat-embed-websocket-8.5.15.jar lib/hibernate-validator-5.2.5.F
+ inal.jar lib/validation-api-1.1.0.Final.jar lib/jboss-logging-3.3.1.F
+ inal.jar lib/classmate-1.3.3.jar lib/jackson-databind-2.8.8.jar lib/j
+ ackson-annotations-2.8.8.jar lib/jackson-core-2.8.8.jar lib/spring-we
+ b-4.3.9.RELEASE.jar lib/spring-aop-4.3.9.RELEASE.jar lib/spring-beans
+ -4.3.9.RELEASE.jar lib/spring-context-4.3.9.RELEASE.jar lib/spring-we
+ bmvc-4.3.9.RELEASE.jar lib/spring-expression-4.3.9.RELEASE.jar lib/sp
+ ring-cloud-starter-eureka-server-1.3.1.RELEASE.jar lib/spring-cloud-s
+ tarter-1.2.2.RELEASE.jar lib/spring-cloud-context-1.2.2.RELEASE.jar l
+ ib/spring-security-crypto-4.1.4.RELEASE.jar lib/spring-cloud-commons-
+ 1.2.2.RELEASE.jar lib/spring-security-rsa-1.0.3.RELEASE.jar lib/bcpki
+ x-jdk15on-1.55.jar lib/bcprov-jdk15on-1.55.jar lib/spring-cloud-netfl
+ ix-eureka-server-1.3.1.RELEASE.jar lib/spring-boot-starter-freemarker
+ -1.4.7.RELEASE.jar lib/freemarker-2.3.26-incubating.jar lib/spring-co
+ ntext-support-4.3.9.RELEASE.jar lib/spring-cloud-netflix-eureka-clien
+ t-1.3.1.RELEASE.jar lib/eureka-client-1.6.2.jar lib/jettison-1.3.7.ja
+ r lib/stax-api-1.0.1.jar lib/netflix-eventbus-0.3.0.jar lib/netflix-i
+ nfix-0.3.0.jar lib/commons-jxpath-1.3.jar lib/antlr-runtime-3.4.jar l
+ ib/stringtemplate-3.2.1.jar lib/antlr-2.7.7.jar lib/gson-2.7.jar lib/
+ commons-math-2.2.jar lib/jsr311-api-1.1.1.jar lib/servo-core-0.10.1.j
+ ar lib/servo-internal-0.10.1.jar lib/jersey-core-1.19.1.jar lib/jerse
+ y-client-1.19.1.jar lib/jersey-apache-client4-1.19.1.jar lib/guice-4.
+ 1.0.jar lib/aopalliance-1.0.jar lib/jersey-servlet-1.19.1.jar lib/jer
+ sey-server-1.19.1.jar lib/eureka-core-1.6.2.jar lib/aws-java-sdk-core
+ -1.11.9.jar lib/commons-logging-1.1.3.jar lib/jackson-dataformat-cbor
+ -2.8.8.jar lib/joda-time-2.9.9.jar lib/aws-java-sdk-ec2-1.11.9.jar li
+ b/aws-java-sdk-autoscaling-1.11.9.jar lib/aws-java-sdk-sts-1.11.9.jar
+  lib/aws-java-sdk-route53-1.11.9.jar lib/servlet-api-2.5.jar lib/wood
+ stox-core-asl-4.4.1.jar lib/stax-api-1.0-2.jar lib/archaius-core-0.7.
+ 4.jar lib/jsr305-3.0.1.jar lib/javax.inject-1.jar lib/jackson-datafor
+ mat-xml-2.8.8.jar lib/jackson-module-jaxb-annotations-2.8.8.jar lib/s
+ tax2-api-3.1.4.jar lib/woodstox-core-5.0.3.jar lib/xstream-1.4.9.jar 
+ lib/xmlpull-1.1.3.1.jar lib/xpp3_min-1.1.4c.jar lib/spring-cloud-star
+ ter-archaius-1.3.1.RELEASE.jar lib/commons-configuration-1.8.jar lib/
+ commons-lang-2.6.jar lib/guava-18.0.jar lib/spring-cloud-starter-ribb
+ on-1.3.1.RELEASE.jar lib/ribbon-2.2.2.jar lib/ribbon-transport-2.2.2.
+ jar lib/rxnetty-contexts-0.4.9.jar lib/rxnetty-servo-0.4.9.jar lib/rx
+ netty-0.4.9.jar lib/netty-codec-http-4.0.27.Final.jar lib/netty-codec
+ -4.0.27.Final.jar lib/netty-handler-4.0.27.Final.jar lib/netty-transp
+ ort-native-epoll-4.0.27.Final.jar lib/netty-common-4.0.27.Final.jar l
+ ib/netty-buffer-4.0.27.Final.jar lib/netty-transport-4.0.27.Final.jar
+  lib/ribbon-core-2.2.2.jar lib/ribbon-httpclient-2.2.2.jar lib/common
+ s-collections-3.2.2.jar lib/netflix-commons-util-0.1.1.jar lib/ribbon
+ -loadbalancer-2.2.2.jar lib/netflix-statistics-0.1.1.jar lib/rxjava-1
+ .1.10.jar lib/ribbon-eureka-2.2.2.jar lib/slf4j-api-1.7.25.jar lib/sp
+ ring-cloud-starter-hystrix-dashboard-1.3.4.RELEASE.jar lib/spring-clo
+ ud-netflix-hystrix-dashboard-1.3.4.RELEASE.jar lib/httpclient-4.5.3.j
+ ar lib/httpcore-4.4.6.jar lib/commons-codec-1.10.jar lib/jquery-2.1.1
+ .jar lib/d3js-3.4.11.jar lib/spring-cloud-starter-hystrix-1.3.4.RELEA
+ SE.jar lib/spring-cloud-netflix-core-1.3.4.RELEASE.jar lib/hystrix-co
+ re-1.5.12.jar lib/HdrHistogram-2.1.9.jar lib/hystrix-metrics-event-st
+ ream-1.5.12.jar lib/hystrix-serialization-1.5.12.jar lib/jackson-modu
+ le-afterburner-2.7.5.jar lib/hystrix-javanica-1.5.12.jar lib/commons-
+ lang3-3.1.jar lib/asm-5.0.4.jar lib/aspectjweaver-1.8.10.jar lib/spri
+ ng-boot-starter-actuator-1.3.4.RELEASE.jar lib/spring-boot-actuator-1
+ .4.7.RELEASE.jar
+Build-Jdk: 1.8.0_144
+Implementation-URL: http://projects.spring.io/spring-boot/testcloud-eu
+ reka/
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: Pivotal Software, Inc.
+Main-Class: org.com.springcloud.EurekaMain
+

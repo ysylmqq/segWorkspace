@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.ysy.springcloud</groupId>
+  <artifactId>testcloud-consumer-user</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+	  <!-- 继承父类 -->
+  <parent>
+  	<groupId>com.ysy.springcloud</groupId>
+  	<artifactId>testcloud-parent</artifactId>
+  	<version>0.0.1-SNAPSHOT</version>
+	<!-- 设置父类的绝对路径 -->
+	<relativePath>../testcloud-parent/pom.xml</relativePath>
+  </parent> 
+
+	<dependencies>
+		
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-ribbon</artifactId>
+			<version>1.3.4.RELEASE</version>
+		</dependency>
+			<!-- 客户端没有往eureka当中注册信息，是因为没有引入下面的eureka包，即使在配置文件当中配置了信息，也没有用 -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka</artifactId>
+			<version>1.3.4.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-zuul</artifactId>
+			<version>1.3.4.RELEASE</version>
+		</dependency>
+		
+		<!-- 
+			由于Spring boot使用的内嵌的tomcat，而内嵌的tamcat是不支持jsp页面的，
+			所有需要导入额外的包才能解决。不然的，访问的时候会出现下载
+			
+			官方不推荐jsp的支持
+			(jar包不支持jsp,jsp需要运行在servletContext中,war包需要运行在server服务器中如tomcat)
+			官方推荐使用thymeleaf，freemarker等模版引擎
+		 -->
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<!-- jsp标签库 -->
+        <dependency>
+           <groupId>javax.servlet</groupId>
+           <artifactId>jstl</artifactId>
+       </dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<classesDirectory>target/classes/</classesDirectory>
+					<archive>
+						<manifest>
+							<mainClass>org.com.springcloud.SpringCloudConsumerMain</mainClass>
+							<!-- 打包时 MANIFEST.MF文件不记录的时间戳版本 -->
+							<useUniqueVersions>false</useUniqueVersions>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+						</manifest>
+						<manifestEntries>
+							<Class-Path>.</Class-Path>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
