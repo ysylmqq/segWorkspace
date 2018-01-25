@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+	<form id='police_transferl' method='post' class="form" style="width:100%" >
+	<div class="title" >旧保单信息</div>
+		<fieldset style="width:850px;">
+			<div class='submit' style="text-align:left;">
+					 <input type='hidden' id="id" name='id'  />
+	            	<span style="width:100px;">入网名:</span>
+	                <input type='text' id="name" name="name"  disabled="disabled" style="width:150px;margin-right:5px;" />
+	                
+	                 
+	                <span style="width:100px;">意外投保人:</span>
+	                <input type='text' id="old_person" name='old_person' disabled="disabled" style="width:150px;" />   
+	                
+	                 <span style="width:100px;">车牌号:</span>
+	                <input type='text' id="old_car_num" name='old_car_num' disabled="disabled"  style="width:150px;" /> 
+	        </div>
+		</fieldset>
+		<div class="title" >过户后信息</div>
+		<fieldset style="width:850px;">
+			<div class="panel">
+	            	<span style="width:100px;">保单号:</span>
+	                <input type='text' id="policyno" name='policyno' disabled="disabled" style="width:155px;" />
+	                 <input type='hidden' id="transferl_id" name='id'  />
+	                 <input type='hidden' id="customer_name" name='customer_name'  />
+	                  <input type='hidden' id="customer_id" name='customer_id'  />
+	                  <input type='hidden' id="status" name='status'  />
+	                    <input type='hidden' id="subco_no" name='subco_no'  />
+	                <span style="width:100px;">投保公司:</span>
+	                <select id="company" name="company" style="width:160px;">
+	                	<option value="1">太平洋保险</option>
+	                	<option value="2">深圳平安保险</option>
+	                </select>                
+	        </div>
+	        <div class="panel">
+	            	<span style="width:100px;">入网名:</span>
+	                <input type='text' id="loginname" name='loginname' required="true"  disabled="disabled" style="width:155px;" />
+	                
+	                <span style="width:100px;">身份证:</span>
+	                <input type='text' id="idcard" name='idcard' disabled="disabled"  style="width:155px;" /> 
+	                  <input type='hidden' id="idcard1" name='idcard1'  />  
+	                
+	                <span style="width:100px;">移动电话:</span>
+	                <input type='text' id="phone" name="phone" list="phoneList" style="width:155px;" />   
+	                 <datalist id='phoneList'></datalist>
+		               
+	                
+	                           
+	        </div>
+	        <div class="panel">
+	            	<span style="width:100px;">意外投保人:</span>
+	                <input type='text' id="person" name='person' required="true" style="width:155px;" />
+	                
+	                <span style="width:100px;">身份证:</span>
+	                <input type='text' id="ywidcard" name='ywidcard' onkeyup="a(this)"  required="true" style="width:155px;" />
+	                 <input type='hidden' id="ywidcard1" name='ywidcard1'  />
+	                
+	                <span style="width:100px;">出生日期:</span>
+	              <input type='date' id="birthday" name='birthday' style="width:155px;" />           
+	        </div>
+	        <div class="panel">
+	        		<span style="width:100px;">固定电话:</span>
+	                <input type='text' id="mobile" name="mobile" style="width:155px;" /> 
+	                
+	            	<span style="width:100px;">已购盗抢险:</span>
+	                <input type="radio" name="is_buypilfer" checked="checked" id="is_buypilfer1" value="0" style="position: relative; top:5px;margin-right:5px;" />是
+            		&nbsp;
+            		<input type="radio" name="is_buypilfer" id="is_buypilfer2" value="1" style="position: relative; top:5px;margin-right:5px;" />否 
+              
+	        </div>
+	        <div class="panel">
+	            	<span style="width:100px;">车牌号码:</span>
+	                <input type='text' id="carNum" name='carNum' required="true" disabled="disabled" style="width:155px;" />
+	                
+	                <span style="width:100px;">车牌型号:</span>
+	                <input type='text' id="vCode" name='vCode'  disabled="disabled" style="width:155px;" /> 
+	                
+	                 <input type='hidden' id="vehicle_id" name='vehicle_id' style="width:155px;" />  
+	                
+	                <span style="width:100px;">新车价:</span>
+	                <input type='text' id="money" name='money' disabled="disabled" style="width:155px;" />              
+	        </div>
+	        <div class="panel">
+	            	<span style="width:100px;">发动机号:</span>
+	                <input type='text' id="ennum" name='ennum' disabled="disabled" style="width:155px;" />
+	                
+	                <span style="width:100px;">车架号:</span>
+	                <input type='text' id="chassnum" name='chassnum' disabled="disabled" style="width:155px;" />  
+	                
+	                <span style="width:100px;">车辆初次登记日:</span>
+	                <input type='date' id="registerTime" name='registerTime' disabled="disabled" style="width:155px;" />              
+	        </div>
+	        <div class="panel">
+	            	<span style="width:100px;">GPS型号:</span>
+	                <input type='text' id="ucall" name='ucall' disabled="disabled" style="width:155px;" />
+	                <input type='hidden' id="ucall2" name='ucall'  />
+	                
+	                <span style="width:100px;">机身编号:</span>
+	                <input type='text' id="code" name='code' disabled="disabled" style="width:155px;" />  
+	                
+	                <span style="width:100px;">安装日期:</span>
+	                <input type='date' id="uTime" name='uTime' disabled="disabled" style="width:155px;" />              
+	        </div>	        
+	        <div class="panel">
+	            	<span style="width:100px;">服务开始日期:</span>
+	                <input type='date' id="start_time" name='start_time' required="true" style="width:155px;" />
+	                
+	                <span style="width:100px;">服务截止日期:</span>
+	                <input type='date' id="end_time" name='end_time' required="true" style="width:155px;" />  
+	                
+	                <span style="width:100px;">保险金额:</span>
+	                 <select id="policyMoney" name="policyMoney" style="width:155px;">
+	                	<option value="100000">10万</option>
+	                	<option value="150000">15万</option>
+	                	<option value="200000">20万</option>
+	                	<option value="300000">30万</option>
+	                	<option value="400000">40万</option>
+	                	<option value="500000">50万</option>
+	                	<option value="600000">60万</option>
+	                	<option value="700000">70万</option>
+	                	<option value="800000">80万</option>
+	                	<option value="900000">90万</option>
+	                	<option value="1000000">100万</option>
+	                </select>   
+	        </div>
+	        <div class="panel">
+	            	<span style="width:100px;">联系地址:</span>
+	                <input type='text' id="address" name='address' required="true" style="width:432px;" />
+	                
+	                <span style="width:100px;">销售员:</span>
+	                <input type='text' id="sales_person" name='sales_person' style="width:155px;" />    
+	        </div>
+	        <div class="panel">
+	        		<span style="width:100px;">保险费用:</span>
+	                <input type='number' id="policyFee" name='policyFee' required="true" style="width:155px;" /> 
+	                
+	                <span style="width:100px;">缴费方式:</span>
+	                <input type="radio" name="payment" id="payment0"  value="0" checked="checked" style="position: relative; top:5px;margin-right:5px;" />年
+            		&nbsp;
+            		<input type="radio" name="payment" id="payment2" value="1" style="position: relative; top:5px;margin-right:5px;" />月
+	                
+	            	<span style="width:100px;margin-left:85px;">是否包含套餐内:</span>
+	                <input type="radio" name="is_contain" id="is_contain1" value="0" checked="checked"  style="position: relative; top:5px;margin-right:5px;" />是
+            		&nbsp;
+            		<input type="radio" name="is_contain" id="is_contain2" value="1" style="position: relative; top:5px;margin-right:5px;" />否 
+              
+	        </div>
+		</fieldset>
+	<!-- 	<fieldset style="width:850px;border-top:0px;">	
+	        <div class='submit' style="height:25px">
+	            <button id="order_detail_submit" type="button" >打印</button>
+	            <button id="mysave" type="submit" >保存</button> 
+	            <button id="mycancel" type="reset">重置</button>
+	        </div>
+        </fieldset> -->
+       <!--  <div class="title" id="today_policy">当日保单列表</div>
+        <fieldset style="width:850px;">
+			<div id="dgd_work_detail" class="datagird"></div>
+		</fieldset> -->
+	</form>
+</body>
+<script type="text/javascript">
+
+
+function a(Xtext)
+{
+    var str=Xtext.value;
+        if(str.length%5==4)
+            Xtext.value=Xtext.value+" ";
+}
+
+function formatStr(str)
+{
+	var result='';
+	if(str == null){
+		return "";
+	}else{
+		for(var i = 0; i < str.length; i++)
+		  {
+		      if (i % 4 == 0 && i != 0)
+		      {
+		      	result = result + " " + str.charAt(i)
+		      }
+		      else
+		      {
+		      	result = result + str.charAt(i)
+		      }
+		  }
+		return result;
+	}
+}
+
+
+
+
+
+$("#police_transferl  #phone").on('click',function(){
+	 
+
+	$.ajax({
+		  type : 'post', 
+		  async: true,   
+		  url : '/sos/getLinkMan',   
+		  data:{customer_id:$("#customer_id","#police_transferl").val()},
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#phone");
+					  phoneList = {};
+					  if(data.length>0){
+						  $("#phoneList").empty();
+					  }
+					  $.each(data,function(k,v){
+						  var op = "<option value='"+v.phone+"'>"+v.linkman+"</option>"
+						  $("#phoneList").append(op); 
+						  
+				  	 }); 
+			  }else{
+			  	alert(data);
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	 alert("responseText="+res.responseText+";error="+error);     
+		  }    
+		});
+   
+});
+
+
+
+
+
+
+
+(function($){
+	
+    $.ajax( {
+		  type : 'POST', 
+		  async: false,   
+		  url : "/sos/policy/getPolicyNo",   
+		  data:{},
+		  success : function(data) {
+			  if(data){
+				  $("#policyno").val(data);
+			  }
+		  } 
+	});
+   
+})(jQuery)
+
+</script>
+</html>

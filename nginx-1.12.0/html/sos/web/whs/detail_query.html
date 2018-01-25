@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div id="whs_detail_query" class="datagird"></div>
+
+</body>
+<script type="text/javascript">
+	(function($){
+		//初始化表格
+	 var now =new Date().format('yyyy-MM-dd');
+   	 var defaults = {
+   		        width:  990,
+   		        height: 400,
+   		        url: '../../stock/findStockInOutDetails2',
+   		        query:{startDate:now,endDate:now},
+   		        rownumbers:true,//序号
+   		        colModel : [
+   		            {display: '商品名称', name : 'productName', width : 200, sortable : true},
+   		         	{display: '出入库标识', name : 'type', width : 60, sortable : false},
+   		            {display: '数量', name : 'inOutNum', width : 80, sortable : false},
+   		            {display: '出入库时间', name : 'stamp', width : 100, sortable : false},
+   		         	{display: '经办人名称', name : 'managerName', width : 80, sortable : false},
+   		         	{display: '客户名称', name : 'channelName', width : 120, sortable : false},
+   		      		{display: '仓库管理员', name : 'whsManagerName', width : 80, sortable : false},
+   		      		{display: '仓库名称', name : 'whsName', width : 120, sortable : false}
+   		        ],
+   		        searchitems :[
+   		            {display:'商品名称',name:'productName',type:'text'},
+   		         	{display:'开始日期',name:'startDate',type:'date',value:now},
+   		      		{display:'结束日期',name:'endDate',type:'date',value:now}
+   		        ],
+   		        sortname: "productName",
+   		        sortorder: "asc"
+   		    };
+   		    $('#whs_detail_query').sgDatagrid(defaults); 
+	})(jQuery)
+</script>
+</html>

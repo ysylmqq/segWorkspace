@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>业务处理主页面</title>
+    <link rel="stylesheet" type="text/css" href="css/ba_layout.css">
+</head>
+
+<body>
+    <aside id="whs_left" style="overflow: auto" class="ba_left"></aside>
+    <article id="whs_content" class="ba_content"></article>
+</body>
+<script type="text/javascript">
+    (function($){
+
+        $("#whs_left").load("web/whs/left.html");
+        $("#whs_content").load("web/whs/content.html");
+
+    })(jQuery)
+</script>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>工单结束</title>
+<style>
+
+</style>
+</head>
+<body>
+	<form id='follow' method='post' class="form" style="width:370px;">
+		<fieldset style="width:350px;">
+			<div class="panel">
+                <span>客户:</span>
+                <input type='text' id="customer" name='customer'  style="width:200px;" disabled="disabled"/>
+                <input type='hidden' id="taskId" name="taskId" />
+            </div>
+           
+            <div class="panel">    
+                <span>联系电话:</span>
+                <input type='text' id="num" name="num"  style="width:200px;" />
+            </div>
+            <div class="panel">
+            	<span style="vertical-align:top;">备注:</span>
+                <textarea id="remark" name="remark" style="width:204px;" rows="2"></textarea>
+            </div>
+        </fieldset>
+
+	</form>
+</body>
+<script type="text/javascript">
+
+function initCompanyno() {
+	var company = document.getElementById('company');
+	$('#companyno').val(company.options[company.selectedIndex].value);
+}
+
+ (function($) {
+})(jQuery)
+
+
+</script>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>APP账号管理</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+</head>
+<body>
+	<div id="monitoring"><!-- nw_document_all -->
+		<div class='datagrid' id="accountMng">
+    	</div>
+    </div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+    (function($) {
+    	
+    	var editId = null;//编辑时选中行ID
+		var editObj = null;//编辑时选中行对象
+		
+		var loadSuccess = function() {
+			$('#loginname','#account_content').val(editObj['loginname']);
+			$('#opname','#account_content').val(editObj['opname']);
+			$('#mobile','#account_content').val(editObj['mobile']);
+			$('#numberplate','#account_content').val(editObj['numberplate']);
+			$('#mail','#account_content').val(editObj['mail']);
+		}
+		
+		var save4update = function() {
+			$("#account_content").on('submit',
+					function(e) {
+				$.ajax({
+					type : 'post',
+					async : false,
+					contentType : 'application/json',
+					dataType : 'json',
+					url : '../../updateAccount',
+					data : JSON.stringify({
+						dn : editObj['dn'],
+						opname : $('#opname', '#account_content').val(),
+						loginname : $('#loginname', '#account_content').val(),
+						mobile : $('#mobile', '#account_content').val(),
+						numberplate : $('#numberplate', '#account_content').val(),
+						mail : $('#mail', '#account_content').val()
+					}),
+					success : function(data) {
+						if (data) {
+							if (data.success) {
+								$(document).sgWindow('close', {
+									id : 'account_update_window'
+								});
+								$('#accountMng').sgDatagrid('reload','sgDatagrid');
+							}
+							$(document).sgPup({message:'message_alert',text: data.msg});
+						}
+					},
+					error : function(res, error) {
+						alert("responseText=" + res.responseText
+								+ ";error=" + error);
+					}
+				});
+				$('#account_content').unbind();//以下两行可以阻止提交2次
+				e.stopPropagation();
+				return false;
+			});
+		};
+		
+		var winClose = function() {
+			$(document).sgWindow('close', {
+				id : 'account_update_window'
+			});
+		}
+    	
+    	var editItem = function() {
+			var obj = $('#accountMng');
+			var bDiv = $('.bDiv', obj);
+			if ($('input[type=checkbox][checked=checked]', bDiv) != null
+					&& $('input[type=checkbox][checked=checked]', bDiv).length == 1) {
+				$('input[type=checkbox][checked=checked]', bDiv).each(
+				function() {
+					if ($(this).attr("checked")) {
+						editId = this.value;
+						editObj = $(this).data('data');
+						//打开窗口
+						var defaults = {
+							title : '修改账号信息',
+							id : 'account_update_window',
+							form : 'account_content',
+							url : 'account_update.html',
+							success : loadSuccess,
+							width : 405,
+							height : 230,
+							buttons : [ {
+								name : '确定',
+								type : 'submit',
+								onpress : save4update
+							}, {
+								name : '取消',
+								onpress : winClose
+							} ]
+						};
+						$(document).sgWindow(defaults);
+					}
+				});
+			} else if ($('input[type=checkbox][checked=checked]', bDiv) != null
+					&& $('input[type=checkbox][checked=checked]', bDiv).length > 1) {
+				$(document).sgPup({message:'message_alert',text: "不能选择多于一个选项！"});
+			} else {
+				$(document).sgPup({message:'message_alert',text: "请选择一个选项！"});
+			}
+		}
+    	
+    	//初始化表格
+    	var defaults = {
+    		        title: "APP账号管理",
+    		        width:  '100%',
+    		        height: 446,
+    		        url:'',
+    		        datatype:"json",
+    		        isNotCheckall:true,
+    		        usepager: true,
+    			    rownumbers:true,
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '姓名', name : 'opname', width : 140},
+						{display: '登录名', name : 'loginname', width : 140},
+						{display: '联系电话', name : 'mobile', width : 140},
+						{display: '车牌号码', name : 'numberplate', width : 140},
+						{display: '邮箱', name : 'mail', width : 140}
+    		        ],
+    		        buttons : [
+						{name : '修改账号',bclass : 'edit',onpress : editItem}
+    		        ],
+    		        searchitems :[
+						{display:'姓名',html:'<span class="ltext"><input type="text" name="opname" id="opname" class="form-control"/></span>'},
+						{display:'登录名',html:'<span class="ltext"><input type="text" name="loginname" id="loginname" class="form-control"/></span>'},
+						{display:'联系电话',html:'<span class="ltext"><input type="text" name="mobile" id="mobile" class="form-control"/></span>'},
+						{display:'车牌号码',html:'<span class="ltext"><input type="text" name="numberplate" id="numberplate" class="form-control"/></span>'},
+						{display:'邮箱',html:'<span class="ltext"><input type="text" name="mail" id="mail" class="form-control"/></span>'}
+    		        ],
+    		        exporturl:'../../exportAccounts'//导出excel
+    		    };
+    		    $('#accountMng').sgDatagrid(defaults);
+	   		    
+	   			//重新赋值url
+      		    var settings =  $('#accountMng').data('sgDatagrid');
+    		    settings.url='../../getAccounts';
+    		    $('#accountMng').data('sgDatagrid',settings);
+	   		    
+    })(jQuery);
+</script>
+<script type="text/javascript">
+$.fn.datetimepicker.dates['zh'] = {
+    days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+    daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+    daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+    months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+    monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+    meridiem : [ "上午", "下午" ],
+    today : "今天"
+};
+$(document).ready(function(){
+    $(".form_datetime").datetimepicker({
+        language : "zh",
+        autoclose: true,
+        minView: "month",
+        format : 'yyyy-mm-dd'
+    });
+});
+</script>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>海马新装用户查询 </title>
+<link rel="stylesheet" type="text/css" href="../../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../../bslib/css/bootstrap-datetimepicker.css" /><!-- +++++ -->
+<link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../../css/pup.css">
+</head>
+<body>
+<div id="monitoring"><!-- nw_document_all -->
+ <div id="dgd_unit_innet" class="datagrid"></div>
+ <datalist id="companyDataList"></datalist>
+ </div>
+ <!-- 打印iframe -->
+<iframe id="ifm_print_stock_main" name="ifm_print_stock_main" style="display: none"></iframe>
+</body>
+<script type="text/javascript" src="../../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../../bslib/js/bootstrap-datetimepicker.js"></script><!-- ++++ -->
+<script type="text/javascript" src="../../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../../jscript/index.js"></script>
+<script type="text/javascript" src="../../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../../jscript/form.js"></script>
+<script type="text/javascript" src="../../../jscript/pup.js" ></script>
+<script type="text/javascript">
+    var level='0';//判断用户是总部、分公司、营业处的人
+    (function($){
+        var companyDataList = null;
+        var lastMonthDay=new Date();//上个月的今天
+        //lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+        lastMonthDay.setDate(1);
+        lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+        var today=new Date().format('yyyy-MM-dd');
+        
+          //修改表格的宽度
+        var height =$('#main_bd',window.parent.document).height()-288;
+        var startDateHTML = '<span class="ltext"><input type="text" name="startDate" class="form-control form_datetime" value='+today+' /></span>';//开始日期
+        var endDateHTML = '<span class="ltext"><input type="text" name="endDate" class="form-control form_datetime" value='+today+' /></span>';//结束日期
+        //初始化表格
+         var defaults = {
+             title: "新装用户查询 ",
+             width:  '100%',
+             fitColumn:  true,
+             height: height,
+             //url: '../../unit/findUnitInNets',
+             url:'',
+             usepager: true,
+             rownumbers:true,
+             useRp: true,
+             colid:'id',  //主键
+             colModel : [
+                 {display: '客户名称', name : 'customerName', width : 140, sortable : false},
+                 {display: '联系方式', name : 'linkmanPhone', width : 140, sortable : false},
+                 {display: '身份证', name : 'idNo', width : 120, sortable : false},
+                 {display: '客户类型', name : 'custType', width : 90, sortable : false},
+                 {display: '分公司', name : 'subcoName', width : 90, sortable : false},
+                 {display: '车牌号码', name : 'plateNo', width : 120, sortable : false},
+                 {display: '发动机号', name : 'engineNo', width : 90, sortable : false},
+                 {display: '车架号', name : 'vin', width : 90, sortable : false},
+                 {display: '配置简码', name : 'equip_code', width : 90, sortable : false},
+                 {display: '车型', name : 'model_name', width : 90, sortable : false},
+                 {display: '颜色', name : 'color', width : 90, sortable : false},
+                 {display: '车载号码', name : 'callLetter', width : 90, sortable : false},
+                 {display: '产品类型', name : 'unittype', width : 90, sortable : false},
+                 {display: '安装日期', name : 'fixTime', width : 90, sortable : false},
+                 {display: '开通日期', name : 'serviceDate', width : 90, sortable : false},
+                 {display: '销售经理', name : 'sales', width : 90, sortable : false},
+                 {display: '安装电工', name : 'worker', width : 90, sortable : false},
+                 {display: '安装地点', name : 'place', width : 90, sortable : false},
+                 {display: '销售网点', name : 'branch', width : 90, sortable : false},
+                 {display: '入网地', name : 'area', width : 90, sortable : false},
+                 {display: '通信模式', name : 'mode', width : 90, sortable : false},
+                 {display: '服务费', name : 'realAmount1', width : 90, sortable : false},
+                 {display: '服务截止时间', name : 'feeSedate1', width : 90, sortable : false},
+                 {display: 'SIM卡流量费', name : 'realAmount2', width : 90, sortable : false},
+                 {display: 'SIM卡截止日期', name : 'feeSedate2', width : 90, sortable : false},
+                 {display: '坐席备注', name : 'remark', width : 280, sortable : false}
+             ],
+             buttons : [
+             ],
+             searchitems :[
+                 {display:'开始日期',html:startDateHTML},
+                 {display:'结束日期',html:endDateHTML},
+                 {html:'<span class="ltext"><input type="hidden" name="subcoNo" id="subcoNo" value="201"/><input type="hidden" name="cdate_table" id="cdate_table" value="2"/></span>'},
+                 {display:'客户名称',html:'<span class="ltext"><input type="text" class="form-control" name="customerName" id="customerName" /></span>'},
+                 {display:'车牌号码',html:'<span class="ltext"><input type="text" class="form-control" name="plateNo" id="plateNo" /></span>'},
+                 {display:'车载电话',html:'<span class="ltext"><input type="text" class="form-control" name="callLetter" id="callLetter" /></span>'},
+                 {display:'销售经理',html:'<span class="ltext"><input type="text" class="form-control" name="sales" id="sales"/></span>'},
+                 {display:'销售网点',html:'<span class="ltext"><input type="text" class="form-control" name="branch" id="branch"/></span>'},
+                 {display:' 入网地',html:'<span class="ltext"><input type="text" class="form-control" name="area" id="area" /></span>'}
+             ],
+             query:{startDate:today,endDate:today, subcoNo:201, cdate_table:2},
+             exporturl:'../../../unit/exportExcelHmUnitInNets'//导出excel
+         };
+         $('#dgd_unit_innet').sgDatagrid(defaults); 
+         
+         //重新赋值url
+         var settings =  $('#dgd_unit_innet').data('sgDatagrid');
+         settings.url='../../../unit/findHmUnitInNets';
+         $('#dgd_unit_innet').data('sgDatagrid',settings);
+    })(jQuery)
+</script>
+<script type="text/javascript">
+$.fn.datetimepicker.dates['zh'] = {
+    days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+    daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+    daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+    months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+    monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+    meridiem : [ "上午", "下午" ],
+    today : "今天"
+};
+$(document).ready(function(){
+    $(".hDiv-header-inner,#dgd_unit_innet_tbl").css("width","2500px");
+    $(".form_datetime").datetimepicker({
+        language : "zh",
+        autoclose: true,
+        minView: "month",
+        format : 'yyyy-mm-dd'
+    });
+});
+</script>
+</html>

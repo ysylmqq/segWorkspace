@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>OBD故障信息下载</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+	<div class='datagrid' id="monitoring">
+    </div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/index.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript">
+    (function($) {
+    	 var now =new Date().format('yyyy-MM-dd');
+    	var today=new Date().format('yyyy-MM');
+    	 var twoDayBefore = GetDateStr(-10);
+    	var height = 476;
+    	//初始化表格
+    	var defaults = {
+    		        title: "OBD故障报表下载",
+    		        width:  '100%',
+    		        height: height,
+    		        rownumbers:true,
+    		        usepager: true,
+    		        url:'../../obd/findObdFaultByPage',
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '文件名', name : 'url', width : 160},
+						{display: '上报时间', name : 'st_date', width : 140}
+    		        ],
+    		      /*   buttons : [ 
+    		   		         {name: '下载',bclass : 'download',onpress : importItem},
+    		   		 	   
+    		  	             ], */
+    		       
+    		        searchitems :[
+    		  		            {display:'开始日期',name:'startDate',type:'date',width:150},
+    		  			      	{display:'结束日期',name:'endDate',type:'date',width:150}
+    		    		        ]
+    		    		        //exporturl:'../../policy/exportExcelPolicysNew'
+    		      		     
+    		    };
+    		    $('#monitoring').sgDatagrid(defaults);
+    })(jQuery);
+    
+    
+    
+    function GetDateStr(AddDayCount) {
+	    var dd = new Date();
+	    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+	    return dd.format('yyyy-MM-dd');
+	}
+</script>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>预约</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+	<div style="overflow-y:hidden;overflow-x:hidden;width:100%;height: 100%; ">
+		<aside id="bm_left" class="bsp_left">
+    		<div id="reservationgrid" class="datagrid"></div>
+    	</aside>
+		<article id="bm_main" class="bsp_main accordion" ></article>
+	</div>
+</body>
+
+<script type="text/javascript">
+(function($){
+	var myclick = function(treenode){
+        alert(treenode.value+treenode.content+treenode.url);
+    }
+    var defaults = {
+        url:"web/bsp/bsp_left.json",
+        onclick: myclick,
+        width:200,
+        div_height: 495,
+        isexpend:false
+    };
+    $('#bm_main').sgAccordion(defaults);
+	
+    
+    var editItem = function(){
+    	var obj = $('#dgd_channelmanagers');
+        var bDiv = $('.bDiv',obj);
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            alert("选择多于一个选项！");
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            alert("请选择一个选项！");
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+                if($(this).attr("checked")){  
+                	editId=this.value;
+                	editObj=$(this).data('data');
+                	var defaults = {
+        	                id:'win_managers',
+         	                form:'form_managers',
+         	                url:'web/sel/channel_managers_form.html',
+        	                success: loadSuccess,
+        	                width: 400,
+        	                height:250,
+        	                buttons : [
+        	                           {name: '确定', type: 'submit', onpress : save},
+        	                           {name: '关闭', onpress : winClose},
+        	                           {name: '重置', type: 'reset'}
+        	                       ]
+        	            };
+                	
+	    	        $(document).sgWindow(defaults);
+                }
+            });
+        }else{
+            alert("请选择一个选项！");
+        }
+    	
+    }
+    
+    
+    
+	 var deleteItem = function(){
+		 var obj = $('#reservationgrid');
+	     var bDiv = $('.bDiv', obj);
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            alert("请选择一个选项！");
+        }else{
+        	var ids=[];
+        	if(window.confirm('确定作废吗?')){
+        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	        		ids.push(this.value);
+ 	            });
+        		 $.ajax( {
+            		  type : 'post', 
+            		  async: false,   
+            		  contentType : 'application/json',     
+            		  dataType : 'json',     
+            		  url : 'task/deleteTasks',   
+            		  data:JSON.stringify(ids),
+            		  success : function(data) {
+            			  if(data){
+            				 if(data.success){
+    	          		 		 $('#reservationgrid').sgDatagrid('reload','sgDatagrid');
+            				 }
+            				 alert(data.msg);
+            			  }
+            		  } ,     
+            		  error : function(res,error) { 
+            		  	     if(res && res.responseText){ alert(res.responseText);}     
+            		  }    
+            		}); 
+        	};
+        	
+        }
+    }
+	 
+	 
+	 
+	
+	var winClose1 = function() {
+		$(document).sgWindow('close', {
+			id : 'form_managers'
+		});
+	}
+	
+	var loadSuccess = function(){
+ 		//填充编辑前的值
+ 		   if(editId && editObj){
+ 				  $("#task_id",$("#form_managers")).val(editObj.id);
+				  $("#billnum",$("#form_managers")).val(editObj.billnum);
+				  $("#number_plate",$("#form_managers")).val(editObj.carNum);
+				  $("#code",$("#form_managers")).val(editObj.code);
+				  $("#customer_name",$("#form_managers")).val(editObj.customerName);
+				  
+				  $.ajax( {
+					  type : 'POST', 
+					  async: true,  
+					  url : "customer/getCustomerPhone",   
+					  data:{id:editObj.customerId},
+					  success : function(data) {
+						  if(data){
+							  $("#customer_phone","#form_managers").val(data);
+						  }
+					  } 
+				});
+				  
+				  
+				  if($('#reservation_history').get(0)){  
+					  $.ajax({
+						  type : 'post', 
+						  async: true,   
+						  url : 'task/getTaskReHistory',   
+						  data:{id:editObj.taskId},
+						  success : function(data) {
+							  if(data){
+								  $('#reservation_history').sgDatagrid('appendData',data);
+							  }else{
+							  	alert(data);
+							  }
+						  } ,     
+						  error : function(res,error) { 
+						  	     if(res && res.responseText){ alert(res.responseText);}     
+						  }    
+						});
+				 }
+				  
+ 		   }
+ 		  editId=null;
+ 		 editObj=null;
+ 		  
+ 	   }
+	
+	
+
+	var loadSuccess2 = function(){
+		debugger;		
+ 		//填充编辑前的值
+ 		   if(editId && editObj){
+				  $("#billnum",$("#view_task")).val(editObj.billnum);
+				  $("#manager_name",$("#view_task")).val(editObj.managerName);
+				  $("#customer_name",$("#view_task")).val(editObj.customerName);
+				  $("#product_name",$("#view_task")).val(editObj.productName);
+				  $("#vehicle_type",$("#view_task")).val(editObj.cName);
+				  $("#place",$("#view_task")).val(editObj.place);
+				  $("#requirements",$("#view_task")).val(editObj.requirements);
+				  if(editObj.isoffice == 1){
+					   $("[name = isoffice]:checkbox",$("#view_task")).attr("checked", true);
+				  }
+				  $.ajax( {
+					  type : 'POST', 
+					  async: true,  
+					  url : "customer/getCustomerPhone",   
+					  data:{id:editObj.customerId},
+					  success : function(data) {
+						  if(data){
+							  $("#phone","#view_task").val(data);
+						  }
+					  } 
+				});
+				  
+				  
+				  $.ajax({
+						type : 'post',
+						async : false,
+						contentType : 'application/json',
+						dataType : 'json',
+						url : 'taskFlow/getDispatchers',
+						data : JSON.stringify({
+							id : editId
+						}),
+						success : function(data) {
+							if (data) {
+								var objs = document.getElementsByName("treeCheckbox");
+								for(var i=0;i<objs.length;i++){
+									var id = objs[i].id;
+									if(data.indexOf(id)!=-1){
+										objs[i].checked = true;
+									}
+								}
+							}
+						},
+						error : function(res, error) {
+							alert("responseText=" + res.responseText
+									+ ";error=" + error);
+						}
+					});
+				  
+ 		   }
+ 		  editId=null;
+ 		 editObj=null;
+ 		  
+ 	   }
+
+    
+    var winClose = function() {
+		$(document).sgWindow('close', {
+			id : 'bill_reservation'
+		});
+	}
+    
+    var winClose2 = function() {
+		$(document).sgWindow('close', {
+			id : 'bill_view'
+		});
+	}
+    
+    var viewItem = function() {
+		    var obj = $('#reservationgrid');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            alert("选择多于一个选项！");
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            alert("请选择一个选项！");
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	        	 $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){  
+		                	editId=this.value;
+		                	editObj=$(this).data('data');
+			    			var defaults = {
+			    				title : '工单查看',
+			    				id : 'bill_view',
+			    				form : 'bill_view_form',
+			    				url : 'web/bsp/bill_view.html',
+			    				success: loadSuccess2,
+			    				width : 710,
+			    				height : 320,
+			    				buttons : [ {
+			    					name : '关闭',
+			    					onpress : winClose2
+			    				} ]
+			    			};
+			    			$(document).sgWindow(defaults);
+		                }
+		            });
+	   }else{
+	       alert("请选择一个选项！");
+	    }
+	}
+    
+    var reservationItem = function() {
+		    var obj = $('#reservationgrid');
+	        var bDiv = $('.bDiv',obj);
+	       // alert($('input[type=checkbox][checked=checked]',bDiv).length) ;
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            alert("选择多于一个选项！");
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            alert("请选择一个选项！");
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	        	 $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){  
+		                	editId=this.value;
+		                	editObj=$(this).data('data');
+		                	var defaults = {
+		                			title : '工单预约',
+		                			id : 'bill_reservation',
+		                			form : 'form_managers',
+		                			url : 'web/bsp/doReservation.html',
+		                			success: loadSuccess,
+		                			width : 710,
+		                			height : 480,
+		                			buttons : [ {
+		                				name : '派工',
+		                				onpress : winClose
+		                			}, {
+		                				name : '保存',
+		                				onpress : save
+		                			}, {
+		                				name : '预约下一个',
+		                				onpress : winClose
+		                			}, {
+		                				name : '关闭',
+		                				onpress : winClose
+		                			} ]
+		                		};
+			    	        $(document).sgWindow(defaults);
+		                }
+		            });
+	   }else{
+	       alert("请选择一个选项！");
+	    }
+	}
+
+
+    var editItem = function(){
+        var obj = $('#reservationgrid');
+        var bDiv = $('.bDiv',obj);
+        //alert($('input[type=checkbox][checked=checked]',bDiv).length) ;
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            alert("选择多于一个选项！");
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            alert("请选择一个选项！");
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+              //  if($(this).attr("checked"))     alert(this.value);
+            });
+        }else{
+            alert("请选择一个选项！");
+        }
+    }
+    
+    var today = new Date().format('yyyy-MM-dd');
+    var twoDayBefore = GetDateStr(-2);
+    
+    var defaults = {
+        title: "预约",
+        width:  720,
+        height: 395,
+        url: 'task/findTasksByPageForReservation',
+        datatype:"json",
+        usepager: true,
+	    rownumbers:true,
+        useRp: true,
+        colid:'id',  //主键
+        query:{tStatus:-1},
+        colModel : [
+            {display: '工单号', name : 'billnum', width : 140, sortable : true},
+            {display: '业务', name : 'type', width : 90, sortable : true,formatter:function(value,row){
+                if(value==0){
+                    value = '新装';
+                }else if(value==1){
+                    value = '维修';
+                }else if(value==2){
+                    value = '回收';
+                }else if(value==3){
+                    value = '拆除';
+                }else if(value==4){
+                    value = '抢修';
+                }else if(value==5){
+                    value = '换装';
+                }else if(value==6){
+                    value = '过户';
+                }else if(value==7){
+                    value = '升级';
+                }else if(value==8){
+                    value = '换号';
+                }else if(value==9){
+                    value = '办停';
+                }else if(value==10){
+                    value = '其他业务';
+                }else if(value==11){
+                    value = '更改资料';
+                }else if(value==12){
+                    value = '重新开通';
+                }else if(value==13){
+                    value = '新业务办理';
+                }
+                return value;
+            }},
+            
+            {display: '客户', name : 'customerName', width : 120, sortable : true},
+            {display: '状态', name : 'status', width : 80, sortable : true,formatter:function(value,row){
+	                if(value==1){
+	                    value = '待预约';
+	                }else if(value > 1){
+	                    value = '已预约';
+	                }
+	                return value;
+	            }},
+            
+            {display: '受理时间', name : 'time', width : 120, sortable : true}
+        ],
+        buttons : [
+			{name: '工单查看', bclass: 'add', onpress : viewItem},
+			{separator: true},
+            {name: '工单作废', bclass: 'delete', onpress : deleteItem},
+            {separator: true},
+            {name: '预约', bclass: 'add', onpress : reservationItem},
+            {separator: true}
+        ],
+        searchitems :[
+            {display:'客户姓名',name:'customerName',type:'text',width:'130px'},
+            {display:'业务',name:'type',html:'<select name="type"><option value="" selected>请选择...</option><option value="0">新装</option><option value="1">维修</option><option value="2">升级</option><option value="3">换装</option><option value="6">过户</option><option value="7">办停</option></select>'},
+            {display:'状态',name:'status',html:'<select name="status"><option value="" selected>请选择...</option><option value="1">待预约</option><option value="2">已预约</option></select>'},
+            {display:'开始时间',name:'startDate',type:'date',width:'130px',value:twoDayBefore},
+	      	{display:'结束时间',name:'endDate',type:'date',width:'130px',value:today}
+        ],
+        sortname: "time",
+        sortorder: "desc"
+    };
+    
+    
+    
+    var save = function(){
+			//做表单提交
+           var params = {};
+           var url='reservation/add';
+  		 	params.task_id=$('#task_id','#form_managers').val();
+  		 	params.person=$('#person','#form_managers').val();
+			params.phone=$('#phone','#form_managers').val();
+			params.place=$('#place','#form_managers').val();
+			params.reason=$('#reason','#form_managers').val();
+			params.reservation_time=$('#reservation_time','#form_managers').val();
+			params.remark=$('#remark','#form_managers').val();
+  		 	alert(JSON.stringify(params));
+  		 	if(window.confirm('确定保存接单吗?')){
+  		 		
+  		 	 if(!params.person){
+	         	   alert('请输入联系人！');
+	         	   return false;
+	            }
+  		 	 
+  		 	if(!params.place){
+	         	   alert('请输入地点！');
+	         	   return false;
+	            }
+  		 		
+                 $.ajax( {
+	           		  type : 'post', 
+	           		  async: false,   
+	           		  contentType : 'application/json',     
+	           		  dataType : 'json',     
+	           		  url : url,   
+	           		  data:JSON.stringify(params),
+	           		  success : function(data) {
+	           			  if(data){
+	           				 if(data.success){
+	           					 $('#reservationgrid').sgDatagrid('reload','sgDatagrid');
+	           				 }
+	           				 alert(data.msg);
+	           			  }
+	           		  } ,     
+	           		  error : function(res,error) { 
+	           		  	 alert(res.responseText);     
+	           		  }    
+	           		}); 
+  		 	}
+	        $('#form_managers').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	        $(document).sgWindow('close', {id : 'bill_reservation'});
+	    	return false;
+	  
+	 	   };
+   
+    
+    
+    $('#reservationgrid').sgDatagrid(defaults);
+})(jQuery);
+</script>
+</html>

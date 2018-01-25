@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>添加档案</title>
+</head>
+
+<body>
+<form id="record_add" method="post" class="form" name="record_add" >
+	<div class="form">
+		<fieldset style="width: 300px;">
+			<div class="panel">
+			<div class="panel">
+                <span>位置编号:</span>
+                <input type='text' id='loc_name' name='loc_name' required="true" style="width:165px;" />
+                 <input type='hidden' id='id' name='id'  style="width:165px;" />
+           	 </div>
+                <span >档案类型:</span>
+	                <select id="b_type" name="b_type" style="width:170px;">
+	                	<option value="1">入网档案</option>
+	                	<option value="2">业务档案</option>
+	                </select>     
+            </div>
+            <div class="panel">
+                <span>具体位置:</span>
+                <textarea id="location" name="location" style="width:165px;" rows="2"></textarea>
+            </div>
+             <div class="panel">
+                <span>备注:</span>
+                <textarea id="remark" name="remark" style="width:165px;" rows="2"></textarea>
+            </div>
+		</fieldset>
+	</div>
+</form>
+
+</body>
+<script type="text/javascript">
+</script>
+</html>

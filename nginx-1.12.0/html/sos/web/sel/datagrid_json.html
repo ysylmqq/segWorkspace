@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <div id="datagrid2" class="datagrid"></div>
+</body>
+
+<script type="text/javascript">
+   (function($){
+	   var addItem = function(){
+	        var defaults = {
+	                title:'My Form',
+	                id:'window1',
+	                form:'myform',
+	                url:'web/ba/taskform.html',
+	                width: 658,
+	                height: 495,
+	                buttons : [
+	                           {name: '确定', type: 'submit', onpress : null},
+	                           {name: '重置', type: 'reset', onpress : null}
+	                       ]
+	            };
+	        $(document).sgWindow(defaults);
+	    }
+
+	    var delItem = function(){
+	    	var obj = $('#datagrid2');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                alert(this.value);
+	            })
+	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择要删除的选项！"});
+	        }
+	    }
+
+	    var editItem = function(){
+	        var obj = $('#datagrid2');
+	        var bDiv = $('.bDiv',obj);
+	        //alert($('input[type=checkbox][checked=checked]',bDiv).length) ;
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked"))     alert(this.value);
+	            });
+	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }
+	    }
+
+	    var defaults = {
+	        title: "任务单",
+	        id: 'grid2',
+	        width:  750,
+	        height: 285,
+	        url: '../../sell/findChannels',
+	        datatype:"json",
+	        userpager: true,
+	        useRp: true,
+	        colid:'id',  //主键
+	        colModel : [
+	            {display: '名称', name : 'name', width : 80, sortable : true},
+	            {display: '地址', name : 'address', width : 180, sortable : true},
+	            {display: '月销售量', name : 'monthSell', width : 120, sortable : true},
+	            {display: '渠道类型', name : 'type', width : 130,formatter:function(value,row){
+	                if(value==0){
+	                    value = '4S店';
+	                }else if(value==1){
+	                    value = '汽车美容店';
+	                }else if(value==2){
+	                    value = '担保公司';
+	                }else if(value==3){
+	                    value = '集团客户';
+	                }
+	                return value;
+	            }},
+	            {display: '所属集团', name : 'groupName', width : 80}
+	        ],
+	        buttons : [
+	            {name: '增加维修', bclass: 'add', onpress : addItem},
+	            {separator: true},
+	            {name: '增加新装', bclass: 'add', onpress : addItem},
+	            {separator: true},
+	            {name: '编辑', bclass: 'edit', onpress : editItem},
+	            {separator: true},
+	            {name: '删除', bclass: 'delete', onpress : delItem},
+	            {separator: true}
+	        ],
+	        searchitems :[
+	            {display:'名称',name:'name',type:'text'},
+	            {display:'渠道类型',name:'type',html:'<select name="type"><option value="" selected>请选择...</option><option value="0">4S店</option><option value="1">汽车美容店</option><option value="2">担保公司</option><option value="3">集团客户</option></select>'}
+	        ],
+	        sortname: "name",
+	        sortorder: "asc"
+	    };
+	    $('#datagrid2').sgDatagrid(defaults); 
+   })(jQuery);
+    
+</script>
+</html>

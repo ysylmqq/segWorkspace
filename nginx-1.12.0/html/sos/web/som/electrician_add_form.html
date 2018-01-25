@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>电工添加</title>
+</head>
+<body>
+	<form id='som_electrician_form' method='post' class="form" style="width:100%" >
+		<fieldset style="width:95%;">
+            <div class="panel">
+                <span>姓名:</span>
+                <input type='text' id="contractNo" name='contractNo' required="true"  style="width:200px;"/>
+            </div>  
+            <div class="panel" style="text-height:16px;">  
+                <span>性别:</span>
+                <input type="radio" name="color" id="colorBlue" value="0" checked="checked"  style="position: relative; top:5px;margin-right:5px;" />男
+            	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            	<input type="radio" name="color" id="colorRed" value="1" style="position: relative; top:5px;margin-right:5px;" />女          
+            </div>
+            <div class="panel">
+                <span>身份证:</span>
+                <input type='text' id="sno" name='sno' required="true" style="width:200px;" />
+             </div>   
+             <div class="panel">
+                <span>手机:</span>
+                <input type='text' id="mobile" name='mobile' required="true" style="width:200px;" />
+            </div>
+             <div class="panel">
+                <span>邮箱:</span>
+                <input type="email" id="email" name='email' required="true" style="width:200px;" />
+            </div>
+             <div class="panel">
+                <span>入职日期:</span>
+                <input type="date" id="matureDate" name='matureDate' required="true" style="width:200px;" />
+            </div>
+            <div class="panel">
+                <span style="vertical-align:top;">备注:</span>
+                <textarea id="remark" name="remark" style="width:200px;height:43px;padding:0px;margin:0px;"></textarea>
+            </div>
+        </fieldset>
+	</form>
+</body>
+</html>

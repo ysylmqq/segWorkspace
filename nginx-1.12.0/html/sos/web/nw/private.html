@@ -1,0 +1,3726 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>私家车客户</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" href="../../bslib/css/bootstrap-datetimepicker.css" /><!-- +++++ -->
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../css/sos.css">
+</head>
+<body>
+	<div id="nw_document_all">
+	<form id='nw_private_form' name='nw_private_form' method='post' class="form">
+		<input type='hidden' id='opid' name='opid' >
+		<input type='hidden' id='cust_id' name='cust_id' >
+		<input type='hidden' id='vehicle_id' name='vehicle_id' >
+		<input type='hidden' id='unit_id' name='unit_id' >
+		<input type='hidden' id='collection_id' name='collection_id' >
+		<input type='hidden' id='guarantee_id' name='guarantee_id' >
+		<div class='title'>私家车客户></div>
+		<fieldset style="width:100%;">
+			<div class="panel">
+				<div class="row">
+					<div class='col-xs-12' id="divObj1" class='submit_2' style="text-align:left;display:none;"><!--style="display: none;"-->
+						<span class='col-xs-2' style="width:11%;">车牌号码:</span>
+						<div class='col-xs-6 input-group'>
+							<span class='col-xs-8' style="position:relative;">
+								<input type='text' id="searchnumber" name='searchnumber' class="form-control" list="vehicleList"/>
+								<datalist id='vehicleList'></datalist>
+							</span>
+							<div class="col-xs-4 input-group-btn" style="padding-left:0;">
+								<button id="searchbtn" type="button" class="btn btn-xs btn-primary" style="padding:2px 15px;" onclick="searchvehicle();" >查询</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">姓名:</span>
+						<span class="col-xs-8">
+								<input type='text' id="customer_name" name='customer_name' required="true" class="form-control" onblur="fillLinkman()"/>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">身份证:</span>
+						<span class="col-xs-8">
+								<input type='text' id="idcard" name='idcard' class="form-control" onblur="checkIdno()" />
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">生日:</span>
+						<span class="col-xs-8">
+								<input type='text' class="form-control form_datetime" id="birthday" name='birthday' onblur="checkdate(this)" />
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">性别:</span>
+						<span class="col-xs-8" style="text-align:left;">
+							<label style="float:none" >
+							<input type='radio' name='sex' checked="checked" style='vertical-align:middle;' value='1' />男
+							</label>
+							<label style="float:none" >
+							<input type='radio' name='sex' style='vertical-align:middle;' value='2' />女
+							</label>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">邮箱:</span>
+						<span class="col-xs-8">
+								<input type='text' id="email" name='email' class="form-control" onblur="checkemail()" />
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">VIP等级:</span>
+						<span class="col-xs-8">
+							<select size="1" name="vip" id="vip" style="width:100%;" autocomplete="on">
+								<option value="1">普通卡</option>
+								<option value="2">银卡</option>
+								<option value="3">金卡</option>
+								<option value="4">白金卡</option>
+								<option value="99">免费</option>
+							</select>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">登录名:</span>
+						<span class="col-xs-8">
+						<input type='text' id="loginname" name='loginname' class="form-control" />
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">服务密码:</span>
+						<span class="col-xs-8">
+						<input type='password' id="server_pwd" name='server_pwd' class="form-control" onblur="checknum()"/>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">确认密码:</span>
+						<span class="col-xs-8">
+						<input type='password' id="confirm_pwd" name='confirm_pwd' class="form-control" onblur="checkpwd()"/>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">隐私密码:</span>
+						<span class="col-xs-8">
+								<input type='password' id="private_pwd" name='private_pwd' class="form-control" onblur="validatePostponeValue(this, 20)"/>
+						</span>
+					</div>
+				</div>    
+			</div>
+			<div class="panel" id="phone_panel">
+				<input type='hidden' id="phone_id" name='phone_id' />
+				<div class='row'>
+					<div class="col-xs-12">
+						<span class="col-xs-2" style="width:8%;margin-left:3%;">联系人:</span>
+						<span class="col-xs-2" style="width:12%;">
+							<input type='text' id="linkman" name='linkman' class="form-control" />
+						</span>
+						<span class="col-xs-2" style="width:70px;">电话号码:</span>
+						<span class="col-xs-2" style="width:12%;">
+							<input type='text' id="phone" name='phone' class="form-control" />
+						</span>
+						<span class="col-xs-2" style="width:40px;">类型:</span>
+						<span class="col-xs-2" style="width:12%;">
+							<select size="1" name="phone_type" id="phone_type" style="width:100%;">
+								<option value="1">第一联系人</option>
+								<option value="2">第二联系人</option>
+								<option value="3">第三联系人</option>
+								<option value="4">第四联系人</option>
+								<option value="5">第五联系人</option>
+								<option value="6">第六联系人</option>
+								<option value="7">第七联系人</option>
+								<option value="8">第八联系人</option>
+								<option value="9">第九联系人</option>
+								<option value="10">第十联系人</option>
+								<option value="99">其他联系人</option>
+							</select>
+						</span>
+						<span class="col-xs-2" style="width:40px;">备注:</span>
+						<span class="col-xs-2" style="width:12%;">
+							<input type='text' id="remark" name='remark' class="form-control" />
+						</span>
+						<span style="width:60px;">APP登录</span>
+						<input type='radio' id="app" name="app" style='vertical-align:middle;' onclick="checkapp()"/>
+						<a href="javascript:void(0);" style="margin:0px;padding:0px;padding-left:10px;padding-top:5px;"><img alt="增加电话号码" src="../../images/form_add.png" title="增加电话号码" style="vertical-align:middle"></a>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class='row'>
+					<div class="col-xs-8">
+						<span class="col-xs-2">担保公司:</span>
+						<span class="col-xs-10">
+							<input type="text" id="guarantee" class="form-control" name='guarantee' list="guaranteeList"  autocomplete="on"/>
+							<datalist id="guaranteeList"></datalist>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class='row'>
+					<div class="col-xs-8">
+						<span class="col-xs-2">联系地址:</span>
+						<span class="col-xs-10">
+							<input type="text" id="cust_address" class="form-control" name="cust_address"/>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class='row'>
+					<div class="col-xs-12">
+						<span style="width:11%;float:left;">备注:</span>
+						<span class="col-xs-10">
+								<input type='text' id="cust_remark" name='cust_remark' class="form-control" />
+						</span>
+					</div>
+				</div>
+			</div>
+    </fieldset>
+
+    <div class='title'>车辆资料</div>
+		<fieldset style="width:100%;">
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">车牌号码:</span>
+						<span class="col-xs-8">
+								<input type='text' id="number_plate" name='number_plate' required="true" class="form-control" placeholder="注意格式.例:粤B12345"/>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">车牌颜色:</span>
+						<span class="col-xs-8">
+							<select size="1" name="plate_color" id="plate_color" style="width:100%;" autocomplete="on">
+								<option value="1">蓝色</option>
+								<option value="2">黄色</option>               
+								<option value="3">黑色</option>
+								<option value="4">白色</option>
+								<option value="9">其他</option>
+							</select>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">车辆类型:</span>
+						<span class="col-xs-8">
+							<select size="1" name="vehicle_type" id="vehicle_type" style="width:100%;" autocomplete="on">
+							</select>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">车型:</span>
+						<span class="col-xs-8">
+							<input type='text' id="model" name='model' list="modelList" class="form-control" />
+							<input type="hidden" id="model_id" name="model_id" />
+							<datalist id='modelList'></datalist>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">车辆识别号:</span>
+						<span class="col-xs-8">
+							<input type='text' id="vehicle_code" name='vehicle_code' list="vehicle_codeList" class="form-control" autocomplete="on" />
+							<input type="hidden" id="sim_id" name="sim_id" />
+							<input type="hidden" id="combo_id" name="combo_id" />
+							<input type="hidden" id="pack_id" name="pack_id" />
+							<datalist id='vehicle_codeList'></datalist>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">发动机号:</span>
+						<span class="col-xs-8">
+								<input type='text' id="engine_no" name='engine_no' class="form-control" />
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+							<span class="col-xs-4">车辆颜色:</span>
+							<span class="col-xs-8">
+									<input type='text' id="color" name='color' class="form-control" />
+							</span>
+					</div>
+					<div class="col-xs-4">
+							<span class="col-xs-4">购车时间:</span>
+							<span class="col-xs-8">
+									<input type='text' class="form-control form_datetime" id="buy_time" name='buy_time' onblur="checkdate(this)" />
+							</span>
+					</div>
+					<div class="col-xs-4">
+							<span class="col-xs-4">生产时间:</span>
+							<span class="col-xs-8">
+									<input type='text' class="form-control form_datetime" id="production_date" name='production_date' onblur="checkdate(this)" />
+							</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+							<span class="col-xs-4">行驶证号码:</span>
+							<span class="col-xs-8">
+									<input type='text' id="driving_no" name='driving_no' class="form-control" />
+							</span>
+					</div>
+					<div class="col-xs-4">
+							<span class="col-xs-4">发放日期:</span>
+							<span class="col-xs-8">
+									<input type='text' class="form-control form_datetime" id="grant_time" name='grant_time' onblur="checkdate(this)" />
+							</span>
+					</div>
+					<div class="col-xs-4">
+							<span class="col-xs-4">有效日期:</span>
+							<span class="col-xs-8">
+									<input type='text' class="form-control form_datetime" id="valid_time" name='valid_time' onblur="checkdate(this)" />
+							</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+							<span class="col-xs-4">4S店:</span>
+							<span class="col-xs-8">
+									<input type='text' id="4s" name='4s' list="sList" class="form-control" />
+									<input type="hidden" id="4s_id" name="4s_id" />
+									<datalist id='sList'></datalist>
+							</span>
+					</div>
+					<div class="col-xs-4">
+							<span class="col-xs-4">保险公司:</span>
+							<span class="col-xs-8">
+									<input type='text' id="insurer" name='insurer' list="insurerList" class="form-control" />
+									<input type="hidden" id="insurer_id" name="insurer_id" />
+									<datalist id='insurerList'></datalist>
+							</span>
+					</div>
+					<div class="col-xs-4">
+							<span class="col-xs-4">从公司购买商业险:</span>
+							<span class="col-xs-8">
+								<select size="1" name="is_corp" id="is_corp" style="width:100%;">
+									<option value='0'>否</option>
+									<option value='1'>是</option>
+								</select>
+							</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+					<div class="row">
+						<div class="col-xs-4">
+								<span class="col-xs-4">保单开始时间:</span>
+								<span class="col-xs-8">
+										<input type='text' class="form-control form_datetime" id="is_bdate" name='is_bdate' onblur="checkdate(this)" />
+								</span>
+						</div>
+						<div class="col-xs-4">
+								<span class="col-xs-4">保单截止时间:</span>
+								<span class="col-xs-8">
+										<input type='text' class="form-control form_datetime" id="is_edate" name='is_edate' onblur="checkdate(this)" />
+								</span>
+						</div>
+						<div class="col-xs-4">
+								<span class="col-xs-4">享有综合盗抢险:</span>
+								<span class="col-xs-8">
+									<select size="1" name="is_pilfer" id="is_pilfer" style="width:100%;">
+										<option value='0'>否</option>
+										<option value='1'>是</option>
+									</select>
+								</span>
+						</div>
+					</div>
+			</div>
+			<!--第7--10行-->
+			<div id="vehicle_licence">
+				<div class="panel">
+						<div class="row">
+							<div class="col-xs-4">
+									<span class="col-xs-4">车辆型号(配置简码):</span>
+									<span class="col-xs-8">
+											<input type='text' class="form-control" id="equip_code" name='equip_code' />
+									</span>
+							</div>
+							<div class="col-xs-4">
+									<span class="col-xs-4">车辆所有人:</span>
+									<span class="col-xs-8">
+											<input type='text' class="form-control" id="vl_owner" name='vl_owner' />
+									</span>
+							</div>
+							<div class="col-xs-4">
+								<span class="col-xs-4">车辆使用性质:</span>
+								<span class="col-xs-8">
+									<select size="1" name="vl_use" id="vl_use" style="width:100%;">
+										<option value='0'>营运</option>
+										<option value='1'>非营运</option>
+									</select>
+								</span>
+							</div>
+						</div>
+				</div>
+				<div class="panel">
+					<div class="row">
+						<div class="col-xs-4">
+								<span class="col-xs-4">总质量(KG):</span>
+								<span class="col-xs-8">
+										<input type="text" pattern="^\d+$" title="总质量不能小于零" class="form-control" id="vl_quality" name='vl_quality' />
+								</span>
+						</div>
+						<div class="col-xs-4">
+								<span class="col-xs-4">核定载质量(KG):</span>
+								<span class="col-xs-8">
+										<input type="text" pattern="^\d+$" title="核定载质量不能小于零" class="form-control" id="vl_ap_quality" name='vl_ap_quality' />
+								</span>
+						</div>
+						<div class="col-xs-4">
+								<span class="col-xs-4">准牵引总质量(KG):</span>
+								<span class="col-xs-8">
+										<input type="text" pattern="^\d+$" title="准牵引总质量不能小于零" class="form-control" id="vl_qt_quality" name='vl_qt_quality' />
+								</span>
+						</div>
+					</div>
+				</div>
+				<div class="panel">
+					<div class="row">
+						<div class="col-xs-4">
+							<span class="col-xs-4">外廓尺寸(mm):</span>
+							<span class="col-xs-2">
+									<input type="text" pattern="^\d+$" title="长度不能小于零" class="form-control" placeholder="长度" id="vl_vsize_length" name='vl_vsize_length' />
+							</span>
+							<span class="col-xs-2">
+									<input type="text" pattern="^\d+$" title="宽度不能小于零" class="form-control" placeholder="宽度" id="vl_vsize_width" name='vl_vsize_width' />
+							</span>
+							<span class="col-xs-2">
+									<input type="text" pattern="^\d+$" title="高度不能小于零" class="form-control" placeholder="高度" id="vl_vsize_height" name='vl_vsize_height' />
+							</span>
+						</div>
+						<div class="col-xs-4">
+							<span class="col-xs-4">档案编号:</span>
+							<span class="col-xs-8">
+									<input type='text' class="form-control" id="vl_doc_no" name='vl_doc_no' />
+							</span>
+						</div>
+						<div class="col-xs-4">
+							<span class="col-xs-4">核定载人数:</span>
+							<span class="col-xs-8">
+									<input type='text' pattern="^\d+$" title="核定载人数需大于1" class="form-control" id="vload" name='vload' />
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="panel">
+					<div class="row">
+							<div class="col-xs-4">
+									<span class="col-xs-4">行驶证类型:</span>
+									<span class="col-xs-8">
+											<input type='text' class="form-control" id="vl_type" name='vl_type' />
+									</span>
+							</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class='row'>
+					<div class="col-xs-12">
+						<span style="width:11%;float:left;">行驶证备注:</span>
+						<span class="col-xs-10">
+							<input type='text' class="form-control" id="vl_remark" name="vl_remark" />
+						</span>
+					</div>
+				</div>
+			</div>
+    </fieldset> 
+		
+    <div class='title'>终端资料</div>
+		<fieldset style="width:100%;">
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">终端类型:</span>
+						<span class="col-xs-8">
+								<input type='text' id="unittype" name='unittype' required="true" list="unittypeList" class="form-control" />
+								<input type="hidden" id="unittype_id" name="unittype_id" />
+								<datalist id='unittypeList'></datalist>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">销售名称:</span>
+						<span class="col-xs-8">
+								<input type='text' id="name" name='name' class="form-control" />
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4" style="color:red;">入网状态:</span>
+						<span class="col-xs-8">
+								<select size="1" name="state" id="state" style="width:100%;" autocomplete="on">
+										<option value="0">在网</option>
+										<option value="1">离网</option>
+										<option value="2">欠费离网</option>
+										<option value="3">非入网</option>
+										<option value="4">研发测试</option>
+										<option value="5">电工测试</option>
+										<option value="6">重新开通</option>
+										<option value="7">不开通</option>
+								</select>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel" id="barcode_sel">
+				<div class="row">
+					<div class="col-xs-8">
+						<span class="col-xs-2">条形码:</span>
+						<input type='hidden' id="barcodeid" name='barcodeid' />
+						<span class="col-xs-2" style="width:125px;padding-left:3px;">
+							<select size="1" name="bartype" id="bartype" style="width:100%;float:left;margin-left:1%;" autocomplete="on">
+								<option value="1">终端条形码</option>
+								<option value="2">汉显条形码</option>
+								<option value="3">手柄条形码</option>
+								<option value="4">遥控器条形码</option>
+								<option value="5">导航仪条形码</option>
+								<option value="6">电子地图条形码</option>
+							</select>
+						</span>
+						<span class="col-xs-2" style="width:160px;">
+								<input type='text' id="barcode" name='barcode' class="form-control" />
+						</span>
+						<a href="javascript:void(0);" style="margin:0px;padding:0px;padding-left:30px;padding-top:5px;"><img alt="增加条形码" src="../../images/form_add.png" title="增加条形码" style="vertical-align:middle"></a>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class='row'>
+					<div class="col-xs-4">
+						<span class="col-xs-4">车载电话:</span>
+						<span class="col-xs-8">
+							<input type='text' id="call_letter" name='call_letter' list="call_letterList" required="true" class="form-control" />
+							<datalist id='call_letterList'></datalist>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">终端卡类型:</span>
+						<span class="col-xs-8" style="text-align:left;">
+							<label style="float:none" >
+								<input type='radio' id="simtype" name="simtype" checked="checked" style='vertical-align:middle;' value='2'/>公司卡
+							</label>
+							<label style="float:none" >
+									<input type='radio' id="simtype" name="simtype" style='vertical-align:middle;' value='1'/>自带卡
+							</label>
+							<label style="float:none" >
+									<input type='radio' id="simtype" name="simtype" style='vertical-align:middle;' value='3' />总部卡
+							</label>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">卡运营商:</span>
+						<span class="col-xs-8" style="text-align:left;">
+							<label style="float:none" >
+								<input type='radio' id="operators" name="operators" checked="checked" style='vertical-align:middle;' value='1' />移动
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="operators" name="operators" style='vertical-align:middle;' value='2' />联通
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="operators" name="operators" style='vertical-align:middle;' value='3' />电信
+							</label>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class='row'>
+					<div class="col-xs-8">
+						<span class="col-xs-2">通信模式:</span>
+						<span class="col-xs-10" style="text-align:left;">
+							<label style="float:none" >
+								<input type='radio' name='mode' checked="checked" style='vertical-align:middle;' value='2' onclick='hideSmsnode();'/>数据流量
+							</label>
+							<label style="float:none" >
+								<input type='radio' name='mode' style='vertical-align:middle;' value='1' onclick='showSmsnode();'/>短信
+							</label>
+							<label style="float:none" >
+								<input type='radio' name='mode' style='vertical-align:middle;' value='3' onclick='showSmsnode();'/>数据流量+短信
+							</label>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">短信通道:</span>
+						<span class="col-xs-8">
+								<select size="1" name="node_name" id="node_name" style="width:100%;" autocomplete="on">
+								</select>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">销售经理:</span>
+						<span class="col-xs-8">
+								<input type="text" name="managerName" id="managerName" list="userDataList" class="form-control" autocomplete="on" />
+								<input type="hidden" name="managerId" id="managerId" />
+								<datalist id="userDataList"></datalist>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">销售网点:</span>
+						<span class="col-xs-8">
+								<input type="text" name="branch" id="branch" list="branchList" class="form-control" autocomplete="on" onchange="fillArea()"/>
+								<datalist id="branchList"></datalist>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">入网地:</span>
+						<span class="col-xs-8">
+								<input type='text' id="unitarea" name='unitarea' class="form-control" required="true"/>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">特批单:</span>
+						<span class="col-xs-8">
+								<input type='text' id="special" name='special' class="form-control" />
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">安装电工:</span>
+						<span class="col-xs-8">
+								<input type='text' id="worker" name='worker' class="form-control" />
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">是否入网深圳:</span>
+						<span class="col-xs-8" style="text-align:left;">
+								<label style="float:none" >
+								<input type='radio' name='is_sz' checked="checked" style='vertical-align:middle;' value='1'/>是
+								</label>
+								<label style="float:none" >
+								<input type='radio' name='is_sz' style='vertical-align:middle;' value='0'/>否
+								</label>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">防拆盒:</span>
+						<span class="col-xs-8" style="text-align:left;">
+							<label style="float:none" >
+								<input type='radio' name='tamper_box' style='vertical-align:middle;' value='1'/>有
+							</label>
+							<label style="float:none" >
+								<input type='radio' name='tamper_box' checked="checked" style='vertical-align:middle;' value='0'/>无
+							</label>
+						</span>
+					</div>
+					<div class="col-xs-4">
+							<span class="col-xs-4">智能防拆:</span>
+							<span class="col-xs-8" style="text-align:left;">
+								<label style="float:none" >
+									<input type='radio' name='tamper_smart' style='vertical-align:middle;' value='1'/>有
+								</label>
+								<label style="float:none" >
+									<input type='radio' name='tamper_smart' checked="checked" style='vertical-align:middle;' value='0'/>无
+								</label>
+							</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">无线防拆:</span>
+						<span class="col-xs-8" style="text-align:left;">
+							<label style="float:none" >
+								<input type='radio' name='tamper_wireless' style='vertical-align:middle;' value='1'/>有
+							</label>
+							<label style="float:none" >
+								<input type='radio' name='tamper_wireless' checked="checked" style='vertical-align:middle;' value='0'/>无
+							</label>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">防拆码:</span>
+						<span class="col-xs-8">
+								<input type='text' id="tampercode" name='tampercode' class="form-control" />
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">安装时间:</span>
+						<span class="col-xs-8">
+								<input type='text' class="form-control form_datetime" id="time" name='time' onblur="checkdate(this)" />
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">IMEI码:</span>
+						<span class="col-xs-8">
+								<input type='text' id="imei" name='imei' class="form-control" />
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class='row'>
+					<div class="col-xs-4">
+						<span class="col-xs-4">归档合同号:</span>
+						<span class="col-xs-8">
+								<input type='text' id="fileno" name='fileno' class="form-control" />
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">归档位置:</span>
+						<span class="col-xs-8">
+								<input type='text' id="location" name='location' class="form-control" />
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">保险销售员:</span>
+						<span class="col-xs-8">
+								<input type="text" name="salesName" id="salesName" list="salesList" class="form-control" autocomplete="on" />
+								<input type="hidden" name="ubi_sales_id" id="ubi_sales_id" />
+								<datalist id="salesList"></datalist>
+						</span>
+					</div>
+				</div>
+			</div>
+    </fieldset>
+		
+    <div class='title'>司机资料</div>
+   	<fieldset style="width:100%;">
+			<div id="driver_panel">
+				<div class="panel">
+					<div class="row">
+						<div class="col-xs-4">
+							<input type='hidden' id='driver_id' name='driver_id' />
+							<span class="col-xs-4">司机编号:</span>
+							<span class="col-xs-8">
+									<input type='number' id="code" name='code' class="form-control" />
+							</span>
+						</div>
+						<div class="col-xs-4">
+							<span class="col-xs-4">司机姓名:</span>
+							<span class="col-xs-8">
+									<input type='text' id="drivername" name='drivername' class="form-control" />
+							</span>
+						</div>
+						<div class="col-xs-4">
+							<span class="col-xs-4">联系电话:</span>
+							<span class="col-xs-8">
+									<input type='text' id="driverphone" name='driverphone' class="form-control" />
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="panel">
+					<div class="row">
+						<div class="col-xs-4">
+							<span class="col-xs-4">驾驶证号:</span>
+							<span class="col-xs-8">
+									<input type='text' id="dr_no" name='dr_no' class="form-control" />
+							</span>
+						</div>
+						<div class="col-xs-4">
+							<span class="col-xs-4">准驾车型:</span>
+							<span class="col-xs-8">
+									<input type='text' id="dr_class" name='dr_class' class="form-control" />
+							</span>
+						</div>
+						<div class="col-xs-4">
+							<span class="col-xs-4">发证日期:</span>
+							<span class="col-xs-8">
+									<input type='text' class="form-control form_datetime" id="dr_issuedate" name='dr_issuedate'  />
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="panel">
+					<div class="row">
+						<div class="col-xs-4">
+								<span class="col-xs-4">起始日期:</span>
+								<span class="col-xs-8">
+										<input type='text' class="form-control form_datetime" id="dr_bdate" name='dr_bdate' />
+								</span>
+						</div>
+						<div class="col-xs-4">
+								<span class="col-xs-4">到期日期:</span>
+								<span class="col-xs-8">
+										<input type='text' class="form-control form_datetime" id="dr_edate" name='dr_edate' />
+								</span>
+						</div>
+						<div class="col-xs-4">
+								<a href="javascript:void(0);" style="margin:0px;padding:0px;padding-left:10px;padding-top:5px;"><img alt="增加司机" src="../../images/form_add.png" title="增加司机" style="vertical-align:middle"></a>
+						</div>
+					</div>
+				</div>
+				<hr>
+			</div>
+		</fieldset>
+        
+    <div class='title' id='ctTitle'>托收资料</div>
+		<fieldset style="width:100%;" id="collection">
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">账号名称:</span>
+						<span class="col-xs-8">
+								<input type='text' id="collection_name" name='collection_name' class="form-control" />
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">银行账号:</span>
+						<span class="col-xs-8">
+								<input type='text' id="account" name='account' class="form-control" />
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">确认账号:</span>
+						<span class="col-xs-8">
+								<input type='text' id="confirm_account" name='confirm_account' class="form-control" onblur='checkaccount()'/>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">账户身份证:</span>
+						<span class="col-xs-8">
+								<input type='text' id="ac_id_no" name='ac_id_no' class="form-control" />
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">托收机构:</span>
+						<span class="col-xs-8">
+							<select size="1" name="agency" id="agency" style="width:100%;" autocomplete="on" onchange="changeAgency();">
+								<option value="2">金融中心</option>
+								<option value="1">银盛</option>
+								<option value="3">银联</option>
+							</select>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">银行:</span>
+						<span class="col-xs-8">
+								<select size="1" name="bank" id="bank" style="width:100%;" autocomplete="on">
+								</select>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">账号类型:</span>
+						<span class="col-xs-8">
+								<select size="1" name="account_type" id="account_type" style="width:100%;" autocomplete="on">
+										<option value="0">借记卡</option>
+										<option value="1">存折</option>
+										<option value="2">信用卡</option>
+								</select>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-8">
+						<span class="col-xs-2">是否投递:</span>
+						<span class="col-xs-8" style="text-align:left;">
+							<label style="float:none" >
+								<input type='radio' id="is_delivery" name="is_delivery" checked="checked" style='vertical-align:middle;' value='0' />不投递
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="is_delivery" name="is_delivery" style='vertical-align:middle;' value='1' />平邮
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="is_delivery" name="is_delivery" style='vertical-align:middle;' value='2' />重点投递
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="is_delivery" name="is_delivery" style='vertical-align:middle;' value='3' />电子账单
+							</label>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">发票收件人:</span>
+						<span class="col-xs-8">
+								<input type='text' id="addressee" name='addressee' class="form-control" />
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">联系电话:</span>
+						<span class="col-xs-8">
+								<input type='text' id="tel" name='tel' class="form-control" />
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">邮政编号:</span>
+						<span class="col-xs-8">
+								<input type='text' id="post" name='post' class="form-control" />
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">托收合同号:</span>
+						<span class="col-xs-8 input-group">
+							<span class='col-xs-6'>
+									<input type='text' id="pay_ct_no" name='pay_ct_no' class="form-control" onblur="checkPayctno();"/>
+							</span>
+							<span class="col-xs-7 input-group-btn" style="padding-left:0;">
+									<button id="ctnobtn" type="button" class="btn btn-xs btn-primary" onclick="generateCtno();" >生成合同号</button>
+							</span>
+						</span>
+					</div>
+				</div>    
+			</div>
+			<div class="panel">
+				<div class='row'>
+					<div class="col-xs-12">
+						<span class="col-xs-1" style="width:11%;">投递地址:</span>
+						<span class="col-xs-1" style="width:13%;">
+								<input type='text' id="province" name='province' class="form-control" />
+						</span>
+						<span style="float:left;">省</span>
+						<span class="col-xs-1" style="width:13%;">
+								<input type='text' id="city" name='city' class="form-control" />
+						</span>
+						<span style="float:left;">市</span>
+						<span class="col-xs-1" style="width:13%;">
+								<input type='text' id="area" name='area' class="form-control" />
+						</span>
+						<span style="float:left;">区</span>
+						<span class="col-xs-1" style="width:28%;">
+								<input type='text' id="address" name='address' class="form-control" />
+						</span>
+					</div>
+				</div>
+			</div>
+		</fieldset>
+          
+    <div class='title'>计费信息</div>
+		<fieldset style="width:100%;">
+			<div id="feediv5" style="display:none"><!--style="display:none"-->
+				<div class="panel">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+							<span style="width:10%;padding-right:0;">前装服务费:</span>
+							<span style="width:11%;">开始日期:</span>
+							<span style="width:14%;">
+									<input type='text' class="form-control form_datetime" id="service_start_time5" name='service_start_time5' />
+							</span>
+							<span style="width:11%;">每月应缴:</span>
+							<span style="width:14%;">
+									<input type='number' class="form-control" id="price5" name='price5' onblur="getMonthprice();"/>
+							</span>
+							<span style="width:8%;">缴费方式:</span>
+							<input type='radio' id="payment5" name="payment5" checked="checked" style='vertical-align:middle;' value='1' />现金
+							&nbsp;
+							<input type='radio' id="payment5" name="payment5" style='vertical-align:middle;' value='2' />转账
+							&nbsp;
+							<input type='radio' id="payment5" name="payment5" style='vertical-align:middle;' value='3' />刷卡
+						</div>
+					</div>
+				</div>            
+				<div class="panel">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+							<span style="width:11%;margin-left:10.5%;">缴费间隔(月):</span>
+							<span style="width:7%;">
+									<input type='number' class="form-control" id="fee_cycle5" name='fee_cycle5' />
+							</span>
+						</div>
+					</div>
+				</div>	            
+				<div class="panel" id="pack_msg">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+							<span style="width:11%;margin-left:10.5%;">服务包:</span>
+							<span style="width:14%;">
+									<select size="1" name="pack_name" id="pack_name" style="width:100%;" autocomplete="on" onchange="changePack();"></select>
+							</span>
+							<span style="width:11%;">服务包周期:</span>
+							<span style="width:14%;">
+									<input type='number' id="fee_cycle" name='fee_cycle' class="form-control" />
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="panel" id="combo_msg">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+								<span style="width:11%;margin-left:10.5%;">套餐名:</span>
+								<span style="width:14%;">
+										<!-- <input type='text' id="combo_name" name='combo_name' class="form-control" /> -->
+										<select size="1" name="combo_name" id="combo_name" style="width:100%;" autocomplete="on"></select>
+								</span>
+								<span style="width:11%;">套餐价格:</span>
+								<span style="width:14%;">
+										<input type='number' id="month_fee" name='month_fee' readonly="readonly" class="form-control" />
+								</span>
+						</div>
+					</div>
+				</div>
+				<div class="panel" id="combo_voice_msg">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+							<span style="width:11%;margin-left:10.5%;">总通话时长(分):</span>
+							<span style="width:14%;">
+								<input type='number' id="voice_time" name='voice_time' readonly="readonly" class="form-control"/>
+							</span>
+							<span style="width:11%;">总流量(兆):</span>
+							<span style="width:14%;">
+								<input type='number' id="data" name='data' readonly="readonly" class="form-control" />
+							</span>
+						</div>
+					</div>
+				</div>
+				<hr>
+			</div>
+			<div id="feediv1" style="display:none"><!--style="display:none"-->
+				<div class="panel">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+							<span id='servicefee' style="width:10%;padding-right:0;">服务费:</span>
+							<span style="width:11%;">开始日期:</span>
+							<span style="width:14%;">
+									<input type='text' class="form-control form_datetime" id="service_start_time1" name='service_start_time1' onblur="checkdate(this)" />
+							</span>
+							<span style="width:11%;">每月应缴:</span>
+							<span style="width:14%;">
+									<input type='number' id="price1" name='price1' class="form-control" onblur="getMonthprice();"/>
+							</span>
+							<span style="width:8%;">缴费方式:</span>
+							<label style="float:none" id="etc1">
+								<input type='radio' id="payment1" name="payment1" checked="checked" style='vertical-align:middle;' value='0' />托收
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="payment1" name="payment1" style='vertical-align:middle;' value='1' />现金
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="payment1" name="payment1" style='vertical-align:middle;' value='2' />转账
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="payment1" name="payment1" style='vertical-align:middle;' value='3' />刷卡
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="panel">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+								<span style="width:11%;margin-left:10.5%;">缴费间隔(月):</span>
+								<span style="width:7%;">
+										<input type='number' id="fee_cycle1" name='fee_cycle1' class="form-control" />
+								</span>
+						</div>
+					</div>
+				</div>
+				<div class="panel" id="servicePanel">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+								<span id="serviceitem" style="width:11%;margin-left:10.5%;">服务内容:</span>
+						</div>
+					</div>
+				</div>
+				<hr>
+			</div>
+      <div id="feediv2" style="display:none"><!--style="display:none"-->
+				<div class="panel">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+							<span id='servicefee' style="width:10%;padding-right:0;">SIM卡:</span>
+							<span style="width:11%;">开始日期:</span>
+							<span style="width:14%;">
+									<input type='text' class="form-control form_datetime" id="service_start_time2" name='service_start_time2' onblur="checkdate(this)" />
+							</span>
+							<span style="width:11%;">每月应缴:</span>
+							<span style="width:14%;">
+									<input type='number' id="price2" name='price2' class="form-control" onblur="getMonthprice();"/>
+							</span>
+							<span style="width:8%;">缴费方式:</span>
+							<label style="float:none" id="etc2">
+								<input type='radio' id="payment2" name="payment2" checked="checked" style='vertical-align:middle;' value='0' />托收
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="payment2" name="payment2" style='vertical-align:middle;' value='1' />现金
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="payment2" name="payment2" style='vertical-align:middle;' value='2' />转账
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="payment2" name="payment2" style='vertical-align:middle;' value='3' />刷卡
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="panel">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+								<span style="width:11%;margin-left:10.5%;">缴费间隔(月):</span>
+								<span style="width:7%;">
+										<input type='number' id="fee_cycle2" name='fee_cycle2' class="form-control" />
+								</span>
+						</div>
+					</div>
+				</div>
+				<hr>
+      </div>
+      <div id="feediv3" style="display:none"><!-- style="display:none" -->
+				<div class="panel">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+							<span id='servicefee' style="width:10%;padding-right:0;">盗抢险:</span>
+							<span style="width:11%;">开始日期:</span>
+							<span style="width:14%;">
+									<input type='text' class="form-control form_datetime" id="service_start_time4" name='service_start_time4' onblur="checkdate(this)" />
+							</span>
+							<span style="width:11%;">每月应缴:</span>
+							<span style="width:14%;">
+									<input type='number' id="price4" name='price4' class="form-control" onblur="getMonthprice();"/>
+							</span>
+							<span style="width:8%;">缴费方式:</span>
+							<label style="float:none" id="etc4">
+								<input type='radio' id="payment4" name="payment4" checked="checked" style='vertical-align:middle;' value='0' />托收
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="payment4" name="payment4" style='vertical-align:middle;' value='1' />现金
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="payment4" name="payment4" style='vertical-align:middle;' value='2' />转账
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="payment4" name="payment4" style='vertical-align:middle;' value='3' />刷卡
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="panel">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+							<span style="width:11%;margin-left:10.5%;">缴费间隔(月):</span>
+							<span style="width:7%;">
+									<input type='number' id="fee_cycle4" name='fee_cycle4' class="form-control" />
+							</span>
+						</div>
+					</div>
+				</div>
+				<hr>
+      </div>
+      <div id="feediv4" style="display:none"><!-- style="display:none" -->
+				<div class="panel">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+							<span id='servicefee' style="width:10%;padding-right:0;">网上查车:</span>
+							<span style="width:11%;">开始日期:</span>
+							<span style="width:14%;">
+									<input type='text' class="form-control form_datetime" id="service_start_time3" name='service_start_time3' onblur="checkdate(this)" />
+							</span>
+							<span style="width:11%;">每月应缴:</span>
+							<span style="width:14%;">
+									<input type='number' id="price3" name='price3' class="form-control" onblur="getMonthprice();"/>
+							</span>
+							<span style="width:8%;">缴费方式:</span>
+							<label style="float:none" id="etc3">
+								<input type='radio' id="payment3" name="payment3" checked="checked" style='vertical-align:middle;' value='0' />托收
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="payment3" name="payment3" style='vertical-align:middle;' value='1' />现金
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="payment3" name="payment3" style='vertical-align:middle;' value='2' />转账
+							</label>
+							<label style="float:none" >
+								<input type='radio' id="payment3" name="payment3" style='vertical-align:middle;' value='3' />刷卡
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="panel">
+					<div class='submit_2' style="text-align:left;">
+						<div class="searchDis_2" style="width:100%;">
+							<span style="width:11%;margin-left:10.5%;">缴费间隔(月):</span>
+							<span style="width:7%;">
+									<input type='number' id="fee_cycle3" name='fee_cycle3' class="form-control" />
+							</span>
+						</div>
+					</div>
+				</div>
+	      <hr>
+      </div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-4">
+						<span class="col-xs-4">合计每月应缴:</span>
+						<span class="col-xs-8">
+								<input type='number' id="monthprice" name='monthprice' class="form-control" onblur="getMonthprice();"/>
+						</span>
+					</div>
+					<div class="col-xs-4">
+						<span class="col-xs-4">合计每年应缴:</span>
+						<span class="col-xs-8">
+								<input type='number' id="yearprice" name='yearprice' class="form-control" onblur="getMonthprice();"/>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="row">
+					<div class="col-xs-12">
+						<span style="width:11%;float:left;">备注:</span>
+						<span class="col-xs-10">
+								<textarea id="feeremark" name="feeremark" class="form-control" style="height:48px;" rows="2"></textarea>
+						</span>
+					</div>
+				</div>
+			</div>
+		</fieldset>
+		
+		<fieldset style="width:100%;border-top:0px;">	
+			<div class='submit'>
+				<button type="submit" onclick="private_saveAndreset();" class="btn btn-primary btn-xs" style="width:100px;">保存并新增</button> 
+					<button type="submit" onclick="private_save();" class="btn btn-primary btn-xs">保存</button> 
+					<button type="button" onclick="private_reset();" class="btn btn-primary btn-xs">重置</button>
+			</div>
+		</fieldset>
+
+	</form>
+	</div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../bslib/js/bootstrap-datetimepicker.js"></script><!-- ++++ -->
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>	
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/index.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/storage_vehicle.js" ></script>
+<script type="text/javascript" src="../../jscript/valpwd.js" ></script>
+<script type="text/javascript" src="../../jscript/cook.js" ></script>
+<script type="text/javascript">
+	document.onkeydown=function(event){
+		var e = event || window.event || arguments.callee.caller.arguments[0];
+		if(e && e.keyCode==13){
+			return false;
+		}
+	}
+</script>
+<script type="text/javascript">
+var isImeiHas = false;	//imei号是否重复
+var isPayCtNoHas = false;	//合同号是否重复
+var isLoginnameHas = false;	//手机登录名是否重复
+
+$("#imei").blur(function(){
+	var imei = $("#imei").val();
+	if(imei == ""){
+		isImeiHas = false;
+		return;
+	}
+	$.ajax({
+		type : 'post',
+		async: false,   
+		contentType : 'application/json',     
+		dataType : 'json',     
+		url : '../../checkImei',   
+		data:JSON.stringify({imei:imei}),
+		success : function(data) {
+			if(data){
+				if(data.success){
+					if(data.msg!=null){
+						$(document).sgPup({message:'message_alert',text: 'IMEI号重复，请重新确认!'});
+						isImeiHas = true;
+					}else{
+						isImeiHas = false;
+					}
+				}else{
+					isImeiHas = false;
+					alert(data.msg);
+				}
+			}
+		} ,   
+		error : function(res,error) { 
+			alert("responseText="+res.responseText+";error="+error);     
+		}
+	});
+});
+
+$("#loginname").on("blur", function(){
+	var loginname = $("#loginname").val();
+	var customerId = $("#cust_id").val();
+	if(loginname == ""){
+		isLoginnameHas = false;
+		return;
+	}
+	$.ajax({
+		type : 'post',
+		async: false,   
+		contentType : 'application/json',     
+		dataType : 'json',     
+		url : '../../checkOperator',   
+		data:JSON.stringify({loginname:loginname,customerId:customerId}),
+		success : function(data) {
+			if(data){
+				if(!data.success){
+					isLoginnameHas = true;
+					alert(data.msg);
+				}
+			}
+		} ,   
+		error : function(res,error) { 
+			alert("responseText="+res.responseText+";error="+error);     
+		}
+	});
+});
+var submitkey = true;
+
+function hideSmsnode(){
+	$('#node_name').attr("required",false);
+}
+
+function showSmsnode(){
+	$('#node_name').attr("required",true);
+}
+
+function hideSimfee(){
+	$('#price2').val('');
+	$('#feediv2').hide();
+}
+
+function showSimfee(){
+	$('#feediv2').show();
+}
+
+function changePack(){
+	var pack_id = $('#pack_name option:selected').val();
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../getSimpackByid',
+		data : JSON.stringify({parameter:pack_id}),
+		success : function(data) {
+			if (data) {
+				$('#pack_id').val(data.pack_id);
+				$('#fee_cycle').val(data.fee_cycle);
+				//查询服务套餐
+				$.ajax({
+					type : 'post',
+					async : false,
+					contentType : 'application/json',
+					dataType : 'json',
+					url : '../../getComboByid',
+					data : JSON.stringify({parameter:data.combo_id}),
+					success : function(data2) {
+						if (data2) {
+							$('#combo_id').val(data2.combo_id);
+							$('#combo_name').val(data2.combo_name);
+							$('#month_fee').val(data2.month_fee);
+							$('#voice_time').val(data2.voice_time);
+							$('#data').val(data2.data);
+						}
+					},
+					error : function(res, error) {
+						$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+							+ ";error=" + error});
+					}
+				});
+			}
+		},
+		error : function(res, error) {
+			$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+				+ ";error=" + error});
+		}
+	});
+}
+
+/*托收合同*/
+function checkPayctno(){
+	var pay_ct_no = $('#pay_ct_no').val();
+	var collection_id = $('#collection_id').val();
+	if(pay_ct_no == ""){
+		isPayCtNoHas = false;
+		return ;
+	}
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../getCollectionByctno',
+		data : JSON.stringify({pay_ct_no:pay_ct_no,collection_id:collection_id}),
+		success : function(data) {
+			if (data) {
+				if(data.success){
+					$(document).sgPup({message:'message_alert',text: "提示:您填写的托收合同号在系统中有重复,请确认!"});
+					isPayCtNoHas = true;
+				}else{
+					isPayCtNoHas = false;
+				}
+			}
+		},
+		error : function(res, error) {
+			$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+				+ ";error=" + error});
+		}
+	});
+	
+}
+
+function fillArea(){
+	var branch = $('#branch').val();
+	$('#unitarea').val(branch);
+}
+
+function fillLinkman(){
+	var customer_name = $('#customer_name').val();
+	$('#linkman').val(customer_name);
+	$('#collection_name').val(customer_name);
+	$('#addressee').val(customer_name);
+}
+
+/*托收合同*/
+function generateCtno(){
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../getMaxid',
+		data : JSON.stringify({}),
+		success : function(data) {
+			if (data) {
+				if(data.success){
+					$('#pay_ct_no').val(data.pay_ct_no);
+				}else{
+					$(document).sgPup({message:'message_alert',text: "生成托收合同号错误!"});
+				}
+			}
+		},
+		error : function(res, error) {
+			$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+				+ ";error=" + error});
+		}
+	});
+}
+
+function checknum(){
+	var server_pwd = $('#server_pwd').val();
+	if(!/^[0-9]*$/.test(server_pwd)){
+        $(document).sgPup({message:'message_alert',text: "密码必须为数字!"});
+        $('#server_pwd').val("");
+    }
+}
+
+function checkpwd(){
+	var server_pwd = $('#server_pwd').val();
+	if(server_pwd==""){
+		return true;
+	}
+	var confirm_pwd = $('#confirm_pwd').val();
+	if(server_pwd!=confirm_pwd){
+		$(document).sgPup({message:'message_alert',text: "输入两次密码必须相同!"});
+		$('#confirm_pwd').val("");
+	}
+}
+
+function checkapp(){
+	var phone;
+	var phones = $('input[name=phone]');
+	var apps = $('input[name=app]');
+	var key = false;
+	$(apps).each(function(k,v){
+		if(apps[k].checked==true){
+			key = true;
+			phone = phones[k].value;
+		}
+	});
+	if(!key){
+		return true;
+	}
+	$.ajax( {
+	  	  type : 'post', 
+	  	  async: false,   
+	  	  contentType : 'application/json',     
+	  	  dataType : 'json',     
+	  	  url : '../../getCustomerByPhone',   
+	  	  data:JSON.stringify({parameter:phone}),
+	  	  success : function(data) {
+	  		  if(data){
+	  			  if(data.success==true){
+	  				  $(document).sgConfirm({
+	  					  title:'提示',
+	  					  text: '该手机号码在系统中已绑定客户,是否为同一客户?',
+	  					  cfn:function(r){
+	  						  if(r){
+	  								$('#opid').val(data.operator.opid);
+	  								$('#loginname').val(data.operator.loginname);
+	  								$('#cust_id').val(data.customer.customer_id);
+	  								if(data.customer.service_pwd){
+	  									$('#server_pwd').val(data.customer.service_pwd);
+	  									$('#confirm_pwd').val(data.customer.service_pwd);
+	  								}
+	  								$('#private_pwd').val(data.customer.private_pwd);
+	  								$('#customer_name').val(data.customer.customer_name);
+	  								$('#cust_type').val(data.customer.cust_type);
+	  								$('#idcard').val(data.customer.id_no);
+	  								if(data.customer.birthday!=null){
+	  									$('#birthday').val(data.customer.birthday.substring(0,10));
+	  								}
+										$("input[name='sex'][value="+data.customer.sex+"]").get(0).checked=true;
+										$('#email').val(data.customer.email);
+										$('#vip').val(data.customer.vip); 
+										$('#fileno').val(data.customer.contract_no);
+										$('#location').val(data.customer.location);
+										$('#cust_remark').val(data.customer.remark);
+										$('#cust_address').val(data.customer.address);
+	  							
+										var custphones = data.custphones;
+										$('#phone_panel0').remove();
+										$('#phone_panel1').remove();
+										$('#phone_panel2').remove();
+										$('#phone_panel3').remove();
+										$('#phone_panel4').remove();
+										$('#phone_panel5').remove();
+										var flag = 0;
+										$(custphones).each(function(k,v){
+											if(k>0){
+												var detail_div = $("<div></div>");
+												var detail_id = "phone_panel"+flag;
+												detail_div.attr('id',detail_id);
+												detail_div.addClass("panel");
+												detail_div.append($("#phone_panel").html());
+												if(k==1){
+													$("#phone_panel").before(detail_div);
+												}else{
+													$("#phone_panel"+(k-2)).before(detail_div);
+												}
+												$("#"+detail_id+" #phone_id").val(custphones[k].linkman_id);
+												$("#"+detail_id+" #phone").val(custphones[k].phone);
+												$("#"+detail_id+" #phone_type").val(custphones[k].linkman_type);
+												$("#"+detail_id+" #remark").val(custphones[k].title);
+												$("#"+detail_id+" #linkman").val(custphones[k].linkman);
+												if(phone==custphones[k].phone){
+													$("#"+detail_id+" #app").attr("checked","checked");
+												}
+												$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+												$("#"+detail_id+" img").attr('title','删除电话号码');
+												
+												$("#"+detail_id+" a").on('click',function(){
+													$("#"+detail_id).remove();
+												})
+												//$("#"+detail_id + " input[list=productList]").on('keyup',checkProduct);
+												flag=flag+1;
+											}else{
+												$('#phone_panel #phone_id').val(custphones[k].linkman_id);
+												$('#phone_panel #phone').val(custphones[k].phone);
+												$('#phone_panel #phone_type').val(custphones[k].linkman_type);
+												$('#phone_panel #remark').val(custphones[k].title);
+												$('#phone_panel #linkman').val(custphones[k].linkman);
+												if(phone==custphones[k].phone){
+													$("#"+detail_id+" #app").attr("checked","checked");
+												}
+											}
+										});
+	  								//托收资料
+										if(data.collection){
+											$('#collection_id').val(data.collection.collection_id);
+											$('#account').val(data.collection.ac_no);
+											$('#confirm_account').val(data.collection.ac_no);
+											$('#collection_name').val(data.collection.ac_name);
+											$('#agency').val(data.collection.agency);
+											var bank = $('#bank');
+											var stype;
+											if(data.collection.agency==1){
+													stype = 3010;
+													$('#ac_id_no').attr("required",false);
+													$("#ctnobtn").hide();
+											}else if(data.collection.agency==2){
+													stype = 3010;
+													$('#ac_id_no').attr("required",false);
+													$("#ctnobtn").show();
+											}else if(data.collection.agency==3){
+													stype = 3011;
+													$('#ac_id_no').attr("required",true);
+													$("#ctnobtn").show();
+											}
+											bank.empty();
+											$.ajax( {
+													type : 'post', 
+													async: false,   
+													contentType : 'application/json',     
+													dataType : 'json',     
+													url : '../../sys/findSysValue',   
+														data:JSON.stringify({stype : stype, isDel : 0}),
+													success : function(data) {
+														if(data){
+															if(bank){
+																$.each(data,function(k,v){
+																	bank.append("<option value='" +v.svalue+"'>" + v.sname+"</option>");
+																}); 
+															}
+														}
+													} ,     
+													error : function(res,error) { 
+														 alert("responseText="+res.responseText+";error="+error);     
+													}    
+											});
+											$('#bank').val(data.collection.bank_code);
+											$('#account_type').val(data.collection.ac_type);
+											$('#tel').val(data.collection.tel);
+											if(data.collection.is_delivery){
+												$("input[name='is_delivery'][value="+data.collection.is_delivery+"]").get(0).checked=true;
+											}
+											$('#addressee').val(data.collection.addressee);
+											$('#post').val(data.collection.post_code);
+											$('#pay_ct_no').val(data.collection.pay_ct_no);
+											$('#province').val(data.collection.province);
+											$('#city').val(data.collection.city);
+											$('#area').val(data.collection.area);
+											$('#address').val(data.collection.address);
+											$('#ac_id_no').val(data.collection.ac_id_no);
+										}
+									}else{
+										$(obj).val('');  
+									}
+	  				  	}
+	  				  });
+	  			  }
+	  		  }
+	  	  } ,     
+	  	  error : function(res,error) { 
+	  	  	 alert("responseText="+res.responseText+";error="+error);     
+	  	  }    
+	  	});
+	
+}
+
+/*计费信息套餐*/
+$(function (){
+	var company=getCookie("companyno");
+	var combo_name=$("#combo_name");
+	var month_fee=$("#month_fee");
+	combo_name.empty();
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../meal/getmealList',
+		data : JSON.stringify({parameter:company}),
+		success : function(data) {
+			if(data){
+					$.each(data,function(k,v){
+						console.log(v);
+						combo_name.append("<option>"+v.combo_name+"</option>");
+						month_fee.val(data[0].month_fee);
+						combo_name.on("change", function(){
+							$.each(data,function(k,v){
+								if(combo_name.val()==v.combo_name){
+									month_fee.val(v.month_fee);
+								};
+							});
+						});
+					});			 
+			}
+			console.log(data);
+		} ,     
+		error : function(res,error) {   
+		}
+	});
+});
+
+function checkaccount(){
+	var account = $('#account').val();
+	if(account==""){
+		return true;
+	}
+	var confirm_account = $('#confirm_account').val();
+	if(account!=confirm_account){
+		$(document).sgPup({message:'message_alert',text: "输入两次银行账号必须相同!"});
+		$('#confirm_account').val("");
+	}
+}
+
+function checkdate(obj){
+	var datetime = $(obj).val();
+	var first = datetime.charAt(0);
+    if(first!==''){
+        if(first!=1&&first!=2){
+            $(document).sgPup({message:'message_alert',text: "日期输入格式不正确,请重新输入。"});
+            $(obj).val("");
+        }
+    }
+}
+/*计费信息月费合计+年费合计*/
+function getMonthprice(){
+	var price1 = $('#price1').val();
+	var price2 = $('#price2').val();
+	var price3 = $('#price3').val();
+	var price4 = $('#price4').val();
+	var price5 = $('#price5').val();
+	var monthprice = Number(price1) + Number(price2) + Number(price3) + Number(price4) + Number(price5);
+	$('#monthprice').val(monthprice);
+	var yearprice = (Number(price1) + Number(price2) + Number(price3) + Number(price4) + Number(price5))*12;
+	$('#yearprice').val(yearprice);
+}
+
+function checkemail(){
+	var email=$('#email').val();
+	if(email==''){
+		return true;
+	}
+	if(!email.match(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/)){
+		$(document).sgPup({message:'message_alert',text: "邮箱格式不对，请重新输入!"});
+		$('#email').val("");
+	}
+}
+
+function checkIdno(){
+	var idcard = $('#idcard').val();
+	$('#ac_id_no').val(idcard);
+}
+
+function checkinfo(){
+	var call_letter=$('#call_letter').val();
+	if(call_letter==''){
+		return true;
+	}
+	if(!call_letter.match(/^1[3|4|5|8][0-9]\d{4,8}$/)){
+		$(document).sgPup({message:'message_alert',text: "请填写正确的SIM卡号!"});
+		$('#call_letter').val("");
+	}
+} 
+
+function changeAgency(){
+	//填充银行
+	var bank = $('#bank');
+    var agency_id = $('#agency option:selected').val();
+    var stype;
+    if(agency_id==1){
+    	stype = 3010;
+    	$('#ac_id_no').attr("required",false);
+    	$("#ctnobtn").hide();
+    }else if(agency_id==2){
+    	stype = 3010;
+    	$('#ac_id_no').attr("required",false);
+    	$("#ctnobtn").show();
+    }else if(agency_id==3){
+    	stype = 3011;
+    	$('#ac_id_no').attr("required",true);
+    	$("#ctnobtn").show();
+    }
+    bank.empty();
+    $.ajax( {
+  	  type : 'post', 
+  	  async: false,   
+  	  contentType : 'application/json',     
+  	  dataType : 'json',     
+  	  url : '../../sys/findSysValue',   
+  	  data:JSON.stringify({stype : stype, isDel : 0}),
+  	  success : function(data) {
+  		  if(data){
+  			  if(bank){
+  				  $.each(data,function(k,v){
+  					  bank.append("<option value='" +v.svalue+"'>" + v.sname+"</option>");
+  				  }); 
+  			  }
+  		  }
+  	  } ,     
+  	  error : function(res,error) { 
+  	  	 alert("responseText="+res.responseText+";error="+error);     
+  	  }    
+  	});
+}
+
+function selectType(){
+	var text = $("#type option:selected").text();
+	if(text == '新装' || text == '过户新装'){
+		$("#divObj1").hide();
+		$("#history1").hide();
+		$("#history2").hide();
+		$("#history3").hide();
+		$("#history4").hide();
+		$("#history5").hide();
+	}else{
+		$("#divObj1").show();
+		$("#history1").show();
+		$("#history2").show();
+		$("#history3").show();
+		$("#history4").show();
+		$("#history5").show();
+	}
+}
+
+function private_save(){
+	$("#nw_private_form").on('submit',function(e){
+		
+		if(!submitkey){
+			return false;
+		}
+		submitkey=false;
+		setTimeout(function(){
+			submitkey=true;
+		},3000);
+
+		$("input[type='text']", "#nw_private_form").each(function(k, v){
+			var input = $(this);
+			input.val(input.val().trim());
+		});
+		var price1 = $('#price1').val();
+		var price2 = $('#price2').val();
+		var price3 = $('#price3').val();
+		var price4 = $('#price4').val();
+		
+		var payment1 =  $('input[name="payment1"]:checked').val();
+		var payment2 =  $('input[name="payment2"]:checked').val();
+		var payment3 =  $('input[name="payment3"]:checked').val();
+		var payment4 =  $('input[name="payment4"]:checked').val();
+		var pay_ct_no = $('#pay_ct_no').val();
+		var account = $('#account').val();
+		var collection_name = $('#collection_name').val();
+		var agency_id = $("#agency").val();
+		
+		if(((price1 != null && price1 != "" && payment1 ==0 ) 
+				|| (price2 != null && price2 != "" && payment2 ==0 )
+				|| (price3 != null && price3 != "" && payment3 ==0 )
+				|| (price4 != null && price4 != "" && payment4 ==0 )) 
+				&& ((pay_ct_no == null || pay_ct_no == "")
+					|| (account == null || account == "")
+					|| agency_id == "" || agency_id == "0"
+					|| (collection_name == null || collection_name == ""))){
+			$(document).sgPup({message:'message_alert',text: "托收用户，请输入正确托收信息!"});
+			$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		}
+		
+		if(((price1 != null && price1 != "" && payment1 ==1 ) 
+				|| (price2 != null && price2 != "" && payment2 ==1 )
+				|| (price3 != null && price3 != "" && payment3 ==1 )
+				|| (price4 != null && price4 != "" && payment4 ==1 )) 
+				&& (account != null && account != "")){
+			if(!confirm("该客户有托收资料,但是缴费方式是现金.确认保存吗?")){
+				$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+				e.stopPropagation();
+				return false;
+			}
+		}
+		
+		var linkmans = $('input[name=linkman]');
+		var phones = $('input[name=phone]');
+		var remarks = $('input[name=remark]');
+		var app = $('input[name=app]');
+		var custphones = new Array();
+		$("select[name=phone_type]").each(function(k,v){
+			var obj = {};
+			var phonevalue = phones[k].value;
+			while(phonevalue.indexOf(" ")!=-1){
+				phonevalue = phonevalue.replace(" ","");
+			}
+			obj.linkman = linkmans[k].value;
+        	obj.phone = phonevalue;
+        	obj.linkman_type = $(this).val();
+        	obj.appsign = app[k].checked==true?1:0;
+        	obj.title = remarks[k].value;
+        	custphones.push(obj);
+		});
+		var barcodes = new Array();
+		var barcodeids = $('input[name=barcodeid]');
+		var codes = $('input[name=barcode]');
+		$("select[name=bartype]").each(function(k,v){
+			var obj = {};
+			obj.id = barcodeids[k].value;
+        	obj.type = $(this).val();
+        	obj.content = codes[k].value;
+        	barcodes.push(obj);
+		});
+		
+		var drivers = new Array();
+		var driver_ids = $('input[name=driver_id]');
+		var codes = $('input[name=code]');
+		var names = $('input[name=drivername]');
+		var phones = $('input[name=driverphone]');
+		var dr_nos = $('input[name=dr_no]');
+		var dr_classs = $('input[name=dr_class]');
+		var dr_issuedates = $('input[name=dr_issuedate]');
+		var dr_bdates = $('input[name=dr_bdate]');
+		var dr_edates = $('input[name=dr_edate]');
+		
+		var r = true;
+		codes.each(function(k,v){
+			var obj = {};
+			obj.driver_id = (driver_ids[k] == undefined ? 0 :driver_ids[k].value);
+        	obj.driver_code = (codes[k] == undefined ? "": codes[k].value);
+        	obj.driver_name = (names[k] == undefined ? "": names[k].value);
+        	obj.phone = (phones[k] == undefined ? "": phones[k].value);
+        	obj.dr_no = (dr_nos[k] == undefined ? "": dr_nos[k].value);
+        	obj.dr_class = (dr_classs[k] == undefined ? "": dr_classs[k].value);
+        	obj.dr_issuedate = (dr_issuedates[k] == undefined ? "": dr_issuedates[k].value);
+        	obj.dr_bdate = (dr_bdates[k] == undefined ? "": dr_bdates[k].value);
+        	obj.dr_edate = (dr_edates[k] == undefined ? "": dr_edates[k].value);
+        	if(obj.phone!=''&&obj.driver_name==''){
+        		r = false;
+        		return false;
+        	}
+        	drivers.push(obj);
+		});
+		if(isImeiHas){
+			$(document).sgPup({message:'message_alert',text: 'IMEI号重复!'});
+			$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		}
+		if(isPayCtNoHas){
+			$(document).sgPup({message:'message_alert',text: '托收合同号重复!'});
+			$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		}
+		if(isLoginnameHas){
+			$(document).sgPup({message:'message_alert',text: 'app登录名重复!'});
+			$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		}
+		if(!r){
+			$(document).sgPup({message:'message_alert',text: '司机姓名不能填写为空.'});
+			$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		}
+		
+		var serviceInfo = {};
+		var simfeeInfo = {};
+		var webgisInfo = {};
+		var insuranceInfo = {};
+		var preloadInfo = {};
+		serviceInfo.fee_date = $('#service_start_time1').val();
+		serviceInfo.month_fee = $('#price1').val();
+		serviceInfo.fee_cycle = $('#fee_cycle1').val();
+		serviceInfo.pay_model = $("input[name='payment1']:checked").val();
+		var items_id = "";
+		$('input:checkbox:checked').each(function() {
+			items_id = items_id + $(this).val() + ",";
+        });
+		serviceInfo.items_id = items_id;
+		serviceInfo.remark = $('#feeremark').val();
+		
+		simfeeInfo.fee_date = $('#service_start_time2').val();
+		simfeeInfo.month_fee = $('#price2').val();
+		simfeeInfo.fee_cycle = $('#fee_cycle2').val();
+		simfeeInfo.pay_model = $("input[name='payment2']:checked").val();
+		simfeeInfo.remark = $('#feeremark').val();
+		
+		webgisInfo.fee_date = $('#service_start_time3').val();
+		webgisInfo.month_fee = $('#price3').val();
+		webgisInfo.fee_cycle = $('#fee_cycle3').val();
+		webgisInfo.pay_model = $("input[name='payment3']:checked").val();
+		webgisInfo.remark = $('#feeremark').val();
+		
+		insuranceInfo.fee_date = $('#service_start_time4').val();
+		insuranceInfo.month_fee = $('#price4').val();
+		insuranceInfo.fee_cycle = $('#fee_cycle4').val();
+		insuranceInfo.pay_model = $("input[name='payment4']:checked").val();
+		insuranceInfo.remark = $('#feeremark').val();
+		
+		preloadInfo.fee_date = $('#service_start_time5').val();
+		preloadInfo.month_fee = $('#price5').val();
+		preloadInfo.fee_cycle = $('#fee_cycle5').val();
+		preloadInfo.pay_model = $("input[name='payment5']:checked").val();
+		preloadInfo.remark = $('#feeremark').val();
+		
+		var idcard = $('#idcard').val();
+		while(idcard.indexOf(" ")!=-1){
+			idcard = idcard.replace(" ","");
+		}
+		var account = $('#account').val();
+		while(account.indexOf(" ")!=-1){
+			account = account.replace(" ","");
+		}
+		var ac_id_no = $('#ac_id_no').val();
+		while(ac_id_no.indexOf(" ")!=-1){
+			ac_id_no = ac_id_no.replace(" ","");
+		}
+		
+		//最近操作车牌号码联系电话
+	//window.gbossLocalStorage.addItem('storage_vehicle',
+	//{plateNo:$('#number_plate').val(),callLetter:$('#call_letter').val()});
+        addItem('storage_vehicle',{plateNo:$('#number_plate').val(),callLetter:$('#call_letter').val()});
+		var vl_vsize = "";
+		var vl_length = $("#vl_vsize_length").val();
+		var vl_width = $("#vl_vsize_width").val();
+		var vl_height = $("#vl_vsize_height").val();
+		vl_vsize = vl_length+"*"+vl_width+"*"+vl_height;
+		var vload_num = ($('#vload').val() == ""?0:$('#vload').val());
+		$.ajax({
+			type : 'post',
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : '../../privateNetwork',
+			data : JSON.stringify({
+				opid : $('#opid').val()==''?0:$('#opid').val(),
+				cust_id : $('#cust_id').val()==''?0:$('#cust_id').val(),
+				vehicle_id : $('#vehicle_id').val(),
+				unit_id : $('#unit_id').val(),
+				collection_id : $('#collection_id').val(),
+				loginname : $('#loginname').val(),
+				server_pwd : $('#server_pwd').val()==''?'123456':$('#server_pwd').val(),
+				private_pwd : $('#private_pwd').val(),
+				customer_name : $('#customer_name').val(),
+				idcard : idcard,
+				birthday : $('#birthday').val(),
+				sex : $("input[name='sex']:checked").val(),
+				email : $('#email').val(),
+				vip : $('#vip option:selected').val(),
+				fileno : $("#fileno").val(),
+				location : $('#location').val(),
+				remark : $('#cust_remark').val(),
+				address : $("#cust_address").val(),
+				custphones : custphones,
+				
+				number_plate : $('#number_plate').val(),
+				plate_color : $('#plate_color option:selected').val(),
+				vehicle_type : $('#vehicle_type option:selected').val(),
+				cartype : $('#model_id').val(),
+				cartype_name : $('#model').val(),
+				code : $('#vehicle_code').val(),
+				engine_no : $('#engine_no').val(),
+				color : $("#color").val(),
+				buy_time : $('#buy_time').val(),
+				production_date : $('#production_date').val(),
+				driving_no : $('#driving_no').val(),
+				grant_time : $('#grant_time').val(),
+				valid_time : $('#valid_time').val(),
+				id_4s : $('#4s_id').val()==''?0:$('#4s_id').val(),
+				insurance_id : $('#insurer_id').val()==''?0:$('#insurer_id').val(),
+				is_bdate : $('#is_bdate').val(),
+				is_edate : $('#is_edate').val(),
+				is_corp : $('#is_corp').val(),
+				is_pilfer : $('#is_pilfer').val(),
+				equip_code : $('#equip_code').val(),
+				vl_owner : $('#vl_owner').val(),
+				vl_type : $('#vl_type').val(),
+				vload : vload_num,
+				vl_use : $('#vl_use').val(),
+				vl_quality : $('#vl_quality').val(),
+				vl_ap_quality : $('#vl_ap_quality').val(),
+				vl_qt_quality : $('#vl_qt_quality').val(),
+				vl_vsize : vl_vsize,
+				vl_doc_no : $('#vl_doc_no').val(),
+				vl_remark : $('#vl_remark').val(),
+				
+				unittype_id : $('#unittype_id').val(),
+				name : $('#name').val(),
+				mode : $("input[name='mode']:checked").val(),
+				call_letter : $('#call_letter').val(),
+				operators : $("input[name='operators']:checked").val(),
+				simtype : $("input[name='simtype']:checked").val(),
+				manager_name : $('#managerName').val(),
+				manager_id : $('#managerId').val()==''?0:$('#managerId').val(),
+				//UBI保险销售员
+				ubi_sales_id : $('#ubi_sales_id').val()==''?0:$('#ubi_sales_id').val(),
+				branch : $('#branch').val(),
+				//pack_id : $('#pack_id').val(),
+				tamper_code : $('#tampercode').val(),
+				unitarea : $('#unitarea').val(),
+				special : $('#special').val(),
+				node : $('#node_name').val()==null?0:$('#node_name').val(),
+				time : $('#time').val(),
+				state : $('#state').val(),
+				guarantee_id : $('#guarantee_id').val(),
+				worker : $('#worker').val(),
+				sim_id : $('#sim_id').val()==''?0:$('#sim_id').val(),
+				combo_id : $('#combo_id').val()==''?0:$('#combo_id').val(),
+				prePack_id : $('#pack_id').val()==''?0:$('#pack_id').val(),
+				tamper_box : $("input[name='tamper_box']:checked").val(),
+				tamper_smart : $("input[name='tamper_smart']:checked").val(),
+				tamper_wireless : $("input[name='tamper_wireless']:checked").val(),
+				is_sz : $("input[name='is_sz']:checked").val(),
+				imei : $('#imei').val(),
+				
+				barcodes : barcodes,
+				serviceInfo : serviceInfo,
+				simfeeInfo : simfeeInfo,
+				webgisInfo : webgisInfo,
+				insuranceInfo : insuranceInfo,
+				preloadInfo : preloadInfo,
+				
+				collection_id : $('#collection_id').val(),
+				account : account,
+				collection_name : $('#collection_name').val(),
+				agency : $('#agency').val(),
+				bank : $('#bank option:selected').text(),
+				bankcode : $('#bank').val(),
+				type : $('#account_type option:selected').val(),
+				is_delivery : $("input[name='is_delivery']:checked").val(),
+				addressee : $('#addressee').val(),
+				post_code : $("#post").val(),
+				pay_ct_no : $("#pay_ct_no").val(),
+				tel : $("#tel").val(),
+				ac_id_no : ac_id_no,
+				province : $('#province').val(),
+				city : $('#city').val(),
+				area : $('#area').val(),
+				address : $("#address").val(),
+				
+				drivers : drivers
+			}),
+			success : function(data) {
+				if (data) {
+					submitkey=false;
+					setTimeout(function(){
+						submitkey=true;
+					},3000);
+					$(document).sgPup({message:'message_alert',text: data.msg});
+				}
+			},
+			error : function(res, error) {
+				$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+					+ ";error=" + error});
+			}
+		});
+		$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+		e.stopPropagation();
+		return false;
+	});
+}
+
+function private_reset(){
+	document.nw_private_form.reset();
+	var today=new Date().format('yyyy-MM-dd');
+	isImeiHas = false;
+	isPayCtNoHas = false;
+	isLoginnameHas = false;
+   	$("#time").val(today);
+   	$('#opid').val();
+	$('#cust_id').val();
+   	$("#service_start_time1").val(today);
+	$("#service_start_time2").val(today);
+	$("#service_start_time3").val(today);
+	$("#service_start_time4").val(today);
+}
+
+function private_saveAndreset(){
+	$("#nw_private_form").on('submit',function(e){
+		
+		if(!submitkey){
+			return false;
+		}
+		
+		$("input[type='text']", "#nw_private_form").each(function(k, v){
+			var input = $(this);
+			input.val(input.val().trim());
+		});
+		var price1 = $('#price1').val();
+		var price2 = $('#price2').val();
+		var price3 = $('#price3').val();
+		var price4 = $('#price4').val();
+		
+		var payment1 =  $('input[name="payment1"]:checked').val();
+		var payment2 =  $('input[name="payment2"]:checked').val();
+		var payment3 =  $('input[name="payment3"]:checked').val();
+		var payment4 =  $('input[name="payment4"]:checked').val();
+		var pay_ct_no = $('#pay_ct_no').val();
+		var account = $('#account').val();
+		var collection_name = $('#collection_name').val();
+		var agency_id = $("#agency").val();
+		
+		if(((price1 != null && price1 != "" && payment1 ==0 ) 
+				|| (price2 != null && price2 != "" && payment2 ==0 )
+				|| (price3 != null && price3 != "" && payment3 ==0 )
+				|| (price4 != null && price4 != "" && payment4 ==0 )) 
+				&& ((pay_ct_no == null || pay_ct_no == "")
+					|| (account == null || account == "")
+					|| agency_id == "" || agency_id == "0"
+					|| (collection_name == null || collection_name == ""))){
+			$(document).sgPup({message:'message_alert',text: "托收用户，请输入正确托收信息!"});
+			$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		}
+		
+		if(((price1 != null && price1 != "" && payment1 ==1 ) 
+				|| (price2 != null && price2 != "" && payment2 ==1 )
+				|| (price3 != null && price3 != "" && payment3 ==1 )
+				|| (price4 != null && price4 != "" && payment4 ==1 )) 
+				&& (account != null && account != "")){
+			if(!confirm("该客户有托收资料,但是缴费方式是现金.确认保存吗?")){
+				$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+				e.stopPropagation();
+				return false;
+			}
+		}
+		
+		var server_pwd = $('#server_pwd').val();
+		var confirm_pwd = $('#confirm_pwd').val();
+		if(server_pwd!=confirm_pwd){
+			$(document).sgPup({message:'message_alert',text: "输入两次密码必须相同!"});
+			$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		}
+		var account = $('#account').val();
+		var confirm_account = $('#confirm_account').val();
+		if(account!=confirm_account){
+			$(document).sgPup({message:'message_alert',text: "输入两次银行账号必须相同!"});
+			$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		}
+		var linkmans = $('input[name=linkman]');
+		var phones = $('input[name=phone]');
+		var remarks = $('input[name=remark]');
+		var app = $('input[name=app]');
+		var custphones = new Array();
+		$("select[name=phone_type]").each(function(k,v){
+			var obj = {};
+			var phonevalue = phones[k].value;
+			while(phonevalue.indexOf(" ")!=-1){
+				phonevalue = phonevalue.replace(" ","");
+			}
+			obj.linkman = linkmans[k].value;
+        	obj.phone = phonevalue;
+        	obj.linkman_type = $(this).val();
+       		obj.appsign = app[k].checked==true?1:0;
+        	obj.title = remarks[k].value;
+        	custphones.push(obj);
+		});
+		var barcodes = new Array();
+		var barcodeids = $('input[name=barcodeid]');
+		var codes = $('input[name=barcode]');
+		$("select[name=bartype]").each(function(k,v){
+			var obj = {};
+			obj.id = barcodeids[k].value;
+        	obj.type = $(this).val();
+        	obj.content = codes[k].value;
+        	barcodes.push(obj);
+		});
+		
+		var drivers = new Array();
+		var driver_ids = $('input[name=driver_id]');
+		var codes = $('input[name=code]');
+		var names = $('input[name=drivername]');
+		var phones = $('input[name=driverphone]');
+		var dr_nos = $('input[name=dr_no]');
+		var dr_classs = $('input[name=dr_class]');
+		var dr_issuedates = $('input[name=dr_issuedate]');
+		var dr_bdates = $('input[name=dr_bdate]');
+		var dr_edates = $('input[name=dr_edate]');
+		
+		var r = true;
+		codes.each(function(k,v){
+			var obj = {};
+			obj.driver_id = (driver_ids[k] == undefined ? 0 :driver_ids[k].value);
+        	obj.driver_code = (codes[k] == undefined ? "": codes[k].value);
+        	obj.driver_name = (names[k] == undefined ? "": names[k].value);
+        	obj.phone = (phones[k] == undefined ? "": phones[k].value);
+        	obj.dr_no = (dr_nos[k] == undefined ? "": dr_nos[k].value);
+        	obj.dr_class = (dr_classs[k] == undefined ? "": dr_classs[k].value);
+        	obj.dr_issuedate = (dr_issuedates[k] == undefined ? "": dr_issuedates[k].value);
+        	obj.dr_bdate = (dr_bdates[k] == undefined ? "": dr_bdates[k].value);
+        	obj.dr_edate = (dr_edates[k] == undefined ? "": dr_edates[k].value);
+        	if(obj.phone!=''&&obj.driver_name==''){
+        		r = false;
+        		return false;
+        	}
+        	drivers.push(obj);
+		});
+		if(isImeiHas){
+			$(document).sgPup({message:'message_alert',text: 'IMEI号重复!'});
+			$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		}
+		if(isPayCtNoHas){
+			$(document).sgPup({message:'message_alert',text: '托收合同号重复!'});
+			$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		}
+		if(isLoginnameHas){
+			$(document).sgPup({message:'message_alert',text: 'app登录名重复!'});
+			$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		}
+		if(!r){
+			$(document).sgPup({message:'message_alert',text: '司机姓名不能填写为空.'});
+			$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		}
+		
+		var serviceInfo = {};
+		var simfeeInfo = {};
+		var webgisInfo = {};
+		var insuranceInfo = {};
+		var preloadInfo = {};
+		serviceInfo.fee_date = $('#service_start_time1').val();
+		serviceInfo.month_fee = $('#price1').val();
+		serviceInfo.fee_cycle = $('#fee_cycle1').val();
+		serviceInfo.pay_model = $("input[name='payment1']:checked").val();
+		var items_id = "";
+		$('input:checkbox:checked').each(function() {
+			items_id = items_id + $(this).val() + ",";
+        });
+		serviceInfo.items_id = items_id;
+		serviceInfo.remark = $('#feeremark').val();
+		
+		simfeeInfo.fee_date = $('#service_start_time2').val();
+		simfeeInfo.month_fee = $('#price2').val();
+		simfeeInfo.fee_cycle = $('#fee_cycle2').val();
+		simfeeInfo.pay_model = $("input[name='payment2']:checked").val();
+		simfeeInfo.remark = $('#feeremark').val();
+		
+		webgisInfo.fee_date = $('#service_start_time3').val();
+		webgisInfo.month_fee = $('#price3').val();
+		webgisInfo.fee_cycle = $('#fee_cycle3').val();
+		webgisInfo.pay_model = $("input[name='payment3']:checked").val();
+		webgisInfo.remark = $('#feeremark').val();
+		
+		insuranceInfo.fee_date = $('#service_start_time4').val();
+		insuranceInfo.month_fee = $('#price4').val();
+		insuranceInfo.fee_cycle = $('#fee_cycle4').val();
+		insuranceInfo.pay_model = $("input[name='payment4']:checked").val();
+		insuranceInfo.remark = $('#feeremark').val();
+		
+		preloadInfo.fee_date = $('#service_start_time5').val();
+		preloadInfo.month_fee = $('#price5').val();
+		preloadInfo.fee_cycle = $('#fee_cycle5').val();
+		preloadInfo.pay_model = $("input[name='payment5']:checked").val();
+		preloadInfo.remark = $('#feeremark').val();
+		
+		var idcard = $('#idcard').val();
+		while(idcard.indexOf(" ")!=-1){
+			idcard = idcard.replace(" ","");
+		}
+		var account = $('#account').val();
+		while(account.indexOf(" ")!=-1){
+			account = account.replace(" ","");
+		}
+		var ac_id_no = $('#ac_id_no').val();
+		while(ac_id_no.indexOf(" ")!=-1){
+			ac_id_no = ac_id_no.replace(" ","");
+		}
+		
+		//最近操作车牌号码联系电话
+		//window.gbossLocalStorage.addItem('storage_vehicle',
+		//{plateNo:$('#number_plate').val(),callLetter:$('#call_letter').val()});
+        addItem('storage_vehicle',{plateNo:$('#number_plate').val(),callLetter:$('#call_letter').val()});
+		var vl_vsize = "";
+		var vl_length = $("#vl_vsize_length").val();
+		var vl_width = $("#vl_vsize_width").val();
+		var vl_height = $("#vl_vsize_height").val();
+		vl_vsize = vl_length+"*"+vl_width+"*"+vl_height;
+		var vload_num = ($('#vload').val() == ""?0:$('#vload').val());
+		$.ajax({
+			type : 'post',
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : '../../privateNetwork',
+			data : JSON.stringify({
+				opid : $('#opid').val()==''?0:$('#opid').val(),
+				cust_id : $('#cust_id').val()==''?0:$('#cust_id').val(),
+				vehicle_id : $('#vehicle_id').val(),
+				unit_id : $('#unit_id').val(),
+				collection_id : $('#collection_id').val(),
+				loginname : $('#loginname').val(),
+				server_pwd : $('#server_pwd').val()==''?'123456':$('#server_pwd').val(),
+				private_pwd : $('#private_pwd').val(),
+				customer_name : $('#customer_name').val(),
+				idcard : idcard,
+				birthday : $('#birthday').val(),
+				sex : $("input[name='sex']:checked").val(),
+				email : $('#email').val(),
+				vip : $('#vip option:selected').val(),
+				fileno : $("#fileno").val(),
+				location : $('#location').val(),
+				remark : $('#cust_remark').val(),
+				address : $('#cust_address').val(),
+				custphones : custphones,
+				
+				number_plate : $('#number_plate').val(),
+				plate_color : $('#plate_color option:selected').val(),
+				vehicle_type : $('#vehicle_type option:selected').val(),
+				cartype : $('#model_id').val(),
+				cartype_name : $('#model').val(),
+				code : $('#vehicle_code').val(),
+				engine_no : $('#engine_no').val(),
+				color : $("#color").val(),
+				buy_time : $('#buy_time').val(),
+				production_date : $('#production_date').val(),
+				driving_no : $('#driving_no').val(),
+				grant_time : $('#grant_time').val(),
+				valid_time : $('#valid_time').val(),
+				id_4s : $('#4s_id').val()==''?0:$('#4s_id').val(),
+				insurance_id : $('#insurer_id').val()==''?0:$('#insurer_id').val(),
+				is_bdate : $('#is_bdate').val(),
+				is_edate : $('#is_edate').val(),
+				is_corp : $('#is_corp').val(),
+				is_pilfer : $('#is_pilfer').val(),
+				equip_code : $('#equip_code').val(),
+				vl_owner : $('#vl_owner').val(),
+				vl_type : $('#vl_type').val(),
+				vload : vload_num,
+				vl_use : $('#vl_use').val(),
+				vl_quality : $('#vl_quality').val(),
+				vl_ap_quality : $('#vl_ap_quality').val(),
+				vl_qt_quality : $('#vl_qt_quality').val(),
+				vl_vsize : vl_vsize,
+				vl_doc_no : $('#vl_doc_no').val(),
+				vl_remark : $('#vl_remark').val(),
+				
+				unittype_id : $('#unittype_id').val(),
+				name : $('#name').val(),
+				mode : $("input[name='mode']:checked").val(),
+				call_letter : $('#call_letter').val(),
+				operators : $("input[name='operators']:checked").val(),
+				simtype : $("input[name='simtype']:checked").val(),
+				manager_name : $('#managerName').val(),
+				manager_id : $('#managerId').val()==''?0:$('#managerId').val(),
+			//UBI保险销售员
+				ubi_sales_id : $('#ubi_sales_id').val()==''?0:$('#ubi_sales_id').val(),
+				branch : $('#branch').val(),
+				//pack_id : $('#pack_id').val(),
+				tamper_code : $('#tampercode').val(),
+				unitarea : $('#unitarea').val(),
+				special : $('#special').val(),
+				node : $('#node_name').val()==null?0:$('#node_name').val(),
+				time : $('#time').val(),
+				state : $('#state').val(),
+				guarantee_id : $('#guarantee_id').val(),
+				worker : $('#worker').val(),
+				sim_id : $('#sim_id').val()==''?0:$('#sim_id').val(),
+				combo_id : $('#combo_id').val()==''?0:$('#combo_id').val(),
+				prePack_id : $('#pack_id').val()==''?0:$('#pack_id').val(),
+				tamper_box : $("input[name='tamper_box']:checked").val(),
+				tamper_smart : $("input[name='tamper_smart']:checked").val(),
+				tamper_wireless : $("input[name='tamper_wireless']:checked").val(),
+				is_sz : $("input[name='is_sz']:checked").val(),
+				imei : $('#imei').val(),
+				
+				barcodes : barcodes,
+				serviceInfo : serviceInfo,
+				simfeeInfo : simfeeInfo,
+				webgisInfo : webgisInfo,
+				insuranceInfo : insuranceInfo,
+				preloadInfo : preloadInfo,
+				
+				collection_id : $('#collection_id').val(),
+				account : account,
+				collection_name : $('#collection_name').val(),
+				agency : $('#agency').val(),
+				bank : $('#bank option:selected').text(),
+				bankcode : $('#bank').val(),
+				type : $('#account_type option:selected').val(),
+				is_delivery : $("input[name='is_delivery']:checked").val(),
+				addressee : $('#addressee').val(),
+				post_code : $("#post").val(),
+				pay_ct_no : $("#pay_ct_no").val(),
+				tel : $("#tel").val(),
+				ac_id_no : ac_id_no,
+				province : $('#province').val(),
+				city : $('#city').val(),
+				area : $('#area').val(),
+				address : $("#address").val(),
+				
+				drivers : drivers
+			}),
+			success : function(data) {
+				if (data) {
+					if(data.success){
+						submitkey=false;
+						setTimeout(function(){
+							submitkey=true;
+						},3000);
+						document.nw_private_form.reset();
+						isImeiHas = false;
+						isPayCtNoHas = false;
+						isLoginnameHas = false;
+						var today=new Date().format('yyyy-MM-dd');
+						$('#opid').val();
+						$('#cust_id').val();
+					   	$("#time").val(today);
+					   	$("#service_start_time1").val(today);
+						$("#service_start_time2").val(today);
+						$("#service_start_time3").val(today);
+						$("#service_start_time4").val(today);
+					}
+					$(document).sgPup({message:'message_alert',text: data.msg});
+				}
+			},
+			error : function(res, error) {
+				$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+					+ ";error=" + error});
+			}
+		});
+		$('#nw_private_form').unbind();//以下两行可以阻止提交2次
+		e.stopPropagation();
+		return false;
+	});
+}
+
+$(function () {
+	
+	var userDataList = {};//销售经理 key:name,value:id
+	var salesList = {};//UBI销售经理 key:name,value:id
+	var unittypeList = {};
+	var guaranteeList = {};
+	var modelList = {};
+	var vehicle_codeList = {};
+	var call_letterList = {};
+	var insurerList = {};
+	var sList = {};
+	
+	var companyno = getCookie("companyno");
+	if(companyno==201){
+		$('#ctTitle').hide();
+		$('#collection').hide();
+		$('#etc1').hide();
+		$('#etc2').hide(); 
+		$('#etc3').hide();
+		$('#etc4').hide();
+	}
+	
+	$('#idcard').bind("change", function(){
+	   var val =  $('#idcard').val();
+	   while(val.indexOf(" ")!=-1){
+		   val = val.replace(" ","");
+	   }
+	   var birthdayValue;
+	    if (15 == val.length) { //15位身份证号码
+	        birthdayValue = val.charAt(6) + val.charAt(7);
+	        if (parseInt(birthdayValue) < 10) {
+	            birthdayValue = '20' + birthdayValue;
+	        }
+	        else {
+	            birthdayValue = '19' + birthdayValue;
+	        }
+	        //$("input[name='sex']").removeAttr("checked");  
+	        birthdayValue = birthdayValue + '-' + val.charAt(8) + val.charAt(9) + '-' + val.charAt(10) + val.charAt(11);
+	        if (parseInt(val.charAt(14))%2==0){
+	        	$("input[name='sex'][value='2']").attr("checked","checked"); 
+	        	$("input[name='sex'][value='2']").get(0).checked=true;
+	        }else{
+	        	$("input[name='sex'][value='1']").attr("checked","checked");
+	        	$("input[name='sex'][value='1']").get(0).checked=true;
+	        }
+	    }else if (18 == val.length) { //18位身份证号码
+	        birthdayValue = val.charAt(6) + val.charAt(7) + val.charAt(8) + val.charAt(9) + '-' + val.charAt(10) + val.charAt(11)  + '-' + val.charAt(12) + val.charAt(13);
+	    	if (parseInt(val.charAt(16))%2 ==0){
+	        	$("input[name='sex'][value='2']").attr("checked","checked"); 
+	    		$("input[name='sex'][value='2']").get(0).checked=true;
+	    	}else{
+	        	$("input[name='sex'][value='1']").attr("checked","checked");
+	    		$("input[name='sex'][value='1']").get(0).checked=true;
+	   		 }
+	    }else{
+	    	$(document).sgPup({message:'message_alert',text: "请输入正确的身份证格式号!"});
+	    }
+	   			 $('#birthday').val(birthdayValue);	
+    });
+			
+		
+	var today=new Date().format('yyyy-MM-dd');
+   	$("#time").val(today);
+   	$("#service_start_time1").val(today);
+	$("#service_start_time2").val(today);
+	$("#service_start_time3").val(today);
+	$("#service_start_time4").val(today);
+	
+	var flag = 0;
+	$("#barcode_sel a").on('click',function(){
+		var detail_div = $("<div></div>");
+		var detail_id = "barcode_sel"+flag;
+		detail_div.attr('id',detail_id);
+		detail_div.addClass("panel");
+		detail_div.append($("#barcode_sel").html());
+		
+		$("#barcode_sel").before(detail_div);
+		$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+		$("#"+detail_id+" img").attr('title','删除条形码');
+		
+		$("#"+detail_id+" a").on('click',function(){
+			$("#"+detail_id).remove();
+		})
+		flag=flag+1;
+	});
+	
+	var flag1 = 0;
+	$("#phone_panel a").on('click',function(){
+		var detail_div = $("<div></div>");
+		var detail_id = "phone_panel"+flag1;
+		detail_div.attr('id',detail_id);
+		detail_div.addClass("panel");
+		detail_div.append($("#phone_panel").html());
+		
+		$("#phone_panel").before(detail_div);
+		$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+		$("#"+detail_id+" img").attr('title','删除电话号码');
+		
+		$("#"+detail_id+" #linkman").focus();
+		
+		$("#"+detail_id+" a").on('click',function(){
+			$("#"+detail_id).remove();
+		})
+		flag1=flag1+1;
+	});
+	
+	var flag2 = 0;
+	$("#driver_panel a").on('click',function(){
+		var detail_div = $("<div></div>");
+		var detail_id = "driver_panel"+flag2;
+		detail_div.attr('id',detail_id);
+		detail_div.addClass("panel");
+		detail_div.append($("#driver_panel").html());
+		
+		$("#driver_panel").after(detail_div);
+		$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+		$("#"+detail_id+" img").attr('title','删除司机');
+		$("#"+detail_id+" #sex").attr('name','sex'+flag2);
+		
+		$("#"+detail_id+" a").on('click',function(){
+			$("#"+detail_id).remove();
+		})
+		//$("#"+detail_id + " input[list=productList]").on('keyup',checkProduct);
+		flag2=flag2+1;
+	});
+	
+	//判断能否修改计费开始时间
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../getCurrentOperator',
+		data : JSON.stringify({}), 
+		success : function(data) {
+			if (data) {
+				var flag = true;
+				if(data.roleid){
+					var roleid = data.roleid;
+					$(roleid).each(function(k,v){
+						var id = roleid[k];
+						if(id=='2fa1df7377a7486ab8aaae5a445871c4'||id=='565de2d8742d41478c8c77871e3d66d0'){
+							flag = false;
+							return false;
+						}
+					});
+				}
+				if(flag){
+					$("#service_start_time1").attr("disabled","disabled");
+					$("#service_start_time2").attr("disabled","disabled");
+					$("#service_start_time3").attr("disabled","disabled");
+					$("#service_start_time4").attr("disabled","disabled");
+				}
+			}
+		},
+		error : function(res, error) {
+		}
+	});
+	
+	//填充服务项
+    $.ajax( {
+	  type : 'post', 
+	  async: false,   
+	  contentType : 'application/json',     
+	  dataType : 'json',     
+	  url : '../../serviceitem/listServiceItem',   
+	  data:JSON.stringify({}),
+	  success : function(data) {
+		  if(data){
+			  $.each(data,function(k,v){
+				  var chbox = $("<input type='checkbox' id='sitem' name='sitem' style='vertical-align:middle;' value='"+v.item_id+"' />"); 
+				  $("#serviceitem").after(v.item_name);
+				  $("#serviceitem").after(chbox);
+				  $("#serviceitem").after("  &nbsp;");
+			  }); 
+		  }
+	  } ,     
+	  error : function(res,error) { 
+	  	 alert("responseText="+res.responseText+";error="+error);     
+	  }    
+	});
+	
+	//判断需要显示的计费信息
+    $.ajax( {
+  	  type : 'post', 
+  	  async: false,   
+  	  contentType : 'application/json',     
+  	  dataType : 'json',     
+  	  url : '../../listSubcoft',   
+  	  data:JSON.stringify({}),
+  	  success : function(data) {
+  		  if(data){
+  			  $.each(data,function(k,v){
+  				  if(v.feetype_id==1){
+  					  $('#feediv1').show();
+  				  }else if(v.feetype_id==2){
+  					  $('#feediv2').show();
+  				  }else if(v.feetype_id==3){
+  					  $('#feediv3').show();
+  				  }else if(v.feetype_id==4){
+  					  $('#feediv4').show();
+  				  }else if(v.feetype_id==101){
+  					  $('#feediv5').show();
+  				  }
+  			  }); 
+  		  }
+  	  } ,     
+  	  error : function(res,error) { 
+  	  	 alert("responseText="+res.responseText+";error="+error);     
+  	  }    
+  	});
+	
+  //填充车辆类型
+	var vehicle_type = $('#vehicle_type');
+    $.ajax( {
+	  type : 'post', 
+	  async: false,   
+	  contentType : 'application/json',     
+	  dataType : 'json',     
+	  url : '../../sys/findSysValue',   
+	  data:JSON.stringify({stype : 2030, isDel : 0}),
+	  success : function(data) {
+		  if(data){
+			  if(vehicle_type){
+				  $.each(data,function(k,v){
+					  if(v.svalue==5){
+							 vehicle_type.append("<option value='" +v.svalue+"' selected='true'>" + v.sname+"</option>");						  
+						  }else{
+						     vehicle_type.append("<option value='" +v.svalue+"'>" + v.sname+"</option>");
+						  }
+				  }); 
+			  }
+		  }
+	  } ,     
+	  error : function(res,error) { 
+	  	 alert("responseText="+res.responseText+";error="+error);     
+	  }    
+	});
+    
+    //填充服务包
+   	var pack_name = $('#pack_name');
+   	pack_name.empty();
+    $.ajax( {
+   	  type : 'post', 
+   	  async: false,   
+   	  contentType : 'application/json',     
+   	  dataType : 'json',     
+   	  url : '../../getSimpack',   
+      data:JSON.stringify({parameter:101}),
+   	  success : function(data) {
+   		  if(data){
+   			  if(pack_name){//
+   				  $.each(data,function(k,v){
+   					  pack_name.append("<option value='" +v.pack_id+"'>" + v.pack_name+"</option>");
+   					  if(k==0){
+   					  	$('#pack_id').val(v.pack_id);
+   					  }
+   				  }); 
+   			  }
+   		  }
+   	  } ,     
+   	  error : function(res,error) { 
+   	  	 alert("responseText="+res.responseText+";error="+error);     
+   	  }    
+   	});
+    
+	$("#managerName").one('click',function(){
+	    //填充销售经理
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCompanySaleManager',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#managerName");
+				  if(manager){
+					  if(data.items.length>0){
+						  userDataList = {};
+						  $("#userDataList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userDataList").append(op);
+						  
+						  userDataList[v.opname] = v.opid;
+					  	 }); 
+					}
+			  }
+		  },     
+		  error : function(res,error) { 
+			  $(document).sgPup({message:'message_alert',text: res.responseText});
+		  }    
+		});
+	});
+
+	$("#salesName").one('click',function(){
+	    //填充UBI销售经理
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getUbiSales',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+		  success : function(data) {
+			  if(data){
+				  var salesName = $("#salesName");
+				  if(salesName){
+					  if(data.items.length>0){
+						  salesList = {};
+						  $("#salesList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.sales);
+						  $("#salesList").append(op);
+						  salesList[v.sales] = v.sales_id;
+					  	 }); 
+					}
+			  }
+		  },     
+		  error : function(res,error) { 
+			  $(document).sgPup({message:'message_alert',text: res.responseText});
+		  }    
+		});
+	});
+	$("#salesName").keyup(function(event){
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.sales = this.value.trim();
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: false,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getUbiSales',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var salesName = $("#salesName");
+						  						  
+						  if(salesName){
+							  if(data.items.length>0){
+								  salesList = {};
+								  $("#salesList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.sales);
+								  $("#salesList").append(op);
+								  
+								  salesList[v.sales] = v.sales_id;
+		 				  	 }); 
+							}
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  }    
+				});
+	});
+	
+	//UBI^^
+	$("#salesName").on('change',function(){
+		  var strs = this.value.split(" ");
+		    if(salesList[strs[strs.length-1]]){
+				$(this).val(strs[strs.length-1]);
+				$("#ubi_sales_id").val(salesList[strs[strs.length-1]]);
+		    }else{
+		    	$(this).val('');
+		    	$("#ubi_sales_id").val("");
+		    }
+		});
+	
+	
+	$("#vehicle_code").one('click',function(){
+	    //填充车架号
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../preload/findPreloadByPage',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#vehicle_code");
+				  if(manager){
+					  if(data.items.length>0){
+						  vehicle_codeList = {};
+						  $("#vehicle_codeList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.vin);
+						  $("#vehicle_codeList").append(op);
+						  
+						  vehicle_codeList[v.vin] = v;
+					  	 }); 
+					}
+			  }
+		  },     
+		  error : function(res,error) { 
+			  $(document).sgPup({message:'message_alert',text: res.responseText});
+		  }    
+		});
+	});
+	
+	$("#call_letter").one('click',function(){
+	    //填充终端号码
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../preload/findPreloadByPage',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#call_letter");
+				  if(manager){
+					  if(data.items.length>0){
+						  call_letterList = {};
+						  $("#call_letterList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.call_letter);
+						  $("#call_letterList").append(op);
+						  
+						  call_letterList[v.call_letter] = v;
+					  	 }); 
+					}
+			  }
+		  },     
+		  error : function(res,error) { 
+			  $(document).sgPup({message:'message_alert',text: res.responseText});
+		  }    
+		});
+	});
+    
+	$("#bank").one('click',function(){
+	  	//填充银行
+		var bank = $('#bank');
+	    var agency_id = $('#agency option:selected').val();
+	    var stype;
+	    if(agency_id==1){
+	    	stype = 3010;
+	    	$('#ac_id_no').attr("required",false);
+	    	$("#ctnobtn").hide();
+	    }else if(agency_id==2){
+	    	stype = 3010;
+	    	$('#ac_id_no').attr("required",false);
+	    	$("#ctnobtn").show();
+	    }else if(agency_id==3){
+	    	stype = 3011;
+	    	$('#ac_id_no').attr("required",true);
+	    	$("#ctnobtn").show();
+	    }
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../sys/findSysValue',   
+	  	  data:JSON.stringify({stype : stype, isDel : 0}),
+		  success : function(data) {
+			  if(data){
+				  if(bank){
+					  $.each(data,function(k,v){
+						  bank.append("<option value='" +v.svalue+"'>" + v.sname+"</option>");
+					  }); 
+				  }
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	 alert("responseText="+res.responseText+";error="+error);     
+		  }    
+		});
+	});
+    
+    $("#node_name").one('click',function(){
+	    //填充短信通道
+		var node_name = $('#node_name');
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../sys/findSysNode',   
+		  data:JSON.stringify({nodetype_id : 1, flag : 1}),
+		  success : function(data) {
+			  if(data){
+				  if(node_name){
+					  node_name.append("<option value='0'></option>");
+					  $.each(data,function(k,v){
+						  node_name.append("<option value='" +v.node_num+"'>" + v.node_name+"</option>");
+					  }); 
+				  }
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	 alert("responseText="+res.responseText+";error="+error);     
+		  }    
+		});
+    });
+    
+    $("#4s").one('click',function(){
+	    //填充4S店
+	    $.ajax( {
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getHaima4s',   
+		  data:JSON.stringify({companytype:6, companyname:""}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#4s");
+				  if(manager){
+					  if(data.length>0){
+						  sList = {};
+						  $("#sList").empty();
+					  }
+					  $.each(data,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.companyname);
+						  $("#sList").append(op);
+						  
+						  sList[v.companyname] = v.companyno;
+					  	 });
+					}
+			  }
+		  },     
+		  error : function(res,error) {
+			  $(document).sgPup({message:'message_alert',text: res.responseText}); 
+		  }    
+		});
+	});
+	
+	$("#insurer").one('click',function(){
+	    //填充保险公司
+	    $.ajax( {
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getInsurers',   
+		  data:JSON.stringify({s_name:""}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#insurer");
+				  if(manager){
+					  if(data.length>0){
+						  insurerList = {};
+						  $("#insurerList").empty();
+					  }
+					  $.each(data,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.s_name);
+						  $("#insurerList").append(op);
+						  
+						  insurerList[v.s_name] = v.ic_id;
+					  	 });
+					}
+			  }
+		  },     
+		  error : function(res,error) {
+			  $(document).sgPup({message:'message_alert',text: res.responseText}); 
+		  }    
+		});
+	});
+    
+ 	//查询终端类型
+	var checkProduct = function(){
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {};
+		params.filter.unittype = this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../unit/getUnitType',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#unittype");
+					  						  
+					  if(manager){
+						  if(data.items.length>0){
+							  unittypeList = {};
+							  $("#unittypeList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.unittype);
+							  $("#unittypeList").append(op);
+							  
+							  unittypeList[v.unittype] = v.unittype_id;
+	 				  	 }); 
+						}
+				  }
+			  } ,     
+			  error : function(res,error) { 
+				 $(document).sgPup({message:'message_alert',text: res.responseText});
+			  }    
+			});
+	};
+	
+	//查询车架号
+	var checkVin = function(){
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {};
+		params.filter.vin = this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../preload/findPreloadByPage',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#vehicle_code");
+					  						  
+					  if(manager){
+						  if(data.items.length>0){
+							  vehicle_codeList = {};
+							  $("#vehicle_codeList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.vin);
+							  $("#vehicle_codeList").append(op);
+							  
+							  vehicle_codeList[v.vin] = v;
+	 				  	 }); 
+						}
+				  }
+			  } ,     
+			  error : function(res,error) { 
+				 $(document).sgPup({message:'message_alert',text: res.responseText});
+			  }    
+			});
+	};
+	
+	//查询终端号码
+	var checkCall_letter = function(){
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {};
+		params.filter.call_letter = this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../preload/findPreloadByPage',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#call_letter");
+					  						  
+					  if(manager){
+						  if(data.items.length>0){
+							  call_letterList = {};
+							  $("#call_letterList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.call_letter);
+							  $("#call_letterList").append(op);
+							  
+							  call_letterList[v.call_letter] = v;
+	 				  	 }); 
+						}
+				  }
+			  } ,     
+			  error : function(res,error) { 
+				 $(document).sgPup({message:'message_alert',text: res.responseText});
+			  }    
+			});
+	};
+	
+	$("#unittype").one('click',function(){
+	    //填充终端类型
+	    $.ajax( {
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../unit/getUnitType',   
+		  data:JSON.stringify({pageNo:1,pageSize:10}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#unittype");
+				  if(manager){
+					  if(data.items.length>0){
+						  unittypeList = {};
+						  $("#unittypeList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.unittype);
+						  $("#unittypeList").append(op);
+						  
+						  unittypeList[v.unittype] = v.unittype_id;
+					  	 }); 
+					}
+			  }
+		  },     
+		  error : function(res,error) { 
+			  $(document).sgPup({message:'message_alert',text: res.responseText});
+		  }    
+		});
+	});
+	
+  	//查询车型
+	var checkModel = function(){
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {};
+		params.filter.is_valid = 1;
+		params.filter.name = this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../careType/findCareType',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#model");
+					  						  
+					  if(manager){
+						  if(data.items.length>0){
+							  modelList = {};
+							  $("#modelList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.name);
+							  $("#modelList").append(op);
+							  
+							  modelList[v.name] = v.id;
+	 				  	 }); 
+						}
+				  }
+			  } ,     
+			  error : function(res,error) { 
+				 $(document).sgPup({message:'message_alert',text: res.responseText});
+			  }    
+			});
+	};
+	
+	$("#model").one('click',function(){
+	    //填充车型
+	    $.ajax( {
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../careType/findCareType',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{is_valid:1}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#model");
+				  if(manager){
+					  if(data.items.length>0){
+						  modelList = {};
+						  $("#modelList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.name);
+						  $("#modelList").append(op);
+						  
+						  modelList[v.name] = v.id;
+					  	 }); 
+					}
+			  }
+		  },     
+		  error : function(res,error) { 
+			  $(document).sgPup({message:'message_alert',text: res.responseText});
+		  }    
+		});
+	});
+    
+    var checkGuarantee = function(){
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {cust_type : 2};
+		params.filter.customer_name = this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../getCustomers',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#guarantee");
+					  if(manager){
+						  if(data.items.length>0){
+							  guaranteeList = {};
+							  $("#guaranteeList").empty();
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.customer_name);
+							  $("#guaranteeList").append(op);
+							  
+							  guaranteeList[v.customer_name] = v.customer_id;
+	 				  	 }); 
+						}
+				  }
+			  } ,     
+			  error : function(res,error) { 
+				  $(document).sgPup({message:'message_alert',text: res.responseText});  
+			  }    
+			});
+	};
+	
+	var check4s = function(){
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../getHaima4s',   
+			  data:JSON.stringify({companytype:6, companyname:this.value}),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#4s");
+					  if(manager){
+						  if(data.length>0){
+							  sList = {};
+							  $("#sList").empty();
+						  }
+						  $.each(data,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(manager.val()+" "+v.companyname);
+							  $("#sList").append(op);
+							  
+							  sList[v.companyname] = v.companyno;
+						  });
+					   }
+				  }
+			  } ,     
+			  error : function(res,error) { 
+				  $(document).sgPup({message:'message_alert',text: res.responseText});  
+			  }    
+			});
+	};
+	
+	var checkInsurer = function(){
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../getInsurers',   
+			  data:JSON.stringify({s_name:this.value}),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#insurer");
+					  if(manager){
+						  if(data.length>0){
+							  insurerList = {};
+							  $("#insurerList").empty();
+						  }
+						  $.each(data,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(manager.val()+" "+v.s_name);
+							  $("#insurerList").append(op);
+							  
+							  insurerList[v.s_name] = v.ic_id;
+						  	 });
+						}
+				  }
+			  } ,     
+			  error : function(res,error) { 
+				  $(document).sgPup({message:'message_alert',text: res.responseText});  
+			  }    
+			});
+	};
+    
+	$("#guarantee").one('click',function(){
+	    //填充客户
+	    $.ajax( {
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCustomers',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{cust_type : 2}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#guarantee");
+				  if(manager){
+					  if(data.items.length>0){
+						  guaranteeList = {};
+						  $("#guaranteeList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.customer_name);
+						  $("#guaranteeList").append(op);
+						  
+						  guaranteeList[v.customer_name] = v.customer_id;
+					  	 });
+					}
+			  }
+		  },     
+		  error : function(res,error) {
+			  $(document).sgPup({message:'message_alert',text: res.responseText}); 
+		  }    
+		});
+	});
+	
+	$("#managerName").keyup(function(event){
+		if(event.keyCode == 32){ //按了空格
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.opname = this.value.trim();
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: false,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getCompanySaleManager',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#managerName");
+						  						  
+						  if(manager){
+							  if(data.items.length>0){
+								  userDataList = {};
+								  $("#userDataList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.opname);
+								  $("#userDataList").append(op);
+								  
+								  userDataList[v.opname] = v.opid;
+		 				  	 }); 
+							}
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  }    
+				});
+        }
+	});
+	$("#managerName").on('change',function(){
+		  var strs = this.value.split(" ");
+		    if(userDataList[strs[strs.length-1]]){
+				$(this).val(strs[strs.length-1]);
+				$("#managerId").val(userDataList[strs[strs.length-1]]);
+				var managerId = userDataList[strs[strs.length-1]];
+				$("#branch").val("");
+				$("#area").val("");
+				$.ajax( {
+					  type : 'post', 
+					  async: false,   
+					  contentType : 'application/json',     
+					  dataType : 'json',     
+					  url : '../../sell/findAllChannelManagers',   
+					  data:JSON.stringify({managerId : managerId}),
+					  success : function(data) {
+						  if(data){
+							  $.each(data,function(k,v){
+								  var op2 = $("<option></option>");
+								  op2.val(v.channelName);
+								  $("#branchList").append(op2);
+								  $("#branch").val(v.channelName);
+								  $("#unitarea").val(v.channelName);
+							  });
+						  }
+					  } ,     
+					  error : function(res,error) { 
+					  	 alert("responseText="+res.responseText+";error="+error);     
+					  }    
+					});
+				
+				if($("#managerId").val().length==0){
+					$("#managerName").val("");
+				}
+		    }else{
+		    	$(this).val('');
+		    	$("#managerId").val("");
+		    }	
+		});
+	
+	$("#unittype").on('keyup',checkProduct);
+	$("#unittype").on('change',function(){
+		  var strs = this.value.split(" ");
+		  var unittype;
+		  if(strs.length==3){
+			  unittype = strs[1]+" "+strs[2];
+		  }else if(strs.length==4){
+			  unittype = strs[1]+" "+strs[2]+" "+strs[3];
+		  }else{
+			  unittype = strs[strs.length-1];
+		  }
+		  
+		    if(unittypeList[unittype]){
+				$(this).val(unittype);
+				$("#unittype_id").val(unittypeList[unittype]);
+				
+				if($("#unittype_id").val().length==0){
+					$("#unittype").val("");
+				}
+		    }else if(unittypeList[this.value]){
+		    	$("#unittype_id").val(unittypeList[this.value]);
+		    	
+		    	if($("#unittype_id").val().length==0){
+					$("#unittype").val("");
+				}
+		    }else{
+		    	$(this).val('');
+		    	$("#unittype_id").val("");
+		    }
+		    var unittype_id = $("#unittype_id").val();
+				//alert(unittype_id);
+				//var input_text = $("#vehicle_licence").find("input[type='text']");
+	    	//2016年1月28日09:22:27  去掉U保必填项
+	    	//2016年3月23日08:56:33 金星 增加U保和天智星IMEI必填
+		    if(unittype_id == "1039" || unittype_id == "1046"){
+		    	//input_text.attr("required", "required");
+		    	$("#imei").attr("required", "required");
+		    }else{
+					//input_text.removeAttr("required");
+		    }
+		});
+	
+	$("#model").on('keyup',checkModel);
+	$("#model").on('change',function(){
+		  var strs = this.value.split(" ");
+		  var model;
+		  if(strs.length==3){
+			  model = strs[1]+" "+strs[2];
+		  }else if(strs.length==4){
+			  model = strs[1]+" "+strs[2]+" "+strs[3];
+		  }else{
+			  model = strs[strs.length-1];
+		  }
+		  
+		    if(modelList[model]){
+				$(this).val(model);
+				$("#model_id").val(modelList[model]);
+				
+				if($("#model_id").val().length==0){
+					$("#model").val("");
+				}
+		    }else if(modelList[this.value]){
+		    	$("#model_id").val(modelList[this.value]);
+		    	
+		    	if($("#model_id").val().length==0){
+					$("#model").val("");
+				}
+		    }else{
+		    	$("#model_id").val("0");
+		    }
+		});
+
+	$("#guarantee").on('keyup',checkGuarantee);
+	$("#guarantee").on('change',function(){
+		  var strs = this.value.split(" ");
+		    if(guaranteeList[strs[strs.length-1]]){
+				$(this).val(strs[strs.length-1]);
+				$("#guarantee_id").val('');
+				$("#guarantee_id").val(guaranteeList[strs[strs.length-1]]);
+		    }else{
+		    	$(this).val('');
+		    	$("#guarantee_id").val("");
+		    }
+		});
+	
+	$("#vehicle_code").on('keyup',checkVin);
+	$("#vehicle_code").on('change',function(){
+		  var strs = this.value.split(" ");
+		    if(vehicle_codeList[strs[strs.length-1]]){
+				$(this).val(strs[strs.length-1]);
+				$("#sim_id").val('');
+				var sim = vehicle_codeList[strs[strs.length-1]];
+				$("#sim_id").val(sim.sim_id);
+				$("#call_letter").val(sim.call_letter);
+				if(sim.telco){
+					$("input[name='operators'][value="+sim.telco+"]").get(0).checked=true;
+				}
+				if(sim.barcode){
+					$('#bartype').val(1);
+					$('#barcode').val(sim.barcode);
+				}
+				if(sim.unittype_id){
+					$.ajax({
+						  type : 'post', 
+						  async: false,   
+						  contentType : 'application/json',     
+						  dataType : 'json',     
+						  url : '../../unitType/getUnitType',   
+						  data:JSON.stringify({parameter : sim.unittype_id}),
+						  success : function(data) {
+							  if(data.success){
+								  $("#unittype").val(data.unittype);
+							  }
+						  },     
+						  error : function(res,error) { 
+						  }    
+						});
+				}
+				$("#engine_no").val(sim.engine_no);
+				$("#color").val(sim.color);
+				$("#imei").val(sim.imei);
+		    }
+		});
+	
+	$("#call_letter").on('keyup',checkCall_letter);
+	$("#call_letter").on('change',function(){
+		  var strs = this.value.split(" ");
+		    if(call_letterList[strs[strs.length-1]]){
+				$(this).val(strs[strs.length-1]);
+				$("#sim_id").val('');
+				var sim = call_letterList[strs[strs.length-1]];
+				$("#sim_id").val(sim.sim_id);
+				if(sim.telco){
+					$("input[name='operators'][value="+sim.telco+"]").get(0).checked=true;
+				}
+				if(sim.barcode){
+					$('#bartype').val(1);
+					$('#barcode').val(sim.barcode);
+				}
+				if(sim.unittype_id){
+					$.ajax({
+						  type : 'post', 
+						  async: false,   
+						  contentType : 'application/json',     
+						  dataType : 'json',     
+						  url : '../../unitType/getUnitType',   
+						  data:JSON.stringify({parameter : sim.unittype_id}),
+						  success : function(data) {
+							  if(data.success){
+								  $("#unittype").val(data.unittype);
+							  }
+						  },     
+						  error : function(res,error) { 
+						  }    
+						});
+				}
+				$("#vehicle_code").val(sim.vin);
+				$("#engine_no").val(sim.engine_no);
+				$("#color").val(sim.color);
+				$("#imei").val(sim.imei);
+		    }
+		});
+	
+	$("#4s").on('keyup',check4s);
+	$("#4s").on('change',function(){
+			var strs = this.value.split(" ");
+		    if(sList[strs[strs.length-1]]){
+				$(this).val(strs[strs.length-1]);
+				$("#4s_id").val('');
+				$("#4s_id").val(sList[strs[strs.length-1]]);
+		    }else{
+		    	$(this).val('');
+		    	$("#4s_id").val("");
+		    }
+		});
+	
+	$("#insurer").on('keyup',checkInsurer);
+	$("#insurer").on('change',function(){
+			var strs = this.value.split(" ");
+		    if(insurerList[strs[strs.length-1]]){
+				$(this).val(strs[strs.length-1]);
+				$("#insurer_id").val('');
+				$("#insurer_id").val(insurerList[strs[strs.length-1]]);
+		    }else{
+		    	$(this).val('');
+		    	$("#insurer_id").val("");
+		    }
+		});
+	
+});
+
+$.fn.datetimepicker.dates['zh'] = {
+  days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+  daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+  daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+  months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+  monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+  meridiem : [ "上午", "下午" ],
+  today : "今天"
+ };
+ $(".form_datetime").datetimepicker({
+  language : "zh",
+  autoclose: true,
+  minView: "month",
+  format : 'yyyy-mm-dd'
+ });
+
+</script>
+</html>

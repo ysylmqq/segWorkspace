@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>工单管理</title>
+    
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/layout.css" />
+<link rel="stylesheet" type="text/css" href="../../css/menu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/accordion.css" />
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css" />
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/tree.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+
+<body>
+	<div id="bsp_taskmanagement_all">
+	
+		<aside id="bm_left" style="float: left;" class="bsp_left"></aside>
+		<article id="bm_main"  style="float: left;" class="bsp_main accordion" ></article>
+	</div>
+
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/index.js"></script>
+<script type="text/javascript" src="../../jscript/accordion.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/tab.js"></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/tree.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+
+    (function($){
+    	
+    	   $("#bm_left").html("")
+    	
+    	  var defaults = {
+    	        	url:"bsp_left.json",	
+    	            //onclick: myclick,
+    	            width:200,
+    	            div_height: 495,
+    	            isexpend:true
+    	        };
+    	  
+      		$("#bm_left").load("bill_list2.html");
+   
+       			// $("#bm_main").load("custInfo.html");
+    	      $('#bm_main').sgAccordion(defaults);
+    	
+        
+
+    })(jQuery)
+    
+    
+</script>
+</html>

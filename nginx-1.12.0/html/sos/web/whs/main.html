@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>业务处理主页面</title>
+    <link rel="stylesheet" type="text/css" href="css/ba_layout.css">
+    <style type="text/css">
+    	.ba_menu a:hover { 
+			background:#c4cdd9; 
+		}
+    </style>
+</head>
+
+<body>
+    <aside id="whs_menu" style="overflow: auto" class="ba_menu"></aside>
+    <article id="whs_main" class="ba_main"></article>
+</body>
+<script type="text/javascript">
+    (function($){
+    	var myclick = function(treenode){
+    		window.mainUrl = treenode.url;
+            $("#whs_main").load('web/'+treenode.url);
+        }        
+        var defaults = {
+                url: 'moduleList',
+                onclick: myclick,
+                level:2,
+                parentMenu:'whs',
+                rendto:'whs_menu'
+            };
+
+        $('#whs_menu').sgMenu(defaults);
+        if(window.mainUrl!=null) $("#whs_main").load("web/"+window.mainUrl);
+        else{
+        	$("#whs_main").load("web/"+window.whs_main);
+        	window.mainUrl = window.whs_main;
+        }
+
+    })(jQuery)
+</script>
+</html>

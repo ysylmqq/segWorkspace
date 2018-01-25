@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CRM关系管理</title>
+        <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<style type="text/css">
+</style>
+</head>
+
+<body>
+<div id="nw_document_all">
+	 	<div id="dgd_channelmanagers" class="datagrid"></div>
+	 	<datalist id="channeDataList">
+        </datalist>
+         <datalist id="userDataList"></datalist>
+</div>         
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script>
+	<script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+    (function($){
+    	var editId=null;//编辑时选中行ID
+        var editObj=null;//编辑时选中行对象
+    	var channeDataList={};//代理商 key:名称,value:id
+    	var userDataList = {};//销售经理 key:name,value:id
+    	var loadSuccess = function(){
+     		//填充编辑前的值
+     		   if(editId && editObj){
+     			  $("#id",$("#form_managers")).val(editId);
+   				  $("#channelId",$("#form_managers")).val(editObj.channelId);
+   				  $("#managerId",$("#form_managers")).val(editObj.managerId);
+   				  $("#channelName",$("#form_managers")).val(editObj.channelName);
+  				  $("#managerName",$("#form_managers")).val(editObj.managerName);
+   				  $("#isdel",$("#form_managers")).val(editObj.isdel);
+   				  $("#remark",$("#form_managers")).val(editObj.remark);
+     		   }
+     		  editId=null;
+     		 editObj=null;
+     		  
+     	   }
+        	
+           var winClose = function (){
+              $(document).sgWindow('close',{id:'win_managers'});
+           }
+     	   var save = function(){
+     		   $("#form_managers").on('submit',function(e){
+     			//做表单提交
+                      var params = {};
+                     var url='../../sell/addSalesManager';
+                     var id=$('#id','#form_managers').val();
+        		     if(id){
+        		    	url='../../sell/updateSalesManager';
+        		     }
+        		    params.id=id;
+        		 	params.channelId=$('#channelId','#form_managers').val();
+        		 	params.managerId=$('#managerId','#form_managers').val();
+        		 	params.managerName=$('#managerName','#form_managers').val();
+        		 	params.isdel=$('#isdel','#form_managers').val();
+        		 	params.remark=$('#remark','#form_managers').val();
+        		 	//alert(JSON.stringify(params));
+              $(document).sgConfirm({text: '确定保存代理商和销售经理的关系信息吗?',cfn:function(r){ 
+                  if(r){
+                       $.ajax( {
+    	           		  type : 'post', 
+    	           		  async: false,   
+    	           		  contentType : 'application/json',     
+    	           		  dataType : 'json',     
+    	           		  url : url,   
+    	           		  data:JSON.stringify(params),
+    	           		  success : function(data) {
+    	           			  if(data){
+    	           				 if(data.success){
+    	           					 $(document).sgWindow('close',{id:'win_managers'}); 
+    	   	          		 		 $('#dgd_channelmanagers').sgDatagrid('reload','sgDatagrid');
+    	   	          		 		
+    	           				 }
+    	           				$(document).sgPup({message:'message_info',text: data.msg});
+    	           			  }
+    	           		  } ,     
+    	           		  error : function(res,error) { 
+    	           		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+    	           		  }    
+    	           		}); 
+        		 	}
+             }});
+    	        $('#form_managers').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+    			e.stopPropagation();
+    	    	return false;
+    	  
+    	 	   })
+    	 	   
+     	   };
+   	    var addItem = function(){
+   	    	editId=null;
+ 	       	editObj=null;
+ 	        var defaults = {
+ 	                title:'CRM新增',
+ 	                id:'win_managers',
+ 	                form:'form_managers',
+ 	                url:'channel_managers_form.html',
+ 	                success: loadSuccess,
+ 	                width: 400,
+	                height:250,
+ 	                buttons : [
+ 	                           {name: '确定', type: 'submit', onpress : save},
+ 	                           {name: '关闭', onpress : winClose},
+ 	                           {name: '重置', type: 'reset'}
+ 	                       ]
+ 	            };
+ 	        $(document).sgWindow(defaults);
+   	    }
+   	    
+   	 var editItem = function(){
+	    	var obj = $('#dgd_channelmanagers');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){  
+	                	editId=this.value;
+	                	editObj=$(this).data('data');
+	                	var defaults = {
+	        	                title:'CRM编辑',
+	        	                id:'win_managers',
+	         	                form:'form_managers',
+	         	                url:'channel_managers_form.html',
+	        	                success: loadSuccess,
+	        	                width: 400,
+	        	                height:250,
+	        	                buttons : [
+	        	                           {name: '确定', type: 'submit', onpress : save},
+	        	                           {name: '关闭', onpress : winClose},
+	        	                           {name: '重置', type: 'reset'}
+	        	                       ]
+	        	            };
+	                	
+		    	        $(document).sgWindow(defaults);
+	                }
+	            });
+	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }
+	    	
+	    }
+	       
+   	 var delItem = function(){
+	    	var obj = $('#dgd_channelmanagers');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+	        	var ids=[];
+            $(document).sgConfirm({text: '删除后不可恢复，确定删除?',cfn:function(r){ 
+                  if(r){
+	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	 	        		ids.push(this.value);
+	 	            });
+	        		 $.ajax( {
+	            		  type : 'post', 
+	            		  async: false,   
+	            		  contentType : 'application/json',     
+	            		  dataType : 'json',     
+	            		  url : '../../sell/deleteSalesManagers',   
+	            		  data:JSON.stringify(ids),
+	            		  success : function(data) {
+	            			  if(data){
+	            				 if(data.success){
+	    	          		 		 $('#dgd_channelmanagers').sgDatagrid('reload','sgDatagrid');
+	            				 }
+	            				$(document).sgPup({message:'message_info',text: data.msg});
+	            			  }
+	            		  } ,     
+	            		  error : function(res,error) { 
+	            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	            		  }    
+	            		}); 
+	        	};
+          }});
+	        	
+	        }else{
+	            $(document).sgPup({message:'message_info',text: "请选择要删除的选项！"});
+	        }
+	    }
+    	
+    	 //修改表格的宽度
+        var height =$('#main_bd',window.parent.document).height()-288;
+    	//初始化表格
+   	    var defaults = {
+   		        title: "CRM管理",
+   		        width:  '100%',
+   		    	height:height,
+   		        url: '../../sell/findChannelManagers',
+   		        usepager: true,
+   		        rownumbers:true,
+   		        useRp: true,
+   		        colid:'id',  //主键
+   		        colModel : [
+						{display: '销售经理', name : 'managerName', width : 120, sortable : false},
+	   		            {display: '代理商名称', name : 'channelName', width : 120, sortable : false},
+	   		            {display: '是否过时', name : 'isdel', width : 80, sortable : false,formatter:function(value,row){
+	   		            	if(value==0){
+			                    value = '<font color="green">否</font>';
+			                }else if(value==1){
+			                    value = '<font color="red">是</font>';
+			                }
+	   		                return value;
+	   		            }},
+	   		         	{display: '时间', name : 'stamp', width : 140, sortable : false},
+	   		            {display: '备注', name : 'remark', width : 120, sortable : false}
+   		        ],
+   		        buttons : [
+   		            {name: '增加', bclass: 'add', onpress : addItem},
+   		            {separator: true},
+   		         	{name: '编辑', bclass: 'edit', onpress : editItem},
+		            {separator: true},
+   		            {name: '删除', bclass: 'delete', onpress : delItem},
+   		            {separator: true}
+   		        ],
+   		        searchitems :[
+   		            {display:'代理商',html:'<input type="text" name="channelName2" id="channelName2" list="channeDataList"/><input type="hidden"  id="channelId2" />'},
+   		            {display:'销售经理',html:'<input type="text" name="managerName2" id="managerName2" list="userDataList"/><input type="hidden"  id="managerId2" />'}
+   		        ],
+   		        exporturl:'../../sell/exportExcel4SaleManagers',//导出excel
+   		        //query:{name:''},//查询默认参数
+   		        order:true,
+     		        sortname: "stamp",
+     		        sortorder: "desc"
+   		    };
+   		    $('#dgd_channelmanagers').sgDatagrid(defaults); 
+   		    
+   		//复制一个查询,再把它插入到原来查询的后面
+			$("#dgd_channelmanagers .sDiv>.pGroup:first").clone().insertAfter($("#dgd_channelmanagers .sDiv>.pGroup:first"));
+			
+			//重写查询点击事件
+			$('#dgd_channelmanagers .sDiv>.pGroup:eq(1) a.button:first').on('click',function(){
+				$('#dgd_channelmanagers').sgDatagrid('reload',{query:{channelId:$('#dgd_channelmanagers #channelId2').val(),managerId:$('#dgd_channelmanagers #managerId2').val()}});
+			});
+			
+			//隐藏之前的查询
+			$('#dgd_channelmanagers a.button:first').hide();
+   		    
+   		//自动查询代理商
+   		 	var checkChannel = function(){
+   		 		/* var text=this.value;
+   		 		text = text.replace(/\s/g,''); //去除空格
+   		 		if(text!=this.value){//有空格
+   		 			this.value=text;
+   		 			//$(this).trigger('change');
+   		 			return false;
+   		 		} */
+   		 		var params = {};
+   		 		params.pageNo = 1;
+   		 		params.pageSize = 10;
+   		 		params.filter = {};
+   		 		params.filter.name = this.value;
+   		 		var obj = $(this);
+   		 		$.ajax({
+   		 			  type : 'post', 
+   		 			  async: false,   
+   		 			  contentType : 'application/json',     
+   		 			  dataType : 'json',     
+   		 			  url : '../../sell/findChannels',   
+   		 			  data:JSON.stringify(params),
+   		 			  success : function(data) {
+   		 				  if(data){
+   		 					 var channels = data.items;
+   		 					 if(channels.length>0){
+   		 					     $("#channeDataList").empty();
+   		 					     channeDataList = {};
+   		 					  }
+   		 					  $.each( channels, function(key,value){
+   		 						  var op = $("<option></option>");
+   		 						  op.val(obj.val()+" "+value.name);
+   		 						  $("#channeDataList").append(op);
+   		 						  
+   		 						  channeDataList[value.name]=value;
+   		 						}); 
+   		 						
+   		 				  }else{
+   		 					  $(document).sgPup({message:'message_info',text: data});
+   		 				  }
+   		 			  } ,     
+   		 			  error : function(res,error) { 
+   		 			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+   		 			  }    
+   		 			});
+   		 	};
+   		   	   
+   		 	//填充代理商
+   			$.ajax({
+   				  type : 'post', 
+   				  async: false,   
+   				  contentType : 'application/json',     
+   				  dataType : 'json',     
+   				  url : '../../sell/findChannels',   
+   				  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+   				  success : function(data) {
+   					  if(data){
+   						  var channels = data.items;
+   						   $("#channeDataList").empty();
+   						  channeDataList = {};
+   						  $.each( channels, function(key,value){
+   							  var op = $("<option></option>");
+   							  op.val(value.name);
+   							  $("#channeDataList").append(op);
+   							  channeDataList[value.name]=value;
+   							});
+   						  $("#channelName2","#dgd_channelmanagers").on('keyup',checkChannel);
+   						  $("#channelName2","#dgd_channelmanagers").on('change',function(){
+   							    var strs = this.value.split(" ");
+   							    if(channeDataList[strs[strs.length-1]]){
+	   								$(this).val(strs[strs.length-1]);
+	   								$("#channelId2","#dgd_channelmanagers").val(channeDataList[strs[strs.length-1]].id);
+	   								
+	   								if($("#channelId2","#dgd_channelmanagers").val().length==0){
+	   									$("#channelName2","#dgd_channelmanagers").val("");
+	   								}
+   							    }else{
+   							    	$(this).val('');
+   							    	$("#channelId2","#dgd_channelmanagers").val("");
+   							    }
+   							});
+   						  
+   					  }else{
+   						  $(document).sgPup({message:'message_info',text: data});
+   					  }
+   				  } ,     
+   				  error : function(res,error) { 
+   				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+   				  }    
+   				});
+   		 	
+   		 	
+   		//自动查询销售经理
+   			var checkUser = function(){
+   				/* var text=this.value;
+   				text = text.replace(/\s/g,''); //去除空格
+   				if(text!=this.value){//有空格
+   					this.value=text;
+   					$(this).trigger('change');
+   					return false;
+   				} */
+   				var params = {};
+   				params.pageNo = 1;
+   				params.pageSize = 10;
+   				params.filter = {};
+   				params.filter.opname = this.value;
+   				var obj = $(this);
+   				$.ajax({
+   					  type : 'post', 
+   					  async: true,   
+   					  contentType : 'application/json',     
+   					  dataType : 'json',     
+   					  url : '../../getCompanySaleManager',   
+   					  data:JSON.stringify(params),
+   					  success : function(data) {
+   						  if(data){
+   							  var manager = $("#managerName2");
+   							  						  
+   							  if(manager){
+   								  if(data.items.length>0){
+   									  userDataList = {};
+   									  $("#userDataList").empty();
+   								  }
+   								  $.each(data.items,function(k,v){
+   									  var op = $("<option></option>");
+   									  op.val(obj.val()+" "+v.opname);
+   									  $("#userDataList").append(op);
+   									  
+   									  userDataList[v.opname] = v.opid;
+   			 				  	 }); 
+   								}
+   						  }else{
+   						  	$(document).sgPup({message:'message_info',text: data});
+   						  }
+   					  } ,     
+   					  error : function(res,error) { 
+   					  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+   					  }    
+   					});
+   			}
+   			
+   		  //填充销售经理
+   		    $.ajax( {
+   			  type : 'post', 
+   			  async: true,   
+   			  contentType : 'application/json',     
+   			  dataType : 'json',     
+   			  url : '../../getCompanySaleManager',   
+   			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+   			  success : function(data) {
+   				  if(data){
+   					  var manager = $("#managerName2");
+   					  if(manager){
+   						  if(data.items.length>0){
+   					  			userDataList = {};
+   							  $("#userDataList").empty();
+   						  }
+   						  $.each(data.items,function(k,v){
+   							  var op = $("<option></option>");
+   							  op.val(v.opname);
+   							  $("#userDataList").append(op);
+   							  
+   							  userDataList[v.opname] = v.opid;
+   						  	 }); 
+   						  manager.on('keyup',checkUser);
+   						  manager.on('change',function(){
+   							  	var strs = this.value.split(" ");
+   								$(this).val(strs[strs.length-1]);
+   								$("#managerId2").val(userDataList[strs[strs.length-1]]);
+   								if($("#managerId2").val().length==0){
+   									$("#managerName2").val("");
+   								}
+   							});
+
+   						};
+   				  }else{
+   				  	$(document).sgPup({message:'message_info',text: data});
+   				  }
+   			  },     
+   			  error : function(res,error) { 
+   			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+   			  }    
+   			});
+    })(jQuery)
+</script>
+</html>

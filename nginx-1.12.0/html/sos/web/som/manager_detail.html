@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>电工销售明细</title>
+</head>
+<body>
+<form id='writeOff_add_form' method='post' class="form" style="width:100%" >
+	<fieldset style="width:840px;">
+		<div class='submit' style="text-align:left;">
+            	<span style="width:30px;">年月:</span>
+                <input type='month' id="stamp" name='stamp' style="width:165px;" />
+                <button id="stockin_detail_submit" type="submit"  >查找</button>
+        </div>
+        <div id="dgd_borrow_detail" class="datagird"></div>
+	</fieldset>
+</form>
+</body>
+<script type="text/javascript">
+(function($){
+	
+	var defaults = {
+	        width:  '100%',
+	        height: 420,
+	     	url:'',
+	        rownumbers:true,//序号
+	        colModel : [
+	            {display: '商品名称', name : 'productName', width : 120, sortable : false},
+	         	{display: '商品规格', name : 'norm', width : 140, sortable : false},
+	            {display: '类型', name : 'type', width : 60, sortable : false},
+	            {display: '数量', name : 'num', width : 40, sortable : false},
+	         	{display: '时间', name : 'stamp', width : 80, sortable : false},
+	         	{display: '仓库', name : 'channelName', width : 80, sortable : false},
+	         	{display: '客户', name : 'channelName', width : 80, sortable : false},
+	         	{display: '回款（销账）', name : 'channelName', width : 80, sortable : false}
+	        ],
+	        query:{writeoffsStatus:0}//未销
+	    };
+	$('#dgd_borrow_detail').sgDatagrid(defaults);
+})(jQuery)
+
+</script>
+</html>

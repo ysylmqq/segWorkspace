@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>业务办理登记表</title>
+</head>
+<body>
+	<div id="process" class="datagrid"></div>
+</body>
+<script type="text/javascript">
+    (function($) {
+    	var today=new Date().format('yyyy-MM-dd');
+    	var height = 476;
+    	//初始化表格
+    	var defaults = {
+    		        title: "营业处业务办理登记表",
+    		        width: '100%',
+    		        height: height,
+    		        rownumbers:true,
+    		        url:'',
+    		        isNotCheckall:true,
+    		        colModel : [
+						{display: '办理日期', name : 'billno', width : 70},
+						{display: '入网名', name : 'stamp', width : 100},
+						{display: '车牌', name : 'productCode', width : 70},
+    		            {display: '车载电话', name : 'productName', width : 70},
+    		            {display: '业务项目', name : 'norm', width : 100},
+    		            {display: '经办人', name : 'unit', width : 70},
+    		            {display: '中心核对人', name : 'inNum', width : 70},
+    		            {display: '备注', name : 'price', width : 70}
+    		        ],
+    		        buttons : [
+    		        ],
+    		        searchitems :[
+						{display:'开始时间',name:'startDate',type:'date',width:150,value:today},         
+				      	{display:'结束时间',name:'endDate',type:'date',width:150,value:today}
+    		        ],
+    		        query:{startDate:today,endDate:today},
+    		        exporturl:'./stock/exportExcel4StockIn',//导出excel
+    		        isCount:true//是否合计
+    		    };
+    		    $('#process').sgDatagrid(defaults);
+   		  //复制一个导出->打印,再把它插入到原来导出的后面
+		  $("#process .sDiv>.pGroup:first").clone().insertAfter($("#process .sDiv>.pGroup:last"));
+		  $("#process .sDiv>.pGroup:last a.button").attr('id','aprint');
+		  $("#process .sDiv>.pGroup:last span.button_span span").html('打印');
+    })(jQuery);
+</script>
+</html>

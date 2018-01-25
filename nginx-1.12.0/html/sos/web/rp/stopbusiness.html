@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>停止业务登记表</title>
+</head>
+<body>
+<div style="overflow-x:scroll;height: 100%;">
+	<div id="stopbusiness" class="datagrid"></div>
+</div>
+</body>
+<script type="text/javascript">
+    (function($) {
+    	var today=new Date().format('yyyy-MM-dd');
+    	var height = 460;
+    	//初始化表格
+    	var defaults = {
+    		        title: "停止业务登记表",
+    		        width:  1500,
+    		        height: height,
+    		        rownumbers:true,
+    		        url:'',
+    		        isNotCheckall:true,
+    		        colModel : [
+						{display: '用户姓名', name : 'billno', width : 70},
+						{display: '车牌', name : 'stamp', width : 70},
+						{display: '车载号', name : 'productCode', width : 70},
+    		            {display: '车型', name : 'productName', width : 70},
+    		            {display: '安装日期', name : 'norm', width : 70},
+    		            {display: '停止日期', name : 'unit', width : 70},
+    		            {display: '停止原因', name : 'inNum', width : 200},
+    		            {display: '是否挽留', name : 'price', width : 70},
+    		            {display: '挽留不成功原因', name : 'code', width : 200},
+    		            {display: '挽留成功原因', name : 'whsName', width : 80},
+    		            {display: '营业处业务办理人', name : 'billno', width : 100},
+    		            {display: '中心受理人员', name : 'location', width : 80},
+    		            {display: '备注', name : 'location', width : 70},
+    		            {display: '公司包月卡', name : 'location', width : 70}
+    		        ],
+    		        buttons : [
+    		        ],
+    		        searchitems :[
+						{display:'开始时间',name:'startDate',type:'date',width:150,value:today},         
+				      	{display:'结束时间',name:'endDate',type:'date',width:150,value:today}
+    		        ],
+    		        query:{startDate:today,endDate:today},
+    		        exporturl:'./stock/exportExcel4StockIn',//导出excel
+    		        isCount:true//是否合计
+    		    };
+    		    $('#stopbusiness').sgDatagrid(defaults);
+   		  //复制一个导出->打印,再把它插入到原来导出的后面
+		  $("#stopbusiness .sDiv>.pGroup:first").clone().insertAfter($("#stopbusiness .sDiv>.pGroup:last"));
+		  $("#stopbusiness .sDiv>.pGroup:last a.button").attr('id','aprint');
+		  $("#stopbusiness .sDiv>.pGroup:last span.button_span span").html('打印');
+    })(jQuery);
+</script>
+</html>

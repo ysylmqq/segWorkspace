@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Built-By: ysy
+Class-Path: lib/slf4j-api-1.7.15.jar lib/slf4j-log4j12-1.7.15.jar lib/
+ log4j-1.2.17.jar lib/netty-all-5.0.0.Alpha2.jar lib/jboss-marshalling
+ -1.3.15.GA.jar lib/protobuf-java-2.5.0.jar lib/sigar-1.6.4.jar lib/ht
+ tpclient-4.3.6.jar lib/httpcore-4.3.3.jar lib/commons-logging-1.1.3.j
+ ar lib/commons-codec-1.6.jar lib/httpmime-4.3.6.jar lib/solr-solrj-4.
+ 10.3.jar lib/commons-io-2.3.jar lib/zookeeper-3.4.6.jar lib/wstx-asl-
+ 3.2.7.jar lib/noggit-0.5.jar lib/druid-1.0.22.jar
+Build-Jdk: 1.8.0_144
+Created-By: Maven Integration for Eclipse
+Main-Class: com.org.maven.MavenTest
+

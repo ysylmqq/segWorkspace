@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>审核私家车入网</title>
+<style>
+
+</style>
+</head>
+<body>
+	<form id='nw_private_form' method='post' class="form" style="width:100%">
+		<div class='title'>基础资料></div>
+		<fieldset style="width:850px;">
+            <div class="panel">
+                <span>注册名:</span>
+                <input type='text' id="register" name='register'  style="width:150px;" />
+                
+                <span>服务密码:</span>
+                <input type='text' id="server_pwd" name='server_pwd'  style="width:150px;" />
+                
+                <span>确认密码:</span>
+                <input type='text' id="confirm_pwd" name='confirm_pwd'  style="width:150px;" />
+            </div>
+            <div class="panel">    
+                <span>姓名:</span>
+                <input type='text' id="customer_name" name='customer_name'  style="width:150px;" />
+                
+                <span>身份证:</span>
+                <input type='text' id="idcard" name='idcard'  style="width:150px;" />
+                
+                <span>生日:</span>
+                <input type='text' id="birthday" name='birthday'  style="width:150px;" />
+            </div>
+            <div class="panel">    
+                <span>性别:</span>
+                <input type='hidden' />
+                <input type='radio' name='sex' style='vertical-align:middle;' />男
+                &nbsp;
+                <input type='radio' name='sex' style='vertical-align:middle;' />女
+                
+                <span style="padding-left:90px;">手机:</span>
+                <input type='text' id="mobile" name='mobile'  style="width:150px;" />
+                
+                <span>邮箱:</span>
+                <input type='text' id="email" name='email'  style="width:150px;" />
+            </div>
+            <div class="panel">    
+                <span>VIP等级:</span>
+                <select size="1" name="vip" id="vip" style="width:154px;" autocomplete="on">
+                    <option value="1">普通卡</option>
+                    <option value="2">银卡</option>
+                    <option value="3">金卡</option>
+                    <option value="4">白金卡</option>
+                </select>
+                
+                <span>联系电话:</span>
+                <input type='text' id="phone" name='phone'  style="width:402px;" />
+            </div>
+            <div class="panel">    
+                <span>备注:</span>
+                <input type='text' id="remark" name='remark'  style="width:654px;" />
+            </div>
+        </fieldset>
+        
+        <div class='title'>车辆资料></div>
+		<fieldset style="width:850px;">
+            <div class="panel">
+                <span>车牌号码:</span>
+                <input type='text' id="number_plate" name='number_plate' style="width:150px;" />
+                
+                <span>车牌颜色:</span>
+                <select size="1" name="color" id="color" style="width:154px;" autocomplete="on">
+                    <option value="1">蓝色</option>
+                    <option value="2">黄色</option>
+                    <option value="3">白色</option>
+                    <option value="4">黑色</option>
+                </select>
+                
+                <span>车辆类型:</span>
+                <input type='text' id="vehicle_type" name='vehicle_type'  style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>品牌型号:</span>
+                <input type='text' id="model" name='model' style="width:150px;" />
+                
+                <span>车辆识别号:</span>
+                <input type='text' id="code" name='code' style="width:150px;" />
+                
+                <span>发动机号:</span>
+                <input type='text' id="engine_no" name='engine_no'  style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>购车时间:</span>
+                <input type='date' id="buy_time" name='buy_time' style="width:150px;" />
+                
+                <span>车辆颜色:</span>
+                <input type='text' id="vehicle_color" name='vehicle_color' style="width:150px;" />
+            </div>
+        </fieldset>
+        
+        <div class='title'>终端资料></div>
+		<fieldset style="width:850px;">
+            <div class="panel">
+                <span>终端型号:</span>
+                <input type='text' id="unittype" name='unittype' style="width:150px;" />
+                
+                <span>销售名称:</span>
+                <input type='text' id="name" name='name' style="width:150px;" />
+                
+                <span>通信模式:</span>
+                <input type='hidden' />
+                <input type='radio' name='mode' style='vertical-align:middle;' />数据流量
+                &nbsp;
+                <input type='radio' name='mode' style='vertical-align:middle;' />短信
+            </div>
+            <div class="panel">
+                <span>防拆码:</span>
+                <input type='text' id="tampercode" name='tampercode' style="width:150px;" />
+                
+                <span>终端条形码:</span>
+                <input type='text' id="unitbarcode" name='unitbarcode' style="width:150px;" />
+                
+                <span>导航条形码:</span>
+                <input type='text' id="vehbarcode" name='vehbarcode'  style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>SIM卡号:</span>
+                <input type='text' id="call_letter" name='call_letter' style="width:150px;" />
+                
+                <span>SIM卡运营商:</span>
+                <input type='radio' id="operators" name="operators" style='vertical-align:middle;'/>移动
+                <input type='radio' id="operators" name="operators" style='vertical-align:middle;'/>联通
+                <input type='radio' id="operators" name="operators" style='vertical-align:middle;'/>电信
+            	<span style="padding-left:29px;">SIM卡类型:</span>
+                <input type='radio' id="simtype" name="simtype" style='vertical-align:middle;'/>自带卡
+                &nbsp;
+                <input type='radio' id="simtype" name="simtype" style='vertical-align:middle;'/>公司卡
+            </div>
+            <div class="panel">
+            	<span>SIM卡费:</span>
+                <input type='text' id="simfee" name='simfee' style="width:150px;" />
+                <span>SIM服务费:</span>
+                <input type='text' id="simfee" name='simfee' style="width:150px;" />
+                <span>SIM截止日期:</span>
+                <input type='date' id="service_end_time" name='service_end_time' style="width:150px;" />
+            </div>
+            <div class="panel">
+            	<span>缴费方式:</span>
+                <input type='radio' id="payment" name="payment" style='vertical-align:middle;'/>年
+                &nbsp;
+                <input type='radio' id="payment" name="payment" style='vertical-align:middle;'/>月
+                &nbsp;
+                
+                <span style="padding-left:82px;">包含在套餐:</span>
+                <input type='checkbox' style='vertical-align:middle;' />
+                
+                <span style="padding-left:141px;">销售经理:</span>
+                <input type='text' id="manager" name='manager' style="width:150px;" />
+            </div>
+            <div class="panel">
+            	<span>销售网点:</span>
+                <input type='text' id="branch" name='branch' style="width:150px;" />
+                
+                <span>销售套餐:</span>
+                <select size="1" name="pack_id" id="pack_id" style="width:154px;" autocomplete="on">
+                    <option value="1">天威星3080 含三年服务费，不含盗抢险，三年后78元/月，享受盗抢险</option>
+                    <option value="2">天王星3600 按月托收，99元/月</option>
+                    <option value="3">天威星3800 含三年服务费，三年盗抢险。三年以后78元/月</option>
+                </select>
+            	
+                <span>特批单:</span>
+                <input type='text' id="special" name='special' style="width:150px;" />
+            </div>
+        </fieldset>
+        
+        <div class='title'>服务费></div>
+		<fieldset style="width:850px;">
+            <div class="panel">
+                <input type='checkbox' style='vertical-align:middle;' />
+            	<a>xxx服务包</a>
+                <span>缴费方式:</span>
+                <input type='radio' id="serverpayment1" name="serverpayment1" style='vertical-align:middle;'/>年
+                &nbsp;
+                <input type='radio' id="serverpayment1" name="serverpayment1" style='vertical-align:middle;'/>月
+                
+                <span style="padding-left:16px;">服务项价格:</span>
+                <input type='text' id="price1" name='price1'  style="width:150px;" />
+                
+            	<div id="serverItem1" class="datagrid">
+            	<div class="hDiv" style="margin:0px;padding:0px;width:760px;">
+	                <table>
+	                    <thead>
+	                    <tr>
+	                        <th style="width:40px;">序号</th>
+	                        <th style="width:160px;">服务项名</th>
+	                        <th style="width:500px;">服务项描述</th>
+	                    </tr>
+	                    <tr><th>1</th><th>网上查车</th><th></th></tr>
+	                    <tr><th>2</th><th>紧急送油</th><th></th></tr>
+	                    <tr><th>3</th><th>酒后接送</th><th></th></tr>
+	                    <tr><th>4</th><th>车圣宝典</th><th></th></tr>
+	                    </thead>
+	                </table>
+                </div>
+                </div>
+            </div>
+            <div class="panel">
+                <input type='checkbox' style='vertical-align:middle;' />
+            	<a>网上查车</a>
+                <span>缴费方式:</span>
+                <input type='radio' id="serverpayment2" name="serverpayment2" style='vertical-align:middle;'/>年
+                &nbsp;
+                <input type='radio' id="serverpayment2" name="serverpayment2" style='vertical-align:middle;'/>月
+                
+                <span style="padding-left:16px;">服务项价格:</span>
+                <input type='text' id="price2" name='price2'  style="width:150px;" />
+                
+            	<div id="serverItem2" class="datagrid">
+            	<div class="hDiv" style="margin:0px;padding:0px;width:760px;">
+	                <table>
+	                    <thead>
+	                    <tr>
+	                        <th style="width:40px;">序号</th>
+	                        <th style="width:160px;">服务项名</th>
+	                        <th style="width:500px;">服务项描述</th>
+	                    </tr>
+	                    <tr><th>1</th><th>网上查车</th><th></th></tr>
+	                    </thead>
+	                </table>
+                </div>
+            	</div>
+            </div>
+            <div class="panel">
+                <input type='checkbox' style='vertical-align:middle;' />
+            	<a>紧急送油</a>
+                <span>缴费方式:</span>
+                <input type='radio' id="serverpayment3" name="serverpayment3" style='vertical-align:middle;'/>年
+                &nbsp;
+                <input type='radio' id="serverpayment3" name="serverpayment3" style='vertical-align:middle;'/>月
+                
+                <span style="padding-left:16px;">服务项价格:</span>
+                <input type='text' id="price3" name='price3'  style="width:150px;" />
+                
+            	<div id="serverItem3" class="datagrid">
+            	<div class="hDiv" style="margin:0px;padding:0px;width:760px;">
+	                <table>
+	                    <thead>
+	                    <tr>
+	                        <th style="width:40px;">序号</th>
+	                        <th style="width:160px;">服务项名</th>
+	                        <th style="width:500px;">服务项描述</th>
+	                    </tr>
+	                    <tr><th>1</th><th>紧急送油</th><th></th></tr>
+	                    </thead>
+	                </table>
+                </div>
+            	</div>
+            </div>
+        </fieldset>
+        
+        <div class='title'>托收资料></div>
+		<fieldset style="width:850px;">
+            <div class="panel">
+                <span>银行账号:</span>
+                <input type='text' id="account" name='account' style="width:150px;" />
+                
+                <span>确认账号:</span>
+                <input type='text' id="confirm_account" name='confirm_account' style="width:150px;" />
+                
+                <span>账号类型:</span>
+                <select size="1" name="account_type" id="account_type" style="width:154px;" autocomplete="on">
+                    <option value="1">存折</option>
+                    <option value="2">借记卡</option>
+                </select>
+            </div>
+            <div class="panel">
+                <span>托收机构:</span>
+                <select size="1" name="agency" id="agency" style="width:154px;" autocomplete="on">
+                    <option value="1">银联</option>
+                    <option value="2">银盛</option>
+                </select>
+                
+                <span>银行:</span>
+                <input type='text' id="bank" name='bank' style="width:150px;" />
+                
+                <span>账号名称:</span>
+                <input type='text' id="account_name" name='account_name'  style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>是否投递:</span>
+                <input type='radio' id="is_delivery" name="is_delivery" style='vertical-align:middle;'/>是
+                &nbsp;
+                <input type='radio' id="is_delivery" name="is_delivery" style='vertical-align:middle;'/>否
+                
+                <span style="padding-left:89px;">发票收件人:</span>
+                <input type='text' id="addressee" name='addressee' style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>投递地址:</span>
+                <input type='text' id="province" name='account_name'  style="width:110px;" />
+                <a>省</a>
+                <input type='text' id="city" name='account_name'  style="width:110px;" />
+                <a>市</a>
+                <input type='text' id="area" name='account_name'  style="width:110px;" />
+                <a>区</a>
+                <input type='text' id="address" name='address' style="width:250px;" />
+            </div>
+        </fieldset>
+
+	</form>
+</body>
+<script type="text/javascript">
+
+</script>
+</html>

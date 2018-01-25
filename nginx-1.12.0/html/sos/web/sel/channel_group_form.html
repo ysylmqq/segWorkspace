@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>代理商所属集团维护</title>
+    <style type="text/css">
+    .btnsubmit{
+    margin-top:-1px;
+padding: 1px 0 1px 0px;
+    background-color:#4791d2;
+    border:1px solid #dedede;
+    border-top:1px solid #eee;
+    border-left:1px solid #eee;
+
+    font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size:12px;
+    line-height:14px;
+    text-decoration:none;
+    text-align:center;
+    color:#fff;
+    cursor:pointer;
+    border-radius: 3px;
+    height: 25px;
+    width:89px;
+}
+.btnsubmit{
+    margin:0 7px 0 0;
+    background-color:#4791d2;
+    border:1px solid #dedede;
+    border-top:1px solid #eee;
+    border-left:1px solid #eee;
+
+    font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size:12px;
+    line-height:130%;
+    text-decoration:none;
+    text-align:center;
+    font-weight:bold;
+    color:#fff;
+    cursor:pointer;
+    border-radius: 3px;
+    padding:5px 10px 6px 7px; /* Links */
+}
+    </style>
+</head>
+
+<body style="padding: 0px;margin: 0px;">
+<form id="form_channel_group" >
+ <div id="dgd_channel_groups" class="datagrid"></div>
+ </form>
+</body>
+<script type="text/javascript">
+    (function($){
+    	//保存按钮点击
+    	var save=function(tr_save){
+    		    //var tr_save=$(this).parent();
+   		    	tr_save.unbind();
+   		    	$('#form_channel_group').unbind('submit');
+   		    	$('#form_channel_group').on('submit',function(){
+   		    		$(document).sgConfirm({text: '确定保存吗?',cfn:function(r){ 
+		    		     	if(r){
+	   		    	 //if(window.confirm('确定保存吗?')){
+	             		var id=$('input[type=checkbox]:first',tr_save).val();
+	             		//var id=$('input[name=id]',tr_save).val();
+	       		    	var cnName=$('input[name=cnName]',tr_save).val();
+	       		    	var remark=$('input[name=remark]',tr_save).val();
+	             		var param={
+	             				id:id,
+	             				cnName:cnName,
+	             				remark:remark
+	             		};
+	             		 $.ajax({
+			            		  type : 'post', 
+			            		  async: false,   
+			            		  contentType : 'application/json',     
+			            		  dataType : 'json',     
+			            		  url : '../../sell/saveChannelGroup',   
+			            		  data:JSON.stringify(param),
+			            		  success : function(data) {
+			            			  if(data){
+			            				 if(data.success){
+			            					 $('#dgd_channel_groups').sgDatagrid('reload','sgDatagrid');
+			            					 disableInput();
+			            				 }
+			            				$(document).sgPup({message:'message_info',text: data.msg});
+			            			  }
+			            		  } ,     
+			            		  error : function(res,error) { 
+			            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			            		  }    
+			            		}); 
+	     			    }
+	     			}});
+   		    		return false;
+   		    	});
+   		    };
+   		var disableInput=function(){
+   		  //设置可编辑的外框border 为0
+      	   $('#dgd_channel_groups .bDiv table input').attr('readonly',true);
+      	   $('#dgd_channel_groups .bDiv table input').css('border','0px');
+      	   $('#dgd_channel_groups .bDiv table input').css('background','transparent');
+      	   //隐藏保存按钮
+      	   $('td:last button','#dgd_channel_groups .bDiv table tr').hide();
+   		}; 
+		var addItem = function(){
+			    editId=null;
+		     	editObj=null;
+		     	var rowDatas=[];
+		     	rowDatas.push({id:'',enName:'',cnName:'',remark:''});
+		     	$('#dgd_channel_groups').sgDatagrid('appendData',rowDatas);
+		     	//操作按钮点击
+		     	$('#dgd_channel_groups .bDiv table tr:last td:last button').on('click',function(){
+		     		save($(this).parents('tr'));
+		     	});
+		 };
+	    var editItem = function(){
+	    	  var bDiv = $('#dgd_channel_groups .bDiv table tr');
+			  if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+		            $(document).sgPup({message:'message_info',text: "选择多于一个选项！"});
+		        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+		            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+		    	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		    		    //输入框变成可输入状态  
+		    		    $('input',$(this).parent().parent()).attr('readonly',false);
+		          	    $('input',$(this).parent().parent()).css('border','2px inset');
+		          	    $('input',$(this).parent().parent()).css('background','white');
+		          		//显示保存按钮
+		            	$('td:last button',$(this).parent().parent()).show();
+		            	$(this).parents('tr').find('button').on('click',function(){
+				     		save($(this).parents('tr'));
+				     	});
+		          });
+		      }
+		 };
+		 
+		var delItem = function(){
+		  	  var obj = $('#dgd_channel_groups');
+		      var bDiv = $('.bDiv',obj);
+		      if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+		          $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		      }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+		    	  var ids=[];
+		    	  $(document).sgConfirm({text: '删除后不可恢复，确定删除?',cfn:function(r){ 
+		    		     	if(r){
+ 	        	  //if(window.confirm('删除后不可恢复，确定删除?')){
+ 	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	        			if(this.value){
+ 	        				if(this.value=='on'){
+ 	        					ids.push('-1');
+ 	        				}else{
+ 	 	        				ids.push(this.value);
+ 	        				}
+ 	        			}
+ 	 	            });
+ 	        		 $.ajax( {
+	            		  type : 'post', 
+	            		  async: false,   
+	            		  contentType : 'application/json',     
+	            		  dataType : 'json',     
+	            		  url : '../../sell/deleteChannelGroups',   
+	            		  data:JSON.stringify(ids),
+	            		  success : function(data) {
+	            			  if(data){
+	            				 if(data.success){
+	    	          		 		 $('#dgd_channel_groups').sgDatagrid('reload','sgDatagrid');
+	    	          		 		disableInput();
+	            				 }
+	            				$(document).sgPup({message:'message_info',text: data.msg});
+	            			  }
+	            		  } ,     
+	            		  error : function(res,error) { 
+	            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	            		  }    
+	            		}); 
+ 	        	};
+ 	        }});
+		      }else{
+		          $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		      }  
+		  };
+    	//初始化表格
+   	 	var defaults = {
+   		        width:  '100%',
+   		        height: 290,
+   		     	url: '../../sell/findAllChannelGroups',
+   		        colid:'id',  //主键
+   		        rownumbers:true,
+   		        colModel : [
+   		            {display: '名称', name : 'cnName', width : 170, sortable : false,formatter:function(value,row){
+   		            	return '<input type="text" name="cnName" style="width: 166px; margin: 0px; padding: 0px;" value="'+value+'" required="true" form="form_channel_group">';
+   		            }},
+		         	{display: '备注', name : 'remark', width : 170, sortable : false,formatter:function(value,row){
+		         		if(value==null||value=='null'){
+		         		   value='';
+		         		}
+		            	return '<input name="remark" style="width:166px;margin:0px;padding:0px;height:24px;" value="'+value+'"/>';
+		            }},
+   		     	 {display: '操作', name : 'saveOperate', width : 82, sortable : false,formatter:function(value,row){
+	            	return '<button name="btn_save" class="btnsubmit" style="width:80px;margin:0px;padding:0px;">保存</button>';
+	            }}
+   		        ],
+   		        buttons : [
+					{name: '添加', bclass: 'add', onpress : addItem},
+					{separator: true},
+					{name: '编辑', bclass: 'edit', onpress : editItem},
+					{separator: true},
+		            {name: '删除', bclass: 'delete', onpress : delItem},
+		            {separator: true}
+   		        ],
+   		        searchitems :[
+   		            	{display:'名称',width:120,html:'<span class="ltext"><input type="text" name="cnName1" class="form-control"/></span>'}
+   		        ],
+   		        query:{}//只查出还未添加到分公司的总部商品
+   		        //exporturl:'',//导出excel
+   		    };
+   		    $('#dgd_channel_groups').sgDatagrid(defaults);
+   		    
+   		    disableInput();
+   		    
+   		  //复制一个查询,再把它插入到原来查询的后面
+			$("#dgd_channel_groups .sDiv>.pGroup:first").clone().insertAfter($("#dgd_channel_groups .sDiv>.pGroup:first"));
+			//重写查询点击事件
+			$('#dgd_channel_groups .sDiv>.pGroup:eq(1) a.button:first').on('click',function(){
+				$('#dgd_channel_groups').sgDatagrid('reload',{query:{cnName:$('input[name=cnName1]').val()}});
+				 disableInput();			
+			});
+   		  //隐藏之前的查询
+			$('#dgd_channel_groups a.button:first').hide();
+   		    
+   	 	    //回车事件代替tab键
+	   	 	$(window.document).keydown(function(event){
+	   	         switch(event.keyCode) {
+	   	             case 13:
+	   	                 event.keyCode=9;
+	   	                 break;
+	   	         }
+	   	     });
+    })(jQuery)
+    
+</script>
+</html>

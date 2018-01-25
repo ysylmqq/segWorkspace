@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>订单主页面</title>
+    <link rel="stylesheet" type="text/css" href="css/ba_layout.css">
+    <style type="text/css">
+    	.ba_menu a:hover { 
+			background:#c4cdd9; 
+		}
+    </style>
+</head>
+
+<body>
+    <aside id="order_menu" style="overflow: auto" class="ba_menu"></aside>
+    <article id="order_main" class="ba_main"></article>
+</body>
+<script type="text/javascript">
+    (function($){
+    	var myclick = function(treenode){
+    		window.mainUrl = treenode.url;
+            $("#order_main").load('web/'+treenode.url);
+        }        
+        var defaults = {
+                url: 'moduleList',
+                onclick: myclick,
+                level:2,
+                parentMenu:'order',
+                rendto:'order_menu'
+            };
+
+        $('#order_menu').sgMenu(defaults);
+        if(window.mainUrl!=null) $("#order_main").load("web/"+window.mainUrl);
+        else{
+        	$("#order_main").load("web/"+window.order_main);
+        	window.mainUrl = window.order_main;
+        }
+
+    })(jQuery)
+</script>
+</html>

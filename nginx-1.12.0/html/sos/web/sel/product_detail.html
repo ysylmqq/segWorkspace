@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>商品明细</title>
+</head>
+
+<body style="padding: 0px;margin: 0px;">
+
+<form id="form_product4View" class="form" style="width:810px;height:440px;" >
+		<div class="title">成品信息></div>
+		<fieldset  style="width:790px;" >
+              <div class="panel">
+                <span>类别:</span>
+                <select id="type"  name="type" style="width:150px"   >
+	                <option value="0">成品</option>
+	                <option value="1">配件</option>
+            	</select>
+          
+                <span>商品编码:</span>
+                <input type="text" id="code" name="code" style="width:146px"   autocomplete="on" />
+               
+                <span>商品名称:</span>
+                <input type="text" id="name" name="name" style="width:146px"   autocomplete="on" />
+              </div>
+              
+              <div class="panel">
+                <span>规格:</span>
+                <input type="text" id="norm" name="norm" style="width:146px"   autocomplete="on" />
+               
+                <span>单位:</span>
+                <input type="text" id="unit" name="unit" style="width:146px"   autocomplete="on" />
+               
+                <span>是否再销:</span>
+                 <select size="1" id="issell"  name="issell" required="type" style="width:150px" >
+	                <option value="1">是</option>
+	                <option value="0">否</option>
+            	</select>
+              </div>
+              
+              <div class="panel">
+               <span style="vertical-align:top;">是否有效:</span>
+                 <select size="1" id="status"  name="status"  style="width:150px;vertical-align:top;"  >
+	                <option value="1">是</option>
+	                <option value="0">否</option>
+            	</select>
+               <span style="vertical-align:top;">备注:</span>
+               <textarea rows="2" style="width:396px;vertical-align:top;" id="remark" name="remark"></textarea>
+               </div>
+        </fieldset>
+		
+		<div class="title">配件信息></div>
+		<fieldset id="fs_part" class='fieldset'  style="width:790px;">
+ 		<div id="dgd_part" class="datagrid"></div>
+        </fieldset>
+</form>
+</body>
+<script type="text/javascript">
+    (function($){
+    	
+   		    
+    })(jQuery)
+    
+</script>
+</html>

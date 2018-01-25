@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>帮助主页面</title>
+    <link rel="stylesheet" type="text/css" href="css/ba_layout.css">
+    <style type="text/css">
+    	.ba_menu a:hover { 
+			background:#c4cdd9; 
+		}
+    </style>
+</head>
+
+<body>
+    <aside id="hp_menu" style="overflow: auto" class="ba_menu"></aside>
+    <article id="hp_main" class="ba_main"></article>
+</body>
+<script type="text/javascript">
+    (function($){
+    	var myclick = function(treenode){
+    		window.mainUrl = treenode.url;
+            $("#hp_main").load('web/'+treenode.url);
+        }        
+        var defaults = {
+                url: 'moduleList',
+                onclick: myclick,
+                level:2,
+                parentMenu:'hp',
+                rendto:'hp_menu'
+            };
+
+        $('#hp_menu').sgMenu(defaults);
+        if(window.mainUrl!=null) $("#hp_main").load("web/"+window.mainUrl);
+        else{
+        	$("#hp_main").load("web/"+window.hp_main);
+        	window.mainUrl = window.hp_main;
+        }
+
+    })(jQuery)
+</script>
+</html>

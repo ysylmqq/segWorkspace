@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>借用查询-操作明细(出入库、核销、销账)</title>
+
+</head>
+<body>
+	<div id="whs_detail_query_grid" class="datagird"></div>
+	<input type="hidden" id="hide_productName"/>
+	<input type="hidden" id="hide_productId"/>
+	<input type="hidden" id="hide_whsId"/>
+	<input type="hidden" id="hide_managersId"/>
+</body>
+<script type="text/javascript">
+	(function($){
+		var now =new Date();
+		var begeinDate =new Date();
+		begeinDate.setDate(1);
+		begeinDate=begeinDate.format('yyyy-MM-dd');
+		now=now.format('yyyy-MM-dd');
+		var squery = {};
+		squery['startDate']=begeinDate;
+		squery['endDate']=now;
+		
+		//初始化表格
+	   	 var defaults = {
+	   				id: 'detail_query_grid',
+	   		        width:  900,
+	   		        height: 380,
+	   		        url: '',//../../stock/findOperates
+	   		        rownumbers:true,//序号
+	   		     	//usepager: true,
+	 	        	//useRp: true,
+	 	        	query:squery,
+	   		        colModel : [
+	   		            {display: '商品名称', name : 'productName', width : 120, sortable : false},
+	   		         	{display: '操作类型', name : 'type', width : 80, sortable : false},
+	   		         	{display: '单号', name : 'stockCode', width : 110, sortable : false},
+	   		            {display: '数量', name : 'inOutNum', width : 60, sortable : false},
+	   		            {display: '操作时间', name : 'stamp', width : 160, sortable : false},
+	   		         	{display: '客户名称', name : 'channelName', width : 120, sortable : false},
+	   		      		{display: '操作员', name : 'userName', width : 120, sortable : false}
+	   		        ],
+	   		    	 searchitems :[	            
+	   			            {display:'开始日期',name:'startDate',type:'date',value:begeinDate},
+	   				      	{display:'结束日期',name:'endDate',type:'date',value:now}
+	   			        ]
+	   		    };
+	   	$('#whs_detail_query_grid').sgDatagrid(defaults);
+		//复制一个查询,再把它插入到原来查询的后面
+		$("#whs_detail_query_grid .sDiv>.pGroup:first").clone().insertAfter($("#whs_detail_query_grid .sDiv>.pGroup:first"));
+		//隐藏之前的查询
+		$('#whs_detail_query_grid a.button:first').hide();
+		//重写查询点击事件
+		$('#whs_detail_query_grid .sDiv>.pGroup:eq(1) a.button:first').on('click',function(){
+		   var params={
+			   productId:$('#hide_productId').val(),
+			   managersId:$('#hide_managersId').val(),
+			   whsId:$('#hide_whsId').val(),
+			   startDate:$('input[name=startDate]',$('#whs_detail_query_grid')).val(),
+			   endDate:$('input[name=endDate]',$('#whs_detail_query_grid')).val()
+		   };
+			$('#whs_detail_query_grid').sgDatagrid('reload',{query:params});
+		  	//设置商品名称
+			$('#whs_detail_query_grid table tr td:nth-child(2) div').text($('#hide_productName').val());
+
+		});
+		
+	})(jQuery)
+</script>			
+</html>

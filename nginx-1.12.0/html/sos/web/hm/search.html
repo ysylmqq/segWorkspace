@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>私家车收费</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../css/sos.css">
+
+</head>
+<body>
+	<div id="nw_document_all">
+	<form id='search_form' name='search_form' method='post' class="form">
+		<div class='title'>客户信息查询></div>
+		<fieldset style="width:850px;">
+			<div class="panel">
+				<div class='submit' style="text-align:left;">
+					<div class="searchDis">
+		            	<span>客户名称:</span>
+		            	<input type='text' id="custname" name='custname' style="width:150px;" />
+		            	<ul class="show_list" id="customerList">
+		            	</ul>
+            		</div>
+					
+                    <div class="searchDis">
+                        <span>车牌号码:</span>
+                        <input type='text' id="searchnumber" name='searchnumber' data-provide="typeahead" style="width:140px;" />
+                        <ul class="show_list" id="vehicleList">
+                        </ul>
+                    </div>
+                   
+		     
+					 <div class="searchDis">
+		            	<span>车载电话:</span>
+	            		<input type='text' id="searchcall" name='searchcall' style="width:150px;" list="unitList"/>
+	            		 <ul class="show_list" id="unitList">
+	            		 </ul>
+		            </div>
+		           <div class="panel"></div>
+		           <div class="searchDis">
+		            	<span>车架号:</span>
+		            	<input type='text' id="vin" name='vin' style="width:150px;" />
+		            	<ul class="show_list" id="vinList">
+		            	</ul>
+		            </div>	 	
+	            	<button id="search_btn" type="button" style="width:80px;height:26px;display:none" onclick="searchcust();" >查询</button>
+	        	</div>
+			</div>
+        </fieldset>
+        </form>
+        
+        <form id='nw_search_form' name='nw_search_form' method='post' class="form">
+        <div class='title'>基本资料</div>
+        	<input type='hidden' id='cust_id' name='cust_id' />
+			<input type='hidden' id='vehicle_id' name='vehicle_id' />
+			<input type='hidden' id='unit_id' name='unit_id' />
+		<fieldset style="width:850px;">
+            <div class="panel">    
+                <span>客户名称:</span>
+                <input type='text' id="customer_name" name='customer_name' style="width:150px;" />
+                
+                <span>身份证号码:</span>
+                <input type='text' id="idcard" name='idcard'  style="width:150px;" />
+                
+                <span>4S店:</span>
+                <input type='text' id="store_name" name='store_name' style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>车牌号码:</span>
+                <input type='text' id="number_plate" name='number_plate' style="width:150px;" />
+                
+                <span>车载电话:</span>
+                <input type='text' id="call_letter" name='call_letter' style="width:150px;" />
+                 <span>车型:</span>
+                <input type='text' id="model" name='model' style="width:150px;" />
+              
+            </div>
+            <div class="panel">
+                <span>车辆颜色:</span>
+                <input type='text' id="color" name='color' style="width:150px;" />
+                <span>发动机号:</span>
+                <input type='text' id="engine_no" name='engine_no' style="width:150px;" />
+              <span>车架号:</span>
+                <input type='text' id="v_vin" name='v_vin' style="width:150px;" />
+               
+            </div>
+            <div class="panel">
+             	 <span>生产日期:</span>
+                <input type='date' id="production_date" name='production_date' style="width:150px;" />
+                <span>TBOX条码:</span>
+                <input type='text' id="barcode" name='barcode' style="width:150px;" />
+                <span>终端型号:</span>
+                <input type='text' id="unittype" name='unittype' style="width:150px;" />
+            </div>
+            <div class="panel">
+              	 <span>总里程:</span>
+                <input type='text' id="total_mileage" name='total_mileage' style="width:150px;" />
+                  <span>当前故障码:</span>
+                <input type='text' id="error_code" name='error_code' style="width:400px;" />
+            </div>
+        </fieldset>
+        
+        
+	<div class='title fee_msg' >服务包信息</div>
+		<fieldset style="width:850px;" class='fee_msg'>
+			     
+		  	<div id="feediv5" >
+	             <div class="panel" id="pack_msg"  >
+	            	<span>服务包名:</span>
+	            	<input type='number' id="pack_name" name='pack_name' readonly="readonly" style="width:150px;" />
+	            	<span>服务包周期:</span>
+	            	<input type='number' id="fee_cycle" name='fee_cycle' readonly="readonly" style="width:150px;" />
+	            	<span style="width: 90px;">服务包价格:</span>
+	            	<input type='number' id="price" name='price' readonly="readonly" style="width:150px;" />
+	            </div>
+	             <div class="panel" id="combo_voice_msg" >
+	             	<span >电信套餐:</span>
+	            	<input type='number' id="combo_name" name='combo_name' readonly="readonly" style="width:150px;" />
+	                <span >总通话时长:</span>
+	            	<input type='number' id="voice_time" name='voice_time' readonly="readonly" style="width:150px;" />
+	            	<span  style="width:90px;">剩余时长(分):</span>
+	            	<input type='number' id="remain_time" name='remain_time' readonly="readonly" style="width:150px;" />
+	            	
+	            </div>
+	             <div class="panel" id="combo_data_msg" >
+	             <span >总流量(兆):</span>
+	            <input type='number' id="data" name='data' readonly="readonly" style="width:150px;" />
+	            <span  >剩余流量(兆):</span>
+	            	<input type='number' id="remain_data" name='remain_data' readonly="readonly" style="width:150px;" />
+	            </div>
+	            
+	             </div>
+	            
+	           
+	            
+		</fieldset>
+		<div id='titleDiv2' class='title'>故障码</div>
+	</form>
+		<div id="records" class="datagird"></div>
+	
+	
+	</div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/storage_vehicle.js" ></script>
+<script type="text/javascript">
+function searchcust(){
+	
+	var cust_id = $('#cust_id').val();
+	var vehicle_id = $('#vehicle_id').val();
+	var unit_id = $('#unit_id').val();
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../getCustInfoForHm',
+		data : JSON.stringify({
+			cust_id : cust_id,
+			vehicle_id : vehicle_id,
+			unit_id : unit_id
+		}),
+		success : function(data) {
+			if (data) {
+				document.nw_search_form.reset();
+				if(data.vehicle==null){
+					$(document).sgPup({message:'message_alert',text: "该用户已被过户!"});
+					return false;
+				}
+				//客戶信息
+				$('#customer_name').val(data.customer.customer_name);
+				$('#idcard').val(data.customer.id_no);
+				//车辆信息
+				$('#number_plate').val(data.vehicle.plate_no);
+				$('#color').val(data.vehicle.color);
+				$('#model').val(data.vehicle.model_name);
+				$('#call_letter').val(data.unit.call_letter);
+				$('#engine_no').val(data.vehicle.engine_no);
+				$('#v_vin').val(data.vehicle.vin);
+				$('#unittype').val(data.unittype);
+				$('#barcode').val(data.tbox_code);
+				$('#production_date').val(data.vehicle.production_date);
+				$('#store_name').val(data.sname);
+				
+				var hmfeeInfo = data.hmfeeInfo;
+				/* if(hmfeeInfo){
+					$('#service_start_time5').val(hmfeeInfo.fee_date);
+					$("input[name='payment5'][value="+hmfeeInfo.pay_model+"]").attr("checked","checked");
+					$('#service_end_time5').val(hmfeeInfo.fee_sedate);
+				} */
+				var pack = data.pack;
+				if(pack){
+					$('#fee_cycle').val(pack.fee_cycle);
+					$('#pack_name').val(pack.pack_name);
+					$('#price').val(pack.price);
+				}
+				var combo = data.combo;
+				if(combo){
+					$('#voice_time').val(combo.voice_time);
+					$('#remain_time').val('');
+					$('#data').val(combo.data);
+					$('#remain_data').val('');
+					
+				}
+				
+				/* if(hmfeeInfo.arrearage_fee != 0){
+					$('#a_months0').val(hmfeeInfo.a_months);
+					$('#a_days0').val(hmfeeInfo.a_days);
+					$('#arrearage_fee0').val(hmfeeInfo.arrearage_fee);
+					total_arrears = parseInt(total_arrears) + hmfeeInfo.arrearage_fee;
+				}else{
+					$('#servicefee_q').hide();
+				} */
+				
+				
+				 var flag = 0;
+				  $.ajax( {
+					  type : 'POST', 
+					  async: false,  
+					  url : "../../checkConnect",   
+					  data:{},
+					  success : function(data) {
+						  if(data){
+							  if(data.success){
+								  flag = 1
+							  }else{
+								  $(document).sgPup({message:'message_alert',text: data.msg});
+							  }
+						  }else{
+							     $(document).sgPup({message:'message_info',text: "obd故障查询系统网络异常！"});
+						  }
+					  } 
+				});
+				  
+				  if(flag == 1){
+					  $.ajax( {
+						  type : 'POST', 
+						  async: false,  
+						  url : "../../getObdErrorMsg",   
+						  data:{call_letter:data.unit.call_letter},
+						  success : function(data) {
+							  if(data){
+								  if(data.success){
+									  $('#error_code').val(data.obdErrorMsg);
+								  }
+							  }
+						  } 
+					});
+					  
+					   $.ajax( {
+						  type : 'POST', 
+						  async: false,  
+						  url : "../../getObdMsg",   
+						  data:{call_letter:data.unit.call_letter},
+						  success : function(data) {
+							  if(data){
+								  if(data.success){
+									  $('#total_mileage').val(data.datas[0].totalDistance);
+								  }
+							  }
+						  } 
+					});
+					   
+					  
+					  
+				    var before = GetDateStr(-1);
+				    var tenDayBefore = GetDateStr(-11);
+					  $('#records').html("");
+					  var defaults = {
+						        title: "",
+						        width:  '50%',
+						        height: '293',
+						        url: '../../getObdErrorMsgList',
+						        usepager: true,
+							    rownumbers:true,
+							    isNotCheckall:true,
+							    useRp: true,
+							    query:{call_letter:data.unit.call_letter},
+						        colModel : [
+									{display: '系统名称', name : 'sysName', width : 120},
+									{display: '故障码', name : 'obdErrorMsg', width : 140},
+									{display: '时间', name : 'date', width : 120}
+						        ],
+						        searchitems :[
+							  		            {display:'开始日期',name:'startDate',type:'date', value:tenDayBefore,width:120},
+							  			      	{display:'结束日期',name:'endDate',type:'date',value:before,width:120}
+							    		     ]
+						    };
+						    $('#records').sgDatagrid(defaults);
+				  }
+				
+				
+				$('#vehicle_id').val(data.vehicle.vehicle_id);
+				$('#cust_id').val(data.customer.customer_id);
+				$('#unit_id').val(data.unit.unit_id);
+				
+				
+			}/* else{
+				$(document).sgPup({message:'message_alert',text: "没有符合查询条件的查询结果，请重新输入！"});
+			} */
+		},
+		error : function(res, error) {
+			$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+				+ ";error=" + error});
+			//$(document).sgPup({message:'message_alert',text: "没有符合查询条件的查询结果，请重新输入！"});
+		}
+	});
+	
+}
+
+
+
+
+function GetDateStr(AddDayCount) {
+    var dd = new Date();
+    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+    return dd.format('yyyy-MM-dd');
+}
+
+(function($){
+
+
+	
+	   var before = GetDateStr(-1);
+	    var tenDayBefore = GetDateStr(-11);
+	var defaults = {
+	        title: "",
+	        width:  '50%',
+	        height: '180',
+	        url: '',
+		    rownumbers:true,
+		    isNotCheckall:true,
+	        colModel : [
+				{display: '系统名称', name : 'sysName', width : 120},
+				{display: '故障码', name : 'obdErrorMsg', width : 140},
+				{display: '时间', name : 'date', width : 120}
+	        ],
+	        searchitems :[
+		  		            {display:'开始日期',name:'startDate',type:'date',value:tenDayBefore,width:120},
+		  			      	{display:'结束日期',name:'endDate',type:'date',value:before,width:120}
+		    		     ]
+	
+	
+	    };
+	    $('#records').sgDatagrid(defaults);
+	
+
+})(jQuery)	
+</script>
+<script type="text/javascript" src="../../jscript/web/vehicleList.js"></script>
+<script type="text/javascript" src="../../jscript/web/unitList.js"></script>
+<script type="text/javascript" src="../../jscript/web/custList.js"></script>
+<script type="text/javascript" src="../../jscript/web/vinList.js"></script>
+</html>

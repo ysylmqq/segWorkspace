@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>分公司收货地址表单</title>
+</head>
+
+<body>
+<form id="form_address" method="post" class="form" name="form_address" >
+		 <input type="hidden" id="id" name="id"/>
+		  <fieldset style="overflow-y:auto;width:540px;height:195px;">
+         <div class="panel">
+            <span>姓名:</span>
+            <input type="text" id="name" name="name" style="width:150px" required="true" placeholder="收货人姓名" autofocus="true" autocomplete="on" />
+           
+           <span>手机号码:</span>
+            <input type="tel" id="phone" name="phone" style="width:150px" autocomplete="on" pattern="^[0-9]{11,11}$" />
+         </div>
+         <div class="panel">
+            <span>固话:</span>
+            <!-- "^(([0\+]\d{2,3}-)?(0\d{2,3})-)(\d{7,8})(-(\d{3,}))?$" -->
+            <input type="tel" id="tel" name="tel" style="width:150px"  autocomplete="on" pattern="^((\+?[0-9]{2,4}\-[0-9]{3,4}\-)|([0-9]{3,4}\-))?([0-9]{7,8})(\-[0-9]+)?$"/>
+            
+            <span>邮箱:</span>
+            <input type="email" id="email" name="email" style="width:150px"   autocomplete="on" />
+        </div>
+        <div class="panel">
+            <span>邮编:</span>
+            <input type="text" id="postcode" name="postcode" style="width:150px" pattern="^[1-9]\d{5}$"/>
+         	<span style="width:120px;">是否为默认地址:</span>
+            <select id="isDefault"  name="isDefault" style="width:112px"  >
+	                <option value="0" >否</option>
+	                <option value="1" >是</option>
+            </select>
+         </div>
+        <div class="panel">
+            <span>地址:</span>
+            <input type="text" id="address" name="address"  required="true" style="width:400px" placeholder="省、市、县/区、街道地址"  autocomplete="on" />
+         </div>
+         
+        <div class="panel">  
+            <span style="vertical-align:top;">备注:</span>
+            <textarea rows="2" style="width:400px;" id="remark" name="remark"></textarea>
+        </div>
+        </fieldset>
+</form>
+
+</body>
+<script type="text/javascript">
+(function($){
+})(jQuery)
+</script>
+</html>

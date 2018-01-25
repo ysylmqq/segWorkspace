@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>版本管理</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+<form id='order_add_form' method='post' class="form">
+		<div class='title'>当前版本&gt;</div>
+        <fieldset style="width:100%;border-bottom:1px;">
+        	<div class="panel">
+        		<div style="width:100%;color: #1b1d20;font-size: 12px;font-weight: bold">
+        			v3.05版本,SVN版本号57379,2015年11月03日更新 
+        		</div>
+        		<div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+        			更新的内容:1.增加车辆基础字段录入(私家车入网/集客入网/资料变更)；2.托收资料录入或者修改时增加托收机构非空判断；3.增加车辆行驶证信息;
+        		</div>
+        	</div>
+        </fieldset>
+        <fieldset style="width:100%;border-bottom:1px;">
+        	<div class="panel">
+        		<div style="width:100%;color: #1b1d20;font-size: 12px;font-weight: bold">
+        			v3.04版本,SVN版本号56904,2015年10月16日更新 
+        		</div>
+        		<div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+        			更新的内容:1.修改过户托收资料复制；2.修改SIM卡资料变更日志记录方式；3.修改开通/办停脚本错误(getMonthprice不存在);4.私家车办停时删除ldap数据、私家车重新开通是补录ldap数据；
+        		</div>
+        	</div>
+        </fieldset> 
+        <fieldset style="width:100%;border-bottom:1px;">
+        	<div class="panel">
+        		<div style="width:100%;color: #1b1d20;font-size: 12px;font-weight: bold">
+        			v3.03版本,SVN版本号56359,2015年8月25日更新 
+        		</div>
+        		<div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+        			更新的内容:1.修改办停汇总报表查询界面(增加日期查询)；2.增加部分报表选择市公司下属机构查询；3.资料变更页面增加合同号位数验证（不超过10位合同号）；4.修改资料变更过户时合同号重复问题；5.资料变更后原私家车登录信息删除；6.增加SIM卡校验页面；
+        		</div>
+        	</div>
+        </fieldset> 
+        <fieldset style="width:100%;border-bottom:1px;">
+            <div class="panel">
+                <div style="width:100%;color: #1b1d20;font-size: 12px;font-weight: bold">
+                v3.02版本,SVN版本号54043,2015年7月28日更新 
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                   	 更新的内容:1.修改查询页面不能第二次查询只查询部分公司bug。2.修改资料变更密码方式。3.重新开通取消托收限制。4.集客收费页面没有分页查询bug。5.增加资料变更页面清除隐私密码功能。6.修改右上方下拉分公司机构(选择分公司下属机构不影响查询分公司车辆)。
+                   	 7.修改后台异常在前端显示。8.增加海马sim卡四个阶段报表。9.增加app登录名重复性前端验证。
+                </div>
+			</div>
+        </fieldset>
+        <fieldset style="width:100%;border-bottom:1px;">
+            <div class="panel">
+                <div style="width:100%;color: #1b1d20;font-size: 12px;font-weight: bold">
+                v3.01版本,SVN版本号51347,2015年5月13日更新 
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                   	 更新的内容:1.页面采用bootstrap风格。2.查询页面右上方公司节点不起作用bug。3.服务密码加密bug。4.IMEI码重复验证功能。5.海马补录资料缺少默认值bug。6.集客添加客户保存信息修改。7.报表表头在拖动下方滚动条不一致问题。8.车辆、终端、客户等查询下拉选择框取值jsbug。9.增加维修功能。
+                </div>
+			</div>
+        </fieldset>
+        
+        <div class='title'>历史版本&gt;</div>
+        <fieldset style="width:100%;height:450px;border-bottom:1px;">
+            <div class="panel">
+                <div style="width:100%;color: #1b1d20;font-size: 12px;font-weight: bold">
+                v2.01版本,SVN版本号8004,2014年12月23日更新 
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                    更新的内容:1.海马入网的各个需求。2.集客查询单个车缴费明细bug。3.服务费查询报表需求更改。4.缴费取整数bug。5.入网状态增加不开通标志。6.增加：□防拆盒□智能防拆□无线防拆。7.增加权限处理，现在在查询界面选择总部后可以查询所有分公司下的车辆，资料变更那里不可以。8.增加了一个是否入网到深圳的标识位。9.终端资料增加一个终端升级时间，就是业务办理升级的时间。10.修复了过户时没有更新托收合同号的BUG。11.修复了当原服务密码为空时更新密码不加密的BUG。12.更新了车辆监控的位置，现在打开车辆监控是新打开一个大页面。13.更新了车辆监控。14.各个分公司的计费信息动态生成。15.增加了app登录名，app登录联系电话。
+                </div>
+			</div>
+        	<div class="panel">
+                <div style="width:100%;color: #1b1d20;font-size: 12px;font-weight: bold">
+                	v1.06版本,SVN版本号7342,2014年12月03日更新 
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                    增加的功能:1.办停时历史记录里显示办停类型。2.增加车辆监控(查车)功能。
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                    修复的BUG:1.少部分分公司用户可以查到其他分公司安装量的BUG。2.少部分分公司用户切换分公司那里显示了两个同样的分公司的BUG。
+                </div>
+			</div>
+        	<div class="panel">
+                <div style="width:100%;color: #1b1d20;font-size: 12px;font-weight: bold">
+                	v1.05版本,SVN版本号6996,2014年11月27日更新 
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                    增加的功能:1.入网和资料变更页面的日期选择框增加格式验证。
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                    修复的BUG:1.查询时按照联系电话查询时没有做权限管理的BUG。
+                </div>
+			</div>
+        
+        	<div class="panel">
+                <div style="width:100%;color: #1b1d20;font-size: 12px;font-weight: bold">
+                	v1.04版本,SVN版本号6948,2014年11月20日更新 
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                    增加的功能:1.门店系统网上查车的后台基础数据提供。
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                    修复的BUG:1.缴费明细查看。2.缴费明细的开始日期bug修改。
+                </div>
+			</div>
+        	<div class="panel">
+                <div style="width:100%;color: #1b1d20;font-size: 12px;font-weight: bold">
+                	v1.03版本,SVN版本号6842,2014年11月18日更新 
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                    增加的功能:1.缴费历史记录可以查看明细。
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                    修复的BUG:1.服务费汇总统计报表的BUG。
+                </div>
+			</div>
+        	<div class="panel">
+                <div style="width:100%;color: #1b1d20;font-size: 12px;font-weight: bold">
+                	v1.02版本,SVN版本号6784,2014年11月14日更新 
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                    增加的功能:1.办停时增加办理类型，可供选择是‘营业处办理停用’(默认)还是‘中心欠费催缴脱网’,统计时将会用到。2.转网时显示从哪个分公司转网过来的。
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                    修复的BUG:1.业务历史记录显示时,当修改了较多资料时有可能丢失部分修改信息的问题。
+                </div>
+			</div>
+        
+        	<div class="panel">
+                <div style="width:100%;color: #1b1d20;font-size: 12px;font-weight: bold">
+                	v1.01版本,SVN版本号6762,2014年11月13日上线 
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                    增加的功能:1.所有司机编号加上数字格式验证以应对集团客户车辆联系人顺序的问题。2.车型管理添加油箱油量。3.增加版本管理功能，现在为记录的第一版。
+                </div>
+                <div style="width:100%;font-size:12px;margin-top:10px;text-indent:2em;color: #565b62;line-height: 1.6em;">
+                    修复的BUG:托收机构和银行之间的关联关系严格限制，之前查询时加载了所有银行去查询有可能出现操作员误操作使得托收机构和银行错误关联。
+                </div>
+			</div>
+        </fieldset>
+	</form>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+</html>

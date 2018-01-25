@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>修改用户资料</title>
+<link rel="stylesheet" type="text/css" href="../../css/form.css" />
+</head>
+<body>
+	<form id='sys_user_form' method='post' class="form" style="width:370px;">
+		<fieldset style="width:360px;">
+			<div class="panel">
+                <span class="title">手机:</span>
+                <input type='text' id="mobile" name='mobile' required="true" style="width:245px;"/>
+            </div>
+            <div class="panel">
+                <span class="title">电话:</span>
+                <input type='text' id="phone" name='phone' required="true" style="width:245px;"/>
+            </div>
+            <div class="panel">
+                <span class="title">传真:</span>
+                <input type='text' id="fax" name='fax' style="width:245px;"/>
+            </div>
+            <div class="panel">
+                <span class="title">邮箱:</span>
+                <input type='email' id="email" name='email' required="true" style="width:245px;"/>
+            </div>
+            <div class="panel">
+                <span class="title">邮政编码:</span>
+                <input type='text' id="post" name='post' style="width:245px;"/>
+            </div>
+            <div class="panel">
+                <span class="title" style="vertical-align:top;">备注:</span>
+                <textarea rows="2" style="width:250px;height:50px;" id="remark" name="remark"></textarea>
+            </div>
+        </fieldset>
+	</form>
+</body>
+</html>

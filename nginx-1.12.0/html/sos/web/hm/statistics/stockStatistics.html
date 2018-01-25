@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>库存汇总报表</title>
+<link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../../css/gbossIframe.css">
+</head>
+<body>
+	<div class='datagrid' id="monitoring">
+    </div>
+</body>
+<script type="text/javascript" src="../../../jscript/jquery-2.0.3.min.js"></script>
+	
+<script type="text/javascript" src="../../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../../jscript/index.js"></script>
+<script type="text/javascript" src="../../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../../jscript/form.js"></script>
+<script type="text/javascript">
+    (function($) {
+    	 var now =new Date().format('yyyy-MM-dd');
+    	var today=new Date().format('yyyy-MM');
+    	 var twoDayBefore = GetDateStr(-30);
+    	var height = 476;
+    	//初始化表格
+    	var defaults = {
+    		        title: "库存汇总报表",
+    		        width:  '100%',
+    		        height: height,
+    		        rownumbers:true,
+    		        usepager: true,
+    		        url:'../../../rpt/stockStatistics',
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '车架号', name : 'vin', width : 100},
+						{display: '发动机号', name : 'engine_no', width : 100},
+						{display: '车载电话', name : 'call_letter', width : 90},
+						{display: 'T-BOX条码', name : 'barcode', width : 110},
+						{display: '终端类型', name : 'unittype', width : 110},
+    		            {display: '生产时间', name : 'production_date', width : 90}
+    		        ],
+    		       
+    		        searchitems :[
+							/* {
+    		  						 display : '车型',
+    		  						width:120,
+    		  						name : 'model',
+    		  						html:'<input type="text" name="modelName" id="modelName" Style="width:122px" placeholder="请输入车型" list="modelDataList"/>'
+    		  							+ '<input type="hidden" name="modelId" id="modelId">'
+    		  							+ '<datalist id="modelDataList"></datalist>'
+    		  				    }, */
+    		  		             {display:'开始日期',name:'startDate',type:'date',width:150},
+    		  		             {display:'<span style="padding-left:30px;">结束日期</span>',name:'endDate',type:'date',width:150}
+    		    		        ]
+    		    		      /*   exporturl:'../../../policy/exportExcelPolicysNew' */
+    		      		     
+    		    };
+    		    $('#monitoring').sgDatagrid(defaults);
+    		    
+    		    
+    		    
+    			//车型下拉
+    			$.ajax({
+    				type : 'post',
+    				async : true,
+    				contentType : 'application/json',
+    				dataType : 'json',
+    				url : '../../../rpt/getModels',
+    				data : JSON.stringify({brandId:101}),
+    				success : function(data) {
+    					if (data) {
+    						var model = data;
+    						if (model.length > 0) {
+    							$("#modelDataList").empty();
+    							modelDataList = {};
+    						}
+    						$.each(model, function(key, value) {
+    							var op = $("<option></option>");
+    							op.val(value.model_name);
+    							$("#modelDataList").append(op);
+    							modelDataList[value.model_name] = value.model_id;
+    						});
+
+    						$("#modelName").on('change', function() {
+    							var strs = this.value.split(" ");
+    							if (modelDataList[strs[strs.length - 1]]) {
+    								$(this).val(strs[strs.length - 1]);
+    								$("#modelId").val(modelDataList[strs[strs.length - 1]]);
+    								if ($("#modelId").val().length == 0) {
+    									$("#modelName").val("");
+    								}
+    							} else {
+    								$(this).val('');
+    								$("#modelId").val("");
+    							}
+    						});
+    					} else {
+    						$(document).sgPup({message : 'message_info', text : data});
+    					}
+    				},
+    				error : function(res, error) {
+    					if (res && res.responseText) {
+    						$(document).sgPup({message : 'message_info', text : res.responseText});
+    					}
+    				}
+    			});
+    		    
+    		    
+    })(jQuery);
+    
+    
+    
+    function GetDateStr(AddDayCount) {
+	    var dd = new Date();
+	    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+	    return dd.format('yyyy-MM-dd');
+	}
+</script>
+</html>

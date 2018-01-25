@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>销账</title>
+</head>
+<body>
+	<form id='writeOff_add_form' method='post' class="form" style="width:100%" >
+		<div class='title'>销账信息></div>
+		<fieldset style="width:850px;">
+            <div class="panel">
+            	<span style="width:100px;">销账单号:</span>
+                <input type='text' id="writeOffNo" name='writeOffNo' disabled="disabled" style="width:165px;" />
+            	
+                <span style="width:110px;">销售经理:</span>
+                <input type="text" name="writeOffManager" id="writeOffManager" list="userList" required="true" style="width:145px;" autocomplete="on" />
+                <input type="hidden" name="writeOffManagerId" id="writeOffManagerId" required="true" value="" />
+                <datalist id='userList'></datalist>
+                
+                <span style="width:110px;">代理商:</span>
+                <input type='text' id="writeOffChannelName" name='writeOffChannelName' list='channellist' required="true"  style="width:145px;" />
+                <input type="hidden" id="writeOffChannelId" name="writeOffChannelId" required="true" value="" />
+                <datalist id="channellist"></datalist>
+                
+            </div>
+            <div class="panel">                         
+                <span style="width:100px;">转账票号:</span>
+                <input type='text' id="writeOffTicketno" name='writeOffTicketno' style="width:165px;" />
+                
+                <span style="width:110px;">本次入账金额(元):</span>
+                <input type='number' id="writeOffAmount" name='writeOffAmount' required="true" value="0" style="width:145px;" />
+                
+                <span style="width:110px;">上次销账余额(元):</span>
+                <input type='number' id="writeOffLastBalance" name='writeOffLastBalance' disabled='disabled' value="0" style="width:145px;" />
+            </div>
+            <div class="panel">
+            	<span style="width:100px;">日期:</span>
+                <input type='date' id="writeOffTime" name='writeOffTime' required="true" style="width:165px;" />
+                
+                <span style="width:110px;">备注:</span>
+                <input type="text" name="remark" id="remark" style="width:425px;">
+            </div>
+        </fieldset>
+		
+		<div class="title">挂账列表></div>
+		<fieldset class='fieldset' style="width:850px;">
+            <div id="dgd_borrows_detail" class="datagird"></div>
+        </fieldset>
+        
+		<div class="title">销账明细></div>
+		<fieldset class='fieldset'  style="width:850px;">
+            <div class='datagrid'>
+            	<div class="hDiv" style="margin:0px;padding:0px;">
+	                <table>
+	                    <thead>
+	                    <tr>
+	                        <th style="width:34px;">序号</th>
+	                        <th style="width:160px;">商品名称</th>
+	                        <th style="width:160px;">商品规格</th>
+	                        <th style="width:80px;">商品价格(元)</th>
+	                        <th style="width:60px;">挂账数量</th>
+	                        <th style="width:100px;">本次销账数量</th>
+	                        <th style="width:60px;">剩余数量</th>
+	                        <th style="width:80px;">金额(元)</th>
+	                    </tr>
+	                    </thead>
+	                </table>
+                </div>
+                <div class="bDiv" style="height: 89px;margin:0px;padding:0px;font-family: Arial, Helvetica, sans-serif;" >
+                	<table id="dgd_writeoffs_details" cellpadding="0" cellspacing="0" border="0">
+                	</table>
+                </div>
+            </div>
+        </fieldset>
+        
+        <fieldset style="width:850px;border:0px">
+        	<div class="panel"> 
+                <span style="width:120px;">本次销账总金额(元):</span>
+                <input type='number' id="offAmount" name='offAmount' disabled='disabled' value="0" style="width:275px;" />               
+                <span style="width:120px;">本次销账余额(元):</span>
+                <input type='number' id="balance" name='balance' disabled='disabled' value="0" style="width:275px;" />
+            </div>
+        </fieldset>
+
+        <fieldset style="width:850px;">	
+	        <div class="submit">
+	            <button id="stockin_detail_submit" type="submit" >打印</button>
+	            <button id="mysave" type="submit" >保存</button> 
+	            <button id="btns_reset" type="reset">重置</button>
+	        </div>
+        </fieldset>
+	</form>
+</body>
+<script type="text/javascript">
+	(function($){
+		var flag = 0;
+		var channelList = null;
+		var managerList = null;
+		
+		$.ajax( {
+			  type : 'POST', 
+			  async: false,  
+			  dataType : 'json', 
+			  url : 'stock/getWriteOffsNo',   
+			  data: {isHx:false},
+			  success : function(data) {
+				  if(data.success){
+					  $("#writeOffNo").val(data.code);
+				  }else{
+					  if(data.msg&&data.msg.indexOf('仓库正在盘点')>-1){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						  }
+						 alert(data.msg); 
+					  }
+			  } 
+		});
+		
+		var checkManager = function(){
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.opname = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : 'getOrgOperators',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#writeOffManager","#writeOff_add_form");
+						  managerList = {};
+						  if(manager){
+							  if(data.items.length>0){
+								  $("#userList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.opname);
+								  $("#userList").append(op);
+								  
+								  managerList[v.opname] = v.opid;
+		 				  	 }); 
+							}
+					  }else{
+					  	alert(data);
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	 alert("responseText="+res.responseText+";error="+error);     
+				  }    
+				});
+		}
+		
+	  //填充员工
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : 'getOrgOperators',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#writeOffManager","#writeOff_add_form");
+				  managerList = {};
+				  if(manager){
+					  if(data.items.length>0){
+						  $("#userList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userList").append(op);
+						  
+						  managerList[v.opname] = v.opid;
+ 				  	 }); 
+					  manager.on('keyup',checkManager);
+					  manager.on('change',function(){
+						  	var strs = this.value.split(" ");
+							$(this).val(strs[strs.length-1]);
+							$("#writeOffManagerId","#writeOff_add_form").val(managerList[strs[strs.length-1]]);
+							if($("#writeOffManagerId","#writeOff_add_form").val().length==0){
+								$("#writeOffManager","#writeOff_add_form").val("");
+							}else{
+								//重新加载借用明细列表
+								if($("#writeOffManagerId").val().length>0){
+									var query={borrowerId:$("#writeOffManagerId").val(),writeoffsStatus:0,type:1,remark:1};//用remark表示是否只查询明细,1表示只查询出明细
+									if($("#writeOffChannelId").val().length>0){
+										query.channelId=$("#writeOffChannelId").val();
+									}
+									$('#dgd_borrows_detail').sgDatagrid('reload',{query:query,url: 'stock/findBorrows'});
+									
+									var params = {};
+									params.manager_id = $("#writeOffManagerId").val();
+									
+									$.ajax( {
+								  		  type : 'post', 
+								  		  async: false,   
+								  		  contentType : 'application/json',     
+								  		  dataType : 'json',     
+								  		  url : 'writeoff/getLastBalance',   
+								  		  data:JSON.stringify(params),
+								  		  success : function(data) {
+								  			  if(data){
+								     				  if(data){
+								     					  if(data.last_balance!=null){
+								     						  $("#writeOffLastBalance").val(data.last_balance);
+								     					  }else{
+								     						  $("#writeOffLastBalance").val(0);
+								     					  }
+								     				  }else{
+								     					  alert("获取上次余额失败！")
+								     				  }
+								     				 
+								     			  }else{
+								     				  alert(data);
+								     			  }
+								  		  } ,     
+								  		  error : function(res,error) { 
+								  		  	 alert("responseText="+res.responseText+";error="+error);     
+								  		  }    
+								  		});
+								}
+							}
+						});
+
+					};
+			  }else{
+			  	alert(data);
+			  }
+		  },     
+		  error : function(res,error) { 
+		  	 alert("responseText="+res.responseText+";error="+error);     
+		  }    
+		});
+	  
+	    var checkChannel = function(){
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.name = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : 'sell/findChannels',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var channels = data.items;
+						  $("#channellist").empty();
+						  channelList = {};
+						  $.each( channels, function(key,value){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+value.name);
+							  $("#channellist").append(op);
+							  
+							  channelList[value.name]=value.id;
+							});
+					  }else{
+						  alert(data);
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	 alert("responseText="+res.responseText+";error="+error);     
+				  }    
+				});
+		};
+		
+	   	$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : 'sell/findChannels',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+			  success : function(data) {
+				  if(data){
+					  var channels = data.items;
+					  $("#channellist").empty();
+					  channelList = {};
+					  $.each( channels, function(key,value){
+						  var op = $("<option></option>");
+						  op.val(value.name);
+						  $("#channellist").append(op);
+						  channelList[value.name]=value.id;
+						});
+					  
+					  $("#writeOffChannelName","#writeOff_add_form").on('keyup',checkChannel);
+					  $("#writeOffChannelName","#writeOff_add_form").on('change',function(){
+						    var strs = this.value.split(" ");
+							$(this).val(strs[strs.length-1]);
+							$("#writeOffChannelId","#writeOff_add_form").val(channelList[strs[strs.length-1]]);
+							if($("#writeOffChannelId","#writeOff_add_form").val().length==0){
+								$("#writeOffChannelName","#writeOff_add_form").val("");
+							}else{
+								//重新加载借用明细列表
+								if($("#writeOffManagerId").val().length>0){
+									var query={borrowerId:$("#writeOffManagerId").val(),writeoffsStatus:0,type:1,remark:1};//用remark表示是否只查询明细,1表示只查询出明细
+									//alert($("#writeOffChannelId").val());
+									if($("#writeOffChannelId").val().length>0){
+										query.channelId=$("#writeOffChannelId").val();
+									}
+									$('#dgd_borrows_detail').sgDatagrid('reload',{query:query,url: 'stock/findBorrows'});
+									var params = {};
+									params.manager_id = $("#writeOffManagerId").val();;
+									
+									$.ajax( {
+								  		  type : 'post', 
+								  		  async: false,   
+								  		  contentType : 'application/json',     
+								  		  dataType : 'json',     
+								  		  url : 'writeoff/getLastBalance',   
+								  		  data:JSON.stringify(params),
+								  		  success : function(data) {
+								  			  if(data){
+								     				  if(data){
+								     					  if(data.last_balance!=null){
+								     						  $("#writeOffLastBalance").val(data.last_balance);
+								     					  }else{
+								     						  $("#writeOffLastBalance").val(0);
+								     					  }
+								     				  }else{
+								     					  alert("获取上次余额失败！")
+								     				  }
+								     				 
+								     			  }else{
+								     				  alert(data);
+								     			  }
+								  		  } ,     
+								  		  error : function(res,error) { 
+								  		  	 alert("responseText="+res.responseText+";error="+error);     
+								  		  }    
+								  		});
+								}
+							}
+						});
+					  
+				  }else{
+					  alert(data);
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	 alert("responseText="+res.responseText+";error="+error);     
+			  }    
+			});	
+
+		var countAllMoney = function(){
+			var allMoney = 0;
+			var moneys = $('input[name=money]','#dgd_writeoffs_details');
+			$.each(moneys,function(k,v){
+				allMoney = Number(allMoney)+Number(v.value);
+			});
+			$('#offAmount','#writeOff_add_form').val(allMoney);
+			$('#balance','#writeOff_add_form').val(Number($('#writeOffAmount','#writeOff_add_form').val())+Number($('#writeOffLastBalance','#writeOff_add_form').val())-Number(allMoney));
+		}
+		
+		$('#writeOffAmount','#writeOff_add_form').on('change',function(){
+			countAllMoney();
+		});
+		$('#writeOffAmount','#writeOff_add_form').on('keyup',function(){
+			countAllMoney();
+		});
+		
+		var chkChange=function(index,rowData,isChecked){
+			var id=rowData.id;
+			if(isChecked){
+				var pid = rowData.productId;
+				var price = rowData.price;
+				var ptx = rowData.productName;
+				var code = rowData.productCode;
+				var norm = rowData.norm;
+				var num = rowData.num;
+				var money = rowData.money;
+				if(pid==null||pid==''){
+					alert("商品不能为空!")
+					return false;
+				}
+	
+				if(num<=0){
+					alert("数量必须大于０!")
+					return false;
+				}
+				
+				var grid = $('#dgd_writeoffs_details');
+				var tr = $('<tr></tr>');
+				tr.attr('id',id+'_tr');
+				
+				if($('#'+id+'_tr').get(0)){
+					$("#"+id+"_tr",$('#dgd_writeoffs_details')).remove();
+				}
+				
+				var sno = $('<td></td>')
+				sno.width(34);
+				tr.append(sno);
+				
+				var td1 = $('<td></td>');
+				var rowId = $("<input type='hidden' name='borrowId' />")
+				rowId.val(id);
+				td1.append(rowId);
+				var sid = $("<input type='hidden' name='commodityId' />")
+				sid.val(pid);
+				td1.append(sid);
+				var sname = $("<input type='hidden' name='productName' />")
+				sname.val(ptx);
+				td1.append(sname);
+				var productCode = $("<input type='hidden' name='productCode' />")
+				productCode.val(code);
+				td1.append(productCode);
+				td1.append(ptx);
+				td1.width(160);
+				tr.append(td1);
+				
+				var td2 = $('<td style="line-height: 16px"></td>');
+				var productNorm = $("<input type='hidden' name='productNorm' disabled='disabled'/>");
+				productNorm.val(norm);
+				td2.append(productNorm);
+				var dv = $('<div></div>');
+                dv.css('padding-top','5px');
+                dv.css('line-height','16px');
+                dv.append(norm)
+				td2.append(dv);
+				td2.width(160);
+				tr.append(td2);
+				
+				var td3 = $('<td></td>');
+				var productPrice = $("<input type='number' name='price3' disabled='disabled'/>");
+				productPrice.val(price);
+				productPrice.width(75);
+				td3.width(80);
+				td3.append(productPrice);
+				tr.append(td3);
+				
+				var td4 = $('<td></td>');
+				var innum = $("<input type='number' name='quantity' disabled='disabled'/>");
+				innum.val(num);
+				innum.width(55);
+				td4.width(60);
+				td4.append(innum);
+				tr.append(td4);
+				
+				var td5 = $('<td></td>');
+				var writeoffsNum = $("<input type='number' name='offQuantity' max='"+num+"' min='1' />");
+				writeoffsNum.on('keyup',function(){
+					this.value=this.value.replace(/\D/g,'');
+					$("input[name=remainQuantity]","#"+id+'_tr').val($("input[name=quantity]","#"+id+'_tr').val()-$("input[name=offQuantity]","#"+id+'_tr').val());
+					$("input[name=money]","#"+id+'_tr').val($("input[name=offQuantity]","#"+id+'_tr').val()*price);
+					countAllMoney();
+				});
+				writeoffsNum.on('change',function(){
+					$("input[name=remainQuantity]","#"+id+'_tr').val($("input[name=quantity]","#"+id+'_tr').val()-$("input[name=offQuantity]","#"+id+'_tr').val());
+					$("input[name=money]","#"+id+'_tr').val($("input[name=offQuantity]","#"+id+'_tr').val()*price);
+					countAllMoney();
+				});
+				writeoffsNum.val(num);
+				writeoffsNum.width(90);
+				td5.width(100);
+				td5.append(writeoffsNum);
+				tr.append(td5);
+				
+				var td6 = $('<td></td>');
+				var writeoffsNum = $("<input type='number' name='remainQuantity' max='"+num+"' min='1' disabled='disabled' />");
+				writeoffsNum.val(0);
+				writeoffsNum.width(55);
+				td6.width(60);
+				td6.append(writeoffsNum);
+				tr.append(td6);
+				
+				var td7 = $('<td></td>');
+				var writeoffsNum = $("<input type='number' name='money' disabled='disabled' />");
+				writeoffsNum.val(num*price);
+				writeoffsNum.width(75);
+				td7.width(80);
+				td7.append(writeoffsNum);
+				tr.append(td7);
+				
+				
+				grid.append(tr);
+				
+				sno.append(grid.find('tr').length);
+			}else{
+				$("#"+id+"_tr",$('#dgd_writeoffs_details')).remove();
+				$.each($('#dgd_writeoffs_details').find('tr'),function(k,v){
+					$(v).find('td:first').html(k+1);
+				})
+			}
+			$('tr:odd','#dgd_writeoffs_details').addClass('normalRow');
+			countAllMoney();
+		}
+		
+		
+	    //初始化销售经理挂账商品表格
+	   	 var defaults = {
+	   		        width:  '100%',
+	   		        height: 76,
+	   		     	url:'',
+	   		     	query:{managersId:'test'},
+	   		     	chkChange:chkChange,
+	   		        isNotCheckall:true,
+	   		     	colid:'id',  //主键
+	   		        rownumbers:true,//序号
+	   		        colModel : [
+	   		            {display: '商品名称', name : 'productName', width : 140, sortable : false},
+	   		         	{display: '商品规格', name : 'norm', width : 140, sortable : false},
+	   		            {display: '商品价格(元)', name : 'price', width : 100, sortable : false},
+	   		            {display: '数量', name : 'num', width : 50, sortable : false},
+	   		         	{display: '挂账时间', name : 'stamp', width : 120, sortable : false},
+	   		         	{display: '代理商', name : 'channelName', width : 140, sortable : false}
+	   		        ],
+	   		        query:{writeoffsStatus:0}//未销
+	   		    };
+	   	$('#dgd_borrows_detail').sgDatagrid(defaults); 
+	    
+	   	$("#writeOffTime").val(new Date().format('yyyy-MM-dd'));
+	   	
+	   	
+		
+		
+	   	
+	   	//销售经理销账保存
+	   	$('#writeOff_add_form').on('submit',function(e){
+	   		debugger;
+	   		if(window.confirm('确定进行销帐吗?')){
+		   		//做表单提交
+	            var params = {};
+		   	    var obj = $('#dgd_borrows_detail');
+		        var bDiv = $('.bDiv',obj);
+		        //alert($('input[type=checkbox][checked=checked]',bDiv).length) ;
+		        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length<1){
+		            alert("请选择一个挂账列表选项！");
+		            return false;
+		        }
+	
+		        params.writeoffno = $('#writeOffNo','#writeOff_add_form').val();
+		        params.manager_id = $('#writeOffManagerId','#writeOff_add_form').val();
+	            params.channel_id= $('#writeOffChannelId','#writeOff_add_form').val();
+	            params.off_amount = $("#offAmount",'#writeOff_add_form').val();	
+	     	    params.ticketno= $('#writeOffTicketno','#writeOff_add_form').val();
+	     	    params.time = $('#writeOffTime','#writeOff_add_form').val();
+	     	    params.balance = $('#balance','#writeOff_add_form').val();
+	     	    params.remark = $('#remark','#writeOff_add_form').val();
+	            
+	            var borrowIds = $('input[name=borrowId]','#writeOff_add_form')
+	     	    var commodityIds = $('input[name=commodityId]','#writeOff_add_form');
+	            //var productNames=$('input[name=productName]','#writeOff_add_form');
+	            var quantitys= $('input[name=quantity]','#writeOff_add_form');
+	            var offQuantitys = $('input[name=offQuantity]','#writeOff_add_form');
+	            var remainQuantitys = $('input[name=remainQuantity]','#writeOff_add_form');
+	            var moneys = $('input[name=money]','#writeOff_add_form');
+	            
+	            var details = new Array();
+	            if(!params.manager_id){
+	         	   alert('请选择经办人！');
+	         	   return false;
+	            }
+	            if(params.balance<0){
+	            	alert('本次销账总余额不能小于0！');
+		         	return false;
+	            }
+	            var isGoOn=true;
+	            $.each(commodityIds,function(k,v){
+	            	var obj = {};            	
+	            	
+	            	obj.commodityId = v.value;
+	            	//obj.productName = productNames[k].value;
+	            	obj.borrowId = borrowIds[k].value
+	            	obj.quantity = quantitys[k].value;
+	            	obj.offQuantity = offQuantitys[k].value;
+	            	obj.remainQuantity = remainQuantitys[k].value;
+	            	obj.money = moneys[k].value;
+	            	
+	            	details.push(obj);
+	            	if(!v.value){ 
+	               	   alert('请添加商品！');
+	             	   isGoOn=false;
+	             	   return false;
+	                }
+	              });
+	              if(!isGoOn){
+	           	   return false;
+	              }
+	              params.writeoffDetails = details;
+	              
+	            //alert(JSON.stringify(params));
+	            $.ajax( {
+	    		  type : 'post', 
+	    		  async: false,   
+	    		  contentType : 'application/json',     
+	    		  dataType : 'json',     
+	    		  url : 'writeoff/add',   
+	    		  data:JSON.stringify(params),
+	    		  success : function(data) {
+	    			  if(data){
+	       				  if(data.success){
+	       					  alert(data.msg);
+	       					
+	       				  }else{
+	       					  alert("销账失败！")
+	       				  }
+	       				 
+	       			  }else{
+	       				  alert(data);
+	       			  }
+	    		  } ,     
+	    		  error : function(res,error) { 
+	    		  	 alert("responseText="+res.responseText+";error="+error);     
+	    		  }    
+	    		});
+	   		}
+	   		
+	   		window.open("web/whs/stock_print.html","stock_print","width=870,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no");
+   		    
+   		    //$("#writeOff_add_form").unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+		    e.stopPropagation();	
+		    return false;
+	   	});	
+	   	
+	})(jQuery)
+	
+	var reset = function(){
+		var countAllMoney = function(){
+			var allMoney = 0;
+			var moneys = $('input[name=money]','#dgd_writeoffs_details');
+			$.each(moneys,function(k,v){
+				allMoney = Number(allMoney)+Number(v.value);
+			});
+			$('#offAmount','#writeOff_add_form').val(allMoney);
+			$('#balance','#writeOff_add_form').val(Number($('#writeOffAmount','#writeOff_add_form').val())+Number($('#writeOffLastBalance','#writeOff_add_form').val())-Number(allMoney));
+		}
+		
+		var chkChange=function(index,rowData,isChecked){
+			var id=rowData.id;
+			if(isChecked){
+				var pid = rowData.productId;
+				var price = rowData.price;
+				var ptx = rowData.productName;
+				var code = rowData.productCode;
+				var norm = rowData.norm;
+				var num = rowData.num;
+				var money = rowData.money;
+				if(pid==null||pid==''){
+					alert("商品不能为空!")
+					return false;
+				}
+	
+				if(num<=0){
+					alert("数量必须大于０!")
+					return false;
+				}
+				
+				var grid = $('#dgd_writeoffs_details');
+				var tr = $('<tr></tr>');
+				tr.attr('id',id+'_tr');
+				
+				if($('#'+id+'_tr').get(0)){
+					$("#"+id+"_tr",$('#dgd_writeoffs_details')).remove();
+				}
+				
+				var sno = $('<td></td>')
+				sno.width(34);
+				tr.append(sno);
+				
+				var td1 = $('<td></td>');
+				var rowId = $("<input type='hidden' name='borrowId' />")
+				rowId.val(id);
+				td1.append(rowId);
+				var sid = $("<input type='hidden' name='commodityId' />")
+				sid.val(pid);
+				td1.append(sid);
+				var sname = $("<input type='hidden' name='productName' />")
+				sname.val(ptx);
+				td1.append(sname);
+				var productCode = $("<input type='hidden' name='productCode' />")
+				productCode.val(code);
+				td1.append(productCode);
+				td1.append(ptx);
+				td1.width(160);
+				tr.append(td1);
+				
+				var td2 = $('<td style="line-height: 16px"></td>');
+				var productNorm = $("<input type='hidden' name='productNorm' disabled='disabled'/>");
+				productNorm.val(norm);
+				td2.append(productNorm);
+				var dv = $('<div></div>');
+                dv.css('padding-top','5px');
+                dv.css('line-height','16px');
+                dv.append(norm)
+				td2.append(dv);
+				td2.width(160);
+				tr.append(td2)
+				
+				var td3 = $('<td></td>');
+				var productPrice = $("<input type='number' name='price3' disabled='disabled'/>");
+				productPrice.val(price);
+				productPrice.width(75);
+				td3.width(80);
+				td3.append(productPrice);
+				tr.append(td3);
+				
+				var td4 = $('<td></td>');
+				var innum = $("<input type='number' name='quantity' disabled='disabled'/>");
+				innum.val(num);
+				innum.width(55);
+				td4.width(60);
+				td4.append(innum);
+				tr.append(td4);
+				
+				var td5 = $('<td></td>');
+				var writeoffsNum = $("<input type='number' name='offQuantity' max='"+num+"' min='1' />");
+				writeoffsNum.on('keyup',function(){
+					this.value=this.value.replace(/\D/g,'');
+					$("input[name=remainQuantity]","#"+id+'_tr').val($("input[name=quantity]","#"+id+'_tr').val()-$("input[name=offQuantity]","#"+id+'_tr').val());
+					$("input[name=money]","#"+id+'_tr').val($("input[name=offQuantity]","#"+id+'_tr').val()*price);
+					countAllMoney();
+				});
+				writeoffsNum.on('change',function(){
+					$("input[name=remainQuantity]","#"+id+'_tr').val($("input[name=quantity]","#"+id+'_tr').val()-$("input[name=offQuantity]","#"+id+'_tr').val());
+					$("input[name=money]","#"+id+'_tr').val($("input[name=offQuantity]","#"+id+'_tr').val()*price);
+					countAllMoney();
+				});
+				writeoffsNum.val(num);
+				writeoffsNum.width(90);
+				td5.width(100);
+				td5.append(writeoffsNum);
+				tr.append(td5);
+				
+				var td6 = $('<td></td>');
+				var writeoffsNum = $("<input type='number' name='remainQuantity' max='"+num+"' min='1' disabled='disabled' />");
+				writeoffsNum.val(0);
+				writeoffsNum.width(55);
+				td6.width(60);
+				td6.append(writeoffsNum);
+				tr.append(td6);
+				
+				var td7 = $('<td></td>');
+				var writeoffsNum = $("<input type='number' name='money' disabled='disabled' />");
+				writeoffsNum.val(num*price);
+				writeoffsNum.width(75);
+				td7.width(80);
+				td7.append(writeoffsNum);
+				tr.append(td7);
+				
+				
+				grid.append(tr);
+				
+				sno.append(grid.find('tr').length);
+			}else{
+				$("#"+id+"_tr",$('#dgd_writeoffs_details')).remove();
+				$.each($('#dgd_writeoffs_details').find('tr'),function(k,v){
+					$(v).find('td:first').html(k+1);
+				})
+			}
+			$('tr:odd','#dgd_writeoffs_details').addClass('normalRow');
+			countAllMoney();
+		}
+		
+	   	var defaults = {
+	   		        width:  '100%',
+	   		        height: 76,
+	   		     	url:'',
+	   		     	query:{managersId:'test'},
+	   		     	chkChange:chkChange,
+	   		        isNotCheckall:true,
+	   		     	colid:'id',  //主键
+	   		        rownumbers:true,//序号
+	   		        colModel : [
+	   		            {display: '商品名称', name : 'productName', width : 250, sortable : false},
+	   		            {display: '商品价格(元)', name : 'price', width : 100, sortable : false},
+	   		            {display: '数量', name : 'num', width : 80, sortable : false},
+	   		         	{display: '挂账时间', name : 'stamp', width : 100, sortable : false},
+	   		         	{display: '代理商', name : 'channelName', width : 180, sortable : false}
+	   		        ],
+	   		        query:{writeoffsStatus:0}//未销
+	   		    };
+	   	$("#writeOff_add_form").get(0).reset();
+        $("#dgd_writeoffs_details").empty();
+        $('#dgd_borrows_detail').sgDatagrid('destroy');
+        $('#dgd_borrows_detail').sgDatagrid(defaults);
+		$("#writeOffTime").val(new Date().format('yyyy-MM-dd'));
+		$.ajax( {
+			  type : 'POST', 
+			  async: false,  
+			  dataType : 'json', 
+			  url : 'stock/getWriteOffsNo',   
+			  data: {isHx:false},
+			  success : function(data) {
+				  if(data.success){
+					  $("#writeOffNo").val(data.code);
+				  }else{
+					  if(data.msg&&data.msg.indexOf('仓库正在盘点')>-1){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						  }
+						 alert(data.msg); 
+					  }
+			  } 
+		});
+	};
+	
+	//打印页面元素设置
+	   var callback=function(subWin){
+	  	$.ajax( {
+	  		  type : 'post', 
+	  		  async: false,   
+	  		  contentType : 'application/json',     
+	  		  dataType : 'json',     
+	  		  url : 'getCurrentCompany',   
+	  		  data:JSON.stringify({}),
+	  		  success : function(data) {
+	  			  if(data){
+	  				  debugger;
+	  				  var total = 0;
+	  				  var rowtotal = 0;
+	  				  //公司中文名字
+	  				  $("#cname",subWin.document.body).empty();
+	  				  $("#cname",subWin.document.body).append(data.cnfullname);
+	  				  //公司英文名字
+	  				  $("#ename",subWin.document.body).empty();
+	  				  $("#ename",subWin.document.body).append(data.enfullname);
+	  				  //表单名字
+	  				  $("#orderTitle",subWin.document.body).empty();
+	  				  $("#orderTitle",subWin.document.body).append("销帐单");
+	  				  
+	  				  //表单日期
+	  				  $("#orderDate",subWin.document.body).empty();
+	  				  $("#orderDate",subWin.document.body).append($("#writeOffTime","#writeOff_add_form").val());
+	  				  //表单单号
+	  				  $("#orderNo",subWin.document.body).empty();
+	  				  $("#orderNo",subWin.document.body).append($("#writeOffNo","#writeOff_add_form").val());
+	  				  
+	  				  var inWhs = '<span>代理商：</span><div>'+$("#writeOffChannelName","#writeOff_add_form").val()+'</div>';
+	  				  $("#headInput",subWin.document.body).append(inWhs);	  				  
+	  				  
+	  				  var order = '<span>销售经理：</span><div>'+$("#writeOffManager","#writeOff_add_form").val()+'</div>';
+	  				  $("#headInput",subWin.document.body).append(order);
+	  			
+	  				  //表头
+	  				  $("#tbHead",subWin.document.body).append('<td style="width: 30px;"><div>序号</div></td>'+
+	  														  '<td style="width: 140px;"><div>商品编码</div></td>'+
+	  														  '<td style="width: 240px;"><div>商品名称</div></td>'+
+	  														  '<td style="width: 240px;" ><div>商品规格</div></td>'+
+	  														  '<td style="width: 60px;"><div>价格(元)</div></td>'+
+	  														  '<td style="width: 60px;"><div>挂帐数量</div></td>'+
+	  														  '<td style="width: 60px;"><div>销帐数量</div></td>'+
+	  														  '<td style="width: 70px;"><div>金额</div></td>');
+	  				  
+	  				  //表格主体
+	  				  var productIds = $('input[name=commodityId]','#writeOff_add_form');
+	  				  var productCodes=$('input[name=productCode]','#writeOff_add_form');
+          		      var productNorms=$('input[name=productNorm]','#writeOff_add_form');
+	                  var productNames=$('input[name=productName]','#writeOff_add_form');
+	                  var productPrices=$('input[name=price3]','#writeOff_add_form');
+	                  var nums= $('input[name=quantity]','#writeOff_add_form');
+	                  var offQuantitys = $('input[name=offQuantity]','#writeOff_add_form');
+	                  //var remainQuantitys = $('input[name=remainQuantity]','#writeOff_add_form');
+	                  var moneys = $('input[name=money]','#writeOff_add_form');
+            		  
+             	  
+	  	              $.each(productIds,function(k,v){
+	  	            	total = Number(total) + Number(moneys[k].value);
+	  	               	var tbbody_tr = '<tr><td style="width:30px;">'+(k+1)+'</td>'
+										+'<td style="width:140px;">'+productCodes[k].value+'</td>'
+	  	               	                +'<td style="width:240px;">'+productNames[k].value+'</td>'
+	  	                                +'<td style="width:240px;">'+productNorms[k].value+'</td>'
+	  	                              	+'<td style="width:60px;">'+productPrices[k].value+'</td>'
+	  	                                +'<td style="width:60px;">'+nums[k].value+'</td>'
+	  	                              	+'<td style="width:60px;">'+offQuantitys[k].value+'</td>'
+	  	               					+'<td style="width:70px;">'+moneys[k].value+'</td></tr>';
+
+	  	               	$("#tbBody",subWin.document.body).append(tbbody_tr);
+	  	              })
+	  				  
+	  				  //表合计
+	  				  var tbfoot = '<tr><td style="width:428px;"><div style="text-align:right;">小计:</div></td><td style="width:526px;"><div style="text-align:right;padding-right:45px;">'+total+'</div></td></tr>';
+	  				  			  
+	  				  $("#tbFoot",subWin.document.body).append(tbfoot);
+	  				  
+	  				  //表尾输入单
+	  				  $("#foot",subWin.document.body).append('<span>核准人：</span><div>&nbsp;</div>'+
+	  													  '<span>经办人：</span><div>&nbsp;</div>'+
+	  													  '<span>财务：</span><div>&nbsp;</div>'+
+	  													  '<span>制单：</span><div>&nbsp;</div>');
+	  				reset();
+	  				  
+	  			  }else{
+	  				  alert(data);
+	  			  }
+	  		  } ,     
+	  		  error : function(res,error) { 
+	  		  	 alert("responseText="+res.responseText+";error="+error);     
+	  		  }    
+	  		});
+	  	
+	      if (navigator.appName == 'Microsoft Internet Explorer'){
+	      	subWin.print();  
+	      }else{ 
+	      	subWin.focus();
+	      	subWin.print();  
+	      }
+	      
+	      
+	  }
+</script>
+</html>

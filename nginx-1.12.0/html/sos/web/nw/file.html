@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>归档资料</title>
+</head>
+<body>
+	<div id="nw_file" class="datagird"></div>
+</body>
+<script type="text/javascript">
+	(function($){
+		var now =new Date().format('yyyy-MM-dd');
+		 
+		var editId=null;//编辑时选中行ID
+		var editobj = null; //编辑时选中的对象
+		
+		var winClose = function() {
+			$(document).sgWindow('close', {
+				id : 'audit'
+			});
+		}
+		
+		var winClose2 = function() {
+			$(document).sgWindow('close', {
+				id : 'file'
+			});
+		}
+		
+		var auditItem = function() {
+			editId = null;
+			editObj = null;
+			var defaults = {
+				title : '审核',
+				id : 'audit',
+				form : 'audit_form',
+				url : 'web/nw/audit_private.html',
+				width : 890,
+				height : 500,
+				buttons : [ {
+					name : '审核通过',
+					type : 'submit',
+					onpress : winClose
+				}, {
+					name : '取消',
+					onpress : winClose
+				} ]
+			};
+			$(document).sgWindow(defaults);
+		}
+		
+		var fileItem = function() {
+			editId = null;
+			editObj = null;
+			var defaults = {
+				title : '归档',
+				id : 'file',
+				form : 'file_form',
+				url : 'web/nw/file_data.html',
+				width : 370,
+				height : 220,
+				buttons : [ {
+					name : '确定',
+					type : 'submit',
+					onpress : winClose2
+				}, {
+					name : '取消',
+					onpress : winClose2
+				} ]
+			};
+			$(document).sgWindow(defaults);
+		}
+		
+		//初始化表格
+	   	 var defaults = {
+	   		        title: "归档资料>",
+	   		     	width:  870,
+			        height: 402,
+	   		        url: '',
+		   		    usepager: true,
+		 	        rownumbers:true,
+		 	        useRp: true,
+		 	        colid:'id',  //主键
+		 	        //query:{startDate:now,endDate:now},
+	   		        colModel : [
+	   		            {display: '入网注册名', name : 'register', width : 80, sortable : false},
+	   		         	{display: '客户名称', name : 'register', width : 80, sortable : false},
+	   		      		{display: '车牌号码', name : 'register', width : 80, sortable : false},
+	   		   			{display: '车载号码', name : 'register', width : 80, sortable : false},
+	   		            {display: '合同号', name : 'contract', width : 100, sortable : false},	   		              		            
+	   		            {display: '归档位置', name : 'fileLocation', width : 80, sortable : false},
+	   		         	{display: '文控文员', name : 'filePerson', width : 80, sortable : false},
+	   		         	{display: '归档时间', name : 'fileTime', width : 100, sortable : false}
+	   		        ],
+	   		     	buttons : [
+				            {name: '归档', bclass: 'add', onpress : fileItem}
+	   			        ],
+	   		        searchitems :[
+	   		            {
+							display : '入网注册名',
+							name : 'register',
+							type : 'text',
+							width : 90
+						}, {
+							display : '客户名称',
+							name : 'name',
+							type : 'text',
+							width : 90
+						}, {
+							display : '车牌号码',
+							name : 'register',
+							type : 'text',
+							width : 90
+						}, {
+							display : '车载号码',
+							name : 'register',
+							type : 'text',
+							width : 90
+						}, {
+							display:'开始时间',
+							name:'startDate',
+							type:'date',
+							width : 102
+						}, {
+							display:'结束时间',
+							name:'endDate',
+							type:'date',
+							width : 102
+						}, {
+							display : '是否归档',
+							name : 'isFile',
+							html : "<select id='isFile' name='isFile'><option value='1' selected='true'>全部</option><option value='2'>是</option><option value='3' selected='selected'>否</option></select>"
+						}
+	   		        ],
+	   		     	order:true
+	   		    };
+	   		    $('#nw_file').sgDatagrid(defaults); 
+		})(jQuery)
+	</script>	
+	
+</html>

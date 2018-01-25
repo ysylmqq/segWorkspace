@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>集团服务费</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/tree.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+    <div id="fee_ls_all">
+	<form id='search_form' name='search_form' method='post' class="form">
+		<input type='hidden' id='cust_id' name='cust_id' >
+		<input type='hidden' id='cust_id_value' name='cust_id_value' >
+        <div class='title'>集团服务费></div>
+        <fieldset style="width:850px;">
+        	<div class="panel">
+				<div class='submit' id="divObj1" style="text-align:left;">
+					<span>客户名称:</span>
+	            	<input type='text' id="custname" name='custname' style="width:150px;" list="customerList"/>
+            		<datalist id='customerList'></datalist>
+	            	
+	            	<button id="search_btn" type="button" style="width:80px;height:26px;" onclick="searchlargecust();" >查询</button>
+	        	</div>
+			</div>
+			<hr>
+			<div class="panel">
+				<span>客户名称:</span>
+            	<input type='text' id="customer_name" name='customer_name' style="width:150px;" disabled="disabled" />
+            	
+            	<span>托收账号:</span>
+            	<input type='text' id="account" name='account' style="width:150px;" disabled="disabled" />
+			</div>
+		</fieldset>
+		<div class='title'>选择车辆</div>
+	</form>
+			<div id='company_vehicle' style="background:#e2e5ec;padding-left:30px;"></div>
+			
+	<form id='largeservice_form' name='largeservice_form' method='post' class="form" style="width:870px;">
+		<fieldset style="width:850px;">
+			<div class="panel" id="largeservice_panel">
+				<div class="panel">
+					<input type='hidden' id="item_name" name="item_name"/>
+					<input type='checkbox' id="is_check" name="is_check" style='vertical-align:middle;' />
+	                <span id='servicefee'></span>
+	                
+	                <span style="padding-left:50px;">服务费:</span>
+	                <input type='text' id="price" name='price' style="width:150px;" disabled="disabled"/>
+	                
+	                <span style="padding-left:50px;">服务项描述:</span>
+	                <input type='text' id="pack_remark" name='pack_remark' style="width:200px;" disabled="disabled"/>
+	            </div>
+	            <div class="panel">
+	            	<span>服务时长(月):</span>
+	                <input type='number' id="s_months" name='s_months' onblur="javascript:getlargeAmount(0);" style="width:150px;" />
+				
+	                <span>应缴金额:</span>
+	                <input type='number' id="ac_amount" name='ac_amount' style="width:150px;" />
+	                
+	                <span>实缴金额:</span>
+	                <input type='number' id="real_amount" name='real_amount' style="width:150px;" />
+	            </div>
+            </div>
+        </fieldset>
+        <div class='title'>合计</div>
+        <fieldset style="width:850px;">
+			<div class="panel">
+                <span>应收金额:</span>
+                <input type='number' id="total_ac_amount" name='total_ac_amount' required="true" onblur="getlargeAcamount();" style="width:150px;" />
+                
+                <span>实收金额:</span>
+                <input type='number' id="total_real_amount" name='total_real_amount' required="true" onblur="getlargeRealamount();" style="width:150px;" />
+            
+            	<span>收据单号:</span>
+                <input type='text' id="bw_no" name='bw_no' required="true" style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>经办人:</span>
+                <input type="text" name="agent_name" id="agent_name" required="true" list="userList" style="width:150px;" autocomplete="on" />
+                <input type="hidden" name="agent_id" id="agent_id" />
+                <datalist id="userList"></datalist>
+   
+                <span>交款方式:</span>
+                <input type="radio" name="pay_model" id="pay_model" value="0" checked="checked"  style="position: relative; top:5px;margin-right:5px;" />现金
+           		&nbsp;&nbsp;
+           		<input type="radio" name="pay_model" id="pay_model" value="1" style="position: relative; top:5px;margin-right:5px;" />刷卡 
+           		&nbsp;&nbsp;
+           		<input type="radio" name="pay_model" id="pay_model" value="2" style="position: relative; top:5px;margin-right:5px;" />转帐
+           		&nbsp;&nbsp;&nbsp;&nbsp;
+           		<input type="checkbox" name="is_invoice" id="is_invoice" style="position: relative; top:5px;margin-right:5px;" />发票
+            </div>
+            <div class="panel">    
+                <span>备注:</span>
+                <input type='text' id="remark" name='remark' style="width:650px;" />
+            </div>
+        </fieldset>
+        <fieldset style="width:850px;border-top:0px;">	
+	        <div class='submit'>
+	            <button id="service_submit" type="submit" onclick="largeservice_save();">保存</button> 
+	            <button id="service_reset" type="button" onclick="largeservice_reset();">重置</button>
+	        </div>
+        </fieldset>
+	</form>
+    </div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript" src="../../jscript/tree.js"></script>
+<script type="text/javascript">
+function getlargeAmount(pack_id){
+	var panel = document.getElementById("largeservice_panel"+pack_id);
+	if(panel){
+		var detail_id = "largeservice_panel"+pack_id;
+		var price = $("#"+detail_id+" #price").val();
+		var month = $("#"+detail_id+" #s_months").val();
+		var amount = price*month;
+		var checkbox = document.getElementById(pack_id);
+		if(checkbox.checked){
+			$("#"+detail_id+" #ac_amount").val(amount);
+		}
+	}else{
+		var detail_id = "largeservice_panel";
+		var price = $("#"+detail_id+" #price").val();
+		var month = $("#"+detail_id+" #s_months").val();
+		var amount = price*month;
+		var checkbox = document.getElementById(pack_id);
+		if(checkbox.checked){
+			$("#"+detail_id+" #ac_amount").val(amount);
+		}
+	}
+}
+
+function getlargeAcamount(){
+	var treebox = $('input[name=treeCheckbox]');
+	var num = 0;
+	treebox.each(function(k,v){
+		var id = $(this).attr("id");
+		var box = document.getElementById(id);
+		if(box.checked){
+			num++;
+		}
+	});
+	var total_acamount = 0;
+	var acamounts = $('input[name=ac_amount]');
+	acamounts.each(function(k,v){
+		total_acamount = Number(total_acamount) + Number(acamounts[k].value);
+	});
+	$('#total_ac_amount').val(total_acamount*num);
+}
+
+function getlargeRealamount(){
+	var treebox = $('input[name=treeCheckbox]');
+	var num = 0;
+	treebox.each(function(k,v){
+		var id = $(this).attr("id");
+		var box = document.getElementById(id);
+		if(box.checked){
+			num++;
+		}
+	});
+	var total_realamount = 0;
+	var realamounts = $('input[name=real_amount]');
+	realamounts.each(function(k,v){
+		total_realamount = Number(total_realamount) + Number(realamounts[k].value);
+	});
+	$('#total_real_amount').val(total_realamount*num);
+}
+
+function largeservice_save(){
+	$("#largeservice_form").on('submit',
+			function(e){
+		var payments = new Array();
+		var is_checks = $('input[name=is_check]');
+		var item_names = $('input[name=item_name]');
+		var s_monthss = $('input[name=s_months]');
+		var ac_amounts = $('input[name=ac_amount]');
+		var real_amounts = $('input[name=real_amount]');
+		var treebox = $('input[name=treeCheckbox]');
+		var is_invoice = 0;
+		var is_invoicebox = document.getElementById("is_invoice");
+		if(is_invoicebox.checked){
+			is_invoice = 1;
+		}
+		is_checks.each(function(k,v){
+			var id = $(this).attr("id");
+			var box = document.getElementById(id);
+			if(box.checked){
+				treebox.each(function(k1,v1){
+					var vehicle_id = $(this).attr("id");
+					var vehicle_box = document.getElementById(vehicle_id);
+					if(vehicle_box.checked){
+						var obj = {};
+						obj.item_id=id;
+						obj.item_name=item_names[k].value;
+						obj.s_months = s_monthss[k].value;
+						obj.ac_amount = ac_amounts[k].value;
+						obj.real_amount = real_amounts[k].value;
+						obj.customer_id = $('#cust_id_value').val();
+						obj.vehicle_id = vehicle_id;
+						obj.feetype_id = 1;
+						obj.pay_model = $("input[name='pay_model']:checked").val();
+						obj.bw_no = $('#bw_no').val();
+						obj.agent_id = $("#agent_id").val();
+						obj.agent_name = $('#agent_name').val();
+						obj.remark = $('#remark').val();
+						obj.is_invoice = is_invoice;
+						payments.push(obj);
+					}
+				});
+			}
+		});
+		
+		$.ajax({
+			type : 'post',
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : '../../payment/addBatch',
+			data : JSON.stringify(
+				payments
+			),
+			success : function(data) {
+				if (data) {
+					$(document).sgPup({message:'message_alert',text: data.msg});
+				}
+			},
+			error : function(res, error) {
+				$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+					+ ";error=" + error});
+			}
+		});
+		$('#largeservice_form').unbind();//以下两行可以阻止提交2次
+		e.stopPropagation();
+		return false;
+	});
+}
+
+function largeservice_reset(){
+	document.largeservice_form.reset();
+}
+
+function searchlargecust(){
+	var cust_id = $('#cust_id').val();
+	if(cust_id==''){
+		$(document).sgPup({message:'message_alert',text: "必须选择客户!"});
+		return false;
+	}
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../getCustInfo',
+		data : JSON.stringify({
+			cust_id : cust_id
+		}),
+		success : function(data) {
+			if (data) {
+				$('#customer_name').val(data.customer.customer_name);
+				$('#cust_id_value').val(data.customer.customer_id);
+				if(data.collection){
+					$('#account').val(data.collection.ac_no);	
+				}
+				$('#company_vehicle').empty();
+				//填充车辆树
+				var defaults = {
+		       		isexpend: true,
+		            url: '../../vehicle/tree',
+		            data : JSON.stringify({
+		            	customer_id : data.customer.customer_id,
+		            	customer_name : data.customer.customer_name,
+		            	pay_model : 1 //这儿的pay_model指的是需要显示哪种服务截止时间
+					}),
+		            root: '车辆列表',
+		            hasbox : true
+		        };
+		        $('#company_vehicle').sgTree(defaults);
+			}
+		},
+		error : function(res, error) {
+			$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+				+ ";error=" + error});
+		}
+	});
+}
+
+	(function($){
+		
+        var checkUser = function(){
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.opname = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getOrgOperators',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#agent_name","#largeservice_form");
+						  						  
+						  userList = {};
+						  if(manager){
+							  if(data.items.length>0){
+								  $("#userList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.opname);
+								  $("#userList").append(op);
+								  
+								  userList[v.opname] = v.opid;
+		 				  	 }); 
+							}
+					  }else{
+					  	alert(data);
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	 alert("responseText="+res.responseText+";error="+error);     
+				  }    
+				});
+		}
+		
+	  //填充员工
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getOrgOperators',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#agent_name","#largeservice_form");
+				  userList = {};
+				  if(manager){
+					  if(data.items.length>0){
+						  $("#userList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userList").append(op);
+						  
+						  userList[v.opname] = v.opid;
+					  	 }); 
+					  manager.on('keyup',checkUser);
+					  manager.on('change',function(){
+						  	var strs = this.value.split(" ");
+							$(this).val(strs[strs.length-1]);
+							$("#agent_id","#largeservice_form").val(userList[strs[strs.length-1]]);
+							if($("#agent_id","#largeservice_form").val().length==0){
+								$("#agent_name","#largeservice_form").val("");
+							}
+						});
+
+					};
+			  }else{
+			  	alert(data);
+			  }
+		  },     
+		  error : function(res,error) { 
+		  	 alert("responseText="+res.responseText+";error="+error);     
+		  }    
+		});
+	  
+	    var checkCustomer = function(){
+			var text=this.value;
+			text = text.replace(/\s/g,'');
+			if(text!=this.value){
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			}
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {cust_type : 1};
+			params.filter.customer_name = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getCustomers',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#custname");
+						  if(manager){
+							  if(data.items.length>0){
+								  customerList = {};
+								  $("#customerList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.customer_name);
+								  $("#customerList").append(op);
+								  
+								  customerList[v.customer_name] = v.customer_id;
+		 				  	 }); 
+							}
+					  }
+				  } ,     
+				  error : function(res,error) { 
+					  $(document).sgPup({message:'message_alert',text: res.responseText});  
+				  }    
+				});
+		};
+	    
+		
+	    //填充客户
+	    $.ajax( {
+		  type : 'post', 
+		  async: true,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCustomers',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{cust_type : 1}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#custname");
+				  if(manager){
+					  if(data.items.length>0){
+						  customerList = {};
+						  $("#customerList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.customer_name);
+						  $("#customerList").append(op);
+						  
+						  customerList[v.customer_name] = v.customer_id;
+					  	 }); 
+					  manager.on('keyup',checkCustomer);
+					  manager.on('change',function(){
+						  var strs = this.value.split(" ");
+						    if(customerList[strs[strs.length-1]]){
+								$(this).val(strs[strs.length-1]);
+								$("#cust_id").val(customerList[strs[strs.length-1]]);
+						    }else{
+						    	$(this).val('');
+						    	$("#cust_id").val("");
+						    }
+						});
+
+					}
+			  }
+		  },     
+		  error : function(res,error) {
+			  $(document).sgPup({message:'message_alert',text: res.responseText}); 
+		  }    
+		});
+	    
+	  //填充服务套餐
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../servicepack/listServicePack',   
+		  data:JSON.stringify({}),
+		  success : function(data) {
+			  if(data){
+				  var start_id;
+				  $.each(data,function(k,v){
+					  if(k>0){
+							var detail_div = $("<div></div>");
+							var detail_id = "largeservice_panel"+v.pack_id;
+							detail_div.attr('id',detail_id);
+							detail_div.addClass("panel");
+							detail_div.append($("#largeservice_panel").html());
+							detail_div.append("<hr>");
+							$("#largeservice_panel").before(detail_div);
+							$("#"+detail_id+" #servicefee").html(v.name+":");
+							$("#"+detail_id+" #item_name").val(v.name);
+							$("#"+detail_id+" #price").val(v.price);
+							$("#"+detail_id+" #pack_remark").val(v.remark);
+							$("#"+detail_id+" #"+start_id).attr('id', v.pack_id);
+							$("#"+detail_id+" #s_months").attr('onblur', 'javascript:getlargeAmount('+v.pack_id+');');
+						}else{
+							$('#servicefee').html(v.name+":");
+							$('#item_name').val(v.name);
+							$("#price").val(v.price);
+							$("#pack_remark").val(v.remark);
+							$('#is_check').attr('id', v.pack_id);
+							$('#s_months').attr('onblur', 'javascript:getlargeAmount('+v.pack_id+');');
+							start_id = v.pack_id;
+						}
+				  }); 
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	 alert("responseText="+res.responseText+";error="+error);     
+		  }    
+		});
+	})(jQuery)
+</script>
+</html>

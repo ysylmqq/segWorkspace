@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>管理主页面</title>
+    <link rel="stylesheet" type="text/css" href="css/ba_layout.css">
+    <style type="text/css">
+    	.ba_menu a:hover { 
+			background:#c4cdd9; 
+		}
+    </style>
+</head>
+
+<body>
+    <aside id="som_menu" style="overflow: auto" class="ba_menu"></aside>
+    <article id="som_main" class="ba_main"></article>
+</body>
+<script type="text/javascript">
+    (function($){
+    	var myclick = function(treenode){
+    		window.mainUrl = treenode.url;
+            $("#som_main").load('web/'+treenode.url);
+        }        
+        var defaults = {
+                url: 'moduleList',
+                onclick: myclick,
+                level:2,
+                parentMenu:'som',
+                rendto:'som_menu'
+            };
+
+        $('#som_menu').sgMenu(defaults);
+        if(window.mainUrl!=null) $("#som_main").load("web/"+window.mainUrl);
+        else{
+        	$("#som_main").load("web/"+window.som_main);
+        	window.mainUrl = window.som_main;
+        }
+
+    })(jQuery)
+</script>
+</html>

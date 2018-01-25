@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>基础资料管理</title>
+</head>
+<body>
+	<div id="nw_file" class="datagird"></div>
+</body>
+<script type="text/javascript">
+	(function($){
+		var now =new Date().format('yyyy-MM-dd');
+		 
+		var editId=null;//编辑时选中行ID
+		var editobj = null; //编辑时选中的对象
+		
+		var winClose = function() {
+			$(document).sgWindow('close', {
+				id : 'repair'
+			});
+		}
+		
+		var winClose2 = function() {
+			$(document).sgWindow('close', {
+				id : 'dress'
+			});
+		}
+		
+		var winClose3 = function() {
+			$(document).sgWindow('close', {
+				id : 'transfer'
+			});
+		}
+		
+		var winClose4 = function() {
+			$(document).sgWindow('close', {
+				id : 'changenumber'
+			});
+		}
+		
+		var winClose5 = function() {
+			$(document).sgWindow('close', {
+				id : 'upgrade'
+			});
+		}
+		
+		var winClose6 = function() {
+			$(document).sgWindow('close', {
+				id : 'update'
+			});
+		}
+		
+		var winClose7 = function() {
+			$(document).sgWindow('close', {
+				id : 'conduct'
+			});
+		}
+		
+		var winClose8 = function() {
+			$(document).sgWindow('close', {
+				id : 'closedown'
+			});
+		}
+		
+		var winClose9 = function() {
+			$(document).sgWindow('close', {
+				id : 'reopen'
+			});
+		}
+		
+		var repairItem = function() {
+			editId = null;
+			editObj = null;
+			var defaults = {
+				title : '维修资料变更',
+				id : 'repair',
+				form : 'repair_form',
+				url : 'web/bsp/view/repair_view.html',
+				width : 840,
+				height : 500,
+				buttons : [ {
+					name : '保存',
+					type : 'submit',
+					onpress : winClose
+				}, {
+					name : '取消',
+					onpress : winClose
+				} ]
+			};
+			$(document).sgWindow(defaults);
+		}
+		
+		var dressItem = function() {
+			editId = null;
+			editObj = null;
+			var defaults = {
+				title : '换装资料变更',
+				id : 'dress',
+				form : 'dress_form',
+				url : 'web/bsp/view/dress_view.html',
+				width : 840,
+				height : 500,
+				buttons : [ {
+					name : '保存',
+					type : 'submit',
+					onpress : winClose2
+				}, {
+					name : '取消',
+					onpress : winClose2
+				} ]
+			};
+			$(document).sgWindow(defaults);
+		}
+		
+		var transferItem = function() {
+			editId = null;
+			editObj = null;
+			var defaults = {
+				title : '过户资料变更',
+				id : 'transfer',
+				form : 'transfer_form',
+				url : 'web/bsp/view/transfer_view.html',
+				width : 840,
+				height : 500,
+				buttons : [ {
+					name : '保存',
+					type : 'submit',
+					onpress : winClose3
+				}, {
+					name : '取消',
+					onpress : winClose3
+				} ]
+			};
+			$(document).sgWindow(defaults);
+		}
+		
+		var changenumberItem = function() {
+			editId = null;
+			editObj = null;
+			var defaults = {
+				title : '换号资料变更',
+				id : 'changenumber',
+				form : 'changenumber_form',
+				url : 'web/bsp/view/changenumber_view.html',
+				width : 840,
+				height : 500,
+				buttons : [ {
+					name : '保存',
+					type : 'submit',
+					onpress : winClose4
+				}, {
+					name : '取消',
+					onpress : winClose4
+				} ]
+			};
+			$(document).sgWindow(defaults);
+		}
+		
+		var upgradeItem = function() {
+			editId = null;
+			editObj = null;
+			var defaults = {
+				title : '升级资料变更',
+				id : 'upgrade',
+				form : 'upgrade_form',
+				url : 'web/bsp/view/upgrade_view.html',
+				width : 840,
+				height : 500,
+				buttons : [ {
+					name : '保存',
+					type : 'submit',
+					onpress : winClose5
+				}, {
+					name : '取消',
+					onpress : winClose5
+				} ]
+			};
+			$(document).sgWindow(defaults);
+		}
+		
+		var updateItem = function() {
+			editId = null;
+			editObj = null;
+			var defaults = {
+				title : '更改资料变更',
+				id : 'update',
+				form : 'update_form',
+				url : 'web/bsp/view/update_view.html',
+				width : 840,
+				height : 500,
+				buttons : [ {
+					name : '保存',
+					type : 'submit',
+					onpress : winClose6
+				}, {
+					name : '取消',
+					onpress : winClose6
+				} ]
+			};
+			$(document).sgWindow(defaults);
+		}
+		
+		var conductItem = function() {
+			editId = null;
+			editObj = null;
+			var defaults = {
+				title : '新业务办理资料变更',
+				id : 'conduct',
+				form : 'conduct_form',
+				url : 'web/bsp/view/conduct_view.html',
+				width : 840,
+				height : 500,
+				buttons : [ {
+					name : '保存',
+					type : 'submit',
+					onpress : winClose7
+				}, {
+					name : '取消',
+					onpress : winClose7
+				} ]
+			};
+			$(document).sgWindow(defaults);
+		}
+		
+		var closedownItem = function() {
+			editId = null;
+			editObj = null;
+			var defaults = {
+				title : '办停资料变更',
+				id : 'closedown',
+				form : 'closedown_form',
+				url : 'web/bsp/view/closedown_view.html',
+				width : 840,
+				height : 500,
+				buttons : [ {
+					name : '保存',
+					type : 'submit',
+					onpress : winClose8
+				}, {
+					name : '取消',
+					onpress : winClose8
+				} ]
+			};
+			$(document).sgWindow(defaults);
+		}
+		
+		var reopenItem = function() {
+			editId = null;
+			editObj = null;
+			var defaults = {
+				title : '重新开通资料变更',
+				id : 'reopen',
+				form : 'reopen_form',
+				url : 'web/bsp/view/reopen_view.html',
+				width : 840,
+				height : 500,
+				buttons : [ {
+					name : '保存',
+					type : 'submit',
+					onpress : winClose9
+				}, {
+					name : '取消',
+					onpress : winClose9
+				} ]
+			};
+			$(document).sgWindow(defaults);
+		}
+		
+		//初始化表格
+	   	 var defaults = {
+	   		        title: "基础资料管理>",
+	   		     	width:  870,
+			        height: 396,
+	   		        url: '',
+		   		    usepager: true,
+		 	        rownumbers:true,
+		 	        useRp: true,
+		 	        colid:'id',  //主键
+		 	        //query:{startDate:now,endDate:now},
+	   		        colModel : [
+	   		            {display: '入网注册名', name : 'register', width : 120, sortable : false},
+	   		         	{display: '客户名称', name : 'register', width : 120, sortable : false},
+	   		      		{display: '车牌号码', name : 'register', width : 120, sortable : false},
+	   		   			{display: '车载号码', name : 'register', width : 120, sortable : false},
+	   		            {display: '入网时间', name : 'contract', width : 120, sortable : false}
+	   		        ],
+	   		     	buttons : [
+	   			            {name: '维修', bclass: 'add', onpress : repairItem},
+	   			         	{separator: true},
+	   			         	{name: '换装', bclass: 'add', onpress : dressItem},
+	   			         	{separator: true},
+	   			      		{name: '过户', bclass: 'add', onpress : transferItem},
+	   			      		{separator: true},
+	   			   			{name: '换号', bclass: 'add', onpress : changenumberItem},
+	   			   			{separator: true},
+				   			{name: '升级', bclass: 'add', onpress : upgradeItem},
+				   			{separator: true},
+				   			{name: '更改资料', bclass: 'add', onpress : updateItem},
+				   			{separator: true},
+				   			{name: '新业务办理', bclass: 'add', onpress : conductItem},
+				   			{separator: true},
+				   			{name: '办停', bclass: 'add', onpress : closedownItem},
+				   			{separator: true},
+	   			         	{name: '重新开通', bclass: 'add', onpress : reopenItem}
+	   			        ],
+	   		        searchitems :[
+	   		            {
+							display : '入网注册名',
+							name : 'register',
+							type : 'text',
+							width : 90
+						}, {
+							display : '客户名称',
+							name : 'name',
+							type : 'text',
+							width : 90
+						}, {
+							display : '车牌号码',
+							name : 'register',
+							type : 'text',
+							width : 90
+						}, {
+							display : '车载号码',
+							name : 'register',
+							type : 'text',
+							width : 90
+						}, {
+							display:'开始时间',
+							name:'startDate',
+							type:'date',
+							width : 102
+						}, {
+							display:'结束时间',
+							name:'endDate',
+							type:'date',
+							width : 102
+						}
+	   		        ],
+	   		     	order:true
+	   		    };
+	   		    $('#nw_file').sgDatagrid(defaults); 
+		})(jQuery)
+	</script>	
+	
+</html>

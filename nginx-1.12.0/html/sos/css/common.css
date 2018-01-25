@@ -1,0 +1,13 @@
+/* CSS Document */
+@charset "utf-8"; 
+
+#header:after{
+	content:".";
+	clear:both;
+	visibility:hidden;
+}
+
+body {
+    font-size: 12px;
+    color:#333333;
+}

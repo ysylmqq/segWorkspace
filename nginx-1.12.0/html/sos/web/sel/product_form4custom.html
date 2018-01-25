@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>商品定义(源于自定义)</title>
+<style type="text/css">
+</style>
+</head>
+<body>
+	<form id='form_product4Custom' name='form_product4Custom' method='post' class="form" style="width:860px;">
+		<div class='title'>商品资料></div>
+		<fieldset style="width:830px;">
+            <input type="hidden" id="id" name="id"/>
+		    <input type="hidden" id="sourceType" name="sourceType" value="2"/>
+            <div class="panel">
+                <span>类别:</span>
+                <select id="type"  name="type" style="width:150px" required="true"  >
+	                <option value="0">成品</option>
+	                <option value="1">配件</option>
+            	</select>
+          
+                <span>商品编码:</span>
+                <input type="text" id="code" name="code" style="width:146px" required="true"  autocomplete="on" autofocus="true"/>
+               
+                <span>商品名称:</span>
+                <input type="text" id="name" name="name" style="width:146px" required="true"  autocomplete="on" />
+              </div>
+              
+              <div class="panel">
+                <span>规格:</span>
+                <input type="text" id="norm" name="norm" style="width:146px" required="true"  autocomplete="on" />
+               
+                <span>单位:</span>
+                <input type="text" id="unit" name="unit" style="width:146px" required="true"  autocomplete="on" value="pcs"/>
+               
+                <span>是否再销:</span>
+                 <select size="1" id="issell"  name="issell" required="type" style="width:150px" >
+	                <option value="1">是</option>
+	                <option value="0">否</option>
+            	</select>
+              </div>
+              
+              <div class="panel">
+                <span style="vertical-align:top;">是否有效:</span>
+                 <select size="1" id="status"  name="status"  style="width:150px;vertical-align:top;"  >
+	                <option value="1">是</option>
+	                <option value="0">否</option>
+            	</select>
+               <span style="vertical-align:top;">备注:</span>
+               <textarea rows="2" style="width:396px;vertical-align:top;" id="remark" name="remark"></textarea>
+              <span style="color: red;font-size:12px;width:330px;">注意:为确保商品编码的唯一性，商品编码长度不能为13位!</span>
+               </div>
+        </fieldset>
+	
+		<div class='title'>配件明细></div>
+        <fieldset id="fs_part" style="width:830px;" >
+			<div id="panel_parts" style="min-height:200px;max-height:220px; overflow-y:auto">
+				<div id="div_parts" class="panel">
+	                <span style="width: 30px;">商品:</span>
+	                <input type='text' name='productName' list="productDataList" required="true" placeholder="请输入商品名称/编码"  autocomplete=false style="width:140px;" />
+	               <input type="hidden" name="productId" />
+	                <input type="hidden" name="productCode" />
+	                <span style="width: 30px;">规格:</span>
+	                <input type='text' name='norm' placeholder="规格" disabled="disabled" style="width:190px;"  />
+	                
+	                <span style="width: 30px;">数量:</span>
+	                <input type='number' name='num' placeholder="数字" required="true" pattern="^[+]?[1-9]+\d*$" style="width:60px;"  onkeyup="this.value=this.value.replace(/\D/g,'')" />
+	                
+	                <span style="width: 30px;">备注:</span>
+	                <input type='text' name='remark' style="width:150px;" />
+	                <a href="javascript:void(0);" ><img alt="增加明细" src="../../images/form_add.png" title="增加明细" style="vertical-align:middle"></a>
+	            </div>
+	            
+			</div>
+            <datalist id="productDataList">
+            </datalist>
+        </fieldset>
+        
+	</form>
+</body>
+<script type="text/javascript">
+	(function($){
+		var flag = 0;
+		var productIdDataList=[];//商品数组 key:code,value:productId
+		//填充配件
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : './../../product/findProducts',   
+			  data:JSON.stringify({pageNo:1,pageSize:15,filter:{issell:1,status:1}}),//type:1, 配件也可能是成品
+			  success : function(data) {
+				  if(data){
+					  var products = data.items;
+					  var key=null;
+					  productDataList=[];
+					  $.each( products, function(key,value){
+						  var op = $("<option></option>");
+						  key=value.code;
+						  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+						  
+						  $("#productDataList").append(op);
+						  productDataList[key]=value.id;
+					 });
+
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+		//自动查询商品
+		var checkProduct = function(){
+			/* var text=this.value;
+			text = text.replace(/\s/g,''); //去除空格
+			if(text!=this.value){//有空格
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			} */
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 15;
+			params.filter = {};
+			params.filter.nameOrCode = this.value;
+			//params.filter.type=1;//type:1, 配件也可能是成品
+			params.filter.status=1;
+			params.filter.issell=1;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../product/findProducts',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var products = data.items;
+						  if(products.length>0){
+							  $("#productDataList").empty();
+						  	productDataList=[];
+						  }
+						  var key=null;
+						  $.each( products, function(key,value){
+							  var op = $("<option></option>");
+							  key=value.code;
+							  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+								 
+							  $("#productDataList").append(op);
+							  productDataList[key]=value.id;
+						 });
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		};
+		
+	   $("#div_parts input[list=productDataList]").on('keyup',checkProduct);
+		
+		//添加商品、数量按钮点击
+		$("#div_parts a").on('click',function(){
+			var detail_div = $("<div></div>");
+			var detail_id = "div_parts_"+flag;
+			detail_div.attr('id',detail_id);
+			detail_div.addClass("panel");
+			detail_div.append($("#div_parts").html());
+			
+			$("#div_parts").before(detail_div);
+			$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+			$("#"+detail_id+" img").attr('title','删除明细');
+			$("#"+detail_id+" input[name=productName]").on('change',function(){
+				var strs = this.value.split(" ");
+				$(this).val(strs[strs.length-3]);
+				if($(this).val()){
+					//设置productId
+					$(this).siblings('input[name=productId]').val(productDataList[strs[strs.length-2]]);
+					//设置商品编码productCode
+					$(this).siblings('input[name=productCode]').val(strs[strs.length-2]);
+					//设置商品规格
+		        	$(this).siblings('input[name=norm]').val(strs[strs.length-1]);
+		        	//光标自动定到下一个可输入框
+		        	$(this).nextAll('input[type=number]:enabled').focus();
+				}else{
+					//设置productId
+					$(this).siblings('input[name=productId]').val('');
+					//设置商品编码productCode
+					$(this).siblings('input[name=productCode]').val('');
+					//设置商品规格
+		        	$(this).siblings('input[name=norm]').val('');
+				}
+			});
+			$("#"+detail_id+" a").on('click',function(){
+				$("#"+detail_id).remove();
+			})
+			$("#"+detail_id + " input[list=productDataList]").on('keyup',checkProduct);
+			flag=flag+1;
+		});
+		
+		$("#div_parts input[name=productName]").on('change',function(){
+			var strs = this.value.split(" ");
+			$(this).val(strs[strs.length-3]);
+			if($(this).val()){
+				//设置productId
+				$(this).siblings('input[name=productId]').val(productDataList[strs[strs.length-2]]);
+				//设置商品编码productCode
+				$(this).siblings('input[name=productCode]').val(strs[strs.length-2]);
+				//设置商品规格
+	        	$(this).siblings('input[name=norm]').val(strs[strs.length-1]);
+				//光标自动定到下一个可输入框
+	        	$(this).nextAll('input[type=number]:enabled').focus();
+			}else{
+				//设置productId
+				$(this).siblings('input[name=productId]').val('');
+				//设置商品编码productCode
+				$(this).siblings('input[name=productCode]').val('');
+				//设置商品规格
+	        	$(this).siblings('input[name=norm]').val('');
+			}
+		});
+		
+		//商品类别，如果是配件，则下面的配件明细隐藏
+		$('#type').change(function(){
+			if($('#type').val()==1){
+				$('#fs_part').hide();
+			}else{
+				$('#fs_part').show();
+			}
+		});
+		
+		 //回车事件代替tab键
+		$(window.document).keydown(function(event){
+	        switch(event.keyCode) {
+	            case 13:
+	                event.keyCode=9;
+	                break;
+	        }
+	    });
+	})(jQuery)
+</script>
+</html>

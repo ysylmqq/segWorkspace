@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>代理商列表</title>
+</head>
+
+<body style="padding: 0px;margin: 0px;">
+ <div id="dgd_channel" class="datagrid"></div>
+</body>
+<script type="text/javascript">
+    (function($){
+    	
+    	//初始化表格
+   	 	var defaults = {
+   		        width:  '100%',
+   		        height: 310,
+   		     	url: '../../sell/findChannels',
+		        usepager: true,
+		        rownumbers:true,
+		        useRp: true,
+		        colid:'id',  //主键
+		        colModel : [
+					{display: '名称', name : 'name', width : 120, sortable : true},
+		            {display: '地址', name : 'address', width : 110, sortable : true},
+		            {display: '月销售量', name : 'monthSell', width : 120, sortable : true},
+		            {display: '类型', name : 'dictName', width : 70, sortable : true},
+		            {display: '所属集团', name : 'groupName', width : 100, sortable : false},
+		            {display: '备注', name : 'remark', width : 120, sortable : false}
+		        ],
+   		        buttons : [
+   		        ],
+   		        searchitems :[
+   		                {display:'名称',name:'name',type:'text'},
+       		            {display:'类型',name:'dictId',html:'<select name="dictId"><option value="" selected>请选择...</option></select>'}
+   		        ],
+   		        query:{exceptDicId:'5'}
+   		    };
+   		    $('#dgd_channel').sgDatagrid(defaults);
+   		 //填充类型下拉框
+		    $.ajax( {
+		 		  type : 'post', 
+		 		  async: false,   
+		 		  contentType : 'application/json',     
+		 		  dataType : 'json',     
+		 		  url : '../../sys/findSysValue',   
+		 		  data:JSON.stringify({stype:1000,sname:''}),
+		 		  success : function(data) {
+		 			  if(data){
+		 				  //alert(JSON.stringify(data));
+		 				  var type=$('#dgd_channel .sDiv select[name=dictId]');
+		 				  if(type){
+		 					  $.each(data,function(k,v){
+		 						 type.append("<option value='" +v.id+"'>" + v.name+"</option>");
+		     				  }); 
+		 				  }
+		 				 
+		 			  }else{
+		 				  $(document).sgPup({message:'message_info',text: data});
+		 			  }
+		 		  } ,     
+		 		  error : function(res,error) { 
+		 		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		 		  }    
+		 		});
+    })(jQuery)
+    
+</script>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>采购合同标表单(编辑和查看)</title>
+<style type="text/css">
+.btnsubmit{
+    margin:0 7px 0 0;
+    background-color:#4791d2;
+    border:1px solid #dedede;
+    border-top:1px solid #eee;
+    border-left:1px solid #eee;
+
+    font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size:12px;
+    line-height:130%;
+    text-decoration:none;
+    text-align:center;
+    font-weight:bold;
+    color:#fff;
+    cursor:pointer;
+    border-radius: 3px;
+    padding:5px 10px 6px 7px; /* Links */
+}
+#div_chk_companys{
+  width: 660px;
+  height: 50px;
+  border: 1px solid;
+  border-color:  #cbcbd5;
+  display: inline-block;
+}
+</style>
+</head>
+<body>
+	<form id='form_supply_contract'method='post' class="form" style="width:100%;">
+		<div class='title'>合同信息></div>
+		<input type="hidden" name="id" id="id">
+		<input type="hidden" name="id2" id="id2"><!-- 防止导入提交时，浏览器自动清空id数据，用id2代替 -->
+		<input type="hidden" name="isEdit" id="isEdit">
+		<fieldset style="width:auto;">
+            <div class="panel">
+                <span>合同编号:</span>
+                <input type='text' id="code" name='code'  placeholder="请输入合同编号"  style="width:150px;" disabled="disabled" />
+                
+                <span>合同名称:</span>
+                <input type='text' id="name" name='name'  placeholder="请输入合同名称"  style="width:150px;" />
+              </div>
+            <div class="panel">
+              <span style="vertical-align: top">适配公司:</span>
+              <div id="div_chk_companys">
+                
+                </div>
+            </div>
+            <div class="panel">
+                <span>生效日期:</span>
+                <input type='date' id="validDate" name='validDate'  style="width:150px;" />
+  				<span>到期日期:</span>
+                <input type='date' id="matureDate" name='matureDate'  style="width:150px;" />
+ 				<span>是否生效:</span>
+                <input type="checkbox" id="status" name='status'  style="width:150px;" />
+            </div>
+            
+             <div class="panel">
+                 <span style="vertical-align:top;">备注:</span>
+            	 <textarea rows="2" id="remark" name='remark' style="width:665px;"></textarea>
+             </div>
+        </fieldset>
+
+	</form>
+	
+	<form id='form_supply_contract2' method='post' class="form" style="width:100%;">
+	<div class='title'>合同信息明细></div>
+		<fieldset style="width:auto;">
+		<div id="dgd_details" class="datagrid"></div>
+        </fieldset>
+	</form>
+</body>
+<script type="text/javascript">
+(function($){
+	//初始化表格
+	 	var defaults = {
+		        width:  830,
+		        height: 235,
+		        url: '',
+	        rownumbers:true,//序号
+		        colModel : [
+		            {display: '商品编码', name : 'productCode', width : 140, sortable : false},
+		            {display: '商品名称', name : 'productName', width : 140, sortable : false},
+		            {display: '商品规格', name : 'norm', width : 200, sortable : false},
+		            {display: '价格', name : 'price', width : 50, sortable : false},
+		            {display: '备注', name : 'remark', width : 80, sortable : false}
+		        ]
+		        //exporturl:'',//导出excel
+		        //query:query//查询默认参数
+		    };
+		    $('#dgd_details').sgDatagrid(defaults);
+})(jQuery)
+</script>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="css/tree.css" />
+</head>
+<body>
+    <div id="whs_tree" style="width:186px;margin:5px;"></div>
+</body>
+<script type="text/javascript">
+(function($){
+	var myclick = function(treenode){
+		var squery = {};
+		squery['whsId'] = treenode.id;
+    	$('#whs_grid').sgDatagrid('reload',{query:squery});
+    	$('#whs_detail_grid').sgDatagrid('reload',{query:squery});
+    	$('#whs_alarm_grid').sgDatagrid('reload',{query:squery});
+    }
+    var defaults = {
+        isexpend: true,
+        url: '../../stock/findWareHouses',
+        onclick: myclick
+    };
+    $('#whs_tree').sgTree(defaults);
+})(jQuery)
+    
+</script>
+</html>

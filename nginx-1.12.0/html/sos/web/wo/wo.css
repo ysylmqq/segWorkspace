@@ -1,0 +1,94 @@
+.a-empty-world {
+  padding-left: 14px;
+}
+#wo_detail {
+  width: 460px;
+  height: 360px;
+  display: none;
+  position: fixed;
+  z-index: 9;
+  left: 340px;
+  top: 15px;
+  font-size: 13px;
+  line-height: 18px;
+}
+#wo_detail > .panel-heading {
+  cursor: move;
+}
+#wo_detail #wo_detail_save {
+  margin: 10px 5px;
+}
+#wo_detail #wo_detail_save .form-control {
+  padding-left: 8px;
+  padding-right: 8px;
+  min-width: 132px;
+}
+#main_panel {
+  /*width: 100%;*/
+  width: 99.5%;
+  background-color: #f5f5f5;
+  border: 1px solid #e2e5ec;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  padding: 1% 2% 1%;
+  margin: 5px 0 0 5px;
+  max-height: 664px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 664px;
+}
+#main_panel > #left_panel {
+  min-height: 500px;
+  width: 24%;
+  display: inline-block;
+  vertical-align: top;
+}
+#main_panel > #left_panel > .panel {
+  margin-bottom: 0;
+}
+#main_panel > #right_panel {
+  width: 75%;
+  display: inline-block;
+  vertical-align: top;
+}
+#main_panel > #right_panel > .panel {
+  margin-bottom: 0;
+}
+#main_panel > #right_panel #wolist_panel {
+  height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;  
+}
+#left_panel #wowaitting .panel-body{
+  height: 142px;
+  overflow: auto;
+}
+.tree .list-group-item {
+  cursor: pointer;
+  padding: 0 0 5px 10px;
+  font-size: 14px;
+  line-height: 20px;
+}
+.tree .list-group-item .leaf {
+  border-radius: 3px;
+  margin-left: 10px;
+  margin-right: 20px;
+}
+.tree .list-group {
+  margin-bottom: 5px;
+}
+#wowaitting span {
+  margin: 2px;
+  line-height: 25px;
+  padding-left: 5px;
+  padding-right: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: solid 1px;
+}
+#wowaitting .red {
+  background-color: #FF3300;
+}
+.completed,
+.completed * {
+  background-color: #C2B3D8 !important;
+}

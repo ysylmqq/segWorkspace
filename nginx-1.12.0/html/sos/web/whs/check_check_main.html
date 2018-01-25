@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>仓库盘点审核</title>
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css"><link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+
+<body>
+<div id="nw_document_all">
+ <div id="dgd_check" class="datagrid"></div>
+ </div>
+ <!-- 打印iframe -->
+	<iframe id="ifm_print_wccm" name="ifm_print_wccm" style="display: none"></iframe>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+    (function($){
+    	
+       var editId=null;//编辑时选中行ID
+       var editObj=null;//编辑时选中行对象
+ 	   var loadSuccess = function(){
+ 			//修改form的id
+		  $('#win_check #dgd_check_details .sDiv form').attr('id','form_check');
+	  	   	//设置提交按钮的表单
+		  $('#btn_submit').attr('form','form_check');
+  	  
+ 		  if(editObj&&editId){
+ 			 var param={};
+  		     param.id=editId;
+ 			 $.ajax( {
+         		  type : 'POST', 
+         		  async: false,   
+         		  contentType : 'application/json',     
+         		  dataType : 'json',     
+         		  url : '../../sell/getCheckAndDetails',  
+         		  data:JSON.stringify(param),
+         		  success : function(data) {
+         			  if(data){
+         				  $("input[name=id]",$("#dgd_check_details .sDiv")).val(data.id);
+       	   				  $("input[name=name]",$("#dgd_check_details .sDiv")).val(data.name);
+	       	   			  var startDate=data.startDate;
+		   				  if(startDate && startDate.length>10){
+		   					startDate=startDate.substring(0,10);
+		            	  }
+	   				      var endDate=data.endDate;
+	   				 	  if(endDate && endDate.length>10){
+	   				 		endDate=endDate.substring(0,10);
+	            	 	  }
+       	   				  $("input[name=startDate]",$("#dgd_check_details .sDiv")).val(startDate);
+       	   				  $("input[name=endDate]",$("#dgd_check_details .sDiv")).val(endDate);
+       	   				  //商品明细
+       	   				  if(data.checkDetailsMap){
+       	   					  $('#dgd_check_details').sgDatagrid('appendData',data.checkDetailsMap);
+       	   					  //隐藏商品ID
+           	   				   $('table tr th:nth-child(2),table tr td:nth-child(2)','#dgd_check_details').hide();
+       	   					}
+       	   				//表格的宽度=表头表格的宽度
+       		     	    $('#dgd_check_details .bDiv table').width($('#dgd_check_details .hDiv table').width());
+       		     	
+         			  }
+         		  } ,     
+         		  error : function(res,error) { 
+         		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+         		  }    
+         		}); 
+ 		  }
+ 	  }
+       var winClose = function (){
+          $(document).sgWindow('close',{id:'win_check'});
+       }
+       
+ 	   var save = function(){
+ 		   $("#form_check").on('submit',function(e){
+ 			  var obj = $('#dgd_check_details');
+		        var bDiv = $('.bDiv',obj);
+		        var params={};
+		        var id=$('#dgd_check_details .sDiv input[name=id]');
+				params.id=id.val();
+				params.status=3;
+				$(document).sgConfirm({text: '审核通过后，不能再进行盘点录入，确定审核通过吗?',cfn:function(r){ 
+		    		if(r){
+ 		        
+ 		        		 $.ajax( {
+ 	            		  type : 'POST', 
+ 	            		  async: false,   
+ 	            		  contentType : 'application/json',     
+ 	            		  dataType : 'json',     
+ 	            		  url : '../../sell/updateCheckStatus',   
+ 	            		  data:JSON.stringify(params),
+ 	            		  success : function(data) {
+ 	            			  if(data){
+ 	            				 if(data.success){
+ 	            					 $(document).sgWindow('close',{id:'win_check'}); 
+ 	    	          		 		 $('#dgd_check').sgDatagrid('reload','sgDatagrid');
+ 	            				 }
+ 	            				$(document).sgPup({message:'message_info',text: data.msg});
+ 	            			  }
+ 	            		  } ,     
+ 	            		  error : function(res,error) { 
+ 	            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+ 	            		  }    
+ 	            		}); 
+ 		        		 
+ 		        	}
+ 		        }});
+ 		        	
+ 		       $('#form_check').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+ 				e.stopPropagation();
+ 	        	return false;
+ 	        });
+  
+ 	   };
+
+	    var print= function(){
+	    	//$('#ifm_print_wccm').attr('src','stock_print2.html');
+		   //window.open("web/whs/stock_print2.html","stock_print","width=870,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no");
+	    	var	sName='winPrint';
+					var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+					if (isChrome){
+					  sName='ifm_print_wccm';
+					}
+					window.open('print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+					if (!isChrome){
+						//新增遮罩层
+		  				var mask=$('<div id="print_mask"></div>');
+		  				mask.addClass('window-mask');
+		  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+		  		        var span=$('<span></span');
+		  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+		  		        span.text('正在打印中...');
+		  		        mask.append(span);
+		  			    $(window.document.body).append(mask);
+				    }
+	    };
+		
+	    var editItem2 = function(){
+ 	    	var obj = $('#dgd_check');
+ 	        var bDiv = $('.bDiv',obj);
+ 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+ 	        	//if(window.confirm('确定审核通过?')){
+ 	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	        				editObj=$(this).data('data');
+ 	        				editId=this.value;
+	 	                	var isGoOn=true;
+	 	                	if(editObj.status==3){
+	 	 	        			$(document).sgPup({message:'message_info',text: '名称为['+editObj.name+"]的盘点记录已审核,无需再审核!"});
+	 	 	        			isGoOn=false;
+	 	 	        			return false;
+	 	 	        		}else if(editObj.status==4){
+	 	 	        			$(document).sgPup({message:'message_info',text: '名称为['+editObj.name+"]的盘点记录已调账,不能再审核!"});
+	 	 	        			isGoOn=false;
+	 	 	        			return false;
+	 	 	        		}
+	 	                	if(!isGoOn){
+	 	                		return false;
+	 	                	}
+ 		            		
+	 	                	var title='仓库盘点';
+	 	        	       /* 	//得到仓库名称
+	 	        	       	$.ajax({
+		 	       			  type : 'POST', 
+		 	       			  async: false,   
+		 	       			  url : '../../stock/getWarehouseName', 
+		 	       			  dataType : 'json',  
+		 	       			  data:{},
+		 	       			  success : function(data) {
+		 	       				  if(data){
+		 	       					  title=title+"["+data.name+"]";
+		 	       				  }
+		 	       			  } ,     
+		 	       			  error : function(res,error) { 
+		 	       			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		 	       			  }   
+		 	       		    }); */
+	 	        	       
+	 	        	        var defaults = {
+	 	        	                title:'仓库盘点审核',
+	 	        	                id:'win_check',
+	 	        	                form:'form_check',
+	 	        	                url:'check_check_form2.html',
+	 	        	                success: loadSuccess,
+	 	        	                width: 1008,
+	 	        	                height: 500,
+	 	        	                buttons : [
+											 {name: '打印', onpress : print},
+											 {name: '确定审核', type:'submit',onpress : save},
+											 {name: '导出Excel', onpress : exportExcel},
+	 	        	                         {name: '关闭', onpress : winClose}
+	 	        	                       ]
+	 	        	            };
+	 	        	        $(document).sgWindow(defaults);
+ 	 	            });
+ 	        	//};
+ 	        	
+ 	        }else{
+ 	            $(document).sgPup({message:'message_info',text: "请选择要审核的选项！"});
+ 	        }
+ 	    }
+ 	    ;
+ 	    
+	    var exportExcel = function(){
+	    	 var url="../../sell/exportCheck4View?id="+editId+"&isCheck=true";
+	         window.location.href=url;
+		};
+ 	   //修改表格的宽度
+        var height =$('#main_bd',window.parent.document).height()-300;
+    	//初始化表格
+    	 var defaults = {
+    		        title: "仓库盘点审核",
+    		        width:  '100%',
+    		        height: height,
+    		        url: '../../sell/findChecksByPage',
+    		        usepager: true,
+    		        rownumbers:true,
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+    		            {display:'盘点名称',name:'name',width :200,sortable : true},
+    		            {display: '开始日期', name : 'startDate', width : 100, sortable : true,formatter:function(value,row){
+    		            	if(value && value.length>10){
+    		            		value=value.substring(0,10);
+    		            	}
+    		            	return value;
+    		            }},
+    		            {display: '结束日期', name : 'endDate', width : 180, sortable : true,formatter:function(value,row){
+    		            	if(value && value.length>10){
+    		            		value=value.substring(0,10);
+    		            	}
+    		            	return value;
+    		            }},
+    		            {display: '盘点状态', name : 'status', width : 100, sortable : true,formatter:function(value,row){
+    		            	if(value==1){
+    		                    value = '<font color="#FF7400">已开始</font>';
+    		                }else if(value==2){
+    		                     value = '<font color="#3914AF">盘点录入</font>';
+    		                }else if(value==3){
+    		                    value = '<font color="#C10087">审核结束</font>';
+    		                }else{
+    		                    value = '<font color="#2DD700">调账结束</font>';
+    		                } 
+    		                return value;
+    		            }},
+    		            {display: '盘点时间', name : 'stamp', width : 120, sortable : true}
+    		        ],
+    		        buttons : [
+    		            {name: '审核', bclass: 'check', onpress : editItem2}
+    		        ],
+    		        searchitems :[
+    		                      {display:'营业处仓库',html:'<select size="1" name="whsId" id="whsId" style="width:150px"><option value="">--请选择--</option> </select>'},
+    		            {display:'盘点名称',name:'name',type:'text'},
+    		            {display:'盘点状态',html:'<select name="status" ><option value="">请选择...</option><option value="1">已开始</option><option value="2" selected="true">盘点录入</option><option value="3" >审核结束</option><option value="4" >调账结束</option></select>'},
+    		            {display:'盘点开始时间',name:'startDate',type:'date'},
+    		            {display:'盘点结束时间',name:'endDate',type:'date'}
+    		        ],
+    		        exporturl:'../../sell/exportCheck',//导出excel
+    		        query:{status:2},//查询默认参数
+    		        order:true,
+       		        sortname: "stamp",
+       		        sortorder: "desc"
+    		    };
+    		    $('#dgd_check').sgDatagrid(defaults); 
+    		    
+    		    //填充营业处仓库
+    		    $.ajax( {
+    			  type : 'post', 
+    			  async: false,   
+    			  contentType : 'application/json',     
+    			  dataType : 'json',     
+    			  url : './../../stock/findWarehouses',   
+    			  data:JSON.stringify({}),
+    			  success : function(data) {
+    				  if(data){
+    					  var whsId=$("#whsId",$('#dgd_check'));
+    					  if(whsId.get(0)){
+    						  $.each(data,function(k,v){
+    							  whsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+    						  }); 
+    					  }
+    					 
+    				  }else{
+    					  $(document).sgPup({message:'message_info',text: data});
+    				  }
+    			  } ,     
+    			  error : function(res,error) { 
+    			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+    			  }    
+    			});	
+
+    			 //回车事件代替tab键
+    			$(window.document).keydown(function(event){
+    		        switch(event.keyCode) {
+    		            case 13:
+    		                event.keyCode=9;
+    		                break;
+    		        }
+    		    });
+    })(jQuery)
+    
+    	
+//打印页面元素设置
+  var callback=function(subWinBody,subWin){
+    	
+    	 var wareHouseName=null;//仓库名称
+ 		//得到仓库名称
+ 	         $.ajax({
+ 			  type : 'POST', 
+ 			  async: false,   
+ 			  url : '../../stock/getWarehouseName', 
+ 			  dataType : 'json',  
+ 			  data:{},
+ 			  success : function(data) {
+ 				  if(data){
+ 					wareHouseName=data.name;
+ 					if(wareHouseName==null || wareHouseName=='null'){
+ 						wareHouseName='&nbsp;';
+ 					}
+ 				  }else{
+ 					wareHouseName='&nbsp;';
+ 				  }
+ 			  } ,     
+ 			  error : function(res,error) { 
+ 			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+ 			  }   
+ 			  
+ 		    });
+    	 
+	$.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCurrentCompany',   
+		  data:JSON.stringify({}),
+		  success : function(data) {
+			  if(data){
+				  var total = 0;
+				  //公司中文名字
+				  $("#cname",subWinBody).empty();
+				  $("#cname",subWinBody).append(data.cnfullname);
+				  //公司英文名字
+				  $("#ename",subWinBody).empty();
+				  $("#ename",subWinBody).append(data.enfullname);
+				  
+				  
+					//表单名字
+					  $("#orderTitle",subWinBody).empty();
+					  $("#orderTitle",subWinBody).append("仓库盘点");
+					  //表单日期
+					  $("#orderDate",subWinBody).empty();
+					  $("#orderDate",subWinBody).append(new Date().format('yyyy-MM-dd'));
+					  //表单单号
+					  $("#orderNo",subWinBody).empty();
+					  $("#orderNo",subWinBody).append($('#dgd_check_details .sDiv input[name=name]').val());
+					  $("#orderNo",subWinBody).prev('span').text('名称：');
+					 
+					  //表前输入单
+					  var startDate = '<span style="width:10%;">开始日期：</span>';
+					  startDate=startDate+'<div style="width:23%;">'+$('#dgd_check_details .sDiv input[name=startDate]').val()+'</div>';
+					  $("#headInput",subWinBody).append(startDate);
+					  
+					  var endDate = '<span style="width:10%;">结束日期：</span>';
+					  endDate=endDate+'<div style="width:23%;">'+$('#dgd_check_details .sDiv input[name=endDate]').val()+'</div>';
+					  $("#headInput",subWinBody).append(endDate);
+					  
+					  var outWhs ='<span style="width:10%;">盘点仓库：</span>';
+					  outWhs=outWhs+'<div style="width:23%;">'+wareHouseName+'</div>';
+					 
+					  $("#headInput",subWinBody).append(outWhs);
+					  //表头
+					  $("#tbHead",subWinBody).append('<td style="width: 4%">序号</td>'+
+															  '<td style="width: 10%">商品编码</td>'+
+															  '<td style="width: 10%">商品名称</td>'+
+															  '<td style="width: 20%">商品规格</td>'+
+															  '<td style="width: 8%">上月帐面结存数量</td>'+
+															  '<td style="width: 8%">本月入库数量</td>'+
+															  '<td style="width: 8%">本月出库数量</td>'+
+															  '<td style="width: 8%">月未帐面结存数量</td>'+
+															  '<td style="width: 8%">月未实物盘存</td>'+
+															  '<td style="width: 6%">盈亏数</td>'+
+															  '<td style="width: 10%">备注</td>');
+	 		       
+					  //表格主体
+		            var productIds = $('input[name=productId]','#dgd_check_details');
+		            var remarks= $('input[name=remark]','#dgd_check_details');
+		              $.each(productIds,function(k,v){
+		            	var tbbody_tr ='<tr>';
+			               	
+		               	var tbbody_td1 = '<td >'+(k+1)+'</td>';
+		               	tbbody_tr=tbbody_tr+tbbody_td1;
+		               	
+		               	var tbbody_td2 = '<td>'+$(this).parents('td').siblings('td:eq(2)').text()+'</td>';
+		               	tbbody_tr=tbbody_tr+tbbody_td2;
+		               	
+		               	var tbbody_td3 = '<td >'+$(this).parents('td').siblings('td:eq(1)').text()+'</td>';
+		               	tbbody_tr=tbbody_tr+tbbody_td3;
+		               	
+		               	var tbbody_td4 = '<td >'+$(this).parents('td').siblings('td:eq(3)').text()+'</td>';;
+		               	tbbody_tr=tbbody_tr+tbbody_td4;
+		               	
+		               	var tbbody_td5 ='<td >'+$(this).parents('td').siblings('td:eq(4)').text()+'</td>';;
+		               	tbbody_tr=tbbody_tr+tbbody_td5;
+		               	
+		               	var tbbody_td_price ='<td >'+$(this).parents('td').siblings('td:eq(5)').text()+'</td>';;
+		               	tbbody_tr=tbbody_tr+tbbody_td_price;
+		               	
+		               	var tbbody_td6 = '<td>'+$(this).parents('td').siblings('td:eq(6)').text()+'</td>';;
+		             	tbbody_tr=tbbody_tr+tbbody_td6;
+		               	
+		            	var tbbody_td7= '<td>'+$(this).parents('td').siblings('td:eq(7)').text()+'</td>';;
+		            	tbbody_tr=tbbody_tr+tbbody_td7;
+		               	
+		            	var tbbody_td8 = '<td>'+$(this).parents('td').siblings('td:eq(8)').text()+'</td>';;
+		            	tbbody_tr=tbbody_tr+tbbody_td8;
+		            	
+		            	var tbbody_td9 = '<td>'+$(this).parents('td').siblings('td:eq(9)').text()+'</td>';;
+		            	tbbody_tr=tbbody_tr+tbbody_td9;
+		               	
+		            	var tbbody_td11 = '<td>'+$(this).parents('td').siblings('td:eq(10)').text()+'</td>';
+		            	tbbody_tr=tbbody_tr+tbbody_td11;
+		            	
+		            	tbbody_tr=tbbody_tr+'</tr>';
+		            	
+		               	$("#tbBody",subWinBody).append(tbbody_tr);
+		              });
+				  //表尾输入单
+				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+													  '<span>复核人：</span><div>&nbsp;</div>'+
+													  '<span>仓管员：</span><div>&nbsp;</div>'+
+													  '<span>制单：</span><div>&nbsp;</div>');
+				  
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+	
+    if (navigator.appName == 'Microsoft Internet Explorer'){
+    	subWin.print();  
+    }else{ 
+    	subWin.focus();
+    	subWin.print();  
+    }
+}
+</script>
+</html>

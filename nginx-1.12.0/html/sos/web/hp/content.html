@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>备忘录管理</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+	<div id="sys_memo_grid" class="datagird"></div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/index.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript">
+	(function($){
+		var now =new Date().format('yyyy-MM-dd');
+		 
+		var editId=null;//编辑时选中行ID
+		var editobj = null; //编辑时选中的对象
+		
+		var toAdd = function(){
+    		//备忘保存
+		   	$('#sys_memo_form').on('submit',function(e){
+		   		//做表单提交
+	            var params = {};
+
+	            params.content = $('#sys_memo_remark','#sys_memo_form').val();
+	            params.isAlert= 1;
+
+	            //alert(JSON.stringify(params));
+	            $.ajax( {
+	    		  type : 'post', 
+	    		  async: false,   
+	    		  contentType : 'application/json',     
+	    		  dataType : 'json',     
+	    		  url : '../../sys/addUserRemark',   
+	    		  data:JSON.stringify(params),
+	    		  success : function(data) {
+	    			  if(data){
+	       				  if(data.success){
+	       					  alert(data.msg);
+	       				  }else{
+	       					  alert("增加备忘录失败！")
+	       				  }
+	       				 
+	       			  }else{
+	       				  alert(data);
+	       			  }
+	    		  } ,     
+	    		  error : function(res,error) { 
+	    		  	 alert("responseText="+res.responseText+";error="+error);     
+	    		  }    
+	    		});
+	            
+	            $(document).sgWindow('close',{id:'sys_memo_window'}); 
+	            $('#sys_memo_grid').sgDatagrid('reload','sgDatagrid');
+	   		    $("#sys_memo_form").unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+			    e.stopPropagation();	
+			    return false;
+		   	});
+    	}
+		
+		var toClose = function(){
+	   		 $("#sys_memo_window"+"_mask").remove();
+	   		 $("#sys_memo_window").remove();
+	   	}
+		 
+		var addItem = function(){
+			var adddefaults = {
+	                title:'增加备忘',
+	                id:'sys_memo_window',
+	                form:'sys_memo_form',
+	                url:'web/hp/sys_memo_add_form.html',
+	                width: 380,
+	                height: 150,
+	                buttons : [
+	                           {name: '确定', type: 'submit', onpress : toAdd},
+	                           {name: '关闭', type: 'submit', onpress : toClose }
+	                       ]
+	            };
+	   		$(document).sgWindow(adddefaults);      	        
+		}
+		
+		var delItem = function(){
+	        var obj = $('#sys_memo_grid');
+	        var bDiv = $('.bDiv',obj);
+
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            alert("请选择一个选项！");
+	        }else{
+	        	if(window.confirm('确定删除所选备忘录?')){
+	        		var flag = false;
+	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){    
+		                	editId=this.value;
+		                	var params=[];
+							params.push(editId);
+		                	//打开窗口
+		                	$.ajax( {
+			            		  type : 'post', 
+			            		  async: false,   
+			            		  contentType : 'application/json',     
+			            		  dataType : 'json',     
+			            		  url : '../../sys/deleteUserRemarks',   
+			            		  data:JSON.stringify(params),
+			            		  success : function(data) {
+			            			  if(data){
+			            				 if(data.success){
+			    	          		 		flag = true; 
+			            				 }else{
+			            					flag = false; 
+			            				 }
+			            			  }
+			            		  } ,     
+			            		  error : function(res,error) { 
+			            		  	 alert("responseText="+res.responseText+";error="+error);     
+			            		  }    
+			            		}); 
+		                }
+		            });
+	        		if(flag){
+	        			alert("删除成功！");
+	        		}else{
+	        			alert("删除不成功！");
+	        		}
+	        		$('#sys_memo_grid').sgDatagrid('reload','sgDatagrid');
+	        	}	            
+	        }
+	    }
+		
+		//初始化表格
+	   	 var defaults = {
+	   		        title: "备忘录列表",
+	   		     	width:  870,
+			        height: 420,
+	   		        url: '../../sys/findUserRemarks',
+		   		    usepager: true,
+		 	        rownumbers:true,
+		 	        useRp: true,
+		 	        colid:'id',  //主键
+		 	        query:{startDate:now,endDate:now},
+	   		        colModel : [
+	   		            {display: '备忘信息', name : 'content', width : 400, sortable : false},
+	   		            {display: '是否提示', name : 'isAlert', width : 100, sortable : false,formatter:function(value,row){
+	   		                if(value==0){
+	   		                    value = '否';
+	   		                }else if(value==1){
+	   		                    value = '是';
+	   		                }else{
+	   		                	value ="否";
+	   		                }
+	   		                return value;
+	   		            }},   		            
+	   		            {display: '日期', name : 'stamp', width : 150, sortable : true}
+	   		        ],
+	   		     	buttons : [
+	   			            {name: '增加', bclass: 'add', onpress : addItem},
+	   			            {separator: true},
+				            {name: '删除', bclass: 'delete', onpress : delItem}
+	   			        ],
+	   		        searchitems :[
+	   		            {display:'开始日期',name:'startDate',type:'date',value:now},
+				      	{display:'结束日期',name:'endDate',type:'date',value:now}
+	   		        ],
+	   		     	order:true,
+	   		        sortname: "stamp",
+	   		        sortorder: "asc"
+	   		    };
+	   		    $('#sys_memo_grid').sgDatagrid(defaults); 
+		})(jQuery)
+	</script>	
+	
+</html>

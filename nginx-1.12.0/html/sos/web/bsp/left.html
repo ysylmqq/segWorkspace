@@ -1,0 +1,105 @@
+
+<meta charset="UTF-8"> 
+
+	<article id="ba_left_main" class="accordion">
+	</article>
+
+<script type="text/javascript">
+    (function($){
+        var myclick = function(treenode){
+        	$("#bsp_main").load('web/' + treenode.url);
+        }
+        
+        $("#ba_left_main").html("")
+        
+        var defaults = {
+        	url:"../../getCustInfoMsg",
+           // onclick: myclick,
+           //licolor:'#',
+            width:196,
+            div_height: 380
+        };
+        $('#ba_left_main').sgAccordion(defaults);
+
+        
+        var winClose = function() {
+    		$(document).sgWindow('close', {
+    			id : 'repair'
+    		});
+    	}
+        
+        
+        
+        function formatStr(id){
+        	  $.ajax({
+				  type : 'post', 
+				  async: true,   
+				  url : '../../task/getTasklMsg',   
+				  data:{task_id:id},
+				  success : function(data) {
+					  if(data){
+						  debugger;
+						  $("#bill_num","#bill_repair").val(data.bill_num);
+						  $("#place","#bill_repair").val(data.place);
+						  $("#symptom","#bill_repair").val(data.symptom);
+						  $("#note","#bill_repair").val(data.note);
+					  }else{
+					  	alert(data);
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ alert(res.responseText);}     
+				  }    
+				});
+        	
+        }
+        
+        
+    	var loadSuccess = function(){
+    		var id = $(this).attr("id");
+    			  $.ajax({
+    				  type : 'post', 
+    				  async: true,   
+    				  url : '../../task/getTasklMsg',   
+    				  data:{task_id:id},
+    				  success : function(data) {
+    					  if(data){
+    						  $("#bill_num","#bill_repair").val(data.bill_num);
+							  $("#place","#bill_repair").val(data.place);
+							  $("#symptom","#bill_repair").val(data.symptom);
+							  $("#note","#bill_repair").val(data.note);
+    					  }else{
+    					  	alert(data);
+    					  }
+    				  } ,     
+    				  error : function(res,error) { 
+    				  	     if(res && res.responseText){ alert(res.responseText);}     
+    				  }    
+    				});
+     		  
+     	   }
+    	
+        
+        
+        $("#ba_left_main a").on('click',function(){
+			var id = $(this).attr("id");
+			 var defaults = {
+					title : '维修明细',
+		   			id : 'repair',
+		   			url : 'repairDetail.html',
+		   			success: formatStr(id),
+		   			width : 400,
+		   			height : 200,
+		   			buttons : [  {
+		   				name : '关闭',
+		   				onpress : winClose
+		   			} ]
+		        }; 
+			$(document).sgWindow(defaults);
+		});
+        
+        
+        
+        
+    })(jQuery);
+</script>

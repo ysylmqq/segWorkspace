@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>销售业绩页面</title>
+</head>
+<body>
+<form id='writeOff_add_form' method='post' class="form" style="width:100%" >
+	<fieldset style="width:840px;">
+		<div class='submit' style="text-align:left;">
+            	<span style="width:30px;">年份:</span>
+                <input type='number' id="stamp" name='stamp' style="width:165px;" />
+                <button id="stockin_detail_submit" type="submit"  >查找</button>
+        </div>
+        <div id="dgd_work_list" class="datagird"></div>
+	</fieldset>
+	<div class="title" style="width:855px;padding-top:5px;">销售商品明细></div>
+	<fieldset style="width:840px;">
+		<div id="dgd_work_detail" class="datagird"></div>
+	</fieldset>
+</form>
+</body>
+<script type="text/javascript">
+(function($){
+
+	var defaults = {
+	        width:  '100%',
+	        height: 175,
+	     	url:'',
+	        colModel : [
+				{display: '年月', name : 'type', width : 35, sortable : false},
+	            {display: '计划销售数量', name : 'productName', width : 80, sortable : false},
+	         	{display: '实际销售数量', name : 'norm', width : 80, sortable : false},
+	            {display: '完成比例', name : 'price', width : 60, sortable : false},
+	            {display: '计划入网数量', name : 'num', width : 80, sortable : false},
+	         	{display: '实际入网数量', name : 'stamp', width : 80, sortable : false},
+	         	{display: '完成比例', name : 'channelName', width : 60, sortable : false},
+	         	{display: '计划回款额度', name : 'channelName', width : 80, sortable : false},
+	         	{display: '实际回款额度', name : 'channelName', width : 80, sortable : false},
+	         	{display: '完成比例', name : 'channelName', width : 60, sortable : false}
+	        ],
+	        query:{writeoffsStatus:0}//未销
+	    };
+	$('#dgd_work_list').sgDatagrid(defaults);
+	
+	var detaildefaults = {
+	        width:  '100%',
+	        height: 170,
+	     	url:'',
+	        rownumbers:true,//序号
+	        colModel : [
+	            {display: '商品名称', name : 'productName', width : 200, sortable : false},
+	         	{display: '商品规格', name : 'norm', width : 200, sortable : false},
+	            {display: '销售数量', name : 'price', width : 100, sortable : false},
+	            {display: '入网数量', name : 'num', width : 100, sortable : false},
+	         	{display: '回款额度', name : 'stamp', width : 100, sortable : false}
+	        ],
+	        query:{writeoffsStatus:0}//未销
+	    };
+	$('#dgd_work_detail').sgDatagrid(detaildefaults);
+})(jQuery)
+
+</script>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>仓库查询</title>
+</head>
+
+<body>
+
+<div id="whs_query_main" class="tab_container f12">
+    <ul class="tabs">
+        <li><a href="#tab1">库存查询</a></li>
+        <li><a href="#tab2">出入库查询</a></li>
+        <li><a href="#tab3">员工借用查询</a></li>
+    </ul>
+    <div class="tab_div_container">
+        <div id="tab1" class="tab_content" src="web/whs/whs_query.html"></div>
+        <div id="tab2" class="tab_content" src="web/whs/detail_query.html"></div>
+        <div id="tab3" class="tab_content" src="web/whs/borrow_query.html"></div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    (function($) {
+        var defaults = {
+            width: 995,
+            height: 535
+        };
+
+        $('#whs_query_main').sgTab(defaults);
+    })(jQuery);
+</script>
+</html>

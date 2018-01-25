@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>入库明细(用于进销存明细报表，查看归还明细)</title>
+</head>
+
+<body style="padding: 0px;margin: 0px;">
+ <div id="dgd_stockindetails" class="datagrid"></div>
+</body>
+<script type="text/javascript">
+    (function($){
+    	//初始化表格
+   	 var defaults = {
+   		        title: "归还入库明细",
+   		        width:  '100%',
+   		        fitColumn:  false,
+   		        height: 360,
+   		        url: '',
+   		        rownumbers:true,
+   		        useRp: true,
+   		        colid:'id',  //主键
+   		        colModel : [
+						{display: '日期', name : 'stamp', width : 70, sortable : false},
+						{display: '商品编码', name : 'productCode', width : 100, sortable : false},
+   		            {display: '商品名称', name : 'productName', width : 100, sortable : false},
+   		            {display: '商品规格', name : 'norm', width : 120, sortable : false},
+   		            {display: '数量', name : 'inNum', width : 46, sortable : false,isAdd:true},
+   		            {display: '入库单号', name : 'code', width : 130, sortable : false},
+   		            {display: '备注', name : 'remark', width : 80, sortable : false}
+   		        ],
+   		        buttons : [
+   		        ],
+   		        searchitems :[
+   		        ],
+   		        query:{type:2},//归还
+   		        isCount:true//是否合计
+   		    };
+   		    $('#dgd_stockindetails').sgDatagrid(defaults); 
+   		    //隐藏查询栏
+   		    $('.mDiv','#dgd_stockindetails').hide();
+   		    $('.sDiv','#dgd_stockindetails').hide();
+   		    
+    })(jQuery)
+    
+</script>
+</html>

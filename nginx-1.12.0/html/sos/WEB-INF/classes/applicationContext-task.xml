@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd   
+           http://www.springframework.org/schema/aop        
+           http://www.springframework.org/schema/aop/spring-aop-3.0.xsd   
+           http://www.springframework.org/schema/tx 
+           http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+           http://www.springframework.org/schema/task      
+           http://www.springframework.org/schema/task/spring-task-3.0.xsd"
+	>
+	
+	<bean id="myTask" class="com.gboss.service.impl.PreloadServiceImpl"></bean>  
+    <task:scheduled-tasks>  
+      <!-- 这里表示的是每天早上凌晨2:55执行一次  --> 
+      <task:scheduled ref="myTask" method="testTask" cron="0 55 2 * * ?" />        
+    </task:scheduled-tasks>  
+	
+	<task:annotation-driven />  <!-- 定时器开关  -->
+</beans>  

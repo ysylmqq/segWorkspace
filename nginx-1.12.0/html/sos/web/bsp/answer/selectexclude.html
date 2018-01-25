@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>故障排除</title>
+</head>
+<body>
+	<div id="exclude_sel" class="datagrid"></div>
+</body>
+<script type="text/javascript">
+(function($){
+	var defaults = {
+        id: 'grid',
+        width:  322,
+        height: 270,
+        url: 'faultcodes/findfaultcodesByPage',
+        datatype:"json",
+	    usepager: true,
+	    rownumbers:true,
+        useRp: true,
+        colid:'code',  //主键
+        colModel : [
+            {display: '故障码', name : 'code', width : 90, sortable : false},
+            {display: '故障排除', name : 'exclude', width : 180, sortable : false}
+        ],
+        searchitems :[
+            {display:'故障码',name:'faultcodes',type:'text',width:120}
+        ]
+    };
+    $('#exclude_sel').sgDatagrid(defaults);
+})(jQuery);
+</script>
+</html>

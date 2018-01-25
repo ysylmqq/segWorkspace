@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>入库明细</title>
+</head>
+
+<body style="padding: 0px;margin: 0px;">
+
+<form id="form_stockin_details" class="form" style="width:810px;height:440px;" >
+		<div class="title">入库信息></div>
+		<fieldset style="width:790px;height:80px;" >
+             <div style="height:30px;" class="panel">
+             	 <input type='hidden' id="id" name='id' disabled="disabled"/>
+              
+                <span>入库单号:</span>
+                <input type='text' id="code" name='code'  style="width:155px;" disabled="disabled"/>
+              
+                <span>日期:</span>
+                <input type='text' id="stamp" name='stamp'  style="width:155px;" disabled="disabled"/>
+              
+                <span>经办人:</span>
+                  <input name="managersName" id="managersName" disabled="disabled" list="userDataList" style="width:150px;"  />
+                
+             </div>
+              <div class="panel">
+                <span style="vertical-align:top;">客户:</span>
+                <input type='text' id="channelName" name="channelName"  style="width:155px;vertical-align:top;" disabled="disabled"/>
+               
+                <span style="vertical-align:top;display: none;" id="spn_in_whs">调出仓库:</span>
+                <input type="text" id="inWhsName"  name="inWhsName" disabled="disabled"style="width:155px;display: none;vertical-align:top;"  />
+                
+              <span style="vertical-align:top;">备注:</span>
+                <textarea  id="remark" name='remark'  style="width:150px;" rows="2" disabled="disabled" ></textarea>
+            </div>
+        </fieldset>
+		
+		<div class="title">商品信息></div>
+		<fieldset id="fs_product" class='fieldset'  style="width:790px;">
+ 		<div id="dgd_product" class="datagrid"></div>
+        </fieldset>
+</form>
+</body>
+<script type="text/javascript">
+    (function($){
+    	//初始化表格
+   	 	var defaults = {
+   		        width:  780,
+   		        height: 275,
+   		        //url: '../../stock/findstockinDetails',
+   		        url:'',
+		        rownumbers:true,//序号
+		        isCount:true,
+   		        colModel : [
+						{display: '编码', name : 'productCode', width : 100, sortable : false},
+    		            {display: '名称', name : 'productName', width : 140, sortable : false},
+    		            {display: '规格', name : 'norm', width : 200, sortable : false},
+    		            {display: '原库存数量', name : 'curNum', width : 90, sortable : false},
+    		            {display: '本次入库数量', name : 'inNum', width : 100, sortable : false,isAdd:true},
+    		            {display: '单价', name : 'price', width : 50, sortable : false},
+    		            {display: '备注', name : 'remark', width : 80, sortable : false}
+   		        ]
+   		    };
+   		    $('#dgd_product').sgDatagrid(defaults);
+   		    
+    })(jQuery)
+    
+</script>
+</html>

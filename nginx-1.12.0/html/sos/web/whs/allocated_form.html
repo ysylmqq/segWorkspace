@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<form id='whs_allocated_form' name='whs_allocated_form' method='post' class="form">
+		<fieldset>
+            <legend>出入仓库</legend>
+            <div>
+                <label>调拨名称:</label>
+                <input type='text' name='name' id='name' requied='true' autocomplete="on"/>
+            </div>
+            <div>
+                <label>调出仓库:</label>
+                <select size="1" name="outWhsId" id="outWhsId" required="true"  autocomplete="on">
+                    <option value="">--请选择--</option>
+                </select>
+            </div>
+            <div>    
+                <label>调入仓库:</label>
+                <select size="1" name="inWhsId" id="inWhsId"  required="true"  autocomplete="on">
+                    <option value="">--请选择--</option>
+                </select>
+            </div>
+        </fieldset>
+	
+        <fieldset>
+            <legend>商品添加</legend>
+            <div>
+                <label>商品:</label>
+                <select size="1" name="product" id="product">
+                    <option value="">--请选择--</option>
+                </select>
+            </div>
+            <div>
+                <label for="num">数量:</label>
+                <input type='text' id="num" name='num' placeholder="只允许数字" pattern="^[+]?[1-9]+\d*$"  onkeyup="this.value=this.value.replace(/\D/g,'')" />
+                <input type="button" id="whs_allocated_add" value="添加" style="width:60px;margin-left:20px;">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>商品列表</legend>
+            <div class='datagrid'>
+            	<div class="hDiv" style="margin:0px;padding:0px;">
+	                <table cellpadding='0' cellspacing='0'>
+	                    <thead>
+	                    <tr>
+	                        <th style="width:34px;">序号</th>
+	                        <th style="width:240px;">商品</th>
+	                        <th style="width:100px;">数量</th>
+	                        <th style="width:80px;">操作</th>
+	                    </tr>
+	                    </thead>
+	                </table>
+                </div>
+                <div class="bDiv" style="height: 90px;margin:0px;padding:0px;" >
+                	<table id="whs_allocated_grid" cellpadding="0" cellspacing="0" border="0">
+                	</table>
+                </div>
+            </div>
+
+        </fieldset>
+	</form>
+</body>
+<script type="text/javascript">
+	(function($){
+		$('#outWhsId').change(function(){
+			//$(document).sgPup({message:'message_info',text: $('#outWhsId').val()});
+			$.ajax( {
+    		  type : 'post', 
+    		  //async: false,   
+    		  contentType : 'application/json',     
+    		  dataType : 'json',     
+    		  url : '../../stock/findAllProduct', 
+    		  data:JSON.stringify({whsId:$('#outWhsId').val(),isContainsOrg:false}),
+    		  success : function(data) {
+    			  if(data){
+    				  var product=$("#product");
+    				  var sval = product.val();
+    				  if(product){
+    					  product.empty();
+    					  product.append("<option value=''>--请选择--</option>")
+    					  $.each(data,function(k,v){
+    						  if(v.productId==sval)
+    						  	product.append("<option value='" +v.productId+"' selected=true>" + v.productName+"</option>");
+    						  else
+    							  product.append("<option value='" +v.productId+"'>" + v.productName+"</option>");
+        				  }); 
+    				  }
+    				 
+    			  }else{
+    				  $(document).sgPup({message:'message_info',text: data});
+    			  }
+    		  } ,     
+    		  error : function(res,error) { 
+    		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+    		  }    
+    		});
+		});
+		
+		$('#whs_allocated_add').on('click',function(){
+			var pid = $('#product').val();
+			var ptx = $('#product').find("option:selected").text();
+			var num = $('#num').val();
+			if(pid==null||pid==''){
+				$(document).sgPup({message:'message_info',text: "商品不能为空!"})
+				return false;
+			}
+
+			if(num<=0){
+				$(document).sgPup({message:'message_info',text: "数量必须大于０!"})
+				return false;
+			}
+			
+			var grid = $('#whs_allocated_grid');
+			
+			var trid = "#"+pid+"_tr";
+			
+			if($(trid).get(0)!=null){
+				var snum = $('input[name=num]',trid).val();
+				$('input[name=num]',trid).val(Number(snum)+Number(num));
+			}else{
+				var tr = $('<tr></tr>');
+				tr.attr('id',pid+'_tr');
+				
+				var sno = $('<td></td>')
+				sno.width(34);
+				tr.append(sno);
+				
+				var td1 = $('<td></td>');
+				var sid = $("<input type='hidden' name='productId' />")
+				sid.val(pid);
+				td1.append(sid);
+				var sname = $("<input type='hidden' name='productName' />")
+				sname.val(ptx);
+				td1.append(sname);
+				td1.append(ptx);
+				td1.width(240);
+				tr.append(td1);
+				
+				var td2 = $('<td></td>');
+				var innum = $("<input type='text' name='num' />");
+				innum.attr('onkeyup',"this.value=this.value.replace(/\D/g,'')");
+				innum.val(num);
+				innum.width(80);
+				td2.width(100);
+				td2.append(innum);
+				tr.append(td2);
+				
+				var td3 = $('<td></td>');
+				var del = $("<input type='button' value='删除' axis='"+pid+"_tr"+"' />")
+				del.css('cursor','pointer');
+				del.on('click',function(){
+					var id = $(this).attr('axis');
+					$("#"+id).remove();
+					$.each($('#whs_allocated_grid').find('tr'),function(k,v){
+						$(v).find('td:first').html(k+1);
+					})
+				})
+				del.width(60);
+				td3.append(del);
+				td3.width(80);
+				tr.append(td3);
+				
+				grid.append(tr);
+				
+				sno.append(grid.find('tr').length);
+			}			
+			
+			
+		})
+	})(jQuery)
+</script>
+</html>

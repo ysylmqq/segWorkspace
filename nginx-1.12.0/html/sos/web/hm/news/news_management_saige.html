@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>资讯审核管理</title>
+<link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/layout.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/menu.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/accordion.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/tabs.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../../css/tree.css">
+<link rel="stylesheet" type="text/css" href="../../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../../css/gbossIframe.css">
+<link href="http://cdn.bootcss.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+<link rel="stylesheet"  href="../../../css/bootstrap.min.css"/>
+<link rel="stylesheet"  href="../../../css/sos2.css"/>
+<script type="text/javascript" src="../../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../../jscript/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../../jscript/index.js"></script>
+<script type="text/javascript" src="../../../jscript/accordion.js"></script>
+<script type="text/javascript" src="../../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../../jscript/tab.js"></script>
+<script type="text/javascript" src="../../../jscript/window.js"></script>
+<script type="text/javascript" src="../../../jscript/form.js"></script>
+<script type="text/javascript" src="../../../jscript/tree.js"></script>
+<script type="text/javascript" src="../../../jscript/pup.js" ></script>
+</head>
+
+<body>
+
+   <div class="container-fluid">
+        <div class="row">
+		    <article id="bm_main_saige" style="margin:5px;"></article>
+        </div>
+	</div>
+</body>
+<script type="text/javascript">
+    
+(function($){
+    	
+    	var myclick = function(treenode){
+            alert(treenode.value+treenode.content+treenode.url);
+        }
+        
+        $("#bm_main_saige").load("news_list_saige.html");
+    })(jQuery)
+    
+</script>
+</html>

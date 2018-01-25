@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>托收数据上传主页面</title>
+</head>
+
+<body>
+<form class="form" style="width:100%" >
+	<div class="form title">销售经理主页面</div>
+</form>
+<div id="tabContainer" class="tab_container f12">
+    <ul class="tabs">
+        <li><a href="#tab1">金融中心托收数据上传</a></li>
+        <li><a href="#tab2">银盛托收数据上传</a></li>
+    </ul>
+    <div class="tab_div_container">
+        <div id="tab1" class="tab_content" src="web/fee/bank_up.html"></div>
+        <div id="tab2" class="tab_content" src="web/fee/ys_up.html"></div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    (function($) {
+        var defaults = {
+            width: 865,
+            height: 508
+        };
+
+        $('#tabContainer').sgTab(defaults);
+    })(jQuery);
+</script>
+</html>

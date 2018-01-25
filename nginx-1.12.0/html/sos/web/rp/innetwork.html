@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>入网汇总表</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap-datetimepicker.css" /><!-- +++++ -->
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+	<div class='datagrid' id="rp_innetwork"></div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../bslib/js/bootstrap-datetimepicker.js"></script><!-- ++++ -->
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/index.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript">
+    (function($) {
+    	var height = 476;
+    	   var today = new Date().format('yyyy-MM');
+    	//初始化表格
+    	var defaults = {
+    		        title: "入网汇总表",
+    		        width:  '100%',
+    		        height: height,
+    		        rownumbers:true,
+    		        usepager: true,
+    		        url:'../../vehicle/innetwork',
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '公司名称', name : 'subco_name', width : 120},
+						{display: '入网完成', name : 'innetwork', width : 100, sortable : true,formatter:function(value,row){
+    	  	                if(value==null){
+    	  	                    value = '0';
+    	  	                }
+    	  	                return value;
+    	  	            }},
+						{display: '其中私车', name : 'privatecar', width : 100, sortable : true,formatter:function(value,row){
+    	  	                if(value==null){
+    	  	                    value = '0';
+    	  	                }
+    	  	                return value;
+    	  	            }},
+						{display: '当月脱网', name : 'outnetwork', width : 100, sortable : true,formatter:function(value,row){
+    	  	                if(value==null){
+    	  	                    value = '0';
+    	  	                }
+    	  	                return value;
+    	  	            }},
+						{display: '在网总数', name : 'totalnum', width : 100, sortable : true,formatter:function(value,row){
+    	  	                if(value==null){
+    	  	                    value = '0';
+    	  	                }
+    	  	                return value;
+    	  	            }}
+						
+    		        ],
+    		       
+    		        searchitems :[
+    		  		            {display:'月份',html:'<span class="ltext"><input type="text" name="start_date" class="form-control form_datetime"/></span>'}
+    		    		        ],
+    		    		        exporturl:'../../vehicle/exportExcelinnetwork',
+    		      		     	order:true,
+    		      		        sortname: "stamp",
+    		      		        sortorder: "desc"
+    		    };
+    		    $('#rp_innetwork').sgDatagrid(defaults);
+   		   //复制一个导出->打印,再把它插入到原来导出的后面
+		  $("#rp_innetwork .sDiv>.pGroup:first").clone().insertAfter($("#rp_innetwork .sDiv>.pGroup:last"));
+		  $("#rp_innetwork .sDiv>.pGroup:last a.button").attr('id','aprint');
+		  $("#rp_innetwork .sDiv>.pGroup:last span.button_span span").html('打印'); 
+		  
+		  //打印
+			 $('#aprint').on('click',function(){
+				 //$('#ifm_print').attr('src','web/whs/stock_print2.html');
+				 window.open('../print/print.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+					//新增遮罩层
+					var mask=$('<div id="print_mask"></div>');
+					mask.addClass('window-mask');
+					mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+			        var span=$('<span></span');
+			        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+			        span.text('正在打印中...');
+			        mask.append(span);
+				    $(document.body).append(mask);  
+			 });
+    })(jQuery);
+    
+    
+    
+    //打印页面元素设置
+      var callback=function(subWinBody,subWin){
+     	         //查询数据
+     	        var params={};
+     		    params.parameter=$('#rp_innetwork input[name=startDate]').val();
+     		    
+     	 		var resultData=null;//查询结果数据
+     	 		 $.ajax({
+     	 	            type: "POST",
+     	 	            async:false,
+     	 	            contentType : 'application/json',
+     	 	            dataType : 'json',
+     	 	            url: '../../vehicle/innetworkforPrint',
+     	 	       		 data:JSON.stringify(params),
+     	 	            success: function(data){
+     	 	            	resultData=data;
+     	 	            } ,     
+     	 	  		  error : function(res,error) { 
+     	 	 		  }  
+     	 	        });
+     	 
+     	$.ajax( {
+     		  type : 'post', 
+     		  async: false,   
+     		  contentType : 'application/json',     
+     		  dataType : 'json',     
+     		  url : '../../getCurrentCompany',   
+     		  data:JSON.stringify({}),
+     		  success : function(data) {
+     			  if(data){
+     				  var total = 0;
+     				  //公司中文名字
+     				  $("#cname",subWinBody).empty();
+     				  $("#cname",subWinBody).append(data.cnfullname);
+     				  //公司英文名字
+     				  $("#ename",subWinBody).empty();
+     				  $("#ename",subWinBody).append(data.enfullname);
+     				  //表单名字
+     				  $("#orderTitle",subWinBody).empty();
+     				  $("#orderTitle",subWinBody).append("入网汇总表");
+     				  //表单日期
+     				  $("#orderDate",subWinBody).empty();
+     				  $("#orderDate",subWinBody).append(new Date().format('yyyy-MM-dd'));
+     				  //表单单号
+     				  $("#orderNo",subWinBody).empty();
+     				  $("#orderNo",subWinBody).append('&nbsp;');
+     				  
+     				 /*  //表前输入单
+     				  var outWhs ='<span style="width:10%;">日期：</span>';
+     				  outWhs=outWhs+'<div style="width:20%;">'+new Date().format('yyyy-MM-dd')+'</div>';
+     				 
+     				  $("#headInput",subWinBody).append(outWhs); */
+     				  //表头
+     				  $("#tbHead",subWinBody).append('<td style="width: 5%;" axis="rownumbers">序号</td>'+
+     														  '<td style="width: 35%;" axis="subco_name">公司名称</td>'+
+     														  '<td style="width: 15%;" axis="innetwork">入网完成</td>'+
+     														  '<td style="width: 15%;" axis="privatecar">其中私车</td>'+
+     														  '<td style="width: 15%;" axis="outnetwork">当月脱网</td>'+
+     														  '<td style="width: 15%;" axis="totalnum">在网总数</td>'
+     														 );
+     				  if(resultData){
+     					//列头
+     					
+     		           		var colModel=[];
+     		           		colModel.push({name:'rownumbers'});
+     		          	 	colModel.push({name:'subco_name'});
+     		           		colModel.push({name:'innetwork'});
+     		           		colModel.push({name:'privatecar'});
+     		          		colModel.push({name:'outnetwork'});
+     		           		colModel.push({name:'totalnum'});
+     		           	   var tr=null;
+     		    	       var td=null;
+     		    	       var stockNum=0;//合计库存数量
+     		    	        $.each(resultData,function(i,row){
+     		    	            tr = '<tr>';
+     		                	$.each(colModel,function(k,v){
+     		                		td ='<td>';
+     		    	                var tdx = v.name;
+
+     		    	            	if(tdx=='rownumbers'){
+     		    	                 	var num = i+1;
+     		    	                 	td=td+num+'</td>';              	
+     		    	                 }else{
+     		    	                	 if(row[tdx]=='null' || row[tdx]==null){
+     		    	                		 row[tdx]='';
+     		    	                	 }
+     		    	                	 td=td+row[tdx];
+     		    	                	 td=td+'</td>';
+     		    	                	 
+     		    	                	 if(tdx=='num'){
+     		    	                		 stockNum=Number(stockNum)+Number(row[tdx]);
+     		    	                	 }
+     		    	                 }
+     		    	           
+     		    	            	tr=tr+td;
+     		                	});
+     		                	tr=tr+'</tr>';
+     		                	$("#tbBody",subWinBody).append(tr);
+     		    	        });
+     		    	      
+     		    	       /*  if(resultData.length>0){
+     							  //表合计
+     							  var tbfoot = '<tr>';
+     							  tbfoot=tbfoot+'<td colspan="4"><div style="text-align:right">小计:</div></td>';
+     							  tbfoot=tbfoot+'<td colspan="1">'+stockNum+'</td>';
+     							   if(lastColumn){
+     							  	tbfoot=tbfoot+'<td colspan="1"></td>';
+     							  } 
+     							  tbfoot=tbfoot+'</tr>';
+     							  $("#tbBody",subWinBody).append(tbfoot);
+     						  } */
+     				  }
+     				 
+     				/*   //表尾输入单
+     				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+     													  '<span>复核人：</span><div>&nbsp;</div>'+
+     													  '<span>仓管员：</span><div>&nbsp;</div>'+
+     													  '<span>制单：</span><div>&nbsp;</div>'); */
+     				  
+     			  }else{
+     				  $(document).sgPup({message:'message_info',text: data});
+     			  }
+     		  } ,     
+     		  error : function(res,error) { 
+     		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+     		  }    
+     		});
+     	
+         if (navigator.appName == 'Microsoft Internet Explorer'){
+         	subWin.print();  
+         }else{ 
+         	subWin.focus();
+         	subWin.print();  
+         }
+     }
+    
+</script>
+<script type="text/javascript">
+$.fn.datetimepicker.dates['zh'] = {
+    days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+    daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+    daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+    months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+    monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+    meridiem : [ "上午", "下午" ],
+    today : "今天"
+};
+$(document).ready(function(){
+    $(".form_datetime").datetimepicker({
+        language : "zh",
+        autoclose: true,
+        minView: "month",
+        format : 'yyyy-mm'
+    });
+});
+</script>
+</html>

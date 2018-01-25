@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+     <script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js" ></script>
+     <link rel="stylesheet" type="text/css" href="../../css/print.css" >
+    <title>赛格导航GBOSS打印页</title>
+</head>
+<body>
+<article style="margin: 0 auto;width: 95%;">
+        <header class="head">
+            <article class="title">
+                <div class="cname" id="cname">深圳市赛格导航科技股份有限公司</div>
+                <div class="ename" id="ename">SHENZHEN SEG SCIENTIFIC NAVIGATIONS CO.,LTD</div>
+                <div class="title_1">
+                	 <div class="content" id="taskTitle">新装工单</div>
+                	 <div class="title_10">
+                	 	<!--  <div><span>工单号：</span><div id="taskNo" class="title_ib title_dl">KA13010054</div></div> -->
+	                	 <span>日期：</span><div id="taskDate" class="title_ib">2013-01-06</div>
+                	 </div>
+                	 <div style="clear:both;"></div>
+                </div>
+            </article>
+      
+
+     <!--    <article class="headinput" id="headInput">
+        </article> -->
+        
+        <article class="headinput" id="headInput">
+          <!--   <span>供应商编码：</span><div>1101</div>
+            <span>供应商简称：</span><div>爱特姆</div>
+            <span>供应商简称：</span><div>爱特姆</div>
+            <span>供应商简称：</span><div>爱特姆</div> -->
+        </article>
+
+        <article class='datagrid' style="margin: 0 auto;">
+            <!-- 表头栏 -->
+            <div class="hDiv">
+            
+                <table cellpadding="0" cellspacing="0" style="table-layout:fixed">
+                    <thead id="tbHead">
+                  <!--   <tr>
+                        <td style="width: 30px;"><div>序号</div></td>
+                        <td style="width: 120px;"><div>料品编码</div></td>
+                        <td style="width: 150px;"><div>料品名称</div></td>
+                        <td style="width: 150px;" ><div>采购规格</div></td>
+                        <td style="width: 40px;"><div>单位</div></td>
+                        <td style="width: 40px;"><div>数量</div></td>
+                        <td style="width: 80px;"><div>采购单价</div></td>
+                        <td style="width: 60px;"><div>金额</div></td>
+                        <td style="width: 80px;"><div>仓库</div></td>
+                        <td style="width: 140px;"><div>采购批号</div></td>
+                    </tr> -->
+                    </thead>
+                    <tbody id="tbBody">
+                    </tbody>
+                </table>
+            </div>
+            <!-- 表格主体栏 
+            <div class="bDiv">
+                <table cellpadding="0" cellspacing="0" style="table-layout:fixed;">
+                    <tbody id="tbBody">
+                    </tbody>
+                </table>
+            </div>
+            -->
+        </article>
+
+        <article>
+            <div class="bDiv">
+                <table cellpadding="0" cellspacing="0">
+                    <tbody id="tbFoot">
+                    <!--
+                    <tr>
+                        <td style="width: 318px" ><div style="text-align: right">合计:</div></td>
+                        <td style="width: 406px"><div style="text-align: right;padding-right: 36px;">400</div></td>
+                        <td style="width: 229px"><div>&nbsp;</div></td>
+                        
+                    </tr>
+                    -->
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="foot" id="foot">
+         <!--
+            <span>核准：</span><div>&nbsp;</div>
+            <span>采购：</span><div>&nbsp;</div>
+            <span>仓库：</span><div>&nbsp;</div>
+            <span>制单：</span><div>&nbsp;</div>
+          -->  
+        </article>
+    </article>
+    
+      </header>
+</body>
+<script type="text/javascript">
+	if(window.opener && window.opener.callback){
+		window.opener.callback($(window.document.body),window);
+	}
+	if(window.parent && window.parent.callback){
+		window.parent.callback($(window.document.body),window);
+	}
+	
+	//关闭前，移除父页面的遮罩
+	window.onbeforeunload = function(){ 
+	    $('div#print_mask',window.opener.document.body).remove();
+	};
+	
+</script>
+</html>

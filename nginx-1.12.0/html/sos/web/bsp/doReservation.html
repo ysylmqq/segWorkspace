@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>预约操作</title>
+<style>
+
+</style>
+</head>
+<body>
+	<form id='form_managers' method='post' class="form" style="width:690px;">
+		<div class='title'>预约</div>
+		<fieldset style="width:670px;">
+			<div class="panel">
+                <span>工单号:</span>
+                <input type='text' id="billnum" name='billnum'  style="width:200px;" disabled="disabled" />
+           	    <input type='hidden' id="task_id" name='task_id'  style="width:200px;" disabled="disabled" />
+            </div>
+            <div class="panel">
+                <span>车牌号:</span>
+                <input type='text' id="number_plate" name='number_plate'  style="width:200px;" disabled="disabled" />
+                
+                <span style="padding-left:50px;">车载号码:</span>
+                <input type='text' id="code" name='code'  style="width:200px;" disabled="disabled" />
+            </div>
+            <div class="panel">    
+                <span>客户:</span>
+                <input type='text' id="customer_name" name='customer_name'  style="width:200px;" disabled="disabled" />
+                
+                <span style="padding-left:50px;">客户电话:</span>
+                <input type='text' id="customer_phone" name='customer_phone'  style="width:200px;" disabled="disabled" />
+            </div>
+            <div class="panel">    
+                <span>联系人:</span>
+                <input type='text' id="person" name='person'  required="true" style="width:200px;" />
+                
+                <span style="padding-left:50px;">联系人电话:</span>
+                <input type='text' id="phone" name='phone'   required="true" style="width:200px;" />
+            </div>
+            <div class="panel">    
+                <span>预约地点:</span>
+                <input type='text' id="place" name='place'  style="width:200px;" />
+                
+                <span style="padding-left:50px;">预约时间:</span>
+                <input type='text' id="reservation_time" name='reservation_time'  style="width:200px;" />
+            </div>
+            <div class="panel">
+            	<span style="vertical-align:top;">预约原因:</span>
+                <textarea id="reason" name="reason" style="width:555px;" rows="2"></textarea>
+            </div>
+            <div class="panel">
+            	<span style="vertical-align:top;">备注:</span>
+                <textarea id="remark" name="remark" style="width:555px;" rows="2"></textarea>
+            </div>
+        </fieldset>
+        
+       	<div class='title'>历史预约</div>
+		<fieldset id="reservation_view" class='fieldset'  style="width:670px;">
+ 		<div id="reservation_history" class="datagrid"></div>
+        </fieldset>
+        
+        <!--  
+        
+        <div class='title'>历史预约</div>
+        <fieldset style="width:670px;">
+        	<div id="serverItem1" class="datagrid">
+            	<div class="hDiv" style="margin:0px;padding:0px;width:650px;">
+	                <table>
+	                    <thead>
+	                    <tr>
+	                        <th style="width:40px;">序号</th>
+	                        <th style="width:100px;">联系人</th>
+	                        <th style="width:100px;">联系人电话</th>
+	                        <th style="width:100px;">预约地点</th>
+	                        <th style="width:100px;">预约时间</th>
+	                        <th style="width:100px;">任务类型</th>
+	                    </tr>
+	                    <tr><th>1</th><th>张三</th><th>137XXXXXX</th><th>xxxxxx</th><th>2013-05-16</th><th>安装</th></tr>
+	                    <tr><th>2</th><th>李四</th><th>137XXXXXX</th><th>xxxxxx</th><th>2013-05-16</th><th>维修</th></tr>
+	                    <tr><th></th><th></th><th></th></tr>
+	                    <tr><th></th><th></th><th></th></tr>
+	                    </thead>
+	                </table>
+                </div>
+            </div>
+        </fieldset>
+        
+        -->
+
+	</form>
+</body>
+<script type="text/javascript">
+(function($){
+	//初始化表格
+	 	var defaults = {
+		        width:  650,
+		        height: 100,
+		        url:'',
+	       	    rownumbers:true,//序号
+	            isCount:true,
+		        colModel : [
+		            {display: '联系人', name : 'person', width : 100, sortable : false},
+		            {display: '联系人电话', name : 'phone', width : 120, sortable : false},
+		            {display: '预约地点', name : 'place', width : 120, sortable : false},
+		            {display: '预约时间', name : 'time', width : 100, sortable : false},
+		            {display: '任务类型', name : 'type', width : 100, sortable : false}
+		        ]
+		    };
+		    $('#reservation_history').sgDatagrid(defaults);
+		    
+})(jQuery)
+
+</script>
+</html>

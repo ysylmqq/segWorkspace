@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>维修登记</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" href="../../bslib/css/bootstrap-datetimepicker.css" /><!-- +++++ -->
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/sos.css">
+<style type="text/css">
+.form span.col-xs-8{text-align: left;}
+</style>
+</head>
+<body>
+  <div id="nw_document_all">
+  <form id='search_form' name='search_form' method='post' class="form">
+    <div class='title'>中心维修登记&gt;</div>
+    <fieldset style="width:100%;">
+        <div class="panel">
+            <div class="row">
+                <div class="col-xs-4">
+                    <span class="col-xs-4">车牌号码:</span>
+                    <span class="col-xs-8">
+                        <input type='text' id="searchnumber" name='searchnumber' class="form-control" />
+                        <ul class="show_list" id="vehicleList"></ul>
+                    </span>
+                </div>
+                
+                <div class="col-xs-4">
+                    <span class="col-xs-4">车载电话:</span>
+                    <span class="col-xs-8">
+                        <input type='text' id="searchcall" name='searchcall' class="form-control" />
+                        <ul class="show_list" id="unitList"></ul>
+                    </span>
+                </div>
+                
+                <div class="col-xs-4">
+                    <span class="col-xs-4">客户名称:</span>
+                    <span class="col-xs-8">
+                        <input type='text' id="custname" name='custname' class="form-control" />
+                        <ul class="show_list" id="customerList"></ul>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="row">
+                <div class="col-xs-4">
+                    <span class="col-xs-4">联系电话:</span>
+                    <span class="col-xs-8">
+                        <input type='text' id="scphone" name='scphone' class="form-control" />
+                        <ul class="show_list" id="phoneList"></ul>
+                    </span>
+                </div>
+                <div class="col-xs-4">
+                    <span class="col-xs-4">车架号:</span>
+                    <span class="col-xs-8">
+                        <input type='text' id="vin" name='vin' class="form-control" />
+                        <ul class="show_list" id="vinList"></ul>
+                    </span>
+                </div>  
+
+                <div class="col-xs-4">
+                    <span class="col-xs-4">发动机号:</span>
+                    <span class="col-xs-8">
+                        <input type='text' id="engineno" name='engineno' class="form-control" />
+                        <ul class="show_list" id="enginenoList"></ul>
+                    </span>
+                </div>
+            </div>
+        </div>
+        </fieldset>
+    </form>
+    <form id='bktype_form' name='bktype_form' method='post' class="form">
+        <div class='title'>基本资料</div>
+    </form>
+  <form id='nw_private_form' name='nw_private_form' method='post' class="form">
+    <input type='hidden' id='cust_id' name='cust_id' >
+    <input type='hidden' id='cust_name' name='cust_name' >
+    <input type='hidden' id='vehicle_id' name='vehicle_id' >
+    <input type='hidden' id='barcode' name='barcode' >
+    <input type='hidden' id='unittype' name='unittype' >
+    <input type='hidden' id='unit_id' name='unit_id' >
+    <input type='hidden' id='barcode' name='barcode' >
+    <input type='hidden' id='fix_time' name='fix_time' >
+    <input type='hidden' id='cust_type' name='cust_type' >
+    <input type='hidden' id='reg_status' name='reg_status' >
+    <fieldset style="width:100%;" id="pCust">
+            <div class="panel displayInfo">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <span class="col-xs-4">姓名:</span>
+                        <span class="col-xs-8" id="customer_name">
+                        </span>
+                    </div>
+                    <div class="col-xs-4">
+                        <span class="col-xs-4">车牌号码:</span>
+                        <span class="col-xs-8">
+    						<input type='text' class="form-control" id='plate_no' name='plate_no' >
+                        </span>
+                    </div>
+                    <div class="col-xs-4">
+                        <span class="col-xs-4">车载电话:</span>
+                        <span class="col-xs-8" id="call_letter">
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="panel displayInfo">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <span class="col-xs-4">开通时间:</span>
+                        <span class="col-xs-8" id="service_date">
+                        </span>
+                    </div>
+                    <div class="col-xs-4">
+                        <span class="col-xs-4">车型:</span>
+                        <span class="col-xs-8" id="model">
+                        </span>
+                    </div>
+                    <div class="col-xs-4">
+                        <span class="col-xs-4">终端类型:</span>
+                        <span class="col-xs-8" id="unittype_name">
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel displayInfo">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <span class="col-xs-4">联系电话:</span>
+                        <span class="col-xs-8">
+                            <input type="text" class="form-control" name="tel" id="tel" placeholder="请输入联系电话" list="linkPhoneList"/>
+		 					<input type="hidden" id="linkman_tel" name="linkman_tel" />
+		 					<datalist id="linkPhoneList"></datalist>
+                        </span>
+                    </div>
+                </div>
+            </div>
+    </fieldset>
+    
+        <div class='title'>中心维修申请单</div>
+        <fieldset style="width:100%;border-bottom:0;" >
+            <div class="panel">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <span class="col-xs-4">维护单号:</span>
+                        <span class="col-xs-8">
+                            <input type='text' id="repair_no" disabled="disabled" name='repair_no' required="true" class="form-control" />
+                        </span>
+                    </div>
+                    <div class="col-xs-4">
+                        <span class="col-xs-4">登记人:</span>
+                        <span class="col-xs-8">
+                            <input type='text' id="reg_op_name" disabled="disabled" required="required" name='reg_op_name' class="form-control" />
+                        </span>
+                    </div>
+                    <div class="col-xs-4">
+                        <span class="col-xs-4">申请时间:</span>
+                        <span class="col-xs-8">
+                            <input type='text' id="resver_time" disabled="disabled" name='reg_time' class="form-control form_datetime" />
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <span class="col-xs-4">业务类型:</span>
+                        <span class="col-xs-8">
+                        	<select id="reg_type" class="form-control">
+                        		<option value="">请选择</option>
+                        		<option value="1">维修</option>
+                        		<option value="2">重大事件</option>
+                        		<option value="3">无法启动</option>
+                        		<option value="4">其他</option>
+                        	</select>
+                        </span>
+                    </div>
+                    <div class="col-xs-4">
+                    	<span class="col-xs-4">故障现象:</span>
+                        <span class="col-xs-8">
+                            <input type="text" id="symptom" name="symptom" required="required"  class="form-control"/>
+                        </span>
+                    </div>
+                    <div class="col-xs-4">
+                        <span class="col-xs-4">车辆所在地:</span>
+                        <span class="col-xs-8">
+                            <input type="text" id="place" name="place" required="required"  class="form-control"/>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <span class="col-xs-2" style="width:11%;">备注:</span>
+                        <span class="col-xs-10" style="width:89%;">
+                            <textarea id="reg_remark" rows="2" class="form-control"></textarea>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <span class="col-xs-4">维修状态:</span>
+                        <span class="col-xs-8" style="text-align:left;">
+                            <select id="repair_status" disabled="disabled" class="form-control">
+                                <option value=''>无</option>
+                                <option value='1'>已登记</option>
+                                <option value='2'>已受理</option>
+                                <option value='3'>已预约</option>
+                                <option value='4'>已派工</option>
+                                <option value='5'>维修中</option>
+                                <option value='6'>维修完成</option>
+                                <option value='7'>未维修完成</option>
+                            </select>
+                        </span>
+                    </div>
+                    <div class="col-xs-8" id="sign_out" >
+                        <span class="col-xs-2">指定营业厅:</span>
+                        <span class="col-xs-4">
+                            <input type="text" class="form-control" name="companyName" id="companyName" placeholder="请输入公司名" list="companyDataList"/>
+							<input type="hidden" name="subcoNo" id="subcoNo" />
+		 					<datalist id="companyDataList"></datalist>
+                        </span>
+                        <span class="col-xs-4" style="text-align:left;">
+                            <button type="button" disabled="disabled" onclick="assign_out();" class="btn btn-xs btn-primary">分派</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset style="width:100%;border-top:0px;"> 
+          <div class='submit'>
+              <button type="button" class="btn btn-primary btn-xs" onclick="repair_save();" >登记</button> 
+              <button type="button" class="btn btn-primary btn-xs" onclick="repair_reset();" >重置</button>
+          </div>
+        </fieldset>
+        <div class="title">维修记录</div>
+    </form>
+    <div id="repairGrid" class='datagrid'></div>
+    
+  <!-- <form class="form">
+    <div id='titleDiv2' class='title'>业务历史记录</div>
+  </form>
+    <div id="records" class="datagird"></div> -->
+    
+  </div>
+  <div id="watermark" style="position:absolute;left:300px;top:200px;display: none;">
+    <img src="../../images/offgrid.png" />
+  </div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../bslib/js/bootstrap-datetimepicker.js"></script><!-- ++++ -->
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>  
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/storage_vehicle.js" ></script>
+<script type="text/javascript" src="../../jscript/valpwd.js" ></script>
+<script type="text/javascript" src="../../jscript/cook.js" ></script>
+<script type="text/javascript" src="../../jscript/web/repair/repair.js"></script>
+<script type="text/javascript" src="../../jscript/web/vehicleList.js"></script>
+<script type="text/javascript" src="../../jscript/web/unitList.js"></script>
+<script type="text/javascript" src="../../jscript/web/custList.js"></script>
+<script type="text/javascript" src="../../jscript/web/phoneList.js"></script>
+<script type="text/javascript" src="../../jscript/web/vinList.js"></script>
+<script type="text/javascript" src="../../jscript/web/enginenoList.js"></script>
+<script type="text/javascript" src="../../jscript/web/companyList.js"></script>
+<script type="text/javascript" src="../../jscript/web/linkphoneList.js"></script>
+</html>

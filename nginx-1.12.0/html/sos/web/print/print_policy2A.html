@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+     <script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js" ></script>
+     <link rel="stylesheet" type="text/css" href="../../css/print.css" >
+    <title>赛格导航GBOSS打印页</title>
+    <style>
+	div#content {   
+	 width:760px; 
+	  margin:0 auto;  
+	text-align:center;
+	}
+	table,tbody,tr,td {
+			margin: 0;
+			padding: 0;
+			border: 0;
+		}
+		table{
+			border-collapse: collapse;
+			border: 1px solid #aaa;
+			width: 648px;
+		}
+		.first-td >td{
+			vertical-align: middle;
+			background-color: #fff;
+			border: 1px solid #fff;
+			text-align: center;
+			height: 18px;
+		}
+		.second-td td{
+			vertical-align: middle;
+			background-color: #fff;
+			border-right: 1px solid #fff;
+			text-align: center;
+			width: 5.555555555555556%;
+			height: 18px;
+			font-size: 12px;
+		}
+</style>
+</head>
+<body>
+<article style="margin: 0 auto;width: 95%;">
+        <header class="head">
+           <!--  <article class="title">
+                <div class="cname" id="cname">深圳市赛格导航科技股份有限公司</div>
+                <div class="ename" id="ename">SHENZHEN SEG SCIENTIFIC NAVIGATIONS CO.,LTD</div>
+                <div class="title_1">
+                	 <div class="content" id="taskTitle">盗抢险</div>
+                	 <div class="title_10">
+                	 	 <div><span>工单号：</span><div id="taskNo" class="title_ib title_dl">KA13010054</div></div>
+	                	 <span>日期：</span><div id="taskDate" class="title_ib">2013-01-06</div>
+                	 </div>
+                	 <div style="clear:both;"></div>
+                </div>
+            </article> -->
+      
+<!-- 
+        <article class="headinput" id="headInput" style="margin: 200px 0 0 350px;">
+        </article>
+         
+        <article id="headInput2" style="margin: 235px 0 0 490px; font-size:15px">
+        </article>
+        
+         <article  id="headInput3" style="margin: 55px 0 0 540px; font-size:15px">
+        </article>
+        
+-->
+        <article style="width: 650px;margin: 55px 0 0 65px;">
+        <table cellpadding="0" cellspacing="0">
+		<tbody>
+			<tr class="first-td">
+				<!-- <td style="width:94px" rowspan="2">入网名</td> -->
+				<td style="width:94px;" ></td>
+				<td style="width:94px;font-size:15px"  id="loginname"></td>
+				<!-- <td style="width:65px">身份证号</td> -->
+				<td style="width:65px"></td>
+				<td style="width:164px;font-size:10px;" id="card">
+					<!-- <table style="width:100%;border:none" cellpadding="0" cellspacing="0">
+					
+					
+						<tbody>
+							<tr class="second-td">
+								<td>1</td>
+								<td>2</td>
+								<td>3</td>
+								<td>4</td>
+								<td>5</td>
+								<td>6</td>
+								<td>7</td>
+								<td>8</td>
+								<td>9</td>
+								<td>6</td>
+								<td>7</td>
+								<td>5</td>
+								<td>5</td>
+								<td>4</td>
+								<td>3</td>
+								<td>8</td>
+								<td>9</td>
+								<td style="border:0">5</td>
+							</tr>
+						</tbody>
+					</table> -->
+				</td>
+				<!-- <td style="width:85px" id="phone">移动电话</td> -->
+				<td style="width:85px" ></td>
+				<td id="phone" style="font-size:14px"></td>
+			</tr>
+			<tr class="first-td">
+			
+				<td style="width:94px;" ></td>
+				<td style="width:94px;font-size:15px"  id="ywloginname"></td>
+				<!-- <td>身份证号</td> -->
+				<td></td>
+				<td id="icard" style="font-size:10px">
+					<!-- <table style="width:100%;border:none" cellpadding="0" cellspacing="0">
+						<tbody>
+							<tr class="second-td">
+								<td>1</td>
+								<td>2</td>
+								<td>3</td>
+								<td>4</td>
+								<td>5</td>
+								<td>6</td>
+								<td>7</td>
+								<td>8</td>
+								<td>9</td>
+								<td>0</td>
+								<td>1</td>
+								<td>2</td>
+								<td>3</td>
+								<td>4</td>
+								<td>5</td>
+								<td>6</td>
+								<td>7</td>
+								<td style="border:0">8</td>
+							</tr>
+						</tbody>
+					</table> -->
+				</td>
+				<!-- <td>出生日期</td> -->
+				<td></td>
+				<td id="birthday" style="font-size:14px"></td>
+			</tr>
+			<tr class="first-td">
+				<!-- <td>固定号码</td> -->
+				<td></td>
+				<td id="mobile" style="font-size:14px"></td>
+				<!-- <td  colspan="3">是 否 已 购 买 机 动 车 辆 保 险 盗 抢 险</td> -->
+				<td  colspan="3"></td>
+				<td id="is_buypilfer" style="text-align:left;font-size:14px">
+				<!-- <input type="radio" name="is_contain" id="is_contain1" value="0" checked="checked"  />是
+            	<input type="radio" name="is_contain" id="is_contain2" value="1"  />否 </td> -->
+			</tr>
+			<tr class="first-td">
+				<!-- <td>车牌号码</td> -->
+				<td></td>
+				<td id="car_num" style="font-size:14px"></td>
+				<!-- <td>厂牌型号</td> -->
+				<td></td>
+				<td id="ucode" style="font-size:14px"></td>
+				<!-- <td>新车价</td> -->
+				<td></td>
+				<td id="money" style="font-size:14px"></td>
+			</tr>
+			<tr class="first-td">
+				<!-- <td>发动机号</td> -->
+				<td></td>
+				<td id="engine_no" style="font-size:14px"></td>
+				<!-- <td>车 架 号</td> -->
+				<td></td>
+				<td id="chassis_nos" style="font-size:14px"></td>
+				<!-- <td>车辆初次登记日期</td> -->
+				<td></td>
+				<td id="register_time" style="font-size:14px"></td>
+			</tr>
+			<tr class="first-td">
+				<!-- <td>GPS型号</td> -->
+				<td></td>
+				<td id="call_letter" style="font-size:14px"></td>
+				<!-- <td>机身编号</td> -->
+				<td></td>
+				<td id="code" style="font-size:14px"></td>
+				<!-- <td>安装日期</td> -->
+				<td></td>
+				<td id="time" style="font-size:14px"></td>
+			</tr>
+			<tr class="first-td">
+				<!-- <td>联系地址</td> -->
+				<td></td>
+				<td colspan="3" id="address" style="font-size:14px" ></td>
+				<!-- <td>销售员</td> -->
+				<td></td>
+				<td id="sales_person" style="font-size:14px"></td>
+			</tr>
+		</tbody>
+	</table>
+        </article> 
+         
+       <article id="headInput4" style="margin: 20px 0 0 230px; font-size:15px">
+        </article>
+        
+     <!--    <article id="headInput5" style="margin: 5px 0 0 140px; font-size:15px">
+        </article> -->
+        
+        <article id="headInput6" style="margin: 14px 0 0 165px; font-size:15px">
+        </article>
+        
+          <article id="headInput7" style="margin: 4px 0 0 165px; font-size:15px">
+        </article>
+       
+        
+        
+
+        <article class='datagrid' style="margin: 0 auto;">
+            <!-- 表头栏 -->
+            <div class="hDiv">
+            
+                <table cellpadding="0" cellspacing="0" style="table-layout:fixed">
+                    <thead id="tbHead">
+                  <!--   <tr>
+                        <td style="width: 30px;"><div>序号</div></td>
+                        <td style="width: 120px;"><div>料品编码</div></td>
+                        <td style="width: 150px;"><div>料品名称</div></td>
+                        <td style="width: 150px;" ><div>采购规格</div></td>
+                        <td style="width: 40px;"><div>单位</div></td>
+                        <td style="width: 40px;"><div>数量</div></td>
+                        <td style="width: 80px;"><div>采购单价</div></td>
+                        <td style="width: 60px;"><div>金额</div></td>
+                        <td style="width: 80px;"><div>仓库</div></td>
+                        <td style="width: 140px;"><div>采购批号</div></td>
+                    </tr> -->
+                    </thead>
+                    <tbody id="tbBody">
+                    </tbody>
+                </table>
+            </div>
+            <!-- 表格主体栏 
+            <div class="bDiv">
+                <table cellpadding="0" cellspacing="0" style="table-layout:fixed;">
+                    <tbody id="tbBody">
+                    </tbody>
+                </table>
+            </div>
+            -->
+        </article>
+
+        <article>
+            <div class="bDiv">
+                <table cellpadding="0" cellspacing="0">
+                    <tbody id="tbFoot">
+                    <!--
+                    <tr>
+                        <td style="width: 318px" ><div style="text-align: right">合计:</div></td>
+                        <td style="width: 406px"><div style="text-align: right;padding-right: 36px;">400</div></td>
+                        <td style="width: 229px"><div>&nbsp;</div></td>
+                        
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="foot" id="foot">
+         <!--
+            <span>核准：</span><div>&nbsp;</div>
+            <span>采购：</span><div>&nbsp;</div>
+            <span>仓库：</span><div>&nbsp;</div>
+            <span>制单：</span><div>&nbsp;</div>
+          -->  
+        </article>
+    </article>
+    
+      </header>
+</body>
+<script type="text/javascript">
+	if(window.opener && window.opener.callback){
+		window.opener.callback($(window.document.body),window);
+	}
+	if(window.parent && window.parent.callback){
+		window.parent.callback($(window.document.body),window);
+	}
+	
+	//关闭前，移除父页面的遮罩
+	window.onbeforeunload = function(){ 
+	    $('div#print_mask',window.opener.document.body).remove();
+	};
+	
+</script>
+</html>

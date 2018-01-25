@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>总部供货合同商品导入</title>
+<style type="text/css">
+.form span{
+	width: 70px;
+}
+.form input[type=file] {
+	width:280px;
+}
+</style>
+</head>
+
+<body>
+<form id="form_imp" method="post" class="form" action="../../sell/impSupplyContractProducts" target="frm_imp" enctype="multipart/form-data">
+		<table >
+		  <tr>
+		  	<td>
+		  		<span>选择文件:</span>
+		  	</td>
+		    <td >
+			 	<input type="file" id="checkFile" width="100px" name="checkFile" required="required" accept="application/vnd.ms-excel" />
+		 	</td>
+		    <td >
+		    	<input type="button" id="btn_template_down" value="模板下载" width="70px"/>
+		    </td>
+		  </tr>
+		</table>
+</form>
+<iframe name='frm_imp' id="frm_imp" style="display:none;" ></iframe> 
+</body>
+<script type="text/javascript">
+(function($){
+	var flag = 0;//商品添加的个数
+	$('#btn_template_down').on('click',function(){
+		document.getElementById('frm_imp').src="../../doc/template/Supply_contract_product.xls";
+	});
+})(jQuery)
+function callback(msg,dataList)   
+{   
+	$(document).sgPup({message:'message_info',text: msg});
+	if(msg=='导入成功') {
+		 //重新给id赋值
+		 $('#id','#win_supply_contract #form_supply_contract').val($('#id2','#win_supply_contract #form_supply_contract').val());
+		 $(document).sgWindow('close',{id:'win_imp'});
+		 //$('#dgd_check').sgDatagrid('reload','sgDatagrid');
+		 var products = $.parseJSON(dataList);
+		 //先删除原有的
+		  $('#div_supply_contract',$('#win_supply_contract')).prevAll('div[id^=div_supply_contract]').find('a').trigger('click');
+		  flag = 0;
+		  var divId=null;
+		  $.each(products, function(key,value){
+			 divId='#win_supply_contract #div_supply_contract';
+			if(key>0){
+				 $("#div_supply_contract a",$('#win_supply_contract')).trigger('click',flag);
+				 key=key-1;
+				 divId=divId+flag;
+				 flag=flag+1;
+			}
+			 $('input[name=productName]',divId).val(value.productName.replace(/\s/g,''));
+			 $('input[name=productCode]',divId).val(value.productCode.replace(/\s/g,''));
+			 $('input[name=productId]',divId).val(value.productId);
+			 $('input[name=norm]',divId).val(value.norm.replace(/\s/g,'-'));
+			 $('input[name=price]',divId).val(value.price);
+			 $('input[name=remark]',divId).val(value.remark);
+		 });
+	}
+}   
+</script>
+</html>

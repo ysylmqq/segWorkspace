@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>机构子账号</title>
+<style>
+
+</style>
+</head>
+<body>
+	<form id='account_add_form' name='account_add_form' method='post' class="form">
+		<div class='title' style="width:865px;">基础资料</div>
+		<fieldset style="width:850px;">
+            <div class="panel">
+                <span>登录名:</span>
+                <input type='text' id="register" name='register' required="true" style="width:150px;" />
+                
+                <span>服务密码:</span>
+                <input type='password' id="server_pwd" name='server_pwd' style="width:150px;" />
+                
+                <span>确认密码:</span>
+                <input type='password' id="confirm_pwd" name='confirm_pwd' style="width:150px;" />
+            </div>
+            <div class="panel">    
+                <span>公司名称:</span>
+                <input type='text' id="customer_name" name='customer_name' required="true" style="width:150px;" />
+                
+                <span>联系地址:</span>
+                <input type='text' id="cust_address" name='cust_address' style="width:150px;" />
+                
+                <span>邮箱:</span>
+                <input type='text' id="email" name='email'  style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>VIP等级:</span>
+                <select size="1" name="vip" id="vip" style="width:154px;" autocomplete="on">
+                	<option value="1">普通卡</option>
+                    <option value="2">银卡</option>
+                    <option value="3">金卡</option>
+                    <option value="4">白金卡</option>
+                    <option value="99">免费</option>
+                </select>
+                
+                <span>所属行业:</span>
+                <select size="1" name="trade" id="trade" style="width:154px;" autocomplete="on">
+                    <option value="1">物流车</option>
+                    <option value="2">出租车</option>
+                    <option value="3">混凝土</option>
+                    <option value="4">公交车</option>
+                    <option value="5">客运车</option>
+                </select>
+                
+                <span style="width:100px;">是否为担保公司:</span>
+                <label style="float:none" >
+                <input type='radio' id="is_guarantee" name="is_guarantee" style='vertical-align:middle;' value='0' />是
+                </label>
+                <label style="float:none" >
+                <input type='radio' id="is_guarantee" name="is_guarantee" checked="checked" style='vertical-align:middle;' value='1' />否
+            	</label>
+            </div>
+            <div class="panel">
+                <span>销售经理:</span>
+                <input name="managerName2" id="managerName2" list="userDataList2" style="width:150px;height:20px;" autocomplete="on" />
+                <input type="hidden" name="managerId2" id="managerId2" required="true" />
+                <datalist id="userDataList2"></datalist>
+            </div>
+            <!--  
+            <div class="panel">
+                <span>归档合同号:</span>
+                <input type='text' id="fileno" name='fileno'  style="width:150px;" />
+                
+                <span>归档位置:</span>
+                <input type='text' id="location" name='location'  style="width:400px;" />
+            </div>
+            -->
+            <div class="panel">    
+                <span>备注:</span>
+                <input type='text' id="cust_remark" name='cust_remark'  style="width:654px;" />
+            </div>
+            <div class="panel" id="child_phone_panel">  
+            	<input type='hidden' id="phone_id" name='phone_id' />
+            	<span>联系人:</span>
+                <input type='text' id="linkman" name='linkman'  style="width:80px;" />
+              
+            	<span>电话号码:</span>
+                <input type='text' id="phone" name='phone'  style="width:90px;" />
+                
+                <span>类型:</span>
+                <select size="1" name="phone_type" id="phone_type" style="width:90px;">
+                	<option value="1">常用联系人</option>
+                	<option value="2">接警联系人</option>
+                	<option value="99">其他联系人</option>
+                </select>
+                
+                <span>备注:</span>
+                <input type='text' id="remark" name='remark'  style="width:140px;" />
+                <a href="javascript:void(0);" style="margin:0px;padding:0px;padding-left:10px;padding-top:5px;"><img alt="增加电话号码" src="../../images/form_add.png" title="增加电话号码" style="vertical-align:middle"></a>
+            </div>
+        </fieldset>
+        
+        <div class='title' style="width:865px;">托收资料</div>
+		<fieldset style="width:850px;">
+            <div class="panel">
+                <span>账号名称:</span>
+                <input type='text' id="collection_name" name='collection_name' style="width:150px;" />
+                
+                <span>银行账号:</span>
+                <input type='text' id="account" name='account' style="width:150px;" />
+                
+                <span>确认账号:</span>
+                <input type='text' id="confirm_account" name='confirm_account' style="width:150px;" onblur='checkaccount()'/>
+            </div>
+            <div class="panel">
+                <span>账户身份证:</span>
+                <input type='text' id="ac_id_no" name='ac_id_no' style="width:150px;" />
+                
+            </div>
+            <div class="panel">
+                <span>托收机构:</span>
+                <select size="1" name="child_agency" id="child_agency" style="width:152px;" autocomplete="on" onchange="changeAgency();">
+                    <option value="2">金融中心</option>
+                    <option value="1">银盛</option>
+                    <option value="3">银联</option>
+                </select>
+                
+                <span>银行:</span>
+                <select size="1" name="child_bank" id="child_bank" style="width:152px;" autocomplete="on">
+                </select>
+                
+                <span>账号类型:</span>
+                <select size="1" name="account_type" id="account_type" style="width:154px;" autocomplete="on">
+                    <option value="0">借记卡</option>
+                    <option value="1">存折</option>
+                    <option value="2">信用卡</option>
+                </select>
+            </div>
+            <div class="panel">
+                <span>是否投递:</span>
+                <label style="float:none" >
+                <input type='radio' id="is_delivery" name="is_delivery" checked="checked" style='vertical-align:middle;' value='0' />不投递
+                </label>
+                <label style="float:none" >
+                <input type='radio' id="is_delivery" name="is_delivery" style='vertical-align:middle;' value='1' />平邮
+                </label>
+                <label style="float:none" >
+                <input type='radio' id="is_delivery" name="is_delivery" style='vertical-align:middle;' value='2' />重点投递
+                </label>
+                <label style="float:none" >
+                <input type='radio' id="is_delivery" name="is_delivery" style='vertical-align:middle;' value='3' />电子账单
+                </label>
+                
+                <span style="padding-left:132px;">发票收件人:</span>
+                <input type='text' id="addressee" name='addressee' style="width:150px;" />
+            </div>
+            <div class="panel">
+                <span>联系电话:</span>
+                <input type='text' id="tel" name='tel' style="width:150px;" />
+                
+                <span>邮政编号:</span>
+                <input type='text' id="post" name='post' style="width:150px;" />
+                
+                <span>托收合同号:</span>
+                <input type='text' id="pay_ct_no" name='pay_ct_no' style="width:150px;" onblur="checkPayctno();"/>
+            </div>
+            <div class="panel">
+                <span>投递地址:</span>
+                <input type='text' id="province" name='province'  style="width:110px;" />
+                <a>省</a>
+                <input type='text' id="city" name='city'  style="width:110px;" />
+                <a>市</a>
+                <input type='text' id="area" name='area'  style="width:110px;" />
+                <a>区</a>
+                <input type='text' id="address" name='address' style="width:250px;" />
+            </div>
+            
+        </fieldset>
+	</form>
+
+	
+</body>
+<script type="text/javascript">
+function checkPayctno(){
+	var pay_ct_no = $('#pay_ct_no').val();
+	var collection_id = $('#collection_id').val();
+	$.ajax({
+		type : 'post',
+		async : false,
+		contentType : 'application/json',
+		dataType : 'json',
+		url : '../../getCollectionByctno',
+		data : JSON.stringify({pay_ct_no:pay_ct_no,collection_id:collection_id}),
+		success : function(data) {
+			if (data) {
+				if(data.success){
+					$(document).sgPup({message:'message_alert',text: "提示:您填写的托收合同号在系统中有重复,请确认!"});
+				}
+			}
+		},
+		error : function(res, error) {
+			$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+				+ ";error=" + error});
+		}
+	});
+	
+}
+
+function changeAgency(){
+	//填充银行
+	var bank = $('#child_bank');
+    var agency_id = $('#child_agency option:selected').val();
+    var stype;
+    if(agency_id==1||agency_id==2){
+    	stype = 3010;
+    }else if(agency_id==3){
+    	stype = 3011;
+    }
+    bank.empty();
+    $.ajax( {
+  	  type : 'post', 
+  	  async: false,   
+  	  contentType : 'application/json',     
+  	  dataType : 'json',     
+  	  url : '../../sys/findSysValue',   
+  	  data:JSON.stringify({stype : stype, isDel : 0}),
+  	  success : function(data) {
+  		  if(data){
+  			  if(bank){
+  				  $.each(data,function(k,v){
+  					  bank.append("<option value='" +v.svalue+"'>" + v.sname+"</option>");
+  				  }); 
+  			  }
+  		  }
+  	  } ,     
+  	  error : function(res,error) { 
+  	  	 alert("responseText="+res.responseText+";error="+error);     
+  	  }    
+  	});
+}
+
+$(function () {
+	$("#ac_id_no").identityInput({min:2,max:24,deimiter:' ',onlyNumber : true});
+	
+	var flag = 0;
+	$("#child_phone_panel a").on('click',function(){
+		var detail_div = $("<div></div>");
+		var detail_id = "child_phone_panel"+flag;
+		detail_div.attr('id',detail_id);
+		detail_div.addClass("panel");
+		detail_div.append($("#child_phone_panel").html());
+		
+		$("#child_phone_panel").before(detail_div);
+		$("#"+detail_id+" phone_id").attr('value','');
+		$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+		$("#"+detail_id+" img").attr('title','删除电话号码');
+		
+		$("#"+detail_id+" a").on('click',function(){
+			$("#"+detail_id).remove();
+		})
+		//$("#"+detail_id + " input[list=productList]").on('keyup',checkProduct);
+		flag=flag+1;
+	});
+	
+	$("#child_bank").on('click',function(){
+		//填充银行
+		var bank = $('#child_bank');
+	    var agency_id = $('#child_agency option:selected').val();
+	    var stype;
+	    if(agency_id==1){
+	    	stype = 3010;
+	    }else if(agency_id==2){
+	    	stype = 3010;
+	    }else if(agency_id==3){
+	    	stype = 3011;
+	    }
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../sys/findSysValue',   
+	  	  data:JSON.stringify({stype : stype, isDel : 0}),
+		  success : function(data) {
+			  if(data){
+				  if(bank){
+					  $.each(data,function(k,v){
+						  bank.append("<option value='" +v.svalue+"'>" + v.sname+"</option>");
+					  }); 
+				  }
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	 alert("responseText="+res.responseText+";error="+error);     
+		  }    
+		});
+	});
+    
+  //自动查询销售经理
+	var checkUser = function(){
+		var params = {};
+		params.pageNo = 1;
+		params.pageSize = 10;
+		params.filter = {};
+		params.filter.opname = this.value;
+		var obj = $(this);
+		$.ajax({
+			  type : 'post', 
+			  async: false,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../getCompanySaleManager',   
+			  data:JSON.stringify(params),
+			  success : function(data) {
+				  if(data){
+					  var manager = $("#managerName2");
+					  						  
+					  if(manager){
+						  if(data.items.length>0){
+							  userDataList = {};
+							  $("#userDataList2").empty();
+						  }
+						  if(text == ''){
+							  var emptyop = $("<option></option>");
+							  emptyop.val(" ");
+							  $("#userDataList2").append(emptyop);
+						  }
+						  $.each(data.items,function(k,v){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+v.opname);
+							  $("#userDataList2").append(op);
+							  
+							  userDataList[v.opname] = v.opid;
+	 				  	 }); 
+						}
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  }    
+			});
+	};
+	
+	$("#managerName2").on('click',function(){
+	    //填充销售经理
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCompanySaleManager',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#managerName2");
+				  if(manager){
+					  if(data.items.length>0){
+						  userDataList = {};
+						  $("#userDataList2").empty();
+					  }
+					  var emptyop = $("<option></option>");
+					  emptyop.val(" ");
+					  $("#userDataList2").append(emptyop);
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userDataList2").append(op);
+						  
+						  userDataList[v.opname] = v.opid;
+					  	 }); 
+					  manager.on('keyup',checkUser);
+					  manager.on('change',function(){
+						  var strs = this.value.split(" ");
+						    if(userDataList[strs[strs.length-1]]){
+								$(this).val(strs[strs.length-1]);
+								$("#managerId2").val(userDataList[strs[strs.length-1]]);
+								
+								if($("#managerId2").val().length==0){
+									$("#managerName2").val("");
+								}
+						    }else{
+						    	$(this).val('');
+						    	$("#managerId2").val("");
+						    }	
+						});
+	
+					}
+			  }
+		  },     
+		  error : function(res,error) { 
+		  }    
+		});
+	 });
+});
+</script>
+</html>

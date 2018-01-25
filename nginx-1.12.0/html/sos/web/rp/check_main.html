@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>盘点</title>
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<style type="text/css">
+.hDiv table th,td {
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #fff;
+	overflow: hidden;
+	vertical-align: top !important;
+	padding-left: 4px;
+	padding-right: 4px;
+	line-height: 28px;
+}
+
+.hDiv table thead th[rowspan],.hDiv th[colspan] {
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-left: 1px solid #fff;
+	overflow: hidden;
+	vertical-align: middle !important;
+	text-align: center !important;
+	line-height: 28px;
+}
+
+/* 表格主体 */
+.hDiv table tbody {
+	border: 1px solid #cbcbd5;
+	border-top: 0px;
+	overflow-y: scroll;
+	border-bottom: 1px solid #ccc;
+	background-color: #fff;
+}
+
+.hDiv table tbody tr.normalRow {
+	background-color: #dfe6ef;
+}
+
+.hDiv table tbody tr:hover {
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4791d2),
+		to(#4791d2), color-stop(.6, #4791d2));
+	background: -moz-linear-gradient(0% 65% 90deg, #4791d2, #4791d2, #4791d2 100%);
+	color: #fff;
+}
+</style>
+</head>
+<body>
+<div id="nw_document_all">
+	<div id='dgd_check_details' class='datagrid'>
+		<div class="mDiv">盘点报表</div>
+		<div class="sDiv" id="div_whs">
+			<form id="form_check">
+			   <div class="pGroup"><span class="label">盘点名称:</span>
+			   <input type="text" name="checkName" id="checkName" list="checkDataList">
+			   <input type="hidden" id="checkId" name="checkId" />   
+                 <datalist id="checkDataList">
+   				 </datalist>
+			   </div>
+				<div class="pGroup">
+					<span>开始日期:</span> <input type="date" name="startDate" id="startDate" style="width:120px;"  >
+				</div>
+				<div class="pGroup">
+					<span>结束日期:</span> <input type="date" name="endDate" id="endDate" style="width:120px;">
+				</div>
+			</form>
+			<div class="pGroup" style="width:70px;">
+				<a type="button" class="button" id="aquery" style="width:55px;" > <span
+					class="button_span" style="padding:5px 0 5px 10px;"> <span class="pSearch">查询</span>
+				</span>
+				</a>
+			</div>
+			<div class="pGroup" style="width:80px;">
+				<a type="button" class="button" id="aexport" style="width:65px;"> <span
+					class="button_span" style="padding:5px 0 5px 10px;"> <span>导出Excel</span>
+				</span>
+				</a>
+			</div>
+			<!-- <div class="pGroup">
+				<a type="button" class="button" id="aimport"> <span
+					class="button_span"> <span>导入Excel</span>
+				</span>
+				</a>
+			</div>-->
+			<div class="pGroup" style="width:70px;">
+				<a type="button" class="button" id="aprint" style="width:55px;"> <span
+					class="button_span" style="padding:5px 0 5px 10px;"> <span class="pSearch">打印</span>
+				</span>
+				</a>
+			</div> 
+		</div>
+		<div class="hDiv" style="margin: 0px; padding: 0px;min-height:510px;max-height:510px;overflow: auto;">
+			<table style="width: 1000px;">
+				<thead>
+					<tr>
+					   <th style="" rowspan="2" axis="rownumbers" width="30px">序号</th>
+						<th style="" rowspan="2" axis="productCode" width="50px">商品编码</th>
+						<th style="" rowspan="2" axis="productName" width="50px" >商品名称</th>
+						<th style="" rowspan="2" axis="productNorm" width="90px" >商品规格</th>
+						<th style="" rowspan="2" axis="unit">计量单位</th>
+						<th style="" rowspan="2" axis="lastSaveNum">上月账面结存数量</th>
+						<th style="" colspan="3">本月入库数（账面数）</th>
+						<th style="" colspan="5">本月减少数（账面数）</th>
+						<th style="" rowspan="2" axis="curSaveNum">月末账面结存数量</th>
+						<th style="" rowspan="2" axis="curObjectNum">月末实物盘存</th>
+						<th style="" rowspan="2" axis="overShortNum">盈亏数</th>
+						<th style="" rowspan="2" axis="changeNum">调账数</th>
+						<th style="width:100px;" rowspan="2" axis="remark">备注</th>
+					</tr>
+					<tr>
+						<th style="" axis="curInNum">本月入库数量</th>
+						<th style="" axis="curReturnNum">当月归还数量</th>
+						<th style="" axis="otherInNum">其他</th>
+						<th style="" axis="selOutNum">销售安装</th>
+						<th style="" axis="borrowOutNum">车行调剂</th>
+						<th style="" axis="upgradeOutNum">升级</th>
+						<th style="" axis="curBorrowNum">当月借出数量</th>
+						<th style="" axis="otherOutNum">其他</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+
+	</div>
+</div>
+	<!-- 打印iframe -->
+	<iframe id="ifm_print_check_main" name="ifm_print_check_main" style="display: none"></iframe>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+	(function($){
+		var checkDataList={};//代理商 key:名称,value:id
+		var today=new Date();
+		today.setMonth(today.getMonth()-1);
+		//开始日期
+		//$("input[name=startDate]").val(today.format('yyyy-MM-dd'));
+		//结束日期
+		today.setMonth(today.getMonth()+1)
+		//$("input[name=endDate]").val(today.format('yyyy-MM-dd'));
+		
+		//自动查询盘点名称
+		var checkCheck = function(){
+			/* var text=this.value;
+			text = text.replace(/\s/g,''); //去除空格
+			if(text!=this.value){//有空格
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			} */
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.name = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../sell/findChecksByPage',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var checks = data.items;
+						  if(checks.length>0){
+							     $("#checkDataList").empty();
+						  		checkDataList = {};
+						   }
+						  $.each( checks, function(key,value){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+value.name.replace(/\s/g,''));
+							  $("#checkDataList").append(op);
+							  checkDataList[value.name.replace(/\s/g,'')]=value;
+							});
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		};
+		//填充盘点名称
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../sell/findChecksByPage',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{}}),
+			  success : function(data) {
+				  if(data){
+					  var checks = data.items;
+					  if(checks.length>0){
+						     $("#checkDataList").empty();
+					  		checkDataList = {};
+						  }
+					  $.each( checks, function(key,value){
+						  var op = $("<option></option>");
+						  op.val(value.name.replace(/\s/g,''));
+						  $("#checkDataList").append(op);
+						  checkDataList[value.name.replace(/\s/g,'')]=value;
+						});
+					  
+					  $("#checkName").on('keyup',checkCheck);
+					  $("#checkName").on('change',function(){
+							var strs = this.value.split(" ");
+							$(this).val(strs[strs.length-1]);
+						    if(checkDataList[strs[strs.length-1]]){
+								$("#checkId").val(checkDataList[strs[strs.length-1]].id);
+								$("#startDate").val(checkDataList[strs[strs.length-1]].startDate);
+								$("#endDate").val(checkDataList[strs[strs.length-1]].endDate);
+								
+								if($("#checkId").val().length==0){
+									$("#checkName").val("");
+								}
+						    }else{
+						    	$(this).val('');
+						    	$("#checkId").val("");
+						   }
+						    
+						});
+					  
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+		
+		//查询
+		$('#aquery').on('click',function(){
+			var param={};
+			param.id=$("#checkId").val();
+			param.startDate=$("input[name=startDate]").val();
+			param.endDate=$("input[name=endDate]").val();
+			if(!param.id && !(param.startDate&&param.endDate)){
+				$(document).sgPup({message:'message_info',text: "盘点名称和时间段必选一个!"});
+				return false;
+			}else if(param.startDate && !param.endDate){
+				$(document).sgPup({message:'message_info',text: "请同时输入开始日期和结束日期!"});
+				$("input[name=endDate]").focus();
+				return false;
+			}else if(param.endDate && !param.startDate){
+				$(document).sgPup({message:'message_info',text: "请同时输入开始日期和结束日期!"});
+				$("input[name=startDate]").focus();
+				return false;
+			}
+			 $.ajax({
+		            type: "POST",
+		            async:false,
+		            contentType : 'application/json',
+		            url: '../../sell/findCheck4Report',
+		            data: JSON.stringify(param),
+		            dataType : 'json',
+		            success: function(data){
+		            	if(data.checkDetailsMap){
+		            	   var obj=$('#dgd_check_details');
+		            	    //列头
+			           		var colModel=[];
+			           		colModel.push({name:'rownumbers'});
+			           		colModel.push({name:'productCode'});
+			           		colModel.push({name:'productName'});
+			           		colModel.push({name:'norm'});
+			           		colModel.push({name:'unit'});
+			           		colModel.push({name:'lastSaveNum'});
+			           		colModel.push({name:'curInNum'});
+			           		colModel.push({name:'curReturnNum'});
+			           		colModel.push({name:'otherInNum'});
+			           		colModel.push({name:'selOutNum'});
+			           		colModel.push({name:'borrowOutNum'});
+			           		colModel.push({name:'upgradeOutNum'});
+			           		colModel.push({name:'curBorrowNum'});
+			           		colModel.push({name:'otherOutNum'});
+			           		colModel.push({name:'curSaveNum'});
+			           		colModel.push({name:'curObjectNum'});
+			           		colModel.push({name:'overShortNum'});
+			           		colModel.push({name:'changeNum'});
+			           		colModel.push({name:'remark'});
+		            	   addData(data.checkDetailsMap,obj,colModel);
+		            	}else{
+		            		$('#dgd_check_details .hDiv table tbody').empty();
+		            	}
+		            } ,     
+		  		  error : function(res,error) { 
+		 		  	 //    if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}  
+		 		  	$('#dgd_check_details .hDiv table tbody').empty();
+		 		  }  
+		        });
+		});
+		//导出
+		$('#aexport').on('click',function(){
+			var id=$("#checkId").val();
+			var startDate=$("input[name=startDate]").val();
+			var endDate=$("input[name=endDate]").val();
+			if(!id && !(startDate&&endDate)){
+				$(document).sgPup({message:'message_info',text: "盘点名称和时间段必选一个!"});
+				return false;
+			}else if(startDate && !endDate){
+				$(document).sgPup({message:'message_info',text: "请同时输入开始日期和结束日期!"});
+				$("input[name=endDate]").focus();
+				return false;
+			}else if(endDate && !startDate){
+				$(document).sgPup({message:'message_info',text: "请同时输入开始日期和结束日期!"});
+				$("input[name=startDate]").focus();
+				return false;
+			}
+			
+			var queryArray  =$("form",'.sDiv').serializeArray();
+            var keyValues=[];
+            $.each(queryArray, function(k, v){
+                if(v.value!=null&& v.value.trim().length>0&& v.value!='null'){
+                	keyValues.push(v.name+"="+v.value);
+                }
+            });
+            var url="../../sell/exportExcel4CheckReport?"+keyValues.join('&');
+            window.location.href=url;
+			
+		});
+		
+		//添加数据
+		var addData=function(json,obj,colModel){
+
+	        var tby = $('<tbody></tbody>') ;
+	        var hdv = $('.hDiv',obj);
+	        $.each(json,function(i,row){
+	            var tr = $('<tr></tr>');
+            	$.each(colModel,function(k,v){
+            		var td = $('<td></td>');
+            		var th_this= $('thead th[axis='+v.name+']', hdv);
+	                var editable = $(th_this).attr('editable');
+	                var disabled = $(th_this).attr('disabled');
+	                var isnum = $(th_this).attr('isnum');
+	                var isrequest = $(th_this).attr('isrequest');
+	                var formatter = $(th_this).attr('formatter');
+	                var tdx = v.name;
+
+	            	if(tdx=='rownumbers'){
+	                 	var tdwidth = $(th_this).css('width');
+	                     td.css('width',tdwidth);
+	                 	var num = i+1;
+	                 	td.append(num);              	
+	                 }else{
+	                	 var tdwidth = $(th_this).css('width');
+	                     td.css('width',tdwidth);
+	                     var dv = $('<div></div>');
+	                     dv.css('width',tdwidth);
+	                     //padding-top: 5px; line-height: 16px;
+	                     dv.css('padding-top','5px');
+	                     dv.css('line-height','16px');
+	                     dv.css('word-break','break-all');
+	                	 if(editable){
+	                		 td.css('margin',0);
+	                		 td.css('padding',2);
+	                     	 var editinput = $("<input type='text' />");
+	                     	 editinput.attr('name',tdx);
+	                     	 editinput.width(tdwidth);
+	                     	 editinput.css('margin',0);
+	                    	 editinput.css('padding',0);
+	                    	 editinput.css('padding',0);
+	                    	 
+	                     	 if(disabled){
+	                     		 editinput.attr('disabled','disabled');
+	                     		 editinput.val(row[tdx]);
+	                     	 }
+	                     	 if(isnum){
+	                     		editinput.attr('type','number');
+	                     	 }
+	                     	 if(isrequest){
+	                     		editinput.attr('required',isrequest);
+	                     	 }
+	                     	 dv.append(editinput);
+	                     }else{                         
+							if(formatter){
+								 dv.html((formatter)(row[tdx],row));
+							}else{
+								 dv.html(row[tdx]);
+							}
+	                     }
+	                	 td.append(dv);
+	                     
+	                 }
+	           
+	                tr.append(td);
+	                td = null;
+            	});
+	            tby.append(tr);
+	        });
+	        //var tbl_id =  "#"+obj.attr("id")+"_tbl";
+	        var tbl = $("#"+obj.attr("id")+" table");
+	        $('tr', tbl).unbind();
+	        //$(tbl).empty();
+	        $('tbody',tbl).empty();
+	        tbl.append(tby);
+	        $('tbody tr:odd',tbl).addClass('normalRow');
+
+	        tby = null;
+	        hdv = null;
+	        tbl = null;
+	        tbl_id = null;
+	        json = null;
+		};
+		
+		 //打印
+		$('#aprint').on('click',function(){
+			 //查询数据
+	        var param={};
+			param.id=$("#checkId").val();
+			param.startDate=$("input[name=startDate]").val();
+			param.endDate=$("input[name=endDate]").val();
+			if(!param.id && !(param.startDate&&param.endDate)){
+				$(document).sgPup({message:'message_info',text: "盘点名称和时间段必选一个!"});
+				return false;
+			}else if(param.startDate && !param.endDate){
+				$(document).sgPup({message:'message_info',text: "请同时输入开始日期和结束日期!"});
+				$("input[name=endDate]").focus();
+				return false;
+			}else if(param.endDate && !param.startDate){
+				$(document).sgPup({message:'message_info',text: "请同时输入开始日期和结束日期!"});
+				$("input[name=startDate]").focus();
+				return false;
+			}
+			//$('#ifm_print_check_main').attr('src','stock_print2.html');
+			var	sName='winPrint';
+					var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+					if (isChrome){
+					  sName='ifm_print_check_main';
+					}
+					window.open('../whs/print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+					if (!isChrome){
+						//新增遮罩层
+		  				var mask=$('<div id="print_mask"></div>');
+		  				mask.addClass('window-mask');
+		  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+		  		        var span=$('<span></span');
+		  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+		  		        span.text('正在打印中...');
+		  		        mask.append(span);
+		  			    $(window.document.body).append(mask);
+				    } 
+		});
+		
+	})(jQuery)
+	
+	//打印页面元素设置
+  var callback=function(subWinBody,subWin){
+		/*得到仓库名称
+	         $.ajax({
+			  type : 'POST', 
+			  async: false,   
+			  url : '../../stock/getWarehouseName', 
+			  dataType : 'json',  
+			  data:{},
+			  success : function(data) {
+				  if(data){
+					wareHouseName=data.name;
+				  }else{
+					wareHouseName='&nbsp;';
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }   
+			  
+		    });*/
+	 
+	 //查询数据
+        var param={};
+		param.id=$("#checkId").val();
+		param.startDate=$("input[name=startDate]").val();
+		param.endDate=$("input[name=endDate]").val();
+		if(!param.id && !(param.startDate&&param.endDate)){
+			$(document).sgPup({message:'message_info',text: "盘点名称和时间段必选一个!"});
+			return false;
+		}else if(param.startDate && !param.endDate){
+			$(document).sgPup({message:'message_info',text: "请同时输入开始日期和结束日期!"});
+			$("input[name=endDate]").focus();
+			return false;
+		}else if(param.endDate && !param.startDate){
+			$(document).sgPup({message:'message_info',text: "请同时输入开始日期和结束日期!"});
+			$("input[name=startDate]").focus();
+			return false;
+		}
+		
+		var checkData=null;//盘点明细
+		
+		 $.ajax({
+	            type: "POST",
+	            async:false,
+	            contentType : 'application/json',
+	            url: '../../sell/findCheck4Report',
+	            data: JSON.stringify(param),
+	            dataType : 'json',
+	            success: function(data){
+	            	checkData=data;
+	            } ,     
+	  		  error : function(res,error) { 
+	 		  	 //    if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}  
+	 		  	$('#dgd_check_details .hDiv table tbody').empty();
+	 		  }  
+	        });
+	 
+	 
+	$.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getCurrentCompany',   
+		  data:JSON.stringify({}),
+		  success : function(data) {
+			  if(data){
+				  var total = 0;
+				  //公司中文名字
+				  $("#cname",subWinBody).empty();
+				  $("#cname",subWinBody).append(data.cnfullname);
+				  //公司英文名字
+				  $("#ename",subWinBody).empty();
+				  $("#ename",subWinBody).append(data.enfullname);
+				  //表单名字
+				  $("#orderTitle",subWinBody).empty();
+				  $("#orderTitle",subWinBody).append("盘点报表");
+				  //表单日期
+				  $("#orderDate",subWinBody).empty();
+				  $("#orderDate",subWinBody).append(new Date().format('yyyy-MM-dd'));
+				  //表单单号
+				  $("#orderNo",subWinBody).empty();
+				  if(checkData){
+				 	 $("#orderNo",subWinBody).append(checkData.name);
+				  }else{
+					  $("#orderNo",subWinBody).append('&nbsp;');
+				  }
+				  $("#orderNo",subWinBody).prev('span').text('名称：');
+				 
+				  //表前输入单
+				  var divFormBefInfo1='<span style="width:10%;">开始日期：</span>';
+				  divFormBefInfo1=divFormBefInfo1+'<span style="text-align:left;width:23%;">';
+				  if(checkData){
+				  	 divFormBefInfo1=divFormBefInfo1+checkData.startDate+'</span>';
+				  }else{
+					  divFormBefInfo1=divFormBefInfo1+'&nbsp;</span>';
+				  }
+				  //客户名称
+				  divFormBefInfo1=divFormBefInfo1+'<span style="width:10%;">结束结束：</span>';
+				  divFormBefInfo1=divFormBefInfo1+'<span style="text-align:left;width:23%;">';
+				  if(checkData){
+				    divFormBefInfo1=divFormBefInfo1+checkData.endDate+'</span>';
+				  }else{
+					  divFormBefInfo1=divFormBefInfo1+'&nbsp;</span>';
+				  }
+				  divFormBefInfo1=divFormBefInfo1+'<span style="width:10%;">盘点仓库：</span>';
+				  divFormBefInfo1=divFormBefInfo1+'<span style="text-align:left;width:23%;">'+checkData.whsName+'</span>';
+				
+				  $("#headInput",subWinBody).append(divFormBefInfo1);
+				
+				  var thead='<tr>';
+				  thead=thead+'<td style="" rowspan="2" axis="rownumbers" width="4%">序号</td>'+
+				  '<td style="" rowspan="2" axis="productCode" width="8%">商品编码</td>'+
+					'<td style="" rowspan="2" axis="productName" width="7%" >商品名称</td>'+
+					'<td style="" rowspan="2" axis="norm" width="14%" >商品规格</td>'+
+					'<td style="" rowspan="2" axis="unit" width="4%">计量单位</td>'+
+					'<td style="" rowspan="2" axis="lastSaveNum" width="5%">上月账面结存数量</td>'+
+					'<td style="" colspan="3" width="17%">本月入库数（账面数）</td>'+
+					'<td style="" colspan="5" width="20%">本月减少数（账面数）</td>'+
+					'<td style="" rowspan="2" axis="curSaveNum" width="5%">月末账面结存数量</td>'+
+					'<td style="" rowspan="2" axis="curObjectNum" width="5%" >月末实物盘存</td>'+
+					'<td style="" rowspan="2" axis="overShortNum" width="3%">盈亏数</td>'+
+					'<td style="" rowspan="2" axis="changeNum" width="3%">调账数</td>'+
+					'<td width="100px" rowspan="2" axis="remark" width="5%">备注</td>';
+				  thead=thead+'</tr>';
+				  thead=thead+'<tr>';
+				  thead=thead+'<td style="" axis="curInNum" width="6%">本月入库数量</td>'+
+					'<td style="" axis="curReturnNum"width="6%" >当月归还数量</td>'+
+					'<td style="" axis="otherInNum" width="5%">其他</td>'+
+					'<td style="" axis="selOutNum" width="5%">销售安装</td>'+
+					'<td style="" axis="borrowOutNum" width="5%">车行调剂</td>'+
+					'<td style="" axis="upgradeOutNum" width="2%">升级</td>'+
+					'<td style="" axis="curBorrowNum"width="5%">当月借出数量</td>'+
+					'<td style="" axis="otherOutNum" width="3%">其他</td>';
+				   thead=thead+'</tr>';
+				  //表头
+				  $("#tbHead",subWinBody).append(thead);
+				 
+				  //表格主体
+	              if(checkData&&checkData.checkDetailsMap){
+	            	    //列头
+		           		var colModel=[];
+		           		colModel.push({name:'rownumbers'});
+		           		colModel.push({name:'productCode'});
+		           		colModel.push({name:'productName'});
+		           		colModel.push({name:'norm'});
+		           		colModel.push({name:'unit'});
+		           		colModel.push({name:'lastSaveNum'});
+		           		colModel.push({name:'curInNum'});
+		           		colModel.push({name:'curReturnNum'});
+		           		colModel.push({name:'otherInNum'});
+		           		colModel.push({name:'selOutNum'});
+		           		colModel.push({name:'borrowOutNum'});
+		           		colModel.push({name:'upgradeOutNum'});
+		           		colModel.push({name:'curBorrowNum'});
+		           		colModel.push({name:'otherOutNum'});
+		           		colModel.push({name:'curSaveNum'});
+		           		colModel.push({name:'curObjectNum'});
+		           		colModel.push({name:'overShortNum'});
+		           		colModel.push({name:'changeNum'});
+		           		colModel.push({name:'remark'});
+	            	  
+		    	        var tr=null;
+		    	        var td=null;
+		    	        $.each(checkData.checkDetailsMap,function(i,row){
+		    	            tr = '<tr>';
+		                	$.each(colModel,function(k,v){
+		                		td ='<td>';
+		    	                var tdx = v.name;
+
+		    	            	if(tdx=='rownumbers'){
+		    	                 	var num = i+1;
+		    	                 	td=td+num+'</td>';               	
+		    	                 }else{
+		    	                	 if(row[tdx]==null || row[tdx]=='null'){
+		    	                		 row[tdx]='';
+		    	                	 }
+		    	                	 td=td+row[tdx];
+		    	                	 td=td+'</td>';
+		    	                 }
+		    	           
+		    	            	tr=tr+td;
+		                	});
+		                	tr=tr+'</tr>';
+		                	$("#tbBody",subWinBody).append(tr);
+		    	        });
+	              }
+				  //表尾输入单
+				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+													  '<span>复核人：</span><div>&nbsp;</div>'+
+													  '<span>仓管员：</span><div>&nbsp;</div>'+
+													  '<span>制单：</span><div>&nbsp;</div>');
+				  
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+	
+    if (navigator.appName == 'Microsoft Internet Explorer'){
+    	subWin.print();  
+    }else{ 
+    	subWin.focus();
+    	subWin.print();  
+    }
+};
+</script>
+</html>

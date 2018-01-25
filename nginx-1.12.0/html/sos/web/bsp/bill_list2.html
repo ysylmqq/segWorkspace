@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/layout.css" />
+<link rel="stylesheet" type="text/css" href="../../css/menu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/accordion.css" />
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css" />
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/tree.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+</head>
+<body>
+    <div id="dispatchgrid" class="datagrid"></div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/index.js"></script>
+<script type="text/javascript" src="../../jscript/accordion.js"></script>
+<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+<script type="text/javascript" src="../../jscript/tab.js"></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/tree.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+(function($){
+	
+	
+	var loadSuccessfollow = function(){
+ 		//填充编辑前的值
+ 		   if(editId && editObj){
+ 				  $("#taskId",$("#follow")).val(editObj.id);
+				  $("#customer",$("#follow")).val(editObj.customerName);
+				  $("#dispatch_id",$("#follow")).val(editObj.dispatchId);
+				  if(editObj.status == 5){
+					   $("[name = is_over]:checkbox",$("#follow")).attr("checked", true);
+				  }
+					 var company =  $("#company",$("#follow"));
+					 $.ajax({
+						  type : 'post', 
+						  async: true,   
+						  url : 'dispatchElectrician/getElectriciansBytaskId',   
+						  data:{id:$("#taskId").val()},
+						  success : function(data) {
+							  if(data){
+								  
+								  $.each(data,function(k,v){
+								  	  company.append("<option value='" +v.id+"'>" + v.name+"</option>");
+								  });
+							  }else{
+							  	alert(data);
+							  }
+						  } ,     
+						  error : function(res,error) { 
+						  	     if(res && res.responseText){ alert(res.responseText);}     
+						  }    
+						});
+					 
+ 		   }
+ 		  editId=null;
+ 		 editObj=null; 
+ 		  
+ 	   }
+
+	
+	function GetDateStr(AddDayCount) {
+	    var dd = new Date();
+	    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+	    return dd.format('yyyy-MM-dd');
+	}
+ 
+    
+	var loadSuccess11 = function(){
+ 		//填充编辑前的值
+ 		   if(editId && editObj){
+ 				  $("#taskId",$("#dispatch_newclothes")).val(editObj.id);
+				  $("#billnum",$("#dispatch_newclothes")).val(editObj.billnum);
+				  $("#managerName",$("#dispatch_newclothes")).val(editObj.managerName);
+				  $("#customerName",$("#dispatch_newclothes")).val(editObj.customerName);
+				  $("#product_name",$("#dispatch_newclothes")).val(editObj.productName);
+				  $("#cartype_name",$("#dispatch_newclothes")).val(editObj.cName);
+				  $("#place",$("#dispatch_newclothes")).val(editObj.place);
+				  $("#phone",$("#dispatch_newclothes")).val(editObj.phone);
+				  $("#requirements",$("#dispatch_newclothes")).val(editObj.requirements);
+				  if(editObj.isoffice == 1){
+					   $("[name = is_busines]:checkbox",$("#dispatch_newclothes")).attr("checked", true);
+				  }
+				  $.ajax( {
+					  type : 'POST', 
+					  async: true,  
+					  url : "/sos/customer/getCustomerPhone",   
+					  data:{id:editObj.customerId},
+					  success : function(data) {
+						  if(data){
+							  $("#phone","#dispatch_newclothes").val(data);
+						  }
+					  } 
+				});
+				  
+				  $.ajax( {
+					  type : 'POST', 
+					  async: true,  
+					  url : "/sos/reservation/getReservationMsg",   
+					  data:{id:editObj.id},
+					  success : function(data) {
+						  if(data){
+							  $("#time","#dispatch_newclothes").val(data.time);
+							  $("#reservation_id","#dispatch_newclothes").val(data.rid);
+						  }
+					  } 
+				});
+				  
+				  
+ 		   }
+ 		  editId=null;
+ 		 editObj=null; 
+ 		  
+ 	   }
+    
+	
+	var loadSuccess12 = function(){
+ 		//填充编辑前的值
+ 		   if(editId && editObj){
+ 				  $("#taskId",$("#dispatch_repair")).val(editObj.id);
+				  $("#billnum",$("#dispatch_repair")).val(editObj.billnum);
+				  $("#type",$("#dispatch_repair")).val(editObj.type); 
+				  
+				  $("#car_num",$("#dispatch_repair")).val(editObj.carNum);
+				  $("#code",$("#dispatch_repair")).val(editObj.code);
+				  $("#cartype_name",$("#dispatch_repair")).val(editObj.cName);
+				  $("#place",$("#dispatch_repair")).val(editObj.place);
+				  $("#symptom",$("#dispatch_repair")).val(editObj.customerName);
+				  $("#note",$("#dispatch_repair")).val(editObj.note);
+				  $("#customerName",$("#dispatch_repair")).val(editObj.customerName);
+				  if(editObj.isoffice == 1){
+					   $("[name = is_busines]:checkbox",$("#dispatch_repair")).attr("checked", true);
+				  }
+				  
+				  $.ajax( {
+					  type : 'POST', 
+					  async: true,  
+					  url : "/sos/reservation/getReservationMsg",   
+					  data:{id:editObj.id},
+					  success : function(data) {
+						  if(data){
+							  $("#time","#dispatch_repair").val(data.time);
+							  $("#reservation_id","#dispatch_repair").val(data.rid);
+						  }
+					  } 
+				});
+				  
+				  
+ 		   }
+ 		  editId=null;
+ 		 editObj=null; 
+ 		  
+ 	   }
+    
+	
+	
+	var loadBillShift = function(){
+ 		//填充编辑前的值
+ 		   if(editId && editObj){
+ 				 $("#taskId",$("#bill_shift")).val(editObj.id);
+				  
+ 		   }
+ 		  editId=null;
+ 		 editObj=null; 
+ 		  
+ 	   }
+	
+	
+	var loadSuccess13 = function(){
+ 		//填充编辑前的值
+ 		   if(editId && editObj){
+ 				  $("#taskId",$("#dispathch_police")).val(editObj.id);
+				  $("#billnum",$("#dispathch_police")).val(editObj.billnum);
+				  $("#customerName",$("#dispathch_police")).val(editObj.customerName);
+				  
+				  $("#code",$("#dispathch_police")).val(editObj.code);
+				  $("#color",$("#dispathch_police")).val(editObj.color);
+				  $("#type",$("#dispathch_police")).val(editObj.type);
+				  $("#cartype_name",$("#dispathch_police")).val(editObj.cName);
+				  $("#place",$("#dispathch_police")).val(editObj.place);
+				  $("#note",$("#dispathch_police")).val(editObj.note);
+				  if(editObj.isoffice == 1){
+					   $("[name = is_busines]:checkbox",$("#dispathch_police")).attr("checked", true);
+				  }
+				  
+				  $.ajax( {
+					  type : 'POST', 
+					  async: true,  
+					  url : "/sos/reservation/getReservationMsg",   
+					  data:{id:editObj.id},
+					  success : function(data) {
+						  if(data){
+							  $("#time","#dispathch_police").val(data.time);
+							  $("#reservation_id","#dispathch_police").val(data.rid);
+						  }
+					  } 
+				});
+				  
+				  
+ 		   }
+ 		  editId=null;
+ 		 editObj=null; 
+ 		  
+ 	   }
+    
+	
+	
+	var loadSuccess14 = function(){
+ 		//填充编辑前的值
+ 		   if(editId && editObj){
+ 				  $("#taskId",$("#dispathch_other")).val(editObj.id);
+				  $("#billnum",$("#dispathch_other")).val(editObj.billnum);
+				  $("#customerName",$("#dispathch_other")).val(editObj.customerName);
+				  $("#code",$("#dispathch_other")).val(editObj.code);
+				  $("#car_num",$("#dispathch_other")).val(editObj.code);
+				  $("#color",$("#dispathch_other")).val(editObj.color);
+				  $("#cartype_name",$("#dispathch_other")).val(editObj.cName);
+				  $("#place",$("#dispathch_other")).val(editObj.place);
+				  $("#note",$("#dispathch_other")).val(editObj.note);
+				  $("#phone",$("#dispathch_other")).val(editObj.phone);
+				  if(editObj.isoffice == 1){
+					   $("[name = is_busines]:checkbox",$("#dispathch_other")).attr("checked", true);
+				  }
+				  $.ajax( {
+					  type : 'POST', 
+					  async: true,  
+					  url : "/sos/customer/getCustomerPhone",   
+					  data:{id:editObj.customerId},
+					  success : function(data) {
+						  if(data){
+							  $("#phone","#dispathch_other").val(data);
+						  }
+					  } 
+				});
+				  
+				  $.ajax( {
+					  type : 'POST', 
+					  async: true,  
+					  url : "/sos/reservation/getReservationMsg",   
+					  data:{id:editObj.id},
+					  success : function(data) {
+						  if(data){
+							  $("#time","#dispathch_other").val(data.time);
+							  $("#reservation_id","#dispathch_other").val(data.rid);
+						  }
+					  } 
+				});
+				  
+				  
+ 		   }
+ 		  editId=null;
+ 		 editObj=null; 
+ 		  
+ 	   }
+	
+	
+	
+	
+	
+	var defaultAdd = function(){
+		$("#sm",$("#bill_add")).hide();
+		$("#rk",$("#bill_add")).hide();
+   }
+	
+	
+	
+	var loadSuccess = function(){
+ 		//填充编辑前的值
+ 		   if(editId && editObj){
+				  $("#billnum",$("#view_task2")).val(editObj.billnum);
+				  $("#type",$("#view_task2")).val(editObj.type);
+				  $("#customerName",$("#view_task2")).val(editObj.customerName);
+				  $("#phone",$("#view_task2")).val(editObj.phone);
+				  $("#car_num",$("#view_task2")).val(editObj.carNum);
+				  
+				  $("#code",$("#view_task2")).val(editObj.code);
+				  $("#car_num",$("#view_task2")).val(editObj.carNum);
+				  $("#cartype_name",$("#view_task2")).val(editObj.cName);
+				  $("#product_name",$("#view_task2")).val(editObj.productName);
+				  $("#managerName",$("#view_task2")).val(editObj.managerName);
+				  $("#color",$("#view_task2")).val(editObj.color);
+				  $("#place",$("#view_task2")).val(editObj.place);
+				  if(editObj.isoffice == 1){
+					   $("[name = is_busines]:checkbox",$("#view_task2")).attr("checked", true);
+				  }
+				  $("#symptom",$("#view_task2")).val(editObj.symptom);
+				  $("#note",$("#view_task2")).val(editObj.note);
+				  $("#requirements",$("#view_task2")).val(editObj.requirements);
+				  
+				  if(editObj.type == 1){
+					    $("#sm").hide();
+						$("#rk").hide();
+						$("#rt").show();
+						$("#new").show();
+				  }else if(editObj.type == 2){
+					  	$("#sm").show();
+						$("#rk").show();
+						$("#rt").hide();
+						$("#new").hide();
+				  }else{
+					    $("#sm").hide();
+						$("#rt").hide();
+						$("#rk").show();
+						$("#new").hide();
+				  }
+ 		   }
+ 		
+ 		
+ 		
+ 		  if($('#shift_detail').get(0)){  
+			  $.ajax({
+				  type : 'post', 
+				  async: true,   
+				  url : '/sos/taskFlow/getTaskFlowsDetail',   
+				  data:{taskId:editObj.id},
+				  success : function(data) {
+					  if(data){
+						  $('#shift_detail').sgDatagrid('appendData',data);
+					  }else{
+					  	alert(data);
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ alert(res.responseText);}     
+				  }    
+				});
+		 }
+ 		  editId=null;
+ 		  editObj=null;
+ 		  
+ 	   }
+	
+	
+ 
+
+    var followItem = function(){
+        var obj = $('#dispatchgrid');
+        var bDiv = $('.bDiv',obj);
+        var title;
+        //alert($('input[type=checkbox][checked=checked]',bDiv).length) ;
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            alert("选择多于一个选项！");
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            alert("请选择一个选项！");
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+            	title = $(this).data('data').billnum + "派工单跟单";
+            	editId=this.value;
+            	editObj=$(this).data('data');
+            });
+            var defaults = {
+       			title : title,
+       			id : 'follow',
+       			form : 'follow_form',
+       			url : 'followbill.html',
+       			success: loadSuccessfollow,
+       			width : 390,
+       			height : 300,
+       			buttons : [ {
+       				name : '确认',
+       				type : 'submit',
+       				onpress : saveFollow
+       			}, {
+       				name : '取消',
+       				onpress : winClose1
+       			} ]
+       		};
+       		$(document).sgWindow(defaults);
+        }else{
+            alert("请选择一个选项！");
+        }
+    }
+    
+    
+    var endItem = function(){
+        var obj = $('#dispatchgrid');
+        var bDiv = $('.bDiv',obj);
+
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+        }else{
+        	
+        	 $(document).sgConfirm({text: '确定结束该工单吗?',cfn:function(r){ 
+ 		     	if(r){
+        	//if(window.confirm('确定结束该工作单吗?')){
+        		var flag = false;
+        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	                if($(this).attr("checked")){    
+	                	editId=this.value;
+	                	editobj = $(this).data('data');
+	                		var ids=[];
+	                		ids.push(editId);
+		                	//打开窗口
+		                	$.ajax( {
+			            		  type : 'post', 
+			            		  async: false,   
+			            		  contentType : 'application/json',     
+			            		  dataType : 'json',     
+			            		  url : '/sos/task/endTasks',   
+			            		  data:JSON.stringify(ids),
+			            		  success : function(data) {
+			            			  if(data){
+			            				 if(data.success){
+			    	          		 		flag = true; 
+			            				 }else{
+			            					flag = false; 
+			            				 }
+			            			  }
+			            		  } ,     
+			            		  error : function(res,error) { 
+			            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			            		  }    
+			            		}); 
+	                	
+	                }
+	            });
+        		if(flag){
+        			$(document).sgPup({message:'message_info',text: "操作成功！"});
+        		}else{
+        			//$(document).sgPup({message:'message_info',text: "删除不成功！"});
+        		}
+        		$('#dispatchgrid').sgDatagrid('reload','sgDatagrid');
+        	}	
+        	 }});
+        	
+        	
+        	
+        	
+        }
+    }
+ 
+ 
+ 
+    
+    var overItem = function(){
+        var obj = $('#dispatchgrid');
+        var bDiv = $('.bDiv',obj);
+        var title;
+        //alert($('input[type=checkbox][checked=checked]',bDiv).length) ;
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            alert("选择多于一个选项！");
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            alert("请选择一个选项！");
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+            $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+            	title ="工单结束";
+            	editId=this.value;
+            	editObj=$(this).data('data');
+            });
+            var defaults = {
+       			title : title,
+       			id : 'follow',
+       			form : 'follow_form',
+       			url : 'over_bill.html',
+       			success: loadSuccessfollow,
+       			width : 390,
+       			height : 300,
+       			buttons : [ {
+       				name : '确认',
+       				type : 'submit',
+       				onpress : saveFollow
+       			}, {
+       				name : '取消',
+       				onpress : winClose1
+       			} ]
+       		};
+       		$(document).sgWindow(defaults);
+        }else{
+            alert("请选择一个选项！");
+        }
+    }
+    
+    
+    var addanswerItem = function(){
+        var obj = $('#dispatchgrid');
+        var bDiv = $('.bDiv',obj);
+        var url;
+        var title;
+        //alert($('input[type=checkbox][checked=checked]',bDiv).length) ;
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            alert("选择多于一个选项！");
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            alert("请选择一个选项！");
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+        	$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+        		var type = $(this).data('data').type;
+        		if(type.indexOf('新装')!=-1){
+        			url = 'web/bsp/answer/answer_newclothes.html';
+        		}else if(type.indexOf('大客户安装')!=-1){
+        			url = 'web/bsp/answer/answer_newclothes.html';
+        		}else if(type.indexOf('大客户维修')!=-1){
+        			url = 'web/bsp/answer/answer_repair.html';
+        		}else if(type.indexOf('维修')!=-1){
+        			url = 'web/bsp/answer/answer_repair.html';
+        		}else if(type.indexOf('升级')!=-1){
+        			url = 'web/bsp/answer/answer_upgrade.html';
+        		}else if(type.indexOf('换装')!=-1){
+        			url = 'web/bsp/answer/answer_repair.html';
+        		}
+        		title = type+'回单';
+        	});
+        	var defaults = {
+       			title : title,
+       			id : 'answer',
+       			form : 'answer_form',
+       			url : url,
+       			width : 710,
+       			height : 420,
+       			buttons : [ {
+       				name : '保存',
+       				onpress : winClose2
+       			}, {
+       				name : '关闭',
+       				onpress : winClose2
+       			} ]
+       		};
+       		$(document).sgWindow(defaults);
+        }else{
+            alert("请选择一个选项！");
+        }
+    }
+    
+    var winClose = function() {
+		$(document).sgWindow('close', {
+			id : 'dispathch'
+		});
+	}
+    
+    var winClose1 = function() {
+		$(document).sgWindow('close', {
+			id : 'follow'
+		});
+	}
+    
+    var winClose2 = function() {
+		$(document).sgWindow('close', {
+			id : 'answer'
+		});
+	}
+    
+    var winClose3 = function() {
+		$(document).sgWindow('close', {
+			id : 'task_view2'
+		});
+	}
+    
+    var winClose4 = function() {
+		$(document).sgWindow('close', {
+			id : 'shift_task'
+		});
+	}
+    
+    
+    
+    
+    var addItem = function(){
+    	var defaults = {
+   			title : '新增工单',
+   			id : 'add_task',
+   			form : 'task_form',
+   			url : 'bill_add.html',
+   			success: defaultAdd,
+   			width : 680,
+   			height : 350,
+   			buttons : [ {
+   				name : '保存',
+   				type : 'submit',
+   			    onpress : savebill
+   			}, {
+   				name : '发送短信',
+   				onpress : winClose1
+   			}, {
+   				name : '打印',
+   				onpress : printBill
+   			} ]
+   		};
+   		$(document).sgWindow(defaults);
+    }
+    
+    
+    
+
+	    var printBill = function(){
+	    	debugger;
+			//$('#ifm_print').attr('src','web/whs/stock_print2.html');
+			window.open('../print/print_bill.html','winPrint','height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+			$("#task",subWinBody).show();
+			//新增遮罩层
+			var mask=$('<div id="print_mask"></div>');
+			mask.addClass('window-mask');
+			mask.css('z-index',$('div.window').css('z-index')+1);//如果有弹出窗口，则将遮罩层置为最上层
+	       var span=$('<span></span');
+	       var span=$('<span></span');
+	       span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+	       span.text('正在打印中...');
+	       mask.append(span);
+		    $(document.body).append(mask);
+		    $('#bill_add').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	        $(document).sgWindow('close', {id : 'add_task'});
+	    	return false;
+		    
+		 	   }; 
+	    
+    
+
+    
+
+    var shiftItem = function() {
+    	 	var obj = $('#dispatchgrid');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "只能选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	        	 $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){  
+		                	editId=this.value;
+		                	editObj=$(this).data('data');
+			    			var defaults = {
+			    				title : '转单',
+			    				id : 'shift_task',
+			    				form : 'bill_shift_form',
+			    				url : 'bill_shift.html',
+			    				success: loadBillShift,
+			    				width : 710,
+			    				height : 400,
+			    				buttons : [ {
+			    					name : '确定',
+			    					type : 'submit',
+			    					onpress : billShift
+			    				}, {
+			    	   				name : '关闭',
+			    	   				onpress : winClose4
+			    	   			} ]
+			    			};
+			    			$(document).sgWindow(defaults);
+		                }
+		            });
+	   }else{
+		   $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	    }
+    	
+	}
+    
+    
+
+    var viewItem = function() {
+    	 	var obj = $('#dispatchgrid');
+	        var bDiv = $('.bDiv',obj);
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+	            $(document).sgPup({message:'message_info',text: "只能选择一条记录！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+	        	 $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){  
+		                	editId=this.value;
+		                	editObj=$(this).data('data');
+			    			var defaults = {
+			    				title : '工单明细',
+			    				id : 'task_view2',
+			    				form : 'bill_view2_form',
+			    				url : 'bill_view2.html',
+			    				success: loadSuccess,
+			    				width : 710,
+			    				height : 430,
+			    				buttons : [ {
+			    					name : '关闭',
+			    					onpress : winClose3
+			    				} ]
+			    			};
+			    			$(document).sgWindow(defaults);
+		                }
+		            });
+	   }else{
+		   $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	    }
+    	
+	}
+	 
+	 var deleteItem = function(){
+	        var obj = $('#dispatchgrid');
+	        var bDiv = $('.bDiv',obj);
+
+	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+	        }else{
+	        	 $(document).sgConfirm({text: '确定该工单作废吗?',cfn:function(r){ 
+	    		   if(r){
+	        	//if(window.confirm('确定该工单作废吗?')){
+	        		var flag = false;
+	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		                if($(this).attr("checked")){    
+		                	editId=this.value;
+		                	editobj = $(this).data('data');
+		                		var ids=[];
+		                		ids.push(editId);
+			                	//打开窗口
+			                	$.ajax( {
+				            		  type : 'post', 
+				            		  async: false,   
+				            		  contentType : 'application/json',     
+				            		  dataType : 'json',     
+				            		  url : '/sos/task/deleteTasks',   
+				            		  data:JSON.stringify(ids),
+				            		  success : function(data) {
+				            			  if(data){
+				            				 if(data.success){
+				    	          		 		flag = true; 
+				            				 }else{
+				            					flag = false; 
+				            				 }
+				            			  }
+				            		  } ,     
+				            		  error : function(res,error) { 
+				            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				            		  }    
+				            		}); 
+		                	
+		                }
+		            });
+	        		if(flag){
+	        			$(document).sgPup({message:'message_info',text: "删除成功！"});
+	        		}else{
+	        			//$(document).sgPup({message:'message_info',text: "删除不成功！"});
+	        		}
+	        		$('#dispatchgrid').sgDatagrid('reload','sgDatagrid');
+	        	}	
+	        	
+	        }});
+	        }
+	    }
+	 
+	 
+	 
+    
+    var dispatchItem = function(){
+        var obj = $('#dispatchgrid');
+        var bDiv = $('.bDiv',obj);
+        var url;
+        var title;
+        var btype;
+        var successVar;
+        var saveVar;
+        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>1){
+            alert("选择多于一个选项！");
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+            alert("请选择一个选项！");
+        }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==1){
+        	$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+	            editId=this.value;
+	            editObj=$(this).data('data');
+        		var type = $(this).data('data').billtype;
+        		if(type==1){
+        			url = 'web/bsp/dispathch/dispathch_newclothes.html';
+        			btype = "新装";
+        			successVar=loadSuccess11;
+        			saveVar = save1;
+        		}else if(type==2){
+        			url = 'web/bsp/dispathch/dispathch_repair.html';
+        			btype = "维修";
+        			successVar=loadSuccess12;
+        			saveVar = save2;
+        		}else if(type==3){
+        			url = 'web/bsp/dispathch/dispathch_police.html';
+        			btype = "出警";
+        			successVar=loadSuccess13;
+        			saveVar = save3;
+        		}else if(type==4){
+        			url = 'web/bsp/dispathch/dispathch_other.html';
+        			btype = "其他";
+        			successVar=loadSuccess14;
+        			saveVar = save4;
+        			
+        		}
+        		title = btype+'派工单';
+        	});
+        	var defaults = {
+       			title : title,
+       			id : 'dispathch',
+       			form : 'dispathch_form',
+       			url : url,
+       			success: successVar,
+       			width : 710,
+       			height : 460,
+       			buttons : [
+       			           
+       			 {name: '保存', type: 'submit', onpress : saveVar},    
+       			 {
+       				name : '发送短信',
+       				onpress : winClose
+       			}, {
+       				name : '打印',
+       				onpress : winClose
+       			} ]
+       		};
+       		$(document).sgWindow(defaults);
+        }else{
+            alert("请选择一个选项！");
+        }
+    }
+    
+    
+    
+    //跟单
+    var saveFollow = function(){
+    	//做表单提交
+        var params = {};
+    	var url='/sos/follow/add';
+	 	params.task_id=$('#taskId','#follow').val();
+	 	params.worker_id=$('#company','#follow').val();
+		params.worker=$('#company','#follow').find("option:selected").text();
+		params.arrival_time=$('#arrival_time','#follow').val();
+		params.departure_time=$('#departure_time','#follow').val();
+		params.dispatch_id=$('#dispatch_id','#follow').val();
+		/* alert($('#is_over','#follow').get(0).checked); */
+	    var chwckk_bu = document.getElementById("is_over");
+      	if(chwckk_bu.checked){
+      		params.is_end="1";
+	    }else{
+	    	params.is_end="0";
+	    }
+		params.remark=$('#remark','#follow').val();
+		params.num=$('#num','#follow').val();
+		 	alert(JSON.stringify(params));
+		 if(window.confirm('确定保存跟单吗?')){
+		 	 if(!params.arrival_time){
+	      	 	  alert('请输入到达时间！');
+	      	  	  return false;
+       		 }
+		 	if(!params.departure_time){
+		       	   alert('请输入离开时间！');
+		       	   return false;
+        	 }
+             $.ajax( {
+           		  type : 'post', 
+           		  async: false,   
+           		  contentType : 'application/json',     
+           		  dataType : 'json',     
+           		  url : url,   
+           		  data:JSON.stringify(params),
+           		  success : function(data) {
+           			  if(data){
+           				 if(data.success){
+           					 $('#dispatchgrid').sgDatagrid('reload','sgDatagrid');
+           				 }
+           				 alert(data.msg);
+           			  }
+           		  } ,     
+           		  error : function(res,error) { 
+           		  	 alert(res.responseText);     
+           		  }    
+           		}); 
+		 	}
+        $('#follow').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+        $(document).sgWindow('close', {id : 'follow'});
+    	return false;
+ 	   }; 
+
+ 	   
+ 	   
+	   $("#bill_add").on('submit',function(e){
+			//做表单提交
+           var params = {};
+           var url='/sos/task/add';
+           var chk_bu = document.getElementById("is_busines");
+       	if(chk_bu.checked){
+       		params.isoffice="1";
+	    	}else{
+	    		params.isoffice="0";
+	    	}
+              
+  		 	params.billno=$('#billnum','#bill_add').val();
+  		 	params.managerId=$('#managerId','#bill_add').val();
+  			params.manager_name=$('#managerName','#bill_add').val();
+  		    params.billtype="1";
+			params.phone=$('#phone','#bill_add').val();
+			params.requirements=$('#requirements','#bill_add').val();
+			params.place=$('#place','#bill_add').val();
+			params.cartype_id=$('#cartype_id','#bill_add').val();
+			params.product_name=$('#product_name','#bill_add').val();
+  			params.customerId=$('#customerId','#bill_add').val();
+  			
+  			params.electricianNames=$('#electrician','#bill_add').val();
+  			params.electricianIds=$('#electricianIds','#bill_add').val();
+  			params.electrician_phone=$('#electrician_phone','#bill_add').val();
+  			
+  			params.start_time=$('#start_time','#bill_add').val();
+  			params.duration=$('#duration','#bill_add').val();
+  		    params.type="0";
+  		   
+  		    
+  			var objs = document.getElementsByName("treeCheckbox");
+			var ids = [];
+			var names = '';
+			var tids  = '';
+			var a = 0;
+			for(var i=0;i<objs.length;i++){
+				if(objs[i].checked == true){
+					for(var j=0; j<ids.length; j++){
+						if(objs[i].id == ids[j])
+							a=1;
+					}
+					if(a == 0){
+					ids.push(objs[i].id);
+					tids += objs[i].id + ',';
+	        		names += objs[i].value + ',';
+					}
+				}
+				a=0;
+			}
+			if(ids.length == 0){
+				alert("请选择至少一个角色！");
+				return;
+			}else{
+				names = names.substring(0, names.length-1);
+				tids = tids.substring(0, tids.length-1);
+			}
+			 params.dispatcher=tids;
+			params.charger=names;   
+			
+  		 	alert(JSON.stringify(params));
+  		 	if(window.confirm('确定保存接单吗?')){
+  		 		
+  		 	 if(!params.managerId){
+	         	   alert('请选择销售经理！');
+	         	   return false;
+	            }
+  		 	 
+  		 	if(!params.product_name){
+	         	   alert('请选择商品！');
+	         	   return false;
+	            }
+  		 
+  		 	if(!params.customerId){
+	         	   alert('请选择客户！');
+	         	   return false;
+	            } 
+  		 		
+                 $.ajax( {
+	           		  type : 'post', 
+	           		  async: false,   
+	           		  contentType : 'application/json',     
+	           		  dataType : 'json',     
+	           		  url : url,   
+	           		  data:JSON.stringify(params),
+	           		  success : function(data) {
+	           			  if(data){
+	           				 if(data.success){
+	           					// $(document).sgWindow('close',{id:'win_managers'}); 
+	   	          		 		 $('#bill_add').sgDatagrid('reload','sgDatagrid');
+	   	          		 		
+	           				 }
+	           				 alert(data.msg);
+	           			  }
+	           		  } ,     
+	           		  error : function(res,error) { 
+	           		  	 alert(res.responseText);     
+	           		  }    
+	           		}); 
+  		 	}
+	        $('#bill_add').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+			e.stopPropagation();
+	    	return false;
+	  
+	 	   });
+	   
+	   
+	    var billShift = function(){
+		    	//做表单提交
+		    var params = {};
+	        var url='/sos/taskFellow/save'; 	
+			var objs = document.getElementsByName("treeCheckbox");
+			var ids = [];
+			var oIds = [];
+			var orgNames = '';
+			var names = '';
+			var tids  = '';
+			var flag='c';
+			var a = 0;
+			var org_ids ='';
+			for(var i=0;i<objs.length;i++){
+				if(objs[i].checked == true){
+					if((objs[i].id).indexOf(flag) != -1){
+						orgNames += objs[i].value + ',';
+						oIds.push(objs[i].id);
+						org_ids += objs[i].id + ',';
+					}
+					 if((objs[i].id).indexOf(flag) != -1 || ids.indexOf(objs[i].id) != -1  ){
+						 a=1;
+					 }
+					if(a == 0){
+						ids.push(objs[i].id);
+						tids += objs[i].id + ',';
+		        		names += objs[i].value + ',';
+					}
+				}
+				a=0;
+			}
+			
+			if(oIds.length > 0){
+				orgNames = orgNames.substring(0, orgNames.length-1);
+				org_ids = org_ids.substring(0, org_ids.length-1);
+			}
+			
+			
+			if(ids.length == 0){
+			    $(document).sgPup({message:'message_alert',text: "请选择至少一个用户或者机构！"});
+				return;
+			}else{
+				names = names.substring(0, names.length-1);
+				tids = tids.substring(0, tids.length-1);
+			}
+			
+			
+			
+			params.charger_id=tids;
+  		 	params.charger=names;
+  		 	params.task_id=$('#taskId','#bill_shift').val();
+  		 	params.org_name=orgNames;
+  		 	params.org_id=org_ids;
+  		 	
+		     
+  		 	
+  		 	alert(JSON.stringify(params));
+	  		 	//if(window.confirm('确定保存接单吗?')){
+	  		 $(document).sgConfirm({text: '确定保存吗?',cfn:function(r){ 
+		  		if(r){	
+	  		 		
+	                 $.ajax( {
+		           		  type : 'post', 
+		           		  async: false,   
+		           		  contentType : 'application/json',     
+		           		  dataType : 'json',     
+		           		  url : url,   
+		           		  data:JSON.stringify(params),
+		           		  success : function(data) {
+		           			  if(data){
+		           				 if(data.success){
+		           					 $('#dispatchgrid').sgDatagrid('reload','sgDatagrid');
+		           				 }
+		           				$(document).sgPup({message:'message_alert',text: data.msg});
+		           			  }
+		           		  } ,     
+		           		  error : function(res,error) { 
+		           		  	 alert(res.responseText);     
+		           		  }    
+		           		}); 
+	  		 	}
+	  		 }}); 
+	  		 	
+	  		 	
+		        $('#bill_shift').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+		        $(document).sgWindow('close', {id : 'shift_task'});
+		    	return false;
+		 	   }; 
+	    
+	   
+	   
+	   
+	  
+	   
+	   
+	    var savebill = function(){
+	    	
+
+	        var params = {};
+	           var url='/sos/task/save';
+	           var chk_bu = document.getElementById("is_busines");
+	       	if(chk_bu.checked){
+	       		params.is_office="1";
+		    	}else{
+		    		params.is_office="0";
+		    	}
+	  		 	params.bill_no=$('#billnum','#bill_add').val();
+	  		 	params.sales_id=$('#managerId','#bill_add').val();
+	  			params.sales=$('#managerName','#bill_add').val();
+	  		    params.task_type=$('#type','#bill_add').val();;
+				params.phone=$('#mobile_phone','#bill_add').val();
+				params.requirements=$('#requirements','#bill_add').val();
+				params.place=$('#place','#bill_add').val();
+				params.model_id=$('#cartype_id','#bill_add').val();
+				params.product_name=$('#product_name','#bill_add').val();
+	  			params.customer_id=$('#customerId','#bill_add').val();
+	  			
+	  			
+	  			params.note=$('#note','#bill_add').val();
+       	        params.symptom=$('#symptom','#bill_add').val();
+       	        params.vehicle_id=$('#vehicleId','#bill_add').val();
+       			params.product_code=$('#code','#bill_add').val();
+       			params.color=$('#color','#bill_add').val();
+       			
+       			params.plate_no=$('#car_num','#bill_add').val();
+	  		   
+	  		  
+	  		 	alert(JSON.stringify(params));
+	  		 	//if(window.confirm('确定保存接单吗?')){
+	  		 	$(document).sgConfirm({text: '确定保存工单吗?',cfn:function(r){ 
+	  		 		if(r){
+	  		 		
+	  		 		if(!params.customer_id){
+			         	  $(document).sgPup({message:'message_alert',text: "请选择客户!"});
+			         	   return false;
+			            } 
+	  		 		
+	  		 	 if(!params.sales_id && params.task_type ==1 ){
+		         	  $(document).sgPup({message:'message_alert',text: "请选择销售经理!"});
+		         	   return false;
+		            }
+	  		 	 
+	  		 	if(!params.product_name && params.task_type ==1 ){
+		         	  $(document).sgPup({message:'message_alert',text: "请选择商品!"});
+		         	   return false;
+		            }
+	  		 
+	                 $.ajax( {
+		           		  type : 'post', 
+		           		  async: false,   
+		           		  contentType : 'application/json',     
+		           		  dataType : 'json',     
+		           		  url : url,   
+		           		  data:JSON.stringify(params),
+		           		  success : function(data) {
+		           			  if(data){
+		           				 if(data.success){
+		           					// $(document).sgWindow('close',{id:'win_managers'}); 
+		   	          		 		 $('#dispatchgrid').sgDatagrid('reload','sgDatagrid');
+		   	          		 		
+		           				 }
+		           				 $(document).sgPup({message:'message_alert',text: data.msg});
+		           			  }
+		           		  } ,     
+		           		  error : function(res,error) { 
+		           		  	 alert(res.responseText);     
+		           		  }    
+		           		}); 
+	                 
+	                 $('#bill_add').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	 		        $(document).sgWindow('close', {id : 'add_task'});
+	  		 	}
+	  		  }}); 
+	  		 		
+		      
+		    	return false;
+		 	   }; 
+	    
+	   
+	   
+ 	   
+ 	   
+    var save1 = function(){
+	    	//做表单提交
+	        var params = {};
+	    	var url='/sos/dispatchTask/add';
+		 	params.task_id=$('#taskId','#dispatch_newclothes').val();
+		 	params.reservation_id=$('#reservation_id','#dispatch_newclothes').val();
+			params.electricianNames=$('#electrician','#dispatch_newclothes').val();
+			params.electricianIds=$('#electricianIds','#dispatch_newclothes').val();
+			params.electrician_phone=$('#electrician_phone','#dispatch_newclothes').val();
+			params.start_time=$('#start_time','#dispatch_newclothes').val();
+			params.duration=$('#duration','#dispatch_newclothes').val();
+  		 	alert(JSON.stringify(params));
+  		 	if(window.confirm('确定保存接单吗?')){
+  		 	 if(!params.electricianIds){
+          	   alert('请选择电工！');
+          	   return false;
+             }
+  		 	 
+  		 	if(!params.start_time){
+           	   alert('请输入开始时间！');
+           	   return false;
+              }
+  		 
+  		 	if(!params.duration){
+           	   alert('请输入预计时长！');
+           	   return false;
+              } 
+  		 		
+                 $.ajax( {
+	           		  type : 'post', 
+	           		  async: false,   
+	           		  contentType : 'application/json',     
+	           		  dataType : 'json',     
+	           		  url : url,   
+	           		  data:JSON.stringify(params),
+	           		  success : function(data) {
+	           			  if(data){
+	           				 if(data.success){
+	           					 $('#dispatchgrid').sgDatagrid('reload','sgDatagrid');
+	           				 }
+	           				 alert(data.msg);
+	           			  }
+	           		  } ,     
+	           		  error : function(res,error) { 
+	           		  	 alert(res.responseText);     
+	           		  }    
+	           		}); 
+  		 	}
+	        $('#dispatch_newclothes').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	        $(document).sgWindow('close', {id : 'dispathch'});
+	    	return false;
+	 	   }; 
+    
+    
+
+	 	    var save2 = function(){
+	 		    	//做表单提交
+	 		        var params = {};
+	 		    	var url='/sos/dispatchTask/add';
+	 			 	params.task_id=$('#taskId','#dispatch_repair').val();
+	 			 	params.reservation_id=$('#reservation_id','#dispatch_repair').val();
+	 				params.electricianNames=$('#electrician','#dispatch_repair').val();
+	 				params.electricianIds=$('#electricianIds','#dispatch_repair').val();
+	 				params.electrician_phone=$('#electrician_phone','#dispatch_repair').val();
+	 				params.start_time=$('#start_time','#dispatch_repair').val();
+	 				params.duration=$('#duration','#dispatch_repair').val();
+	 	  		 	alert(JSON.stringify(params));
+	 	  		 	if(window.confirm('确定保存接单吗?')){
+	 	  		 	 if(!params.electricianIds){
+	 	          	   alert('请选择电工！');
+	 	          	   return false;
+	 	             }
+	 	  		 	 
+	 	  		 	if(!params.start_time){
+	 	           	   alert('请输入开始时间！');
+	 	           	   return false;
+	 	              }
+	 	  		 
+	 	  		 	if(!params.duration){
+	 	           	   alert('请输入预计时长！');
+	 	           	   return false;
+	 	              } 
+	 	  		 		
+	 	                 $.ajax( {
+	 		           		  type : 'post', 
+	 		           		  async: false,   
+	 		           		  contentType : 'application/json',     
+	 		           		  dataType : 'json',     
+	 		           		  url : url,   
+	 		           		  data:JSON.stringify(params),
+	 		           		  success : function(data) {
+	 		           			  if(data){
+	 		           				 if(data.success){
+	 		           					 $('#dispatchgrid').sgDatagrid('reload','sgDatagrid');
+	 		           				 }
+	 		           				 alert(data.msg);
+	 		           			  }
+	 		           		  } ,     
+	 		           		  error : function(res,error) { 
+	 		           		  	 alert(res.responseText);     
+	 		           		  }    
+	 		           		}); 
+	 	  		 	}
+	 		        $('#dispatch_repair').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	 		        $(document).sgWindow('close', {id : 'dispathch'});
+	 		    	return false;
+	 		 	   }; 
+	 	    
+	 		 	   
+	 		 	   
+
+	 		 	    var save3 = function(){
+	 		 		    	//做表单提交
+	 		 		        var params = {};
+	 		 		    	var url='/sos/dispatchTask/add';
+	 		 			 	params.task_id=$('#taskId','#dispathch_police').val();
+	 		 			 	params.reservation_id=$('#reservation_id','#dispathch_police').val();
+	 		 				params.electricianNames=$('#electrician','#dispathch_police').val();
+	 		 				params.electricianIds=$('#electricianIds','#dispathch_police').val();
+	 		 				params.electrician_phone=$('#electrician_phone','#dispathch_police').val();
+	 		 				params.start_time=$('#start_time','#dispathch_police').val();
+	 		 				params.duration=$('#duration','#dispathch_police').val();
+	 		 	  		 	alert(JSON.stringify(params));
+	 		 	  		 	if(window.confirm('确定保存接单吗?')){
+	 		 	  		 	 if(!params.electricianIds){
+	 		 	          	   alert('请选择电工！');
+	 		 	          	   return false;
+	 		 	             }
+	 		 	  		 	 
+	 		 	  		 	if(!params.start_time){
+	 		 	           	   alert('请输入开始时间！');
+	 		 	           	   return false;
+	 		 	              }
+	 		 	  		 
+	 		 	  		 	if(!params.duration){
+	 		 	           	   alert('请输入预计时长！');
+	 		 	           	   return false;
+	 		 	              } 
+	 		 	  		 		
+	 		 	                 $.ajax( {
+	 		 		           		  type : 'post', 
+	 		 		           		  async: false,   
+	 		 		           		  contentType : 'application/json',     
+	 		 		           		  dataType : 'json',     
+	 		 		           		  url : url,   
+	 		 		           		  data:JSON.stringify(params),
+	 		 		           		  success : function(data) {
+	 		 		           			  if(data){
+	 		 		           				 if(data.success){
+	 		 		           					 $('#dispatchgrid').sgDatagrid('reload','sgDatagrid');
+	 		 		           				 }
+	 		 		           				 alert(data.msg);
+	 		 		           			  }
+	 		 		           		  } ,     
+	 		 		           		  error : function(res,error) { 
+	 		 		           		  	 alert(res.responseText);     
+	 		 		           		  }    
+	 		 		           		}); 
+	 		 	  		 	}
+	 		 		        $('#dispathch_police').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	 		 		        $(document).sgWindow('close', {id : 'dispathch'});
+	 		 		    	return false;
+	 		 		 	   }; 
+	 		 	    
+	 		 		 	   
+	 		 		 	   
+
+	 		 		     var save4 = function(){
+	 		 		 	    	//做表单提交
+	 		 		 	        var params = {};
+	 		 		 	    	var url='/sos/dispatchTask/add';
+	 		 		 		 	params.task_id=$('#taskId','#dispathch_other').val();
+	 		 		 		 	params.reservation_id=$('#reservation_id','#dispathch_other').val();
+	 		 		 			params.electricianNames=$('#electrician','#dispathch_other').val();
+	 		 		 			params.electricianIds=$('#electricianIds','#dispathch_other').val();
+	 		 		 			params.electrician_phone=$('#electrician_phone','#dispathch_other').val();
+	 		 		 			params.start_time=$('#start_time','#dispathch_other').val();
+	 		 		 			params.duration=$('#duration','#dispathch_other').val();
+	 		 		   		 	alert(JSON.stringify(params));
+	 		 		   		 	if(window.confirm('确定保存接单吗?')){
+	 		 		   		 	 if(!params.electricianIds){
+	 		 		           	   alert('请选择电工！');
+	 		 		           	   return false;
+	 		 		              }
+	 		 		   		 	 
+	 		 		   		 	if(!params.start_time){
+	 		 		            	   alert('请输入开始时间！');
+	 		 		            	   return false;
+	 		 		               }
+	 		 		   		 
+	 		 		   		 	if(!params.duration){
+	 		 		            	   alert('请输入预计时长！');
+	 		 		            	   return false;
+	 		 		               } 
+	 		 		   		 		
+	 		 		                  $.ajax( {
+	 		 		 	           		  type : 'post', 
+	 		 		 	           		  async: false,   
+	 		 		 	           		  contentType : 'application/json',     
+	 		 		 	           		  dataType : 'json',     
+	 		 		 	           		  url : url,   
+	 		 		 	           		  data:JSON.stringify(params),
+	 		 		 	           		  success : function(data) {
+	 		 		 	           			  if(data){
+	 		 		 	           				 if(data.success){
+	 		 		 	           					 $('#dispatchgrid').sgDatagrid('reload','sgDatagrid');
+	 		 		 	           				 }
+	 		 		 	           				 alert(data.msg);
+	 		 		 	           			  }
+	 		 		 	           		  } ,     
+	 		 		 	           		  error : function(res,error) { 
+	 		 		 	           		  	 alert(res.responseText);     
+	 		 		 	           		  }    
+	 		 		 	           		}); 
+	 		 		   		 	}
+	 		 		 	        $('#dispathch_other').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+	 		 		 	        $(document).sgWindow('close', {id : 'dispathch'});
+	 		 		 	    	return false;
+	 		 		 	 	   }; 
+	 		 		     
+	 	   
+	 	   
+    var today = new Date().format('yyyy-MM-dd');
+    var twoDayBefore = GetDateStr(-2);
+
+    var defaults = {
+        title: "工单管理",
+        width:  720,
+        height: 395,
+        url: '/sos/task/findTasksByPageNew',
+        datatype:"json",
+        usepager: true,
+	    rownumbers:true,
+        useRp: true,
+        colid:'id',  //主键
+        query:{tStatus:0},
+        colModel : [
+            {display: '工单号', name : 'billnum', width : 110, sortable : false},
+            {display: '类型', name : 'type', width : 40, sortable : true,formatter:function(value,row){
+                if(value==1){
+                    value = '新装';
+                }else if(value==2){
+                    value = '维修';
+                }else if(value==3){
+                    value = '出警';
+                }else if(value==4){
+                    value = '其他';
+                }
+                return value;
+            }},
+            {display: '客户', name : 'customerName', width : 60, sortable : false},
+            {display: '车牌号', name : 'carNum', width : 70, sortable : false},
+            {display: '状态', name : 'status', width : 60, sortable : true,formatter:function(value,row){
+                if(value==1){
+                    value = '正常';
+                }else if(value==2){
+                    value = '已结束';
+                }
+                return value;
+            }}, 
+            //{display: '联系电话', name : 'phone', width : 100, sortable : false},
+            {display: '车型', name : 'cName', width : 70, sortable : false},
+            {display: '受理时间', name : 'time', width : 120, sortable : false}
+        ],
+        
+        buttons : [
+			{name: '新增工单', bclass: 'add', onpress : addItem},
+			{separator: true},
+			{name: '工单查看', bclass: 'add', onpress : viewItem},
+			{separator: true},
+			{name: '转单', bclass: 'add', onpress : shiftItem},
+			{separator: true},
+            {name: '工单作废', bclass: 'delete', onpress : deleteItem},
+            {separator: true},
+          /*   {name: '派工', bclass: 'add', onpress : dispatchItem},
+            {separator: true},
+            {name: '跟单', bclass: 'add', onpress : followItem},
+            {separator: true}, */
+            {name: '工单结束', bclass: 'add', onpress : endItem},
+            {separator: true}
+        ],
+        searchitems :[
+            {display:'车牌号码',name:'carNum',type:'text',width:'140'},
+            //{display:'电工',name:'eNames',type:'text',width:'100'},
+            {display:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;类型',name:'type',html:'<select style="width:142px" name="type"><option value="" selected>请选择...</option><option value="1">新装</option><option value="2">维修</option><option value="3">出警</option><option value="4">其他</option></select>'},
+            {display:'&nbsp;&nbsp;状态',name:'status',html:'<select  style="width:142px" name="status"><option value="" selected>请选择...</option><option value="1">正常</option><option value="2">已结束</option></select>'},
+            {display:'开始时间',name:'startDate',type:'date',width:'140px',value:twoDayBefore},
+	      	{display:'结束时间',name:'endDate',type:'date',width:'140px',value:today}
+        ],
+        sortname: "id",
+        sortorder: "desc"
+    };
+    $('#dispatchgrid').sgDatagrid(defaults);
+})(jQuery);
+
+
+
+
+//打印页面元素设置
+   var callback=function(subWinBody,subWin){
+  	$.ajax( {
+  		  type : 'post', 
+  		  async: false,   
+  		  contentType : 'application/json',     
+  		  dataType : 'json',     
+  		  url : '/sos/getCurrentCompany',   
+  		  data:JSON.stringify({}),
+  		  success : function(data) {
+  			  if(data){
+  			  	debugger;
+  				  var total = 0;
+  				  var rowtotal = 0;
+  				  //公司中文名字
+  				  $("#cname",subWinBody).empty();
+  				  $("#cname",subWinBody).append(data.cnfullname);
+  				  //公司英文名字
+  				  $("#ename",subWinBody).empty();
+  				  $("#ename",subWinBody).append(data.enfullname);
+  				  //表单名字
+  				  $("#taskTitle",subWinBody).empty();
+  				  $("#taskTitle",subWinBody).append("新增工单");
+  				  
+
+  				  
+  				    //表单日期
+  				  $("#taskDate",subWinBody).empty();
+  				  $("#taskDate",subWinBody).append(new Date().format('yyyy-MM-dd'));
+  				
+  				/*   //表单单号
+  				  $("#taskNo",subWinBody).empty();
+  				  $("#taskNo",subWinBody).append($('#billnum','#newclothes').val()); */
+  				
+  				  
+
+  				  var billnum = '<span>工单号：</span><div>'+$('#billnum','#bill_add').val()+'</div>';
+  				  $("#headInput",subWinBody).append(billnum);
+  				
+  				  
+  				  var type = '<span>工单类型：</span><div>'+$('#type','#bill_add').find("option:selected").text()+'</div>';
+  				  $("#headInput",subWinBody).append(type);
+  				  
+  				  
+  				  var customerName = '<span>客户姓名：</span><div>'+$('#customerName','#bill_add').val()+'</div>';
+  				  $("#headInput",subWinBody).append(customerName);
+  				  
+  				  var phone = $('#mobile_phone','#bill_add').val();
+  				  if(phone =="" || phone == null){
+  					phone = "&nbsp";
+  				  }
+  				  
+  				  var customerPhone = '<span>联系电话：</span><div style="width:30%">'+phone+'</div>';
+  				  $("#headInput",subWinBody).append(customerPhone);
+  				  
+  				  var carNum = $('#car_num','#bill_add').val();
+  				  if(carNum =="" || carNum == null){
+  					carNum = "&nbsp";
+  				  }
+  				  var car_num = '<span>车牌号：</span><div>'+carNum+'</div>';
+  				  $("#headInput",subWinBody).append(car_num);
+  				  
+  				  var code_1 = $('#code','#bill_add').val();
+  				  if(code_1 =="" || code_1 == null){
+  					code_1 = "&nbsp";
+  				  }
+  				  var code = '<span>产品型号：</span><div>'+code_1+'</div>';
+  				  $("#headInput",subWinBody).append(code);
+  				  
+  				  var type_name = $('#cartype_name','#bill_add').val();
+  				  if(type_name =="" || type_name == null){
+  					type_name = "&nbsp";
+  				  }
+  				 var cartype_name = '<span>车型：</span><div>'+type_name+'</div>';
+  				  $("#headInput",subWinBody).append(cartype_name);
+  				  
+  				  var color_1 = $('#color','#bill_add').val();
+  				  if(color_1 =="" || color_1 == null){
+  					color_1 = "&nbsp";
+  				  }
+  				var color = '<span>车辆颜色：</span><div>'+color_1+'</div>';
+  				  $("#headInput",subWinBody).append(color);
+  				  
+  				var value = $('#type','#bill_add').val();
+  				  
+  				if(value == 1){
+  					
+  					  var p_name = $('#product_name','#bill_add').val();
+  	  				  if(p_name =="" || p_name == null){
+  	  					p_name = "&nbsp";
+  	  				  }
+  					 var product_name = '<span>商品名称：</span><div>'+p_name+'</div>';
+	  				  $("#headInput",subWinBody).append(product_name);
+	  				  
+	  				  
+	  				  var mp_name = $('#managerName','#bill_add').val();
+  	  				  if(mp_name =="" || mp_name == null){
+  	  					mp_name = "&nbsp";
+  	  				  }
+	  				 var managerName = '<span>销售经理：</span><div>'+mp_name+'</div>';
+	  				  $("#headInput",subWinBody).append(managerName);
+	  			}
+  				
+  			 	  var address = $('#place','#bill_add').val();
+				  if(address =="" || address == null){
+					  address = "&nbsp";
+				  }
+  				 var place = '<span>地点：</span><div>'+address+'</div>';
+  				  $("#headInput",subWinBody).append(place);
+  				  
+	  				var isonline='';  
+	  				var chk_bu = document.getElementById("is_busines");
+	              	if(chk_bu.checked){
+	              		isonline="是";
+	      	    	}else{
+	      	    		isonline="否";
+	      	    	}
+  				  
+	  				var is_busines = '<span>是否营业处：</span><div>'+isonline+'</div>';
+	  				  $("#headInput",subWinBody).append(is_busines);
+				
+	  				 var remark = $('#note','#bill_add').val();
+					  if(remark =="" || remark == null){
+						  remark = "&nbsp";
+					  }
+	  				  
+	  			
+	  				if(value == 1){
+		  			  var req = $('#requirements','#bill_add').val();
+					  if(req =="" || req == null){
+						  req = "&nbsp";
+					  }
+	  				var requirements = '<span>要求：</span><div>'+req+'</div>';
+		  			$("#headInput",subWinBody).append(requirements);
+	  			}else if(value == 2){
+	  				 var sy = $('#symptom','#bill_add').val();
+					  if(sy =="" || sy == null){
+						  sy = "&nbsp";
+					  }
+	  				var symptom = '<span>故障现象：</span><div style="width:80%">'+sy+'</div>';
+		  			 $("#headInput",subWinBody).append(symptom);
+		  			 $("#headInput",subWinBody).append('<span></span><div style="width:20%"></div>');
+		  			var note ='<span>注意事项：</span><div style="width:80%">'+remark+'</div>';
+		  			 $("#headInput",subWinBody).append(note);
+	  			}else{
+	  				var note = '<span>注意事项：</span><div style="width:80%">'+remark+'</div>';
+		  			 $("#headInput",subWinBody).append(note);
+	  			}
+	  			
+  				
+				 /*  var tbfoot = '<tr>';
+				  tbfoot=tbfoot+'<td colspan="4"><div style="text-align:right">小计:</div></td>';
+				  tbfoot=tbfoot+'<td colspan="1"><div style="text-align:right">'+total+'</div></td>';
+				  tbfoot=tbfoot+'<td colspan="1"></td>';
+				  tbfoot=tbfoot+'</tr>';
+				  $("#tbBody",subWinBody).append(tbfoot);
+				  reset();
+				  */
+  				  
+  			
+  				
+  				  
+  			  }else{
+  				  $(document).sgPup({message:'message_info',text: data});
+  			  }
+  		  } ,     
+  		  error : function(res,error) { 
+  		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+  		  }    
+  		});
+  	
+      if (navigator.appName == 'Microsoft Internet Explorer'){
+      	subWin.print();  
+      }else{ 
+      	subWin.focus();
+      	subWin.print();  
+      }
+      
+      
+  }
+
+</script>
+</html>

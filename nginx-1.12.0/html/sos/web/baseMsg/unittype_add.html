@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>车台类型录入</title>
+</head>
+
+<body>
+<form id="unittype_add_form" name="unittype_add_form" method="post" class="form" style="width: 460px;">
+		<fieldset style="width: 470px;">
+			<div id="abc" class="panel" >
+				<div class="row">
+					<span class="col-xs-6">
+						<span class="col-xs-4">车台类型:</span>
+						<span class="col-xs-8">
+							<input type='hidden' id='unittype_id' name='unittype_id'  />
+							<input type='text' id='unittype' name='unittype' required="true" class="form-control" />
+						</span>
+					</span>
+					<span class="col-xs-6">
+						<span class="col-xs-4">用途分类:</span>
+						<span class="col-xs-8">
+							<input type='text' id='typeclass' name='typeclass' required="true" class="form-control" />
+						</span>
+					</span>
+				</div>
+            </div>
+            
+            <div class="panel">
+            	<div class="row">
+					<span class="col-xs-6">
+						<span class="col-xs-4">协议:</span>
+						<span class="col-xs-8">
+							<select size="1" name="protocol_id" id="protocol_id" style="width:100%;height:24px;" quired="true" autocomplete="on" ></select>
+						</span>
+					</span>
+					<span class="col-xs-6">
+						<span class="col-xs-4">说明:</span>
+						<span class="col-xs-8">
+							<input type='text' id='memo' name='memo' class="form-control" />
+						</span>
+					</span>
+				</div>
+            </div>
+		</fieldset> 
+		
+</form>
+
+</body>
+<script type="text/javascript">
+
+(function($){
+    
+	//填充协议
+	var abc =  $('#abc');
+	var protocol_id = $('#protocol_id');
+    $.ajax( {
+	  type : 'post', 
+	  async: false,   
+	  contentType : 'application/json',     
+	  dataType : 'json',     
+	  url : '../../unitType/getSysValue',   
+	  data:JSON.stringify({}),
+	  success : function(data) {
+		  if(data){
+			  if(protocol_id){
+				  $.each(data,function(k,v){
+					  protocol_id.append("<option value='" +v.svalue+"'>" + v.sname+"</option>");
+					 /*  abc.append("<img src='../../images/footer_bg.png'><br/>" ); */
+				  }); 
+			  }
+		  }
+	  } ,     
+	  error : function(res,error) { 
+	  	 alert("responseText="+res.responseText+";error="+error);     
+	  }    
+	});
+    
+    
+})(jQuery);
+</script>
+
+</html>

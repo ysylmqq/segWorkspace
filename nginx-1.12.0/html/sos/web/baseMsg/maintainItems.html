@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style type="text/css">
+#maintainItems_window .window-body {overflow:hidden;}
+</style>
+</head>
+<body>
+<form id="maintainItems_form" method="post" class="form" name="maintainItems_form" >
+       <!--  <div class="title" id="today_policy">当日保单列表</div> -->
+        <fieldset >
+        <input type="hidden" id="model_id" name="model_id">
+        
+			<div id="maintainItems" style="width:870px;" class="datagird"></div>
+</fieldset>
+		</form>
+</body>
+
+<script type="text/javascript" src="../../jscript/autoCheckbox.js"></script>
+<script type="text/javascript">
+
+ function xuan(){ 
+		 var $checkboxs = $('input[type="checkbox"][name="air_filter"]');	
+		$checkboxs.autoCheckbox();
+		
+		var $checkboxs = $('input[type="checkbox"][name="engine_oil"]');	
+		$checkboxs.autoCheckbox();
+		
+		var $checkboxs = $('input[type="checkbox"][name="ac_system"]');	
+		$checkboxs.autoCheckbox();
+		
+	 
+	  /*  var arr=document.getElementsByName("engine_oil");
+	   var ids = [];
+	   for (var i=0;i<arr.length;i++)
+	   {
+	    if(arr[i].checked==true){
+	    	ids.push(arr[i].id);
+		}
+	   }
+	    debugger;
+	    if(ids.length == 2){
+	    	var a =ids[1];
+	    	var b = ids[1] - ids[0];
+	        for (var i=a;i<arr.length;i=parseInt(i)+parseInt(b))
+			   {
+	    		 arr[i].checked='checked';
+			   }
+	    } */
+
+	} 
+
+
+(function($){
+	
+	var first_mileage ='';
+	var second_mileage ='';
+	var interval_mileage ='';
+	
+	
+	  $.ajax( {
+		  type : 'POST', 
+		  async: false,  
+		  url : "../../model/getMaintainRuleMsg",   
+		  data:{model_id:$("#model_id").val()},
+		  success : function(data) {
+			  if(data){
+				  first_mileage = data.first_mileage;
+				  second_mileage = data.second_mileage;
+				  interval_mileage = data.interval_mileage;
+			  }
+		  } 
+	});
+	
+	var three = second_mileage + interval_mileage;
+	var four = three + interval_mileage;
+	var five = four + interval_mileage;
+	var six = five + interval_mileage;
+	var seven = six + interval_mileage;
+	var eight  = seven + interval_mileage;
+	var nine = eight + interval_mileage;
+	var ten = nine + interval_mileage;
+	var eleven = ten + interval_mileage;
+	var twelf =  eleven + interval_mileage;
+	
+	
+	
+	
+	var defaults = {
+			width:'100%',
+		    height: '100%',
+	     	url:'',
+	        rownumbers:false,//序号
+	        isNotCheckall:false,
+	        colModel : [
+				{display: '保养项目/里程 ', name : 'name', width : 80,align:'center', sortable : false},
+				{display: first_mileage+'公里', name : 'a', width : 55,align:'center', sortable : false},
+	            {display: second_mileage+'公里', name : 'b', width : 55, sortable : false},
+	         	{display: three+'公里', name : 'c', width : 55, sortable : false},
+	            {display: four+'公里', name : 'd', width : 55, sortable : false},
+	         	{display: five+'公里', name : 'e', width : 55, sortable : false},
+	         	{display: six+'公里', name : 'f', width : 55, sortable : false},
+	         	{display: seven+'公里', name : 'g', width : 55, sortable : false},
+		        {display: eight+'公里', name : 'h', width : 55, sortable : false}, 
+		        {display: nine+'公里', name : 'i', width : 55, sortable : false},
+		        {display: ten+'公里', name : 'j', width : 55, sortable : false},
+		        {display: eleven+'公里', name : 'k', width : 55, sortable : false}, 
+		        {display: twelf+'公里', name : 'm', width : 55, sortable : false}
+	        ],
+	    };
+	$('#maintainItems').sgDatagrid(defaults);
+	
+	
+	/* 
+	xuan("air_filter");
+	xuan("ac_system");
+	xuan("engine_oil"); */
+	
+	
+	
+})(jQuery)
+
+</script>
+</html>

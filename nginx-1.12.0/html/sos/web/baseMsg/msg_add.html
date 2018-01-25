@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>添加机构</title>
+</head>
+
+<body>
+<form id="company_add_form" method="post" class="form" name="company_add_form" >
+	<div class="form">
+		<fieldset style="width: 380px;">
+			<input type="hidden" id="parentid" name="parentid"/>
+        	<input type="hidden" id="opid_add" name="opid_add"/>
+        	<input type="hidden" id="companytype_add" name="companytype_add" />
+			<div class="panel">
+				<span>上级机构:</span> <input type='text' id="parentname"
+					name='parentname' style="width: 200px;"
+					disabled="disabled" />
+			</div>
+			<div class="panel">
+                <span>机构简称:</span>
+                <input type='text' id="companyname" name='companyname' required="true" style="width:200px;" />
+            </div>
+            <div class="panel">
+                <span>中文全称:</span>
+                <input type='text' id="cnfullname" name='cnfullname' style="width:200px;" />
+            </div>
+            <div class="panel">
+                <span>英文全称:</span>
+                <input type='text' id="enfullname" name='enfullname' style="width:200px;" />
+            </div>
+            <div class="panel">
+                <span>自定义编号:</span>
+                <input type='text' id="companycode" name='companycode' style="width:200px;" />
+            </div>
+            <div class="panel">
+                <span>地址:</span>
+                <input type='text' id="address" name='address' style="width:200px;" />
+            </div>
+            <div class="panel">
+                <span>成立时间:</span>
+                <input type='date' id="time" name='time' required="true" style="width:200px;" />
+            </div>
+            <div class="panel">
+                <span>机构类型:</span>
+                <select size="1" name="type_add" id="type_add" style="width:205px;height:24px;" onchange="initType();">
+	                <option value="1">一般部门</option>
+	                <option value="2">营业处</option>
+	                <option value="3">投资公司</option>
+	                <option value="4">仓库</option>
+	            </select>
+            </div>
+            <!--  
+            <div class="panel">
+                <span>负责人:</span>
+                <select size="1" name="opname_add" id="opname_add" style="width:205px;height:24px;" onchange="initOpid();">
+	                <option value='' selected='selected'>--请选择--</option>
+	            </select>
+            </div>
+            -->
+            <div class="panel">
+                <span>排序:</span>
+                <input type='text' id="order" name='order' required="true" value="0" style="width:200px;" />
+            </div>
+		</fieldset>
+	</div>
+</form>
+
+</body>
+<script type="text/javascript">
+
+	function initOpid() {
+		var op = document.getElementById('opname_add');
+		$('#opid_add').val(op.options[op.selectedIndex].value);
+	}
+	
+	function initType() {
+		var type = document.getElementById('type_add');
+		$('#companytype_add').val(type.options[type.selectedIndex].value);
+	}
+</script>
+</html>

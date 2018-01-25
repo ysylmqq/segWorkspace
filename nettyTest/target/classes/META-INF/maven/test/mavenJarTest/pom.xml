@@ -1,0 +1,127 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>test</groupId>
+  <artifactId>mavenJarTest</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <properties>
+     <spring.version>3.2.4.RELEASE</spring.version>
+     <spring-security.version>3.1.3.RELEASE</spring-security.version>
+  </properties>
+  
+  <dependencies>
+	<dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>slf4j-api</artifactId>
+	    <version>1.7.15</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>slf4j-log4j12</artifactId>
+	    <version>1.7.15</version>
+	</dependency>
+	<dependency>
+	    <groupId>io.netty</groupId>
+	    <artifactId>netty-all</artifactId>
+	    <version>5.0.0.Alpha2</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.jboss.marshalling</groupId>
+	    <artifactId>jboss-marshalling</artifactId>
+	    <version>1.3.15.GA</version>
+	</dependency>
+	<dependency>
+	    <groupId>com.google.protobuf</groupId>
+	    <artifactId>protobuf-java</artifactId>
+	    <version>2.5.0</version>
+	</dependency>
+	<!-- 用来获取机器上的信息 -->
+	<dependency>
+	    <groupId>org.fusesource</groupId>
+	    <artifactId>sigar</artifactId>
+	    <version>1.6.4</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpclient</artifactId>
+	    <version>4.3.6</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpmime</artifactId>
+	    <version>4.3.6</version>
+	</dependency>
+	<!-- solr -->
+	<dependency>
+	    <groupId>org.apache.solr</groupId>
+	    <artifactId>solr-solrj</artifactId>
+	    <version>4.10.3</version>
+	</dependency>
+	<dependency>
+	    <groupId>com.alibaba</groupId>
+	    <artifactId>druid</artifactId>
+	    <version>1.0.22</version>
+	</dependency>
+  </dependencies>
+  
+ <build>  
+ 	<finalName>mavenJar</finalName>
+    <plugins>  
+        <plugin>  
+        <!-- maven-jar-plugin用于生成META-INF/MANIFEST.MF文件的部分内容， -->
+            <groupId>org.apache.maven.plugins</groupId>  
+            <artifactId>maven-jar-plugin</artifactId>  
+            <version>2.6</version>  
+            <configuration>  
+                <archive>  
+                    <manifest>  
+                   		<!--  会在MANIFEST.MF加上Class-Path项并配置依赖包， -->
+                        <addClasspath>true</addClasspath> 
+                        <!-- 指定依赖包所在目录  也就是manifest.mf文件当中的jar包前面加上这个路径--> 
+                        <classpathPrefix>lib/</classpathPrefix> 
+                        	<!-- 指定MANIFEST.MF中的Main-Class， --> 
+                        <mainClass>com.org.maven.MavenTest</mainClass>  
+                    </manifest>  
+                </archive>  
+            </configuration>  
+        </plugin>  
+        <!-- 把依赖的jar包打到target目录下的lib目录当中 -->
+        <plugin>  
+            <groupId>org.apache.maven.plugins</groupId>  
+            <artifactId>maven-dependency-plugin</artifactId>  
+            <version>2.10</version>  
+            <executions>  
+                <execution>  
+                    <id>copy-dependencies</id>  
+                    <phase>package</phase>  
+                    <goals>  
+                        <goal>copy-dependencies</goal>  
+                    </goals>  
+                    <configuration>  
+                    <!-- 代表的目录是target/lib -->
+                        <outputDirectory>${project.build.directory}/lib</outputDirectory>  
+                    </configuration>  
+                </execution>  
+            </executions>  
+        </plugin>  
+	  <!-- 把源码也打包进去 -->
+ 		<plugin> 
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-source-plugin</artifactId>
+			<version>3.0.1</version>
+			<executions>
+				<execution>
+					<phase>compile</phase>
+					<goals><goal>jar</goal></goals>
+					<configuration>
+						<!-- 把源码打包，输出到target/lib目录下面 -->
+						<!-- <outputDirectory>${project.build.directory}/lib</outputDirectory> -->
+					</configuration>
+				</execution>
+			</executions>
+ 		</plugin>
+    </plugins>  
+</build>  
+  
+  
+</project>

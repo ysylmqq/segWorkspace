@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css"><link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+    <title>库存设置</title>
+</head>
+
+<body>
+<div id="nw_document_all">
+ <div id="dgd_setup" class="datagrid"></div>
+</div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+    (function($){
+       var editId=null;//编辑时选中行ID
+       var editObj=null;//编辑时选中行对象
+       var editIds=null;//批量修改库存设置的ID
+ 	   var loadSuccess = function(){
+    	   if(editObj&&editIds&&editIds.length>0){
+    		   $('#minStock').val(editObj.minStock);
+    		   $('#overstockTime').val(editObj.overstockTime);
+    	   }
+ 	   }
+    	
+       var winClose = function (){
+          $(document).sgWindow('close',{id:'win_setup'});
+       }
+ 	   var save = function(){
+ 		   $("#form_setup").on('submit',function(e){
+ 			    var obj = $('#dgd_product');
+ 		        var bDiv = $('.bDiv',obj);
+ 		        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+ 		        	var ids=[];
+ 		        	$(document).sgConfirm({text: '确定要统一设置这些商品的库存吗?',cfn:function(r){ 
+		    		   if(r){
+ 		        
+ 		        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 		 	        		ids.push($(this).data('data').id);
+ 		 	            });
+ 		        		 $.ajax( {
+ 	            		  type : 'POST', 
+ 	            		  async: false,   
+ 	            		  //contentType : 'application/json',     
+ 	            		  dataType : 'json',     
+ 	            		  url : '../../stock/addSetups',  
+ 	            		  data:{ids:ids,minStock:$('#minStock').val(),overstockTime:$('#overstockTime').val()},
+ 	            		  success : function(data) {
+ 	            			  if(data){
+ 	            				 if(data.success){
+ 	            					 $(document).sgWindow('close',{id:'win_setup'}); 
+ 	    	          		 		 $('#dgd_setup').sgDatagrid('reload','sgDatagrid');
+ 	            				 }
+ 	            				$(document).sgPup({message:'message_info',text: data.msg});
+ 	            			  }
+ 	            		  } ,     
+ 	            		  error : function(res,error) { 
+ 	            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+ 	            		  }    
+ 	            		}); 
+ 		        	}
+ 		        }});
+ 		        	
+ 		        }else{
+ 		            $(document).sgPup({message:'message_info',text: "请选择要添加的选项！"});
+ 		        }
+ 		       $('#form_setup').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+ 				e.stopPropagation();
+ 	        	return false;
+ 	        });
+  
+ 	   };
+
+ 	  var save4edit = function(){
+		   $("#form_setup_edit").on('submit',function(e){
+			   var str='';
+			   var str2='该';
+			   if(editIds&&editIds.length>1){
+				   str='统一';
+				   str2='这些';
+			   }
+			   $(document).sgConfirm({text: '确定要'+str+'修改'+str2+'商品的库存吗?',cfn:function(r){ 
+		    	if(r){
+			
+				    var obj = $('#dgd_product');
+			        var bDiv = $('.bDiv',obj);
+	        		 $.ajax( {
+	           		  type : 'POST', 
+	           		  async: false,   
+	           		  //contentType : 'application/json',     
+	           		  dataType : 'json',     
+	           		  url : '../../stock/updateSetups',  
+	           		  data:{ids:editIds,minStock:$('#minStock').val(),overstockTime:$('#overstockTime').val()},
+	           		  success : function(data) {
+	           			  if(data){
+	           				 if(data.success){
+	           					 $(document).sgWindow('close',{id:'win_setup'}); 
+	   	          		 		 $('#dgd_setup').sgDatagrid('reload','sgDatagrid');
+	           				 }
+	           				$(document).sgPup({message:'message_info',text: data.msg});
+	           			  }
+	           		  } ,     
+	           		  error : function(res,error) { 
+	           		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	           		  }    
+	           		}); 
+		  		 }
+		  		}});
+			   $('#form_setup_edit').unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+				e.stopPropagation();
+	        	return false;
+	        });
+ 
+	   };
+ 	   var addItem = function(){
+ 		    editId=null;
+ 			editIds=[];
+ 	       	editObj=null;
+ 	        var defaults = {
+ 	                title:'库存设置',
+ 	                id:'win_setup',
+ 	                form:'form_setup',
+ 	                url:'setup_form.html',
+ 	                success: loadSuccess,
+ 	                width: 788,
+ 	                height: 456,
+ 	                buttons : [
+ 	                           {name: '确定', type: 'submit', onpress : save},
+ 	                           {name: '关闭', onpress : winClose},
+ 	                           {name: '重置', type: 'reset'}
+ 	                       ]
+ 	            };
+ 	        $(document).sgWindow(defaults);
+ 	        
+ 	        
+ 	    }
+ 	        
+
+ 	    var delItem = function(){
+ 	    	var obj = $('#dgd_setup');
+ 	        var bDiv = $('.bDiv',obj);
+ 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+ 	        	var ids=[];
+ 	        	$(document).sgConfirm({text: '删除后不可恢复，确定删除?',cfn:function(r){ 
+		    		if(r){
+ 	        
+ 	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	 	        		ids.push(this.value);
+ 	 	            });
+ 	        		 $.ajax( {
+	            		  type : 'post', 
+	            		  async: false,   
+	            		  contentType : 'application/json',     
+	            		  dataType : 'json',     
+	            		  url : '../../stock/deleteSetups',   
+	            		  data:JSON.stringify(ids),
+	            		  success : function(data) {
+	            			  if(data){
+	            				 if(data.success){
+	    	          		 		 $('#dgd_setup').sgDatagrid('reload','sgDatagrid');
+	            				 }
+	            				$(document).sgPup({message:'message_info',text: data.msg});
+	            			  }
+	            		  } ,     
+	            		  error : function(res,error) { 
+	            		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	            		  }    
+	            		}); 
+ 	        	}
+ 	        }});
+ 	        	
+ 	        }else{
+ 	            $(document).sgPup({message:'message_info',text: "请选择要删除的选项！"});
+ 	        }
+ 	    }
+
+ 	    var editItem = function(){
+ 	    	var obj = $('#dgd_setup');
+ 	        var bDiv = $('.bDiv',obj);
+ 	       	editIds=[];
+ 	       	editObj=null;
+ 	        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+ 	        		$('input[type=checkbox][checked=checked]',bDiv).each(function(){
+ 	        			editIds.push(this.value);
+ 	        			editObj=$(this).data('data');
+ 	 	            });
+ 	        		//打开窗口
+	                var defaults = {
+	    	                title:'库存设置',
+	    	                id:'win_setup',
+	    	                form:'form_setup_edit',
+	    	                url:'setup_form_edit.html',
+	    	                success: loadSuccess,
+	    	               	width: 408,
+		   	                height: 220,
+		   	                buttons : [
+	   	                           {name: '确定', type: 'submit', onpress : save4edit},
+	   	                           {name: '关闭', onpress : winClose},
+	    	                       {name: '重置', type: 'reset'}
+	    	                       ]
+	    	            };
+	    	        $(document).sgWindow(defaults);
+ 	        	
+ 	        }else{
+ 	            $(document).sgPup({message:'message_info',text: "请选择要编辑的选项！"});
+ 	        }
+ 	    }
+ 	   //修改表格的宽度
+         var height =$('#main_bd',window.parent.document).height()-288;
+    	//初始化表格
+    	 var defaults = {
+    		        title: "库存设置",
+    		        width:  '100%',
+    		        height: height,
+    		        url: '../../stock/findStockSetup',
+    		        usepager: true,
+    		        rownumbers:true,
+    		        useRp: true,
+    		        colid:'id',  //主键
+    		        colModel : [
+						{display: '仓库名称', name : 'whsName', width : 100, sortable : false},
+    		            {display:'商品编码',name:'productCode',width : 100,sortable : true},
+    		            {display: '商品名称', name : 'productName', width : 100, sortable : true},
+    		            {display: '商品规格', name : 'norm', width : 180, sortable : true},
+    		            {display: '最小库存', name : 'minStock', width : 100, sortable : true},
+    		            {display: '积压时长(月)', name : 'overstockTime', width : 120, sortable : true}
+    		        ],
+    		        buttons : [
+    		            {name: '增加', bclass: 'add', onpress : addItem},
+    		            {separator: true},
+    		            {name: '编辑', bclass: 'edit', onpress : editItem},
+    		            {separator: true},
+    		            {name: '删除', bclass: 'delete', onpress : delItem},
+    		            {separator: true}
+    		        ],
+    		        searchitems :[
+    		            {display:'商品名称',name:'productName',type:'text'},
+    		            {display:'最小库存',name:'minStock',type:'text',width:100},
+    		            {display:'积压时长(月)',name:'overstockTime',type:'text',width:100}
+    		        ],
+    		        exporturl:'../../product/exportSetups',//导出excel
+    		        //query:{name:''},//查询默认参数
+    		        order:true,
+       		        sortname: "productName",
+       		        sortorder: "asc"
+    		    };
+    		    $('#dgd_setup').sgDatagrid(defaults); 
+
+    })(jQuery)
+</script>
+</html>

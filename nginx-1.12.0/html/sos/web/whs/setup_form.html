@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>库存设置表单</title>
+<style type="text/css">
+.form_right{
+  float: left;
+  width: 240px;
+  padding-top: 20px;
+}
+.art_center{
+  float: left;
+  width: 530px;
+}
+.form label {
+	width: 70px;
+	float: left;
+	padding-right: 0px;
+}
+</style>
+</head>
+
+<body style="width: 780px;">
+    <article id="article_center" class="art_center">
+     <div id="dgd_product" class="datagrid"></div>
+    </article>
+	<aside id="aside_right" class="form_right" >
+		<form id="form_setup" method="post" class="form" name="form_setup"  >
+			 <input type="hidden" id="id" name="id"/>
+	        <div style="float: left;" class="panel">
+	            <label for="minStock">最小库存:</label>
+	            <input type="number" id="minStock" name="minStock" style="width:150px" required="true" autofocus="true" autocomplete="on" value="50" />
+	        </div>
+	         <div class="panel">
+	            <label for="overstockTime">积压时长(月):</label>
+	            <input type="number" id="overstockTime" name="overstockTime" style="width:150px" required="true"  autocomplete="on" value="12"/>
+	        </div>
+	</form>
+	</aside>
+
+
+
+</body>
+<script type="text/javascript">
+(function($){
+	
+    	//初始化表格
+   	 	var defaults = {
+   		        width:  540,
+   		        height: 320,
+   		        url: '../../product/findAllProducts',
+   		     	rownumbers:true,
+   		        colid:'id',  //主键
+   		        colModel : [
+   		            	{display: '编码', name : 'code', width : 100, sortable : false},
+    		            {display: '名称', name : 'name', width : 110, sortable : false},
+    		            {display: '规格', name : 'norm', width : 160, sortable : false},
+   		           		{display: '类别', name : 'type', width : 40, sortable : false,formatter:function(value,row){
+   		                if(value==0){
+   		                    value = '成品';
+   		                }else if(value==1){
+   		                    value = '配件';
+   		                }
+   		                return value;
+   		            }}
+   		        ],
+   		        buttons : [
+   		        ],
+   		        searchitems :[
+						{display:'编码',name:'code',type:'text'},
+   		            	{display:'名称',name:'name',type:'text'},
+   		            	{display:'规格',name:'norm',type:'text'},
+   		            	{display:'类型',name:'type',html:'<select name="type"><option value="" selected>请选择...</option><option value="0" selected="true">成品</option><option value="1">配件</option></select>'}
+   		        ],
+   		        query:{notSetup:true,type:0}//只查出还未添加到分公司的总部商品
+   		        //exporturl:'',//导出excel
+   		    };
+   		    $('#dgd_product').sgDatagrid(defaults);
+	
+})(jQuery)
+</script>
+</html>

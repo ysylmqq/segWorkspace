@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>换装</title>
+<style>
+
+</style>
+</head>
+<body>
+	<form id='dress_view' method='post' class="form" style="width:820px;">
+		<fieldset style="width:800px;">
+			<div class="panel">
+                <span>工单号:</span>
+                <input type='text' id="number_plate" name='number_plate' style="width:150px;" />
+            </div>
+		</fieldset>
+		<div class='title'>车辆资料></div>
+		<fieldset style="width:800px;">
+            <div class="panel">
+                <span>车牌号码:</span>
+                <input type='text' id="number_plate" name='number_plate' style="width:150px;" />
+                
+                <span>车牌颜色:</span>
+                <select size="1" name="color" id="color" style="width:154px;" autocomplete="on">
+                    <option value="1">蓝色</option>
+                    <option value="2">黄色</option>
+                    <option value="3">白色</option>
+                    <option value="4">黑色</option>
+                </select>
+                
+                <span>车辆类型:</span>
+                <select size="1" name="vehicle_type" id="vehicle_type" style="width:154px;" autocomplete="on">
+                    <option value="1">小型车</option>
+                    <option value="2">卡车</option>
+                </select>
+            </div>
+            <div class="panel">
+                <span>品牌:</span>
+                <select size="1" name="color" id="color" style="width:154px;" autocomplete="on">
+                    <option value="1">大众</option>
+                    <option value="2">宝马</option>
+                    <option value="3">保时捷</option>
+                    <option value="4">本田</option>
+                </select>
+                
+                <span>车系:</span>
+                <select size="1" name="color" id="color" style="width:154px;" autocomplete="on">
+                    <option value="1">与品牌联动</option>
+                </select>
+                
+                <span>车型:</span>
+                <select size="1" name="color" id="color" style="width:154px;" autocomplete="on">
+                    <option value="1">与车系联动</option>
+                </select>
+            </div>
+            <div class="panel">
+            	<span>车辆识别号:</span>
+                <input type='text' id="code" name='code' style="width:150px;" />
+            
+            	<span>发动机号:</span>
+                <input type='text' id="engine_no" name='engine_no'  style="width:150px;" />
+                
+                <span>生产厂家:</span>
+                <input type='text' id="model" name='model' style="width:150px;" />
+            </div>
+            <div class="panel">
+            	<span>车辆颜色:</span>
+                <input type='text' id="vehicle_color" name='vehicle_color' style="width:150px;" />
+            
+                <span>购车时间:</span>
+                <input type='date' id="buy_time" name='buy_time' style="width:150px;" />
+            </div>
+        </fieldset>
+        
+        <div class='title'>历史资料</div>
+        <fieldset style="width:800px;">
+        	<div id="serverItem1" class="datagrid">
+            	<div class="hDiv" style="margin:0px;padding:0px;width:750px;">
+	                <table>
+	                    <thead>
+	                    <tr>
+	                        <th style="width:40px;">序号</th>
+	                        <th style="width:100px;">注册名</th>
+	                        <th style="width:100px;">客户名称</th>
+	                        <th style="width:100px;">车牌号码</th>
+	                        <th style="width:100px;">车载号码</th>
+	                        <th style="width:100px;">修改人</th>
+	                        <th style="width:100px;">修改时间</th>
+	                        <th style="width:40px;">操作</th>
+	                    </tr>
+	                    <tr><th>1</th><th>XXXX</th><th>XXXX</th><th>137XXXXXX</th><th>xxxxxx</th><th>张小红</th><th>2014-01-27</th><th><a href=''>查看</a></th></tr>
+	                    <tr><th>2</th><th>XXXX</th><th>XXXX</th><th>137XXXXXX</th><th>xxxxxx</th><th>张燕</th><th>2014-01-15</th><th><a href=''>查看</a></th></tr>
+	                    </thead>
+	                </table>
+                </div>
+            </div>
+        </fieldset>
+
+	</form>
+</body>
+<script type="text/javascript">
+$(function () {
+	var flag = 0;
+	$("#barcode_sel a").on('click',function(){
+		var detail_div = $("<div></div>");
+		var detail_id = "barcode_sel"+flag;
+		detail_div.attr('id',detail_id);
+		detail_div.addClass("panel");
+		detail_div.append($("#barcode_sel").html());
+		
+		$("#barcode_sel").before(detail_div);
+		$("#"+detail_id+" img").attr('src','images/form_del.png');
+		$("#"+detail_id+" img").attr('title','删除条形码');
+		
+		$("#"+detail_id+" a").on('click',function(){
+			$("#"+detail_id).remove();
+		})
+		//$("#"+detail_id + " input[list=productList]").on('keyup',checkProduct);
+		flag=flag+1;
+	});
+});
+</script>
+</html>

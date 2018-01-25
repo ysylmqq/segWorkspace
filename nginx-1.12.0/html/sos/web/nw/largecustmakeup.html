@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>批量改联系电话</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../css/tree.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../css/sos.css">
+</head>
+<body>
+	<div id="nw_document_all">
+	<form id='search_form' name='search_form' method='post' class="form">
+		<div class='title'>批量改联系电话></div>
+		<fieldset style="width:100%;">
+			<div class="panel">
+				<div class="row" id="divObj1">
+	            	<div class="col-xs-6">
+	    				<span class="col-xs-2">公司名称:</span>
+	    				<div class="col-xs-8" style="position:relative;">
+			            	<input type='text' id="custname" name='custname' class="form-control" />
+			            	<ul class="show_list" id="customerList"></ul>
+		            	</div>
+		            </div>
+	        	</div>
+			</div>
+		</fieldset>
+	</form>
+	<form id='nw_largecustupdate_form' name='nw_largecustupdate_form' method='post' class="form">
+		<input type='hidden' id='opid' name='opid' >
+		<input type='hidden' id='companyno' name='companyno' >
+		<input type='hidden' id='cust_id' name='cust_id' >
+		<input type='hidden' id='url_tye' value='2' >
+		
+		<div class='title'>联系人资料</div>
+   		<fieldset style="width:100%;">
+   			<div id="driver_panel">
+            	<div class="panel">
+	            	<div class="row">
+	                    <div class="col-xs-3">
+		                    <input type='hidden' id='driver_id' name='driver_id' />
+			                <span class="col-xs-4">司机编号:</span>
+			                <span class="col-xs-8">
+			                	<input type='number' id="code" name='code' class="form-control" />
+			                </span>
+	                    </div>
+	                    <div class="col-xs-3">
+		                    <span class="col-xs-4">司机姓名:</span>
+		                    <span class="col-xs-8">
+			                	<input type='text' id="drivername" name='drivername' class="form-control" />
+			                </span>
+	                    </div>
+	                    <div class="col-xs-3">
+		                    <span class="col-xs-4">联系电话:</span>
+		                    <span class="col-xs-8">
+			                	<input type='text' id="phone" name='phone' class="form-control" />
+			                </span>
+	                    </div>
+	                    <a href="javascript:void(0);" style="margin:0px;padding:0px;padding-left:10px;padding-top:5px;"><img alt="增加司机" src="../../images/form_add.png" title="增加司机" style="vertical-align:middle"></a>
+	                </div>
+	            </div>
+	            <hr>
+            </div>
+        </fieldset>
+		
+        <fieldset style="width:100%;border-top:0px;">	
+	        <div class='submit'>
+	            <button type="submit" onclick="largecustupdate_save();" class="btn btn-primary btn-xs">保存</button>
+	        </div>
+        </fieldset>
+	</form>
+   	</div>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../jscript/html5.js"></script>
+<script type="text/javascript" src="../../jscript/window.js"></script>
+<script type="text/javascript" src="../../jscript/form.js"></script>
+<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript" src="../../jscript/tree.js"></script>
+<script type="text/javascript">
+	document.onkeydown=function(event){
+		var e = event || window.event || arguments.callee.caller.arguments[0];
+		if(e && e.keyCode==13){
+			return false;
+		}
+	}
+</script>
+<script type="text/javascript">
+	var submitkey = true;
+
+	function searchcust(){
+		
+	}
+
+	function largecustupdate_save(){
+		$("#nw_largecustupdate_form").on('submit',
+				function(e){
+			if(!submitkey){
+				return false;
+			}
+			var cust_id = $('#cust_id').val();
+			if(cust_id==''){
+				$(document).sgPup({message:'message_alert',text: '请先选择一个集团客户.'});
+				return false;
+			}
+			
+			var drivers = new Array();
+			var codes = $('input[name=code]');
+			var names = $('input[name=drivername]');
+			var phones = $('input[name=phone]');
+			var r = true;
+			codes.each(function(k,v){
+				var obj = {};
+	        	obj.driver_code = codes[k].value;
+	        	obj.driver_name = names[k].value;
+	        	obj.phone = phones[k].value;
+	        	if(obj.phone!=''&&obj.driver_name==''){
+	        		r = false;
+	        		return false;
+	        	}
+	        	drivers.push(obj);
+			});
+			if(!r){
+				$(document).sgPup({message:'message_alert',text: '司机姓名不能填写为空.'});
+				return false;
+			}
+			$.ajax({
+				type : 'post',
+				async : false,
+				contentType : 'application/json',
+				dataType : 'json',
+				url : '../../largeCustPhone',
+				data : JSON.stringify({
+					cust_id : cust_id,
+					drivers : drivers
+				}),
+				success : function(data) {
+					if (data) {
+						submitkey=false;
+						setTimeout(function(){
+							submitkey=true;
+						},3000);
+						$(document).sgPup({message:'message_alert',text: data.msg});
+					}
+				},
+				error : function(res, error) {
+					$(document).sgPup({message:'message_alert',text: "responseText=" + res.responseText
+						+ ";error=" + error});
+				}
+			});
+			$('#nw_largecustupdate_form').unbind();//以下两行可以阻止提交2次
+			e.stopPropagation();
+			return false;
+		});
+	}
+
+    $(function () {
+    	var flag = 0;
+    	$("#driver_panel a").on('click',function(){
+    		var detail_div = $("<div></div>");
+    		var detail_id = "driver_panel"+flag;
+    		detail_div.attr('id',detail_id);
+    		detail_div.addClass("panel");
+    		detail_div.append($("#driver_panel").html());
+    		
+    		$("#driver_panel").after(detail_div);
+    		$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+    		$("#"+detail_id+" img").attr('title','删除司机');
+    		$("#"+detail_id+" #sex").attr('name','sex'+flag);
+    		
+    		$("#"+detail_id+" a").on('click',function(){
+    			$("#"+detail_id).remove();
+    		})
+    		//$("#"+detail_id + " input[list=productList]").on('keyup',checkProduct);
+    		flag=flag+1;
+    	});
+	    
+    });
+</script>
+<script type="text/javascript" src="../../jscript/web/custList.js"></script>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>营业处收款日报表</title>
+</head>
+<body>
+	<form id='writeOff_add_form' method='post' class="form" style="width:100%" >
+	<div class="form title">营业处收款日报表</div>
+		<fieldset style="width:850px;">
+			<div class='submit' style="text-align:left;">
+	            	<span style="width:60px;">开始日期:</span>
+	                <input type="datetime-local" id="stamp" name='stamp' style="width:165px;" />&nbsp;&nbsp;
+	                <span style="width:60px;">结束日期:</span>
+	                <input type="datetime-local" id="stamp" name='stamp' style="width:165px;" />
+	                <button id="stockin_detail_submit" type="submit" style="width:80px;height:26px;" >查询</button>
+	                <button id="stockin_detail_submit" type="submit" style="width:80px;height:26px;" >导出Excel</button>
+	                <button id="stockin_detail_submit" type="submit" style="width:80px;height:26px;" >打印</button>
+	        </div>
+		</fieldset>
+	</form>
+	<div id="tabContainer" class="tab_container f12">
+    <ul class="tabs">
+        <li><a href="#tab1">销售</a></li>
+        <li><a href="#tab2">服务费</a></li>        
+        <li><a href="#tab3">检测费</a></li>
+    </ul>
+    <div class="tab_div_container">
+        <div id="tab1" class="tab_content" src="web/rp/rece_sale.html"></div>
+        <div id="tab2" class="tab_content" src="web/rp/rece_service.html"></div>
+        <div id="tab3" class="tab_content" src="web/rp/rece_detect.html"></div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    (function($) {
+        var defaults = {
+            width: 865,
+            height: 458
+        };
+
+        $('#tabContainer').sgTab(defaults);
+    })(jQuery);
+</script>
+</html>

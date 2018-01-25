@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>核销明细</title>
+</head>
+
+<body style="padding: 0px;margin: 0px;">
+
+<form id="form_writeoffs4View" class="form" style="width:810px;height:440px;" >
+		<div class="title">核销信息></div>
+		<fieldset style="width:98.9%;height:80px;" >
+             <div style="height:30px;" class="panel">
+             	 <input type='hidden' id="id" name='id' disabled="disabled"/>
+              
+                <span>核销单号:</span>
+                <input type='text' id="writeoffsNo" name='writeoffsNo'  style="width:155px;" disabled="disabled"/>
+              
+                <span>日期:</span>
+                <input type='date' id="stamp" name='stamp'  style="width:155px;" disabled="disabled"/>
+              
+                <span>经办人:</span>
+                  <input name="managersName" id="managersName"   disabled="disabled" list="userDataList" style="width:150px;"  />
+                <input type="hidden" name="managersId" id="managersId" />
+                <datalist id="userDataList"></datalist>
+                <span id="borrowedNum" style="vertical-align:top;width:10px;color: red"></span>
+                
+             </div>
+              <div class="panel">
+                <span style="vertical-align:top;">收据编号:</span>
+                <input type="text" id="receiptNo"  name="receiptNo" style="width:155px;vertical-align:top;"disabled="disabled"/>
+                
+                <span style="vertical-align:top;">人工费:</span>
+                <input type="text" id="peopleMoney"  name="peopleMoney" disabled="disabled"style="width:155px;vertical-align:top;"  />
+                
+              <span style="vertical-align:top;">备注:</span>
+                <textarea  id="remark" name='remark'  style="width:150px;" rows="2" disabled="disabled" ></textarea>
+            </div>
+        </fieldset>
+		
+		<div class="title">商品信息></div>
+		<fieldset id="fs_product" class='fieldset'  style="width:790px;">
+ 		<div id="dgd_product" class="datagrid"></div>
+        </fieldset>
+</form>
+</body>
+<script type="text/javascript">
+    (function($){
+    	//初始化表格
+   	 	var defaults = {
+   		        width:  770,
+   		        height: 255,
+   		        //url: '../../stock/findWriteoffsDetails',
+   		        url:'',
+		        rownumbers:true,//序号
+		        isCount:true,
+   		        colModel : [
+						{display: '编码', name : 'productCode', width : 100, sortable : false},
+    		            {display: '名称', name : 'productName', width : 140, sortable : false},
+    		            {display: '规格', name : 'norm', width : 200, sortable : false},
+    		            {display: '数量', name : 'num', width : 50, sortable : false,isAdd:true},
+    		            {display: '单价', name : 'price', width : 50, sortable : false},
+    		            {display: '是否在保质期内', name : 'isExpired', width : 90, sortable : false,formatter:function(value,row){
+    		                if(value==0){
+    		                    value = '否';
+    		                }else if(value==1){
+    		                    value = '是';
+    		                }
+    		                return value;
+    		            }},
+    		            {display: '费用', name : 'money', width : 50, sortable : false}
+   		        ]
+   		    };
+   		    $('#dgd_product').sgDatagrid(defaults);
+   		    
+    })(jQuery)
+    
+</script>
+</html>

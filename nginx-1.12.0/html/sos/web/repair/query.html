@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>维修查询</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap-datetimepicker.css" /><!-- +++++ -->
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+</head>
+<body>
+	<div id="monitoring">
+		<div id="repair_order" class="datagrid"></div>
+	</div>
+	
+	<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../bslib/js/bootstrap-datetimepicker.js"></script><!-- ++++ -->
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+	<script type="text/javascript">
+		var lastMonthDay=new Date(); //上个月的今天
+        //lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+		lastMonthDay.setDate(1);
+		lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+		var today=new Date().format('yyyy-MM-dd');
+        
+          //修改表格的宽度
+		var height =$('#main_bd',window.parent.document).height()-288;
+		var startDateHTML = '<span class="ltext"><input type="text" name="startDate" class="form-control form_datetime" value='+lastMonthDay+' /></span>';//开始日期
+		var endDateHTML = '<span class="ltext"><input type="text" name="endDate" class="form-control form_datetime" value='+today+' /></span>';//结束日期
+		var defaults = {
+			title: "维修任务查询 ",
+			width : '100%',
+			height : 350,
+			url : '../../repair/findRepairHisPage',
+			datatype : "json",
+			isNotCheckall : true,
+			usepager : true,// 包含表格底部的分页等等一行信息
+			autoLoad : false,
+			rownumbers : true,
+			useRp : true,
+			colid : 'rpId', // 主键
+			colModel : [ 
+			    {display : '维护单号', name : 'jobNo', width : 180 }, 
+			    {display : '故障现象', name : 'symptom', width : 150}, 
+			    {display : '维护电工', name : 'worker', width : 60}, 
+			    {display : '维护地点', name : 'rpPlace', width : 100}, 
+			    {display : '操作员', name : 'acpOpName', width : 60}, 
+			    {display : '工单状态', name : 'status', width : 100, formatter : function(value, row) {
+					if (value == 1) {
+						value = '<font color="red">已登记</font>';
+					} else if (value == 2) {
+						value = '<font color="red">已受理</font>';
+					} else if (value == 3) {
+						value = '<font color="red">已预约</font>';
+					} else if (value == 4) {
+						value = '<font color="red">已派工</font>';
+					} else if (value == 5) {
+						value = '<font color="red">维修中</font>';
+					} else if (value == 6) {
+						value = '<font color="green">维修完成</font>';
+					} else if (value == 7) {
+						value = '<font color="red">未维修完成</font>';
+					}
+					return value;
+				}}, 
+				{display : '处理时间', name : 'stamp', width : 120},
+				{display : '备注', name : 'regRemark', width : 180}, 
+				{display : '跟踪情况', name : 'traceResult',width : 180}
+			],
+			searchitems : [
+				{display:'开始日期',html:startDateHTML},
+				{display:'结束日期',html:endDateHTML}, 
+				{display:'维修状态',html:'<span class="ltext"><select class="form-control" name="status"><option value="" selected="selected">请选择...</option><option value="1">已登记</option><option value="2">已受理</option><option value="3">已预约</option><option value="4">已派工</option><option value="5">维修中</option><option value="6">维修完成</option><option value="7">未维修完成</option></select></span>'},
+				{display:'客户名称',html:'<span class="ltext"><input type="text" class="form-control" name="customerName" id="customerName" /></span>'},
+				{display:'车牌号码',html:'<span class="ltext"><input type="text" class="form-control" name="plateNo" id="plateNo" /></span>'},
+				{display:'车载电话',html:'<span class="ltext"><input type="text" class="form-control" name="callLetter" id="callLetter" /></span>'}
+			],
+			query:{startDate:today,endDate:today}
+        };
+		$('#repair_order').sgDatagrid(defaults);
+
+		$.fn.datetimepicker.dates['zh'] = {
+			days : [ "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ],
+			daysShort : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+			daysMin : [ "日", "一", "二", "三", "四", "五", "六", "日" ],
+			months : [ "一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月" ],
+			monthsShort : [ "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二" ],
+			meridiem : [ "上午", "下午" ],
+			today : "今天"
+		};
+		$(document).ready(function(){
+		    $(".form_datetime").datetimepicker({
+				language : "zh",
+				autoclose: true,
+				minView: "month",
+				format : 'yyyy-mm-dd'
+			});
+		});
+	</script>
+</body>
+</html>

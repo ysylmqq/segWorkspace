@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>盘点录入</title>
+    <style type="text/css">
+    .btnsubmit{
+    margin-top:-1px;
+padding: 1px 0 1px 0px;
+    background-color:#4791d2;
+    border:1px solid #dedede;
+    border-top:1px solid #eee;
+    border-left:1px solid #eee;
+
+    font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-size:12px;
+    line-height:14px;
+    text-decoration:none;
+    text-align:center;
+    color:#fff;
+    cursor:pointer;
+    border-radius: 3px;
+    height: 25px;
+    width:89px;
+}
+    </style>
+</head>
+
+<body style="padding: 0px;margin: 0px;">
+ <div id="dgd_check_details" class="datagrid"></div>
+ <datalist id="productDataList">
+ </datalist>
+</body>
+<script type="text/javascript">
+    (function($){
+    	var productDataList=[];//商品数组 key:商品名称,value:productId
+    	var lastMonthDay=new Date();//上个月的今天
+    	lastMonthDay.setMonth(lastMonthDay.getMonth()-1);
+    	lastMonthDay=lastMonthDay.format('yyyy-MM-dd');
+		var today=new Date().format('yyyy-MM-dd');
+		//填充商品
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../product/findProducts',   
+			  data:JSON.stringify({pageNo:1,pageSize:15,filter:{type:0}}),
+			  success : function(data) {
+				  if(data){
+					  var products = data.items;
+					  $("#productDataList",'#form_stockout_agent').empty();
+					  var key=null;
+					  productDataList=[];
+					  $.each( products, function(key,value){
+						  var op = $("<option></option>");
+						  key=value.code;
+						  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+						  
+						  $("#productDataList").append(op);
+						  productDataList[key]=value.id;
+					 });
+
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			}); 
+		//自动查询商品
+		var checkProduct = function(){
+			/* var text=this.value;
+			text = text.replace(/\s/g,''); //去除空格
+			if(text!=this.value){//有空格
+				this.value=text;
+				$(this).trigger('change');
+				return false;
+			} */
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 15;
+			params.filter = {};
+			params.filter.nameOrCode = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../product/findProducts',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var products = data.items;
+						  $("#productDataList").empty();
+						  productDataList=[];
+						  var key=null;
+						  $.each( products, function(key,value){
+							  var op = $("<option></option>");
+							  key=value.code;
+							  op.val(obj.val().replace(/\s/g,'')+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+								 
+							  $("#productDataList").append(op);
+							  productDataList[key]=value.id;
+						 });
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		};
+		var addItem = function(){
+			    editId=null;
+		     	editObj=null;
+		     	var rowDatas=[];
+		     	rowDatas.push({productId:'',productName:'',productCode:'',norm:'',unit:'',lastSaveNum:'',curInNum:'',curOutNum:'',curSaveNum:''});
+		     	$('#dgd_check_details').sgDatagrid('appendData',rowDatas);
+		     	
+		     	//隐藏商品ID
+			    $('table tr td:nth-child(3)','#dgd_check_details').hide();
+		     	//添加的行数据，修改disable状态
+		     	$('table tr:last input','#dgd_check_details').removeAttr('disabled');
+		     	//盈亏数加上disabled属性
+		     	$('table tr:last input[name=overShortNum]','#dgd_check_details').attr('disabled',true);
+		     	
+		     	$('input[name=productName]',$('table tr:last','#dgd_check_details')).on('change',function(){
+					var strs = this.value.split(" ");
+					$(this).val(strs[strs.length-3]);
+					if($(this).val()){
+						//设置productId
+						$(this).parents('td').prev().find('input[name=productId]').val(productDataList[strs[strs.length-2]]);
+						//设置商品编码
+			        	$(this).parents('td').nextAll(':eq(0)').find('div[name=productCode]').html(strs[strs.length-2]);
+						//设置商品规格
+			        	$(this).parents('td').nextAll(':eq(1)').find('div[name=norm]').html(strs[strs.length-1]);
+					}else{
+						//设置productId
+						$(this).parents('td').prev().find('input[name=productId]').val('');
+						//设置商品编码
+			        	$(this).parents('td').nextAll(':eq(0)').find('div[name=productCode]').html('');
+						//设置商品规格
+			        	$(this).parents('td').nextAll(':eq(1)').find('div[name=norm]').html('');
+				
+					}
+		     	});
+				$('input[name=productName]',$('table tr:last','#dgd_check_details')).on('keyup',checkProduct);
+				
+				//当月未实物盘存修改时，自动设置盈亏数
+				$('input[name=curObjectNum]',$('table tr:last','#dgd_check_details')).on('keyup',function(){
+					//月未帐面结存数量
+					var curSaveNum= $(this).parents('td').prev().find('input[name=curSaveNum]');
+					if(curSaveNum.val()!=''){
+						//自动设置盈亏数
+						$(this).parents('td').nextAll(':eq(0)').find('input[name=overShortNum]').val(Number($(this).val())-Number(curSaveNum.val()));
+					}else{
+						curSaveNum.focus();
+						$(document).sgPup({message:'message_info',text: '请先输入月未帐面结存数量！'});
+					}
+				});
+				
+				//当月未帐面结存数量修改时，自动设置盈亏数
+				$('input[name=curSaveNum]',$('table tr:last','#dgd_check_details')).on('keyup',function(){
+					//月未实物盘存
+					var curObjectNum= $(this).parents('td').nextAll(':eq(0)').find('input[name=curObjectNum]');
+					if(curObjectNum.val()!=''){
+						//自动设置盈亏数
+						$(this).parents('td').nextAll(':eq(1)').find('input[name=overShortNum]').val(Number(curObjectNum.val())-Number($(this).val()));
+					}else{
+						curObjectNum.focus();
+						$(document).sgPup({message:'message_info',text: '请输入月未实物盘存数量！'});
+					}
+				});
+
+		 }
+		
+		var delItem = function(){
+		  	  var obj = $('#dgd_check_details');
+		      var bDiv = $('.bDiv',obj);
+		      if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+		          $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		      }else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+		          $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+		              if($(this).attr("checked")){    
+		              	editId=this.value;
+		              	$(this).parent().parent().remove();
+		              }
+		          });
+		      }else{
+		          $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+		      }  
+		  };
+    	//初始化表格
+   	 	var defaults = {
+   		        width:  '100%',
+   		        height: 350,
+   		     	url: '',
+   		        //url: '../../sell/getCheckDetails',
+   		        colid:'id',  //主键
+   		        rownumbers:true,
+   		        colModel : [
+					{display: '商品id', name : 'productId', width : 0, formatter:function(value,row){
+		                var elements='<input type="hidden" name="productId" style="width:0px;display:none;" value="'+value+'" required="true" form="form_check"></input>';
+						return elements;
+		            }},
+   		            {display: '商品名称', name : 'productName', width : 120, sortable : false,formatter:function(value,row){
+   		            	return '<input type="text" name="productName" style="width: 123px; margin: -4px; " value="'+value+'" list="productDataList" required="true" disabled="true" form="form_check">';
+   		            }},
+   		            {display: '商品编码', name : 'productCode', width : 80, sortable : false,disabled:true,formatter:function(value,row){
+   		            	return '<div name="productCode" style="width:83px;margin:-4px;">'+value+'</div>';
+   		            }},
+   		            {display: '商品规格', name : 'norm', width : 100, sortable : false,disabled:true,formatter:function(value,row){
+   		            	return '<div name="norm" style="width:103px;margin:-4px;">'+value+'</div>';
+   		            }},
+   		            {display: '上月帐面结存数量', name : 'lastSaveNum', width : 80, sortable : false,isnum:true,editable:true,disabled:true},
+   		            {display: '本月入库数量', name : 'curInNum', width : 70, sortable : false,isnum:true,editable:true,disabled:true},
+   		            {display: '本月出库数量', name : 'curOutNum', width : 70, sortable : false,isnum:true,editable:true,disabled:true},
+   		            {display: '月未帐面结存数量', name : 'curSaveNum', width : 80, sortable : false,isnum:true,editable:true,disabled:true},
+   		            {display: '月未实物盘存', name : 'curObjectNum', width : 80, sortable : false,formatter:function(value,row){
+   		            	if(value==null||value=='null'){
+   	   		         		value=row.curSaveNum;
+   	   		         	}
+   		            	return '<input type="number" name="curObjectNum" style="width: 75px; margin: 0px; padding: 0px;" value="'+value+'" required="true" form="form_check" >';
+   		            }},
+   		         	{display: '盈亏数', name : 'overShortNum', width : 56, sortable : false,formatter:function(value,row){
+   		         		if(value==null||value=='null'){
+   		         		  value=0;
+   		         		}
+   		            	return '<input name="overShortNum" style="width:59px;margin:-4px;" value="'+value+'" disabled="true" form="form_check"/>';
+   		            }}
+   		         	,
+		         	{display: '备注', name : 'remark', width : 80, sortable : false,formatter:function(value,row){
+		         		if(value==null||value=='null'){
+		         		   value='';
+		         		}
+		            	return '<input name="remark" style="width:83px;margin:-4px;" value="'+value+'"/>';
+		            }}
+   		        ],
+   		        buttons : [
+					{name: '添加', bclass: 'add', onpress : addItem},
+					{separator: true},
+		            {name: '删除', bclass: 'delete', onpress : delItem},
+		            {separator: true}
+   		        ],
+   		        searchitems :[
+   		            	{display:'名称',html:'<input type="text" name="name" required="true" style="width:250px;"/><input type="hidden" name="id"/>'},
+   		            	{display:'开始日期',html:'<input type="date" name="startDate" value="'+lastMonthDay+'" required="true" disabled="true"/>'},
+				      	{display:'结束日期',html:'<input type="date" name="endDate" value="'+today+'" required="true" disabled="true"/>'},
+				      	{display:'商品名称',html:'<input type="text" name="txt_productName" style="width:120px;"/>'}
+   		        ],
+   		        query:{}//只查出还未添加到分公司的总部商品
+   		        //exporturl:'',//导出excel
+   		    };
+   		    $('#dgd_check_details').sgDatagrid(defaults);
+   		    
+   	  		//隐藏商品ID
+		    $('table tr th:nth-child(3),table tr td:nth-child(3)','#dgd_check_details').hide();
+		   //表格的宽度=表头表格的宽度
+     	    $('#dgd_check_details .bDiv table').width($('#dgd_check_details .hDiv table').width());
+     	
+		    //复制一个查询,再把它插入到原来查询的后面
+			$("#dgd_check_details .sDiv>.pGroup:first").clone().insertAfter($("#dgd_check_details .sDiv>.pGroup:first"));
+			
+			//重写查询点击事件
+			$('#dgd_check_details .sDiv>.pGroup:eq(1) a.button:first').on('click',function(){
+				var id=$('#dgd_check_details input[name=id]').val();
+				var productName=$('#dgd_check_details input[name=txt_productName]').val();
+				$('#dgd_check_details').sgDatagrid('reload',{url:'../../sell/getCheckDetails',query:{productName:productName,id:id}});
+				//隐藏商品ID
+			    $('table tr th:nth-child(3),table tr td:nth-child(3)','#dgd_check_details').hide();
+			   
+			    //表格的宽度=表头表格的宽度
+	     	    $('#dgd_check_details .bDiv table').width($('#dgd_check_details .hDiv table').width());
+	     	
+				//当月未实物盘存修改时，自动设置盈亏数
+				$('input[name=curObjectNum]',$('#dgd_check_details table tr')).on('keyup',function(){
+					//月未帐面结存数量
+					var curSaveNum= $(this).parents('td').prev().find('input[name=curSaveNum]');
+					if(curSaveNum.val()!=''){
+						//自动设置盈亏数
+						$(this).parents('td').nextAll(':eq(0)').find('input[name=overShortNum]').val(Number($(this).val())-Number(curSaveNum.val()));
+					}else{
+						curSaveNum.focus();
+						$(document).sgPup({message:'message_info',text: '请先输入月未帐面结存数量！'});
+					}
+				});
+			});
+   	  		
+			//之前的查询按钮隐藏
+   	  		$("#dgd_check_details .sDiv>.pGroup:first").hide();
+   	  		
+   	 	//回车事件代替tab键
+   	 	$(window.document).keydown(function(event){
+   	         switch(event.keyCode) {
+   	             case 13:
+   	                 event.keyCode=9;
+   	                 break;
+   	         }
+   	     });
+    })(jQuery)
+    
+</script>
+</html>

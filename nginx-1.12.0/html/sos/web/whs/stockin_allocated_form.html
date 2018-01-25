@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>调拨入库</title>
+<link rel="stylesheet" type="text/css" href="../../bslib/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/common.css" />
+<link rel="stylesheet" type="text/css" href="../../css/form.css">
+<link rel="stylesheet" type="text/css" href="../../css/window.css">
+<link rel="stylesheet" type="text/css" href="../../css/pup.css">
+<link rel="stylesheet" type="text/css" href="../../css/tabs.css">
+<link rel="stylesheet" type="text/css" href="../../css/datagrid.css">
+<link rel="stylesheet" type="text/css" href="../../css/gbossIframe.css">
+
+</head>
+<body>
+ <div id="nw_document_all">
+	<form id='whs_stockin_allocated_form' method='post' class="form" style="width:100%;">
+		<div class='title'>调拨入库信息></div>
+		<fieldset style="width:100%;">
+            <div class="panel">
+            	<div class="row">
+            		<div class="col-xs-4">
+            			<span class="col-xs-4">入库单号:</span>
+            			<span class="col-xs-8">
+		                	<input type='text' id="stockInNo" name='stockInNo' disabled="disabled" class="form-control" />
+		                </span>
+            		</div>
+            		<div class="col-xs-4">
+            			<span class="col-xs-4">入库日期:</span>
+            			<span class="col-xs-8">
+		                	<input type='date' id="stockInStamp" name='stockInStamp' disabled="disabled" class="form-control" />
+		                </span>
+            		</div>
+            		<div class="col-xs-4">
+            			<span class="col-xs-4" id="for_add_span">调出仓库:</span>
+            			<span class="col-xs-8">
+			                <select size="1" name="stockOutWhsId" id="stockOutWhsId" required="true" class="form-control" autocomplete="on">
+			                   <!--  <option value="">--请选择--</option> -->
+			                </select>
+			            </span>
+            		</div>
+            	</div>
+            </div>
+            <div class="panel">
+            	<div class="row">
+            		<div class="col-xs-4">
+		                <span class="col-xs-4">调拨单号:</span>
+		                <span class="col-xs-8">
+			                <input type="text" name="stockOutCode" id="stockOutCode" required="true" list="stockOutData" class="form-control" autocomplete="on" />
+			                <input type="hidden" name="stockOutId" id="stockOutId" required="true" />
+			                <datalist id="stockOutData"></datalist>
+			            </span>
+		            </div>
+		            <div class="col-xs-4">
+		                <span class="col-xs-4">经办人:</span>
+		                <span class="col-xs-8">
+			                <input type="text" name="stockInManagers" id="stockInManagers" required="true" list="userList" class="form-control" autocomplete="on" />
+			                <input type="hidden" name="stockInManagersId" id="stockInManagersId" required="true" />
+			                <datalist id="userList"></datalist>
+			            </span>
+		            </div>
+		        </div>
+            </div>
+            
+            <div class="panel">
+            	<div class="row">
+            		<div class="col-xs-8">
+		            	<span class="col-xs-2">备注:</span>
+		            	<span class="col-xs-10">
+		                	<input type='text' id="stockInRemark" name='purchaseRemark' class="form-control" />
+		                </span>
+		            </div>
+		        </div>
+            </div>
+        </fieldset>
+
+        <div class='title'>调拨入库明细></div>
+		<fieldset style="width:100%;">
+			<div id="stockin_detail_panel" style="min-height:300px;max-height:380px; overflow-y:auto">
+				<div class="panel">
+					<div class="row">
+						<div class="col-xs-8">
+							<span class="col-xs-2">成品:</span>
+							<span class="col-xs-5">
+								<input type='text' name='productName1' list="productDataList" placeholder="请输入成品名称/编码" autocomplete=false class="form-control" />
+								<input type="hidden" name="productId1" />
+							</span>
+							<span class="col-xs-5" style="text-align:left">
+				                <font color="red">*输入成品查询配件</font>
+				              	<!--   <div class='submit' style="display: inline-block;">
+					            <button id="btn_getparts" type="button" style="">查询配件</button>
+					            </div>  -->
+					        </span>
+						</div>
+					</div>
+		        </div>
+				<div id="stockin_detail_div" class="panel">
+					<div class='row'>
+                    	<div class="col-xs-12">
+                    		<input type='hidden' name='stockoutDetailId' required="true" />
+                    		<span class="col-xs-2" style="width:11%;">商品:</span>
+                    		<span class="col-xs-2" style="width:14%;">
+	                    		<input type='text' name='productName' list="productDataList" required="true" placeholder="请输入商品名称/编码" class="form-control" />
+				                <input type="hidden" name="productId" />
+				            </span>
+				            <span class="col-xs-2" style="width:5%;">编码:</span>
+				            <span class="col-xs-2" style="width:14%;">
+			                	<input type='text' name='productCode' disabled="disabled" class="form-control"/>
+			                </span>
+			                <span class="col-xs-2" style="width:5%;">规格:</span>
+			                <span class="col-xs-2" style="width:14%;">
+			                	<input type='text' name='productNorm' disabled="disabled" class="form-control" />
+			                </span>
+			                <span class="col-xs-2" style="width:5%;">数量:</span>
+			                <span class="col-xs-1" style="width:5%;">
+			                	<input type='number' name='num' placeholder="只允许数字" required="true" value="1" pattern="^[+]?[1-9]+\d*$" class="form-control" min="1" onkeyup="this.value=this.value.replace(/\D/g,'')" />
+			                </span>
+			                <span class="col-xs-2" id="for_add_span" style="width:5%;">备注:</span>
+			                <span class="col-xs-2" style="width:14%;margin-right:5px;">
+			                	<input type='text' name='remark' class="form-control" />
+			                </span>
+			                <a href="javascript:void(0);"><img alt="增加明细" src="../../images/form_add.png" title="增加明细" style="vertical-align:middle"></a>
+                    	</div>
+                    </div>
+	            </div>
+	            
+			</div>
+            <datalist id="productDataList"></datalist>
+        </fieldset>
+
+        <fieldset style="width:860px;border-top:0px;">	
+	        <div class='submit'>
+	        <button id="stockin_detail_submit1" type="submit"style="width:60px;">提交</button>
+	            <button id="stockin_detail_submit" type="submit" style="width:112px;">提交并打印</button> <button id="mycancel" type="button">重置</button>
+	       <button id="btn_print" type="button" style="display: none;">打印</button>
+	        </div>
+        </fieldset>
+
+	</form>
+ </div>
+	<!-- 打印iframe -->
+	<iframe id="ifm_print_wsaf" name="ifm_print_wsaf" style="display: none"></iframe>
+</body>
+<script type="text/javascript" src="../../jscript/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../jscript/html5.js"></script>
+	<script type="text/javascript" src="../../jscript/index.js"></script>
+	<script type="text/javascript" src="../../jscript/form.js"></script><script type="text/javascript" src="../../jscript/window.js"></script>
+	<script type="text/javascript" src="../../jscript/tab.js"></script>
+	<script type="text/javascript" src="../../jscript/datagrid.js"></script>
+	<script type="text/javascript" src="../../jscript/pup.js" ></script>
+<script type="text/javascript">
+
+	(function($){
+		var flag = 0;
+		var productDataList = null;
+		var userList = null
+		var stockOutData=null;
+		
+		$.ajax( {
+			  type : 'POST', 
+			  async: false, 
+			  dataType : 'json',
+			  url : '../../stock/getStockInOutNo',   
+			  data: {isIn:true},
+			  success : function(data) {
+				  if(data.success){
+					  $("#stockInNo").val(data.code);
+				  }else{
+					  if(data.msg&&data.msg.indexOf('仓库正在盘点')>-1){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						  }
+					  $(document).sgPup({message:'message_info',text: data.msg,cfn:function(){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						}});  
+					  }
+			  } 
+		});
+		
+		var checkProduct = function(){
+			if(!this.value){
+				return false;
+			}
+			//console.dir('input:'+this.value);
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 15;
+			params.filter = {};
+			params.filter.nameOrCode = this.value;
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../product/findProducts',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var products = data.items;
+						  if(products.length>0){
+						 	  $("#productDataList").empty();
+							  productDataList = {};
+						  }
+						  $.each( products, function(key,value){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+							  $("#productDataList").append(op);
+							  
+							  productDataList[value.code] = value.id;
+							});
+
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		};
+		
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../product/findProducts',   
+			  data:JSON.stringify({pageNo:1,pageSize:15,filter:{type:0}}),
+			  success : function(data) {
+				  if(data){
+					  var products = data.items;
+					  $("#productDataList").empty();
+					  productDataList = {};
+					  $.each( products, function(key,value){
+						  var op = $("<option></option>");
+						  op.val(value.name.replace(/\s/g,'')+" "+value.code+" "+value.norm.replace(/\s/g,'-'));
+						  $("#productDataList").append(op);
+						  
+						  productDataList[value.code] = value.id;
+						});
+					  $("#stockin_detail_panel input[list^=productDataList]").unbind('keyup');
+					  $("#stockin_detail_panel input[list^=productDataList]").on('keyup',checkProduct);
+					  $("#stockin_detail_panel input[name^=productName]").on('change',function(){
+							var strs = this.value.split(" ");
+							var $this=$(this);
+							$this.val(strs[strs.length-3]);
+							var productId=$this.siblings('input[name^=productId]');
+							productId.val(productDataList[strs[strs.length-2]]);
+							//如果输入的是成品,要查询配件
+							if($this.attr('name')=='productName1'){
+								var productId1=productId.val();
+								 //配件信息窗口加载成功后
+							    var partWinLoad = function(){
+							    	if($('#dgd_part').get(0)){
+							        	var query={productId:productId1};//type:1,如果是配件转成了成品，则查询配件时，把type=1的条件去掉 
+							        	$('#dgd_part','#win_product_part').sgDatagrid('reload',{query:query,url:'../../product/findParts'});
+							    	}
+							 	}
+							    var getParts=function(){
+							    	var obj = $('#dgd_part','#win_product_part');
+							        var bDiv = $('.bDiv',obj);
+							        if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length==0){
+						 	            $(document).sgPup({message:'message_info',text: "请选择一个选项！"});
+						 	        } else if($('input[type=checkbox][checked=checked]',bDiv)!=null&&$('input[type=checkbox][checked=checked]',bDiv).length>0){
+						 	        	  $('input[type=checkbox][checked=checked]',bDiv).each(function(){
+						 	 	                if($(this).attr("checked")){ 
+						 	 	                   var rowData=$(this).data('data');
+						 	 	                   //加到出库列表
+													  var divId='#stockin_detail_div';
+													  var stockin_detail_div_len= $("div[id^=stockin_detail_div_]").length;
+													  var productId0=$('input[name=productId]',divId).val();
+													  if(stockin_detail_div_len==0 && !productId0){
+														  divId='#stockin_detail_div';
+													  }else{
+														  $('#stockin_detail_div a').trigger('click');
+														  var fflag=flag-1;
+														  divId="#stockin_detail_div_"+fflag;
+													  }
+													 $('input[name=productName]',divId).val(rowData.name.replace(/\s/g,''));
+													 $('input[name=productCode]',divId).val(rowData.code.replace(/\s/g,''));
+													 $('input[name=productId]',divId).val(rowData.id);
+													 $('input[name=productNorm]',divId).val(rowData.norm.replace(/\s/g,'-'));
+													 $('input[name=num]',divId).val(rowData.num);
+													 $('input[name=remark]',divId).val(rowData.remark);
+													 //光标自动定到下一个可输入框
+										        	 $('input:enabled:last',divId).focus();
+						 	 	                }
+						 	        	  });
+					              	$(document).sgWindow('close',{id:'win_product_part'});
+						 	        }
+					    	   };
+							    //查询成品的配件信息
+						    	//打开窗口
+						         var defaults = {
+							                title:'配件信息',
+							                id:'win_product_part',
+							                url:'../sel/product_part.html',
+							                success: partWinLoad,
+							                width: 828,
+							                 height: 445,
+							                buttons : [
+														{name: '确定', type: 'button', onpress :getParts},
+							                           {name: '关闭', type: 'button', onpress : function (){
+							                               $(document).sgWindow('close',{id:'win_product_part'});
+							                            }
+							                           }
+							                       ]
+							            };
+							        $(document).sgWindow(defaults);
+						        
+							}else{ //下面的商品列表
+								$("#stockin_detail_div input[name=productCode]").val(strs[strs.length-2]);
+								$("#stockin_detail_div input[name=productNorm]").val(strs[strs.length-1]);
+							}
+						});
+
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+		
+		
+		$("#stockin_detail_div a").on('click',function(){
+			var detail_div = $("<div></div>");
+			var detail_id = "stockin_detail_div_"+flag;
+			detail_div.attr('id',detail_id);
+			detail_div.addClass("panel");
+			detail_div.append($("#stockin_detail_div").html());
+			
+			$("#stockin_detail_div").before(detail_div);
+			$("#"+detail_id+" img").attr('src','../../images/form_del.png');
+			$("#"+detail_id+" img").attr('title','删除明细');
+			$("#"+detail_id+" input[name=productName]").on('change',function(){
+				var strs = this.value.split(" ");
+				$(this).val(strs[strs.length-3]);
+				$("#"+detail_id+" input[type=hidden]").val(productDataList[strs[strs.length-2]]);
+				$("#"+detail_id+" input[name=productCode]").val(strs[strs.length-2]);
+				$("#"+detail_id+" input[name=productNorm]").val(strs[strs.length-1]);
+			});
+			$("#"+detail_id+" input[name=productName]").attr('autofocus','autofocus');
+			$("#"+detail_id+" a").on('click',function(){
+				$("#"+detail_id).remove();
+			})
+			$("#"+detail_id + " input[list=productDataList]").on('keyup',checkProduct);
+			flag=flag+1;
+		});
+		
+		
+		$("#stockInStamp").val(new Date().format('yyyy-MM-dd'));		
+		
+		var checkUser = function(){
+			if(!this.value){
+				return false;
+			}
+			console.dir('input:'+this.value);
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.opname = this.value;
+			params.filter.isCompany = true;//查询机构下的的所有操作人
+			var obj = $(this);
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../getOrgOperators',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var manager = $("#stockInManagers","#whs_stockin_allocated_form");
+						  						  
+						  if(manager){
+							  if(data.items.length>0){
+						  		  userList = {};
+								  $("#userList").empty();
+							  }
+							  $.each(data.items,function(k,v){
+								  var op = $("<option></option>");
+								  op.val(obj.val()+" "+v.opname);
+								  $("#userList").append(op);
+								  
+								  userList[v.opname] = v.opid;
+		 				  	 }); 
+							}
+					  }else{
+					  	$(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		}
+		
+	  //填充员工
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : '../../getOrgOperators',   
+		  data:JSON.stringify({pageNo:1,pageSize:10,filter:{isCompany:true}}),
+		  success : function(data) {
+			  if(data){
+				  var manager = $("#stockInManagers","#whs_stockin_allocated_form");
+				  if(manager){
+					  if(data.items.length>0){
+				 		  userList = {};
+						  $("#userList").empty();
+					  }
+					  $.each(data.items,function(k,v){
+						  var op = $("<option></option>");
+						  op.val(v.opname);
+						  $("#userList").append(op);
+						  
+						  userList[v.opname] = v.opid;
+ 				  	 }); 
+					  manager.on('keyup',checkUser);
+					  manager.on('change',function(){
+						  	var strs = this.value.split(" ");
+							$(this).val(strs[strs.length-1]);
+							$("#stockInManagersId","#whs_stockin_allocated_form").val(userList[strs[strs.length-1]]);
+							if($("#stockInManagersId","#whs_stockin_allocated_form").val().length==0){
+								$("#stockInManagers","#whs_stockin_allocated_form").val("");
+							}
+						});
+
+					};
+			  }else{
+			  	$(document).sgPup({message:'message_info',text: data});
+			  }
+		  },     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+	  
+	    //获取登录用户，设置为经办人
+	    $.ajax({
+				type : 'post',
+				async : false,
+				contentType : 'application/json',
+				dataType : 'json',
+				url : '../../getCurrentOperator',
+				data : JSON.stringify({}),
+				success : function(data) {
+					if (data) {
+						$("#stockInManagersId","#whs_stockin_allocated_form").val(data.opid);
+						$("#stockInManagers","#whs_stockin_allocated_form").val(data.opname);
+					} else {
+						$(document).sgPup({message:'message_info',text: data});
+					}
+				},
+				error : function(res, error) {
+					window.location.reload();
+				}
+			});
+	  
+	  //自动查询调拨单id=出库单id
+	    var checkstockOutCode = function(){
+			var obj = $('#stockOutCode');
+			var params = {};
+			params.pageNo = 1;
+			params.pageSize = 10;
+			params.filter = {};
+			params.filter.code = obj.val();
+			params.filter.whsId = $('#stockOutWhsId').val();
+			params.filter.isCompleted=0;
+			params.filter.isAllocated=true;//调拨
+			$.ajax({
+				  type : 'post', 
+				  async: true,   
+				  contentType : 'application/json',     
+				  dataType : 'json',     
+				  url : '../../stock/findStockOutsPage',   
+				  data:JSON.stringify(params),
+				  success : function(data) {
+					  if(data){
+						  var stockoutDatas = data.items;
+					 	  $("#stockOutData").empty();
+					 	  stockOutData = {};
+						  $.each( stockoutDatas, function(key,value){
+							  var op = $("<option></option>");
+							  op.val(obj.val()+" "+value.code.replace(/\s/g,''));
+							  $("#stockOutData").append(op);
+							  
+							  stockOutData[value.code] = value.id;
+							});
+
+					  }else{
+						  $(document).sgPup({message:'message_info',text: data});
+					  }
+				  } ,     
+				  error : function(res,error) { 
+				  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+				  }    
+				});
+		};
+	    //填充调出仓库
+	    $.ajax( {
+		  type : 'post', 
+		  async: false,   
+		  contentType : 'application/json',     
+		  dataType : 'json',     
+		  url : './../../stock/findWarehousesInCompany',   
+		  data:JSON.stringify({isExceptMe:true}),//除开本仓库
+		  success : function(data) {
+			  if(data){
+				  var inWhsId=$("#stockOutWhsId",'#whs_stockin_allocated_form');
+				  if(inWhsId.get(0)){
+					  $.each(data,function(k,v){
+						  inWhsId.append("<option value='" +v.companyno+"'>" + v.companyname+"</option>");
+					  }); 
+				  }
+				  inWhsId.on('change',function(){
+					  checkstockOutCode();
+				  });
+				 
+			  }else{
+				  $(document).sgPup({message:'message_info',text: data});
+			  }
+		  } ,     
+		  error : function(res,error) { 
+		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		  }    
+		});
+	   
+		  //填充调拨单号
+		$.ajax({
+			  type : 'post', 
+			  async: true,   
+			  contentType : 'application/json',     
+			  dataType : 'json',     
+			  url : '../../stock/findStockOutsPage',   
+			  data:JSON.stringify({pageNo:1,pageSize:10,filter:{whsId:$('#stockOutWhsId').val(),isCompleted:0,isAllocated:true}}),
+			  success : function(data) {
+				  if(data){
+					  var stockoutDatas = data.items;
+				 	  $("#stockOutData").empty();
+				 	  stockOutData = {};
+					  $.each( stockoutDatas, function(key,value){
+						  var op = $("<option></option>");
+						  op.val(value.code.replace(/\s/g,''));
+						  $("#stockOutData").append(op);
+						  
+						  stockOutData[value.code] = value.id;
+						});
+					  $("#whs_stockin_allocated_form input[list=stockOutData]").on('keyup',checkstockOutCode);
+					  $("#whs_stockin_allocated_form input[list=stockOutData]").on('change',function(){
+							var strs = this.value.split(" ");
+							$(this).val(strs[strs.length-1]);
+							var stockOutId=$("#whs_stockin_allocated_form input[name=stockOutId]");
+							stockOutId.val(stockOutData[strs[strs.length-1]]);
+							if(stockOutId.val()){
+								//查询商品明细
+					       		 $.ajax({
+									  type : 'post', 
+									  async: true,   
+									  contentType : 'application/json',     
+									  dataType : 'json',     
+									  url : '../../stock/findStockOutDetails',   
+									  data:JSON.stringify({stockoutId:stockOutId.val()}),
+									  success : function(data) {
+										  if(data){
+											  //先删除原有的
+											  $('#stockin_detail_div').prevAll('div[id^=stockin_detail_div]').find('a').trigger('click');
+											  var divId=null;
+											  flag=0;
+											  var num=0;
+											  $.each(data, function(key,value){
+												 divId='#stockin_detail_div';
+												if(key>0){
+													 $("#stockin_detail_div a").trigger('click');
+													 key=key-1;
+													 divId=divId+'_'+key;
+												}
+												if(!value.allocatedNum){
+												  value.allocatedNum=0;
+												}
+												num=Number(value.outNum)-Number(value.allocatedNum);
+												 $('input[name=stockoutDetailId]',divId).val(value.id);
+												 $('input[name=productName]',divId).val(value.productName.replace(/\s/g,''));
+												 $('input[name=productCode]',divId).val(value.productCode.replace(/\s/g,''));
+												 $('input[name=productId]',divId).val(value.productId);
+												 $('input[name=productNorm]',divId).val(value.norm.replace(/\s/g,'-'));
+												 $('input[name=price]',divId).val(value.price);
+												 $('input[name=num]',divId).val(num);
+												 $('input[name=num]',divId).attr('max',num);
+												 $('input[name=remark]',divId).val(value.remark);
+											 });
+										  }else{
+										  	$(document).sgPup({message:'message_info',text: data});
+										  }
+									  } ,     
+									  error : function(res,error) { 
+									  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+									  }    
+									});
+							}else{
+								$(this).val('');
+							}
+					  });
+
+				  }else{
+					  $(document).sgPup({message:'message_info',text: data});
+				  }
+			  } ,     
+			  error : function(res,error) { 
+			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+			  }    
+			});
+		$('button[type=submit]').on('click',function(){
+			   var $this=this;
+			   var existProductMap=[];//已选择的商品
+			   //做表单提交
+               var params = {};
+               params.type = 1;
+               params.code = $('#stockInNo','#whs_stockin_allocated_form').val();
+               params.stamp= $('#stockInStamp','#whs_stockin_allocated_form').val();
+               params.managersId = $("#stockInManagersId",'#whs_stockin_allocated_form').val();	
+               params.managersName = $("#stockInManagers",'#whs_stockin_allocated_form').val();
+        	   params.remark= $('#stockInRemark','#whs_stockin_allocated_form').val();
+        	   params.stockoutId = $('#stockOutId','#whs_stockin_allocated_form').val();
+        	   params.outWhsId = $('#stockOutWhsId','#whs_stockin_allocated_form').val();
+        	   params.outWhsName = $("#stockOutWhsId",'#whs_stockin_allocated_form').find('option:selected').text();
+        	   
+               var productIds = $('input[name=productId]','#whs_stockin_allocated_form');
+               var stockoutDetailIds = $('input[name=stockoutDetailId]','#whs_stockin_allocated_form');
+               var productNames=$('input[name=productName]','#whs_stockin_allocated_form');
+               var productNums= $('input[name=num]','#whs_stockin_allocated_form');
+               var remarks= $('input[name=remark]','#whs_stockin_allocated_form');
+               var details = new Array();
+               if(productIds.length==0){ 
+            	   $(document).sgPup({message:'message_info',text: '请添加商品！'})
+            	   return false;
+               }
+               $.each(productIds,function(k,v){
+               	var obj = {};
+            	obj.stockoutDetailId=stockoutDetailIds[k].value;
+               	obj.productId = v.value;
+               	obj.productName = productNames[k].value;
+               	obj.inNum = productNums[k].value;
+               	obj.remark = remarks[k].value;
+               	details.push(obj);
+               	
+               	if(v.value){
+    	       		productNames[k].setCustomValidity(''); 
+    		       	if(existProductMap[productIds[k].value]){ 
+    		        	productNames[k].setCustomValidity('此商品已添加!'); 
+    		       	   	return false;
+    		          }else{
+    		        	  productNames[k].setCustomValidity(''); 
+    		          	  existProductMap[productIds[k].value]=productIds[k].value;
+    		          }
+    		    }else{
+    		    	productNames[k].setCustomValidity('请输入商品名称/编码!'); 
+    		    }
+               });
+               params.stockinDetails = details;
+               $('form:eq(0)').unbind('submit');//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+			      $("#whs_stockin_allocated_form").on('submit',function(e){
+			      	$(document).sgConfirm({text: '确定进行调拨吗?',cfn:function(r){ 
+		    		  if(r){
+				   
+		               //alert(JSON.stringify(params))
+		               $.ajax( {
+		       		  type : 'post', 
+		       		  async: false,   
+		       		  contentType : 'application/json',     
+		       		  dataType : 'json',     
+		       		  url : '../../stock/addStockIn',   
+		       		  data:JSON.stringify(params),
+		       		  success : function(data) {
+		       			  if(data){
+		       				  $(document).sgPup({message:'message_info',text: data.msg,cfn:function(){
+   	       				
+		       				  if(data.success){
+		       					if($($this).text()=='提交并打印'){
+		       						var	sName='winPrint';
+		   	       					var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+		   	       					if (isChrome){
+		   	       					  sName='ifm_print_wsaf';
+		   	       					}
+		   	       					window.open('print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+		   	       					if (!isChrome){
+		   	       						//新增遮罩层
+		   	       		  				var mask=$('<div id="print_mask"></div>');
+		   	       		  				mask.addClass('window-mask');
+		   	       		  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+		   	       		  		        var span=$('<span></span');
+		   	       		  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+		   	       		  		        span.text('正在打印中...');
+		   	       		  		        mask.append(span);
+		   	       		  			    $(window.document.body).append(mask);
+	   	       					    }
+		       					}
+		       				  
+		       				  }
+		       				}});
+		       				 
+		       			  }else{
+		       				  $(document).sgPup({message:'message_info',text: data});
+		       			  }
+		       		  } ,     
+		       		  error : function(res,error) { 
+		       		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+		       		  }    
+		       		}); 
+				   }	
+				}});
+				       
+				   //$("#whs_stockin_allocated_form").unbind();//以下两行可以阻止提交2次，暂时注释，也不会提交2次
+				    e.stopPropagation();	
+				    return false;
+		        });
+			   
+		 });
+	   //打印
+		$('#btn_print').on('click',function(){
+			//$('#ifm_print_wsaf').attr('src','stock_print2.html');
+			var	sName='winPrint';
+					var isChrome = navigator.userAgent.toLowerCase().match(/chrome/) != null;
+					if (isChrome){
+					  sName='ifm_print_wsaf';
+					}
+					window.open('print.html',sName,'height='+$(window).outerHeight()+',width='+$(window).outerWidth()+',top=0,left=0,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no,alwaysRaised=yes');
+					if (!isChrome){
+						//新增遮罩层
+		  				var mask=$('<div id="print_mask"></div>');
+		  				mask.addClass('window-mask');
+		  				mask.css('z-index',Number($('div.window').css('z-index'))+1);//如果有弹出窗口，则将遮罩层置为最上层
+		  		        var span=$('<span></span');
+		  		        span.css({position:'absolute',left:$(window).outerWidth()/2,top:$(window).outerHeight()/2-60,color:'red','font-size':'x-large','font-weight':'bold'});
+		  		        span.text('正在打印中...');
+		  		        mask.append(span);
+		  			    $(window.document.body).append(mask);
+				    }
+		});
+	})(jQuery)
+	
+	var reset = function(){
+		$("#whs_stockin_allocated_form").get(0).reset();
+  		$("#stockInStamp").val(new Date().format('yyyy-MM-dd'));
+   		$.each($("#stockin_detail_panel div"),function(k,v){
+           	if(v.id!="stockin_detail_div"){
+           		v.remove();
+           	}
+        });
+   		$.ajax( {
+			  type : 'POST', 
+			  async: false, 
+			  dataType : 'json', 
+			  url : '../../stock/getStockInOutNo',   
+			  data: {isIn:true},
+			  success : function(data) {
+				  if(data.success){
+					  $("#stockInNo").val(data.code);
+				  }else{
+					  if(data.msg&&data.msg.indexOf('仓库正在盘点')>-1){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						  }
+					  $(document).sgPup({message:'message_info',text: data.msg,cfn:function(){
+							$('input,select,textarea,a,button').attr('disabled',true);
+						}}); 
+					  }
+			  } 
+		});
+
+   		
+	};
+	
+	$("#mycancel").on('click',function(e){
+		 reset();
+	})
+	
+	//打印页面元素设置
+	    var callback=function(subWinBody,subWin){
+	  	$.ajax( {
+	  		  type : 'post', 
+	  		  async: false,   
+	  		  contentType : 'application/json',     
+	  		  dataType : 'json',     
+	  		  url : '../../getCurrentCompany',   
+	  		  data:JSON.stringify({}),
+	  		  success : function(data) {
+	  			  if(data){
+	  				  var total = 0;
+	  				  var rowtotal = 0;
+	  				  //公司中文名字
+	  				  $("#cname",subWinBody).empty();
+	  				  $("#cname",subWinBody).append(data.cnfullname);
+	  				  //公司英文名字
+	  				  $("#ename",subWinBody).empty();
+	  				  $("#ename",subWinBody).append(data.enfullname);
+	  				  //表单名字
+	  				  $("#orderTitle",subWinBody).empty();
+	  				  $("#orderTitle",subWinBody).append("调拨入库单");
+	  				  
+	  				  //表单日期
+	  				  $("#orderDate",subWinBody).empty();
+	  				  $("#orderDate",subWinBody).append($("#stockInStamp","#whs_stockin_allocated_form").val());
+	  				  //表单单号
+	  				  $("#orderNo",subWinBody).empty();
+	  				  $("#orderNo",subWinBody).append($("#stockInNo","#whs_stockin_allocated_form").val());
+	  				  
+	  				  //表前输入单
+	  				  //得到仓库名称
+	         	         $.ajax({
+	  	       			  type : 'POST', 
+	  	       			  async: false,   
+	  	       			  url : '../../stock/getWarehouseName', 
+	  	       			  dataType : 'json',  
+	  	       			  data:{},
+	  	       			  success : function(data) {
+	  	       				  if(data){
+	  	       					 var str = '<span style="width:10%">调入仓库：</span><div style="width:20%">'+data.name+'</div>';
+	  	       					 $("#headInput",subWinBody).append(str);
+		  	       				 str = '<span style="width:10%">调拨单号：</span><div style="width:20%">'+$("#stockOutCode","#whs_stockin_allocated_form").val()+'</div>';
+	  	       					 $("#headInput",subWinBody).append(str);
+	  	       				  }else{
+	  	       					 var str = '<span style="width:10%">调入仓库：</span><div style="width:20%">&nbsp;</div>';
+ 	       					 	 $("#headInput",subWinBody).append(str);
+	  	       				  }
+	  	       			  } ,     
+	  	       			  error : function(res,error) { 
+	  	       			  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  	       			  }   
+	  	       			  
+	  	       		    });
+	
+	  				  
+	  				  var order = '<span style="width:10%">调出仓库：</span><div style="width:20%">'+$("#stockOutWhsId").find('option:selected').text()+'</div>';
+	  				  $("#headInput",subWinBody).append(order);
+	  			
+	  				  //表头
+	  				  $("#tbHead",subWinBody).append('<td style="width: 10%;">序号</td>'+
+	  														  '<td style="width: 20%;">商品编码</td>'+
+	  														  '<td style="width: 20%;">商品名称</td>'+
+	  														  '<td style="width: 20%;" >商品规格</td>'+
+	  														  '<td style="width: 10%;">数量</td>'+
+	  														  '<td style="width: 20%;">备注</td>');
+	  				  
+	  				  //表格主体
+	  				  var productIds = $('input[name=productId]','#whs_stockin_allocated_form');
+               		  var productNames=$('input[name=productName]','#whs_stockin_allocated_form');
+               		  var productNums= $('input[name=num]','#whs_stockin_allocated_form');
+              	      var remarks= $('input[name=remark]','#whs_stockin_allocated_form');
+            		  var productCodes=$('input[name=productCode]','#whs_stockin_allocated_form');
+            		  var productNorms=$('input[name=productNorm]','#whs_stockin_allocated_form');
+             	  
+	  	              $.each(productIds,function(k,v){
+	  	            	total = Number(total) + Number(productNums[k].value);
+	  	               	var tbbody_tr = '<tr><td>'+(k+1)+'</td>'
+										+'<td>'+productCodes[k].value+'</td>'
+	  	               	                +'<td>'+productNames[k].value+'</td>'
+	  	                                +'<td>'+productNorms[k].value+'</td>'
+	  	               	                +'<td>'+productNums[k].value+'</td>'
+	  	               					+'<td>'+remarks[k].value+'</td></tr>';	  
+
+	  	               	$("#tbBody",subWinBody).append(tbbody_tr);
+	  	              })
+	  				  
+	  				/*   //表合计
+	  				  var tbfoot = '<tr><td style="width:428px;"><div style="text-align:right;">小计:</div></td><td style="width:349px;"><div style="text-align:right;padding-right:90px;">'+total+'</div></td><td style="width: 140px"><div>&nbsp;</div></td></tr>';
+		  
+	  				  $("#tbFoot",subWinBody).append(tbfoot); */
+	  				  
+	  				 var tbfoot = '<tr>';
+					  tbfoot=tbfoot+'<td colspan="4"><div style="text-align:right">小计:</div></td>';
+					  tbfoot=tbfoot+'<td colspan="1"><div style="text-align:right">'+total+'</div></td>';
+					  tbfoot=tbfoot+'<td colspan="1"></td>';
+					  tbfoot=tbfoot+'</tr>';
+					  $("#tbBody",subWinBody).append(tbfoot);
+	  				  
+	  				  //表尾输入单
+	  				  $("#foot",subWinBody).append('<span>核准人：</span><div>&nbsp;</div>'+
+	  													  '<span>经办人：</span><div>&nbsp;</div>'+
+	  													  '<span>仓库：</span><div>&nbsp;</div>'+
+	  													  '<span>制单：</span><div>&nbsp;</div>');
+	  				reset();
+	  				  
+	  			  }else{
+	  				  $(document).sgPup({message:'message_info',text: data});
+	  			  }
+	  		  } ,     
+	  		  error : function(res,error) { 
+	  		  	     if(res && res.responseText){ $(document).sgPup({message:'message_info',text: res.responseText});}     
+	  		  }    
+	  		});
+	  	
+	      if (navigator.appName == 'Microsoft Internet Explorer'){
+	      	subWin.print();  
+	      }else{ 
+	      	subWin.focus();
+	      	subWin.print();  
+	      }
+	      
+	      
+	  }
+</script>
+</html>
