@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.chinaGPS.gtmp.mapper.ReseachAnswerMapper"> 
+	
+	<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+	
+	
+	<resultMap type="ReseachAnswerPOJO" id="reseachAnswerMap">
+	    <id property="id" column="ID" jdbcType="BIGINT" />  
+	    <result property="userId" column="USER_ID" jdbcType="BIGINT"/>
+	    <result property="userName" column="USER_NAME" jdbcType="VARCHAR"/>
+	    <result property="answerId" column="ANSWER_ID" jdbcType="BIGINT"/>
+	    <result property="researchId" column="RESEARCH_ID" jdbcType="BIGINT"/>
+	    <result property="answerName" column="ANSWER_NAME" jdbcType="VARCHAR"/>
+	    <result property="content" column="CONTENT" jdbcType="VARCHAR"/>
+	    <result property="textContent" column="TEXT_CONTENT" jdbcType="VARCHAR"/>
+	    <result property="textAnswer" column="TEXT_ANSWER" jdbcType="VARCHAR" />
+	    <result property="lastAskDate" column="LAST_ASK_DATE" jdbcType="TIMESTAMP"/> 
+	    <result property="lastAnswerDate" column="LAST_ANSWER_DATE" jdbcType="TIMESTAMP"/> 
+        <result property="isValid" column="IS_VALID" jdbcType="INTEGER"/>
+	</resultMap> 
+	
+	
+	<select id="countAll" parameterType="map" resultType="Integer">
+		SELECT COUNT(V.ID) 
+	    FROM T_USER_RESEARCH V
+	    WHERE IS_VALID = 0 
+		<!-- <if test="userInfo!=null">
+			   <if test="@Ognl@isNotBlank(userInfo.userId)">
+			    and  USER_ID=#{userInfo.userId}
+			   </if>
+			   </if> -->
+
+	</select>
+
+<select id="getByIdReseachAnswer" resultSetType="SCROLL_SENSITIVE" parameterType="com.chinaGPS.gtmp.entity.ReseachAnswerPOJO" resultMap="reseachAnswerMap" useCache="false">
+	select v.ID,
+       v.USER_ID,
+       v.USER_NAME,
+       v.TEXT_CONTENT,
+       v.LAST_ASK_DATE,
+       v.IS_VALID,
+       v.CONTENT,
+       t.ANSWER_NAME,
+       t.LAST_ANSWER_DATE,
+       t.ANSWER_ID,
+       t.TEXT_ANSWER
+  from   T_USER_RESEARCH v
+  left join T_USER_RESEARCH_ANSWER t on t.RESEARCH_ID = v.id
+	    WHERE v.IS_VALID = 0 and v.id = #{id} and t.answer_id = #{answerId}
+	</select>
+	
+	<select id="getById" parameterType="Long" resultMap="reseachAnswerMap">
+		select ID,USER_ID,USER_NAME,TEXT_CONTENT,LAST_ASK_DATE,IS_VALID,CONTENT 
+	from   T_USER_RESEARCH 
+	    WHERE IS_VALID = 0 and id = #{id}
+	</select>
+	
+	
+	<select id="selectQuestion" parameterType="map" resultMap="reseachAnswerMap" useCache="false" resultSetType="SCROLL_SENSITIVE">
+	select 
+	t.ID,
+	t.USER_ID,
+	t.USER_NAME,
+	t.TEXT_CONTENT,
+	t.LAST_ASK_DATE,
+	t.IS_VALID,
+    t.CONTENT
+	from   T_USER_RESEARCH t
+		order by t.last_ask_date desc
+	</select>
+	
+	
+	
+	
+ 	<insert id="add" parameterType="com.chinaGPS.gtmp.entity.ReseachAnswerPOJO">
+		<selectKey keyProperty="id" resultType="Long" order="BEFORE">  
+			select SEQ_USER_RESEARCH_ANSWER.nextval from dual
+		</selectKey> 
+		
+		INSERT INTO T_USER_RESEARCH_ANSWER
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+		 	
+       		ID,
+           
+            <if test="@Ognl@isNotBlank(textAnswer)" >
+       		TEXT_ANSWER,
+            </if>
+            <if test="@Ognl@isNotBlank(answerId)" >
+       		ANSWER_ID,
+            </if>
+            <if test="@Ognl@isNotBlank(answerName)" >
+       		ANSWER_NAME,
+            </if>
+             <if test="@Ognl@isNotBlank(researchId)" >
+       		RESEARCH_ID,
+            </if>
+            IS_VALID,
+            
+       		LAST_ANSWER_DATE
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	
+       		#{id},
+            
+            <if test="@Ognl@isNotBlank(textAnswer)" >
+       		#{textAnswer,jdbcType=VARCHAR},
+            </if>
+            <if test="@Ognl@isNotBlank(answerId)" >
+       		#{answerId},
+            </if>
+            <if test="@Ognl@isNotBlank(answerName)" >
+       		#{answerName,jdbcType=VARCHAR},
+            </if>
+             <if test="@Ognl@isNotBlank(researchId)" >
+       		#{researchId},
+            </if>
+            0,
+       		sysdate
+		 </trim>
+ 	</insert>
+ 	
+ 	
+ 	<update id="edit" parameterType="ReseachAnswerPOJO">
+		UPDATE T_USER_RESEARCH_ANSWER 
+		SET 
+    	<trim suffixOverrides=",">
+    		LAST_ANSWER_DATE=sysdate,
+    		<if test="@Ognl@isNotBlank(isValid)">IS_VALID=#{isValid},</if> 
+		 	<if test="@Ognl@isNotBlank(answerId)">ANSWER_ID=#{answerId},</if>
+            <if test="@Ognl@isNotBlank(answerName)">ANSWER_NAME=#{answerName},</if>
+            <if test="@Ognl@isNotBlank(textAnswer)">TEXT_ANSWER=#{textAnswer},</if>
+      	</trim>
+ 		WHERE RESEARCH_ID=#{researchId,jdbcType=BIGINT} and ANSWER_ID = #{answerId,jdbcType=BIGINT}
+	</update>
+ 	
+ 	
+ 	
+	
+</mapper>  

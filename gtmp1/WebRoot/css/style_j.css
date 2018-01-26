@@ -1,0 +1,52 @@
+.jcbLegend legend {
+  font-family: arial, sans-serif;
+
+  font-weight: bold;
+
+  font-size: 90%;
+
+  color: #911;
+
+  background: #ccd;
+
+  border: 1px solid #911;
+
+  border-bottom-color: #911;
+
+  border-right-color: #911;
+
+  padding: 4px 8px;
+  }
+  
+  
+.easyui-dialog legend {
+  font-family: arial, sans-serif;
+
+  font-weight: bold;
+
+  font-size: 90%;
+
+  color: #911;
+
+  background: #ccd;
+
+  border: 1px solid #911;
+
+  border-bottom-color: #911;
+
+  border-right-color: #911;
+
+  padding: 4px 8px;
+  } 
+  
+.easyui-layout fieldset {
+
+  border: 1px solid #911;
+  padding:5px;
+
+  }
+  
+#questions_datagrid {  font-size: 12px;}
+#question_datagrid {  font-size: 12px;}
+#answer_datagrid {  font-size: 12px;}
+  

@@ -1,0 +1,90 @@
+package cc.chinagps.seat.controller;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import cc.chinagps.seat.bean.EventReport;
+import cc.chinagps.seat.comm.SeatException;
+import cc.chinagps.seat.service.EventReportService;
+import cc.chinagps.seat.util.WordGenerator;
+
+import com.googlecode.jsonplugin.JSONException;
+import com.googlecode.jsonplugin.JSONUtil;
+
+@Controller
+@RequestMapping(value="/event/" , produces="text/plain;charset=UTF-8")
+public class EventReportController extends BasicController {
+	
+	//@Autowired
+	private EventReportService eventReportService;
+	
+	@RequestMapping("/report")
+	@ResponseBody
+	public String getEventReport(@RequestParam(value="vehicle_id" )Long vehicle_id,
+			@RequestParam(value="stolen_id" )Long stolen_id) throws JSONException {
+		Map<String, Object>  result = new HashMap<String, Object>();
+		result.put("success", true);
+		try {
+			Map<String, Object>  query_result  = eventReportService.getEventReport(vehicle_id,stolen_id);
+			result.put("data", query_result);
+		} catch (SeatException e) {
+			result.put("success", false);
+			result.put("message", "获取出错");
+		}
+		return JSONUtil.serialize(result);
+	}
+	
+	@RequestMapping("/edit")
+	@ResponseBody
+	public String edit(@Valid EventReport eventReport,Long stolen_id,HttpServletRequest request) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("success", true);
+		try {
+			cc.chinagps.seat.auth.User user = getLoginUser(request);
+			//事件编号
+			if(!StringUtils.hasText(eventReport.getE_no())){
+				eventReport.setE_no(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
+				//受理人//受理人ID
+				eventReport.setAc_op_name(user.getOpName());
+				eventReport.setAc_op_id(user.getOpId());
+			}else{
+				eventReport.setOp_id(user.getOpId());//操作人
+				eventReport.setOp_name(user.getOpName());
+			}
+			eventReportService.saveOrUpdateEventReport(stolen_id,eventReport);
+		} catch (SeatException e) {
+			resultMap.put("success", false);
+			resultMap.put("success", "操作失败");
+		}
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@RequestMapping("/report/export")
+	public void exoprt(@RequestParam(value="vehicle_id" )Long vehicle_id, @RequestParam(value="stolen_id" )Long stolen_id, HttpServletResponse response) throws JSONException {
+		//事件编号
+		File file = null;  
+		Map<String, Object> query_result = null ;
+		try {
+			query_result = eventReportService.getEventReport(vehicle_id,stolen_id);
+			file = WordGenerator.createDoc(query_result, "eventReport");  
+			exportWord(response, file, "重大事件报告");
+		} catch (SeatException e) {
+			e.printStackTrace();
+		}
+	}
+
+}

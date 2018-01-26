@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.DepartMapper"> 
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+<resultMap type="DepartPOJO" id="departMap">
+    <id property="departId" column="DEPART_ID" jdbcType="BIGINT" />  
+    <result property="departName" column="DEPART_NAME" jdbcType="VARCHAR"/>
+    <result property="pid" column="PID" jdbcType="BIGINT" />  
+    <result property="address" column="ADDRESS" jdbcType="VARCHAR"/>
+    <result property="tel" column="TEL" jdbcType="VARCHAR"/>
+    <result property="fax" column="FAX" jdbcType="VARCHAR" />
+    <result property="departType" column="DEPART_TYPE" jdbcType="INTEGER"/>
+    <result property="supperierSn" column="supperier_Sn" jdbcType="VARCHAR"/>
+    <result property="dealerId" column="DEALER_ID" jdbcType="BIGINT"/>
+    <result property="isValid" column="IS_VALID" jdbcType="INTEGER"/>
+    <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/> 
+</resultMap>
+	
+	<sql id="getListCondition">
+		<where>
+			<if test="depart!=null">
+				 <if test="@Ognl@isNotBlank(depart.departName)">   
+	        		AND D.DEPART_NAME LIKE '%'||#{depart.departName}||'%'
+	    		</if>
+	    		<if test="depart.dealerId!=null"> 
+	    			AND D.DEALER_ID= #{depart.dealerId}
+				</if>
+				 <if test="depart.supperierSn!=null"> 
+	    			AND D.supperier_Sn= #{depart.supperierSn}
+				</if>
+	    		 <if test="depart.departId!=null"> 
+	    			AND D.DEPART_ID= #{depart.departId}
+				</if>
+				<if test="depart.isValid!=null"> 
+	    			AND D.IS_VALID= #{depart.isValid}
+				</if>
+    		</if>
+		</where>
+	</sql>
+	
+	<select id="getList" parameterType="DepartPOJO" resultMap="departMap">
+		 SELECT * FROM t_p_depart where is_valid=0
+		  START WITH pid is null 
+        CONNECT BY PRIOR depart_id = pid
+         <if test="@Ognl@isNotBlank(departId)">
+        and depart_id!=#{departId}
+        </if>
+	</select>
+	
+	<select id="hasDepartByName" parameterType="DepartPOJO" resultType="Integer">
+		SELECT COUNT(D.DEPART_ID) FROM T_P_DEPART D
+		<where>
+		    <if test="@Ognl@isNotBlank(departName)">   
+        		AND D.DEPART_NAME=#{departName}
+    		</if>
+    		<if test="@Ognl@isNotBlank(pid)">   
+        		AND D.PID=#{pid}
+    		</if>
+    		 <if test="departId!=null"> 
+    			AND D.DEPART_ID!= #{departId}
+			</if>
+		</where>   
+	</select>
+	
+	<select id="getById" parameterType="Long" resultMap="departMap">
+		SELECT D.* FROM T_P_DEPART D WHERE D.DEPART_ID= #{id}
+	</select>
+	
+	<delete id="removeById" parameterType="Long" >
+		delete from T_P_DEPART D WHERE D.DEPART_ID= #{id}
+	</delete>
+	
+	<insert id="add" parameterType="DepartPOJO">
+		INSERT INTO T_P_DEPART
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+		 	DEPART_ID,
+		 	<if test="@Ognl@isNotBlank(dealerId)" >
+       		DEALER_ID,
+            </if>
+		 	<if test="@Ognl@isNotBlank(departName)" >
+       		DEPART_NAME,
+            </if>
+            <if test="@Ognl@isNotBlank(pid)" >
+       		PID,
+            </if>
+            <if test="@Ognl@isNotBlank(address)" >
+       		ADDRESS,
+            </if>
+             <if test="@Ognl@isNotBlank(tel)" >
+       		TEL,
+            </if>
+            <if test="@Ognl@isNotBlank(fax)" >
+       		FAX,
+            </if>
+            <if test="@Ognl@isNotBlank(isValid)" >
+       		IS_VALID,
+            </if>
+            <if test="@Ognl@isNotBlank(supperierSn)" >
+       		supperier_Sn,
+            </if>
+            STAMP,
+            <if test="@Ognl@isNotBlank(departType)" >
+       		DEPART_TYPE,
+            </if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	SEQ_DEPART.NEXTVAL,
+		 	<if test="@Ognl@isNotBlank(dealerId)" >
+       		#{dealerId},
+            </if>
+		 	<if test="@Ognl@isNotBlank(departName)" >
+       		#{departName},
+            </if>
+            <if test="@Ognl@isNotBlank(pid)" >
+       		#{pid},
+            </if>
+            <if test="@Ognl@isNotBlank(address)" >
+       		#{address},
+            </if>
+             <if test="@Ognl@isNotBlank(tel)" >
+       		#{tel},
+            </if>
+            <if test="@Ognl@isNotBlank(fax)" >
+       		#{fax},
+            </if>
+            <if test="@Ognl@isNotBlank(isValid)" >
+       		#{isValid},
+            </if>
+            <if test="@Ognl@isNotBlank(supperierSn)" >
+       		 #{supperierSn},
+            </if>
+            sysdate,
+            <if test="@Ognl@isNotBlank(departType)" >
+       		 #{departType},
+            </if>
+		 </trim>
+ 	</insert>
+ 
+	<update id="edit" parameterType="DepartPOJO">
+		UPDATE T_P_DEPART
+   SET 
+    	<trim  suffixOverrides=",">
+    	<if test="@Ognl@isNotBlank(dealerId)" >
+       		DEALER_ID=#{dealerId},
+            </if>
+		 	<if test="@Ognl@isNotBlank(departName)" >
+       		DEPART_NAME=#{departName},
+            </if>
+            <if test="@Ognl@isNotBlank(pid)" >
+       		PID=#{pid},
+            </if>
+            <if test="@Ognl@isNotBlank(address)" >
+       		ADDRESS=#{address},
+            </if>
+             <if test="@Ognl@isNotBlank(tel)" >
+       		TEL=#{tel},
+            </if>
+            <if test="@Ognl@isNotBlank(fax)" >
+       		FAX=#{fax},
+            </if>
+            <if test="isValid!=null" >
+       		IS_VALID=#{isValid},
+            </if>
+            <if test="supperierSn!=null" >
+       		supperier_Sn=#{supperierSn},
+            </if>
+            STAMP=sysdate,
+            <if test="@Ognl@isNotBlank(departType)" >
+       		DEPART_TYPE=#{departType},
+            </if>
+      </trim>
+  WHERE
+  <choose>
+    <when test="departId!=null">
+       DEPART_ID = #{departId,jdbcType=BIGINT}
+    </when>
+    <otherwise>
+   	   supperier_Sn=#{supperierSn}
+    </otherwise>
+   </choose>
+	</update>
+	
+	<select id="getList4User" parameterType="DepartPOJO" resultMap="departMap">
+   SELECT d.depart_id,
+          d.depart_name,
+          d.pid,
+          decode(u.user_id, null, 'false', 'true') as address
+     FROM (SELECT *
+             FROM t_p_depart
+            where is_valid = 0
+            START WITH pid is null
+           CONNECT BY PRIOR depart_id = pid) d
+     left join (select * from t_p_user 
+     <where>
+       <if test="@Ognl@isNotBlank(address)">
+       and user_id = #{address}
+       </if>
+     </where>
+     ) u on u.depart_id =d.depart_id
+	</select>
+	
+	<delete id="removeBySupperierSn" parameterType="String" >
+		delete from T_P_DEPART D WHERE D.supperier_Sn= #{id}
+	</delete>
+</mapper>  

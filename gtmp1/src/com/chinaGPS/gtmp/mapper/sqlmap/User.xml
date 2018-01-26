@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.UserMapper"> 
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+    <resultMap type="UserPOJO" id="userMap">  
+        <id property="userId" column="USER_ID" jdbcType="BIGINT" />  
+        
+        <result property="loginName" column="LOGIN_NAME" jdbcType="VARCHAR"/>
+        <result property="password" column="PASSWORD" jdbcType="VARCHAR"/>
+        <result property="userName" column="USER_NAME" jdbcType="VARCHAR"/>
+        <result property="sex" column="sex" jdbcType="VARCHAR"/>
+        <result property="tel" column="TEL" jdbcType="VARCHAR"/>
+        <result property="email" column="EMAIL" jdbcType="VARCHAR" />
+        <result property="departId" column="DEPART_ID" jdbcType="BIGINT" /> 
+        <result property="departName" column="DEPART_Name" jdbcType="VARCHAR" />
+        <result property="isValid" column="IS_VALID" jdbcType="INTEGER"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>  
+    </resultMap>
+    
+    <!-- 用户和角色的中间表 -->
+    <resultMap type="UserRolePOJO" id="userRoleMap">  
+        <result property="userId" column="USER_ID" jdbcType="BIGINT" />  
+        <result property="roleId" column="ROLE_ID" jdbcType="BIGINT" />
+    </resultMap>
+    
+	<!-- 用户信息 -->
+    <resultMap type="UserPOJO"  id="userInfoResultMap" extends="userMap">
+		 <!-- 机构信息 -->
+		 <association property="departInfo" column="DEPART_ID"
+	    select="selectUserDepartInfo"
+	    ></association>
+	    
+	     <!-- 角色信息 -->
+	    <collection property="roles" ofType="RolePOJO" resultMap="com.chinaGPS.gtmp.mapper.RoleMapper.roleMap">
+		</collection>
+	</resultMap>
+	
+    <sql id="getUserByLoginNamePwdCondition">
+		<where>
+			UR.user_type = 0 and u.is_valid = 0
+			<if test="user!=null">
+				<if test="@Ognl@isNotBlank(user.loginName)">   
+	        		AND U.LOGIN_NAME= #{user.loginName}
+	    		</if>
+	    		<!-- 
+	    		<if test="@Ognl@isNotBlank(user.password)"> 
+	    			AND U.PASSWORD= #{user.password}
+				</if> -->
+				<if test="user.isValid!=null"> 
+	    			AND U.IS_VALID= #{user.isValid}
+				</if>
+    		</if>
+		</where>
+	</sql>
+	<!-- 登录查询,根据用户名和密码 -->
+	<select id="getUserByLoginNamePwd" parameterType="map" resultMap="userInfoResultMap" useCache="false">
+		SELECT U.*,R.* FROM T_P_USER U 
+		LEFT JOIN T_P_USER_ROLE UR ON U.USER_ID = UR.USER_ID
+       LEFT JOIN T_P_ROLE R ON UR.ROLE_ID=R.ROLE_ID                 
+		<include refid="getUserByLoginNamePwdCondition"/>   
+	</select>
+	
+	  <!-- 获得用户机构 -->
+    <select id="selectUserDepartInfo" parameterType="Long" resultMap="com.chinaGPS.gtmp.mapper.DepartMapper.departMap" >
+         SELECT D.* FROM T_P_DEPART D where D.DEPART_ID= #{departId}   
+    </select>
+    
+	<select id="get" parameterType="UserPOJO" resultMap="userMap">
+		SELECT U.* FROM T_P_USER U  LEFT JOIN 
+		T_P_DEPART D ON U.DEPART_ID=D.DEPART_ID 
+		<where>
+		<if test="@Ognl@isNotBlank(loginName)">   
+	        		AND U.LOGIN_NAME= #{loginName}
+	    </if>
+	    <!-- 防重判断-->
+		<if test="@Ognl@isNotBlank(userId)"> 
+					AND U.USER_ID!= #{userId}
+		</if>
+		</where>
+	</select>
+	
+	<sql id="getByPageCondition">
+		<where>
+			<if test="user!=null">
+				 <if test="@Ognl@isNotBlank(user.loginName)">   
+	        		AND U.LOGIN_NAME LIKE '%'||#{user.loginName}||'%'
+	    		</if>
+	    		<if test="@Ognl@isNotBlank(user.userName)">   
+	        		AND U.USER_NAME LIKE '%'||#{user.userName}||'%'
+	    		</if>
+	    		 <if test="user.departId!=null"> 
+	    			AND U.DEPART_ID= #{user.departId}
+				</if>
+				<if test="user.isValid!=null"> 
+	    			AND U.IS_VALID= #{user.isValid}
+				</if>
+    		</if>
+		</where>
+	</sql>
+	
+	<!-- 分页查询用户 -->
+	<select id="getByPage" parameterType="map" resultMap="userMap">
+		SELECT U.*,D.DEPART_NAME FROM T_P_USER U  LEFT JOIN 
+		T_P_DEPART D ON U.DEPART_ID=D.DEPART_ID
+		<include refid="getByPageCondition"/>   
+	</select>
+	<select id="countAll" parameterType="map" resultType="Integer">
+		SELECT COUNT(U.USER_ID) FROM t_p_user U
+		<include refid="getByPageCondition"/>   
+	</select> 
+	
+	<select id="getById" parameterType="Long" resultMap="userMap">
+		SELECT U.* FROM t_p_user U WHERE U.USER_ID= #{id}
+	</select>
+	
+	<delete id="removeById" parameterType="Long" >
+		delete from t_p_user U WHERE U.USER_ID= #{id}
+	</delete>
+	
+	<insert id="add" parameterType="UserPOJO">
+		INSERT INTO T_P_USER
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+		 	USER_ID,
+		 	<if test="@Ognl@isNotBlank(loginName)" >
+       		LOGIN_NAME,
+            </if>
+            <if test="@Ognl@isNotBlank(password)" >
+       		PASSWORD,
+            </if>
+            <if test="@Ognl@isNotBlank(userName)" >
+       		USER_NAME,
+            </if>
+             <if test="@Ognl@isNotBlank(sex)" >
+       		sex,
+            </if>
+            <if test="@Ognl@isNotBlank(tel)" >
+       		TEL,
+            </if>
+            <if test="@Ognl@isNotBlank(email)" >
+       		EMAIL,
+            </if>
+            <if test="departId!=null" >
+       		DEPART_ID,
+            </if>
+            <if test="isValid!=null" >
+       		IS_VALID,
+            </if>
+            STAMP
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	SEQ_USER.NEXTVAL,
+		 	<if test="@Ognl@isNotBlank(loginName)" >
+       		#{loginName},
+            </if>
+            <if test="@Ognl@isNotBlank(password)" >
+       		#{password},
+            </if>
+            <if test="@Ognl@isNotBlank(userName)" >
+       		#{userName},
+            </if>
+            <if test="@Ognl@isNotBlank(sex)" >
+       		#{sex},
+            </if>
+            <if test="@Ognl@isNotBlank(tel)" >
+       		#{tel},
+            </if>
+            <if test="@Ognl@isNotBlank(email)" >
+       		#{email},
+            </if>
+            <if test="departId!=null" >
+       		#{departId},
+            </if>
+            <if test="isValid!=null" >
+       		#{isValid},
+            </if>
+            sysdate
+		 </trim>
+ 	</insert>
+ 
+	<update id="edit" parameterType="UserPOJO">
+		UPDATE T_P_USER
+   SET 
+    	<trim  suffixOverrides=",">
+	        <if test="@Ognl@isNotBlank(loginName)"> 
+	      	 	LOGIN_NAME = #{loginName},
+	       </if>
+	       <if test="@Ognl@isNotBlank(password)"> 
+	      		 PASSWORD = #{password},
+	       </if>
+	       <if test="@Ognl@isNotBlank(userName)"> 
+	       		USER_NAME = #{userName},
+	       </if>
+	       <if test="@Ognl@isNotBlank(sex)"> 
+	       		sex =#{sex},
+	       </if>
+	       <if test="@Ognl@isNotBlank(tel)"> 
+	       		TEL = #{tel},
+	       </if>
+	       <if test="@Ognl@isNotBlank(email)"> 
+	       		EMAIL = #{email},
+	       </if> 
+	       <if test="departId!=null" >
+       			DEPART_ID = #{departId},
+            </if>
+            <if test="isValid!=null" >
+       			IS_VALID = #{isValid},
+            </if>
+            	STAMP=sysdate
+      </trim>
+ WHERE USER_ID = #{userId,jdbcType=BIGINT}
+	</update>
+	
+	<insert id="insertUserRoleBatch" parameterType="java.util.List">  
+		INSERT INTO t_p_user_role
+			(user_id, role_id, user_type)
+	    <foreach collection="list" item="item" index="index"   separator="union all">  
+	        SELECT #{item.userId}, #{item.roleId}, #{item.userType} FROM dual 
+	    </foreach>  
+	</insert> 
+  
+    <delete id="removeUserRolesByUId" parameterType="long" >
+		DELETE FROM t_p_user_role WHERE user_id = #{userId}
+	</delete>
+	
+	<delete id="removeByUserRole" parameterType="UserRolePOJO" flushCache="true">
+		DELETE FROM t_p_user_role WHERE user_id = #{userId} AND user_type = #{userType}
+	</delete>
+	
+	<insert id="insertUserRole" parameterType="UserRolePOJO">  
+     INSERT INTO T_P_USER_ROLE
+     	(USER_ID, ROLE_ID) VALUES  ( #{userId}, #{roleId})  
+    </insert> 
+    
+    <select id="getUserRoles" parameterType="UserRolePOJO" resultMap="userRoleMap">
+		SELECT U.* FROM T_P_USER_ROLE U 
+		<where>
+				<if test="@Ognl@isNotBlank(userId)">   
+	        		AND U.USER_ID=#{userId}
+	    		</if>
+	    		<if test="@Ognl@isNotBlank(roleId)">   
+	        		AND U.ROLE_ID=#{roleId}
+	    		</if>
+	    		AND U.USER_TYPE = 0
+	     </where>
+	</select>
+     
+    <select id="getAccessibleModues" parameterType="map" resultMap="com.chinaGPS.gtmp.mapper.ModuleMapper.moduleMap" useCache="false">
+		SELECT distinct M.* FROM T_P_MODULE M 
+		INNER JOIN T_P_ROLE_MODULE RM
+		ON M.MODULE_ID=RM.MODULE_ID 
+		<where>
+		 M.IS_VALID = 0
+		   <if test="roles!=null"> 
+	    			AND RM.ROLE_ID IN 
+		    		<foreach collection="roles" item="role" open="(" separator="," close=")">
+			 			  #{role.roleId} 
+					</foreach>
+			</if>
+		</where> 
+		order by m.list_no asc 
+	</select>
+</mapper>  

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="外呼业务明细">
+<meta name="description" content="外呼业务明细">
+
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/jquery.dataTables.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/data_style.css" rel="stylesheet" />
+<link href="../dist/plugins/css/datepicker.css" rel="stylesheet">
+<link href="../css/base.css" rel="stylesheet" />
+<title>外呼业务明细</title>
+
+</head>
+<body style="background-color:white;">
+	<div class="container-fluid Reports_page">
+		<h1>外呼业务明细</h1>
+		<div class="row c_area">
+            <div class="filter_box">
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">归属公司：</h6>
+                    <div class="filter_content">
+                        <span class="filiale">
+                            <input type="text" class="form-control reports_search_4_engine" id="calloutDetails_Com_search" value="全部" />
+                            <i class="glyphicon glyphicon-chevron-down filialeDown"></i>
+                            <input type="hidden" class="search_filiale_id" id="calloutDetails_ID_search" value="0">
+                            <ul class="reports_search_4_list" style="display:none;"></ul>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">搜索：</h6>
+                    <div class="filter_content">
+                        <span class="reports_search_1">
+                            <input type="text" id="calloutDetailsCar_partNo" class="form-control reports_search_1_engine" placeholder="车牌号码或车载电话" style="width:250px;">
+                            <input type="hidden" class="search_plate_no">
+                            <input type="hidden" class="search_call_letter">
+                            <input type="hidden" class="search_vehicle_id" id="calloutDetailsCarID">
+                            <ul class="reports_search_1_list" style="display:none;">
+                                <!--
+                            	<li><span class="p_plate_no">粤B.123456</span> <span class="p_call_letter">13698521459</span></li>
+                            	-->
+                            </ul>
+                        </span>
+                        <span>
+                            <input type="text" class="form-control" placeholder="客户名称" id="calloutDetailsCosName">
+                        </span>
+                        <span>
+                            <input type="text" class="form-control" placeholder="呼出号码" id="calloutDetailsPhone">
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">呼入时间：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control form_datetime starTime" id="calloutDetailsStartTime">
+                            <span class="input-group-addon">至</span>
+                            <input type="text" class="form-control form_datetime endTime" id="calloutDetailsEndTime">
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">呼出工号：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control" id="jobNum">                  
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix" style="width:100%;">
+                    <h6 class="control-label control_title">服务大类：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <label class="TOS_checkall"><input type="checkbox" id="TOS_opt_in_checkall"/>全选</label>
+                        </span>
+                        <span class="TOS_opt" id="TOS_opt_out1"></span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix" style="width:100%;height:auto;">
+                    <h6 class="control-label control_title">业务类型：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <label class="TOS_checkall"><input type="checkbox" id="TOS_opt_in2_checkall"/>全选</label>
+                        </span>
+                        <span class="TOS_opt" id="TOS_opt_out2"></span>
+                    </div>
+                </div>
+                
+                <div class="form-group clearfix btns">
+                    <a href="#" class="exportExcel" id="calloutDetailsSearch"><i class="glyphicon glyphicon-search"></i>查询</a>
+                    <a href="#" class="exportExcel" id="calloutDetailsExport"><i class="glyphicon glyphicon-export"></i>导出Excel</a>
+                </div>
+            </div>            
+        </div>
+        <div class="row r_scroll">
+            <div class="Reports_box" style="width:1300px;">
+                <table id="calloutDetails-table" class="display compact table_borders dataTable" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th style="width:20px;"></th>
+                            <th style="width:110px;">呼出时间</th>
+                            <th style="width:90px;">客户名称</th>
+                            <th style="width:90px;">车牌号码</th>
+                            <th style="width:50px;">车载电话</th>
+                            <th style="width:80px;">呼出号码</th>
+                            <th style="width:50px;">呼出人</th>
+                            <th style="width:60px;">服务类型</th>
+                            <th style="width:180px;">服务明细</th>
+                            <th style="width:180px;">处理结果</th>
+                            <th style="width:60px;">归属公司</th>
+                            <th style="width:50px;">接通情况</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+	</div>
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/fnReloadAjax.js"></script>
+<script type="text/javascript" src="../dist/plugins/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/reports.js"></script>
+<script type="text/javascript">
+    //呼出业务明细查询
+    $("#calloutDetailsSearch").click(function(){    
+        if(checkTimeBox()==0){//判断时间是否为空
+            return;
+        }else if($('.starTime').val() >= $('.endTime').val()){
+            alert("起始时间不能大于结束时间");
+            return;
+        }else{
+            if ( typeof(add_table) != "undefined") {
+                calloutDetailsReport();
+                add_table.fnReloadAjax("../app/callbrief/call_out?" + paras);
+            }
+            else{
+                calloutDetailsReport();
+            };
+        };
+     });
+
+    //呼出业务明细导出
+    $("#calloutDetailsExport").click(function(){
+        $(this).attr("href","../app/callbrief/call_out/export?"+callparas);
+    });
+
+    //呼出业务明细查询
+    function calloutDetailsReport(){
+        var ValcompanyNo = [];//所属公司id
+        var ValvehicleId = $("#calloutDetailsCarID").val();//车辆id（隐藏）
+        var ValpartNo =  $("#calloutDetailsCar_partNo").val();//部分车牌或车载
+        var Valname =  encodeURI($("#calloutDetailsCosName").val());//客户名称
+        var Valphone =  $("#calloutDetailsPhone").val();//呼出号码
+        var ValbeginTime = $(".starTime").val();//开始时间
+        var ValendTime = $(".endTime").val();//结束时间
+        var ValjobNum = $("#jobNum").val();//呼出工号
+        var ValserverType = [];//服务大类
+        if($("#TOS_opt_out1 label input:checked").length>0){
+            $.each($("#TOS_opt_out1 label input:checked"),function(i,item){
+                ValserverType.push(parseInt($(item).val()));
+            });
+        }
+        var ValbusinessType = [];//业务类型
+        if($("#TOS_opt_out2 label input:checked").length>0){
+            $.each($("#TOS_opt_out2 label input:checked"),function(i,item){
+                ValbusinessType.push(parseInt($(item).val()));
+            });
+        }
+
+        ValcompanyNo[0] = $("#calloutDetails_ID_search").val();
+        if ($("#calloutDetails_ID_search").val()=='0'){//所属公司拼接
+            callinDetailscompanyNo='';
+        }else{
+            callinDetailscompanyNo = 'companyNo='+ValcompanyNo+'&';
+        };
+
+        if (ValvehicleId == ''){//车辆id或部分车牌车载拼接
+            callinDetailsvehicleId = '';
+            if (ValpartNo==''){
+                callinDetailspartNo='';
+            }else{
+                callinDetailspartNo = 'partNo='+ValpartNo+'&';
+            };
+        }else{
+            callinDetailsvehicleId = 'vehicleId='+ValvehicleId+'&';
+            callinDetailspartNo='';
+        };
+
+        if (Valname==''){//客户名称拼接
+            callinDetailsname = '';
+        }else{
+            callinDetailsname = 'name='+Valname+'&';
+        };
+     
+        if (Valphone==''){//联系电话拼接
+            callinDetailsphone = '';
+        }else{
+            callinDetailsphone = 'phone='+Valphone+'&';
+        };
+
+        if (ValjobNum == 0){//受理工号拼接
+            callinDetailsjobNum = '';
+        }else{
+            callinDetailsjobNum = 'jobNum='+ValjobNum+'&';
+        };
+
+        if ($("#TOS_opt_in_checkall").is(":checked")){//（是否全选）服务大类拼接
+            callinDetailsserverType = '';
+        }else{
+            if(ValserverType.length==0){
+                callinDetailsserverType = '';
+            } else{
+                callinDetailsserverType = 'serverType='+ValserverType+'&';
+            }
+        };
+
+        if ($("#TOS_opt_in2_checkall").is(":checked")){//（是否全选）业务类型拼接
+            callinDetailsbusinessType = '';
+        }else{
+            if(ValbusinessType.length==0){
+                callinDetailsbusinessType = '';
+            } else{
+                callinDetailsbusinessType = 'businessType='+ValbusinessType+'&';
+            }            
+        };
+
+        if (ValbeginTime==''){//开始时间
+            callinDetailsbeginTime='';
+        }else{
+            callinDetailsbeginTime = 'beginTime='+ValbeginTime+'&';
+        };
+
+        if (ValendTime==''){//结束时间
+            callinDetailsendTime='';
+        }else{
+            callinDetailsendTime = 'endTime='+ValendTime;
+        };
+
+        callparas = callinDetailscompanyNo+callinDetailsvehicleId+callinDetailspartNo+callinDetailsname+callinDetailsphone+callinDetailsjobNum+callinDetailsserverType+callinDetailsbusinessType+callinDetailsbeginTime+callinDetailsendTime;//归属公司、车辆id、客户名称、呼入电话、时间段、呼入组别、受理工号、服务大类、业务类型
+        // alert(callparas);
+        paras = callparas;//参数;
+        add_table = $("#calloutDetails-table").dataTable({
+            "bSort": false,//不排序
+            "filter": false,//去掉搜索框
+            "pagingType": "full_numbers",
+            "processing" : true,
+            "serverSide" : true,//后端处理
+            "bRetrieve": true,
+            "bDestroy": true,
+            "oLanguage": {
+                "sUrl":"../assets/data-tables/js/dataTable.cn.txt"
+            },
+            "ajax" : {
+                "type":"POST",
+                "url":"../app/callbrief/call_out?" + paras //获取数据的API
+            },             
+            "columns":[
+                {"data":"sn"},//序列号
+                {"data":"stamp"},//呼出时间
+                {"data":"customer_name"},//客户名称
+                {"data":"plate_no"},//车牌号码
+                {"data":"call_letter"},//车载电话
+                {"data":"phone"},//呼出号码
+                {"data":"op_name"},//呼出人
+                {"data":"super_servertype_name"},//服务类型
+                {"data":"content"},//服务明细
+                {"data":"result"},//处理结果
+                {"data":"company_name"},//归属公司
+                {"data":"flag"}//接通情况
+            ],
+            "rowCallback": function(row,data) {
+                $('td:eq(11)',row).html(calloutSituation(data.flag));
+            }
+        });
+        return add_table;
+    }
+</script>
+</body>
+</html>

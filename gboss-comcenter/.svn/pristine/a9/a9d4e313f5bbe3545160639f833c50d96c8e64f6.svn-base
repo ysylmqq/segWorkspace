@@ -1,0 +1,358 @@
+/*!
+ * gboss v0.0.1
+ */
+ 
+/************************************************************************************/
+/*更改BootStrap.css*/
+.form-control {
+  height: 25px;
+}
+
+/*
+.form-control:-moz-placeholder {
+  color: #bbbbbb;
+}
+.form-control::-moz-placeholder {
+  color: #bbbbbb;
+  opacity: 1;
+}
+.form-control:-ms-input-placeholder {
+  color: #bbbbbb;
+}
+.form-control::-webkit-input-placeholder {
+  color: #bbbbbb;
+}*/
+
+.navbar-nav>li>a{
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+.navbar-nav>button {
+	margin: 10px;
+}
+ 
+.row {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.panel-heading > .row {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.btn-xs {
+	height:25px;
+}
+
+.navbar-info {
+  min-height: 40px;
+  margin-bottom: 5px;
+}
+
+.navbar-info,
+.dropdown-menu,
+.btn-default {
+  background-image: url(../images/bg-blue.gif);
+  background-size: 100% 100%;
+}
+
+.pagination {
+	margin: -20px 0 10px 0;
+}
+
+.form-control {
+  width: 100%;
+  height: 25px;
+  padding: 4px 5px;
+}
+
+.modal-dialog {
+	width: 700px;
+}
+
+.modal-body {
+	max-height: 600px;
+  	overflow:auto;
+}
+
+.panel-heading,
+.modal-header {
+	padding: 5px 10px;
+	background-image: url(../images/bg-blue.gif);
+}
+
+.table {
+	margin-bottom: 0;
+}
+
+.pagination {
+	margin: 0;
+}
+
+/************************************************************************************/
+/*公共样式*/
+iframe {
+	width:100%;
+	height:100%;
+	border:none;
+}
+
+.iframe .row {
+	margin: 10px 0px;
+}
+
+.divborder {
+  border:1px solid #dddddd;
+}
+
+.datetimepicker {
+	width: 180px !important;
+}
+
+.btnnormalwidth {
+	min-width: 80px !important;
+}
+
+.marginleft10{
+  margin-left:10px !important;
+}
+
+.paddingleft10{
+  padding-left:10px !important;
+}
+
+.paddingleft0{
+  padding-left:0px !important;
+}
+
+.paddingright10 {
+  padding-right:10px !important;
+}
+
+/*表格选择行颜色*/
+.table tr.row_selected_bc td {
+	background-color: #B0BED9 !important;
+}
+
+/************************************************************************************/
+/* 主界面内容  及左右分隔*/
+@media (min-width: 1000px) {
+	#indexwrap {
+		min-height: 100%;
+		height: 918px;
+		padding: 125px 0px 0px 0px;
+		width: 1280px !important;
+	}
+}
+
+@media (min-width: 1200px) {
+	#indexwrap {
+		min-height: 100%;
+		height: 918px;
+		padding: 85px 0px 0px 0px;
+		width: 1280px !important;
+	}
+}
+.gbosspanel{ 
+  height:100%;
+  display:inline-block;
+  position:relative; 
+  border:1px solid #dddddd;
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+.seatpanelleft{
+	width:360px;
+}
+.seatpanelright{
+	width:915px;
+}
+
+/************************************************************************************/
+/*左边界面样式*/
+/*注意事项高度*/
+.userevent-list{
+  width:100%;
+  height:170px;
+  overflow:auto;
+}
+
+/*服务记录高度*/
+.leftgroup-list{
+  width:100%;
+  height:430px;
+  overflow:auto;
+}
+.userservicerecordheight {
+  width:100%;
+  height:300px;
+  overflow:auto;
+}
+
+.useroperatemainpanel {
+ 	margin-left: 10px;
+ 	margin-right: 20px;
+}
+
+.useroperatecontentpanel {
+	width: 100%;
+ 	height: 640px;
+	border:1px solid #dddddd;
+}
+
+.historyalarmheight {
+  width:100%;
+  height:310px;
+  overflow:auto;
+}
+
+.historynavigateheight {
+  width:100%;
+  max-height:350px;
+  overflow:auto;
+}
+
+.seat-caller-list {
+  width:100%;
+  height:256px;
+  line-height:100px;
+  overflow:auto;
+  overflow-x:hidden;
+}
+
+.UseInfo {
+  left: 0;
+  right: 0;
+  /*z-index: 1400;*/
+  position:absolute; 
+  border:1px solid #dddddd;
+  height: 100%; 
+}
+
+.dropdown-menu-right {
+  left: auto;
+  right: 0;	
+}
+
+.gpstable {
+  font-size: 12px;
+}
+
+/*电工列表框*/
+.maintainer-list{
+  margin-top: 10px;
+  width:100%;
+  height:150px;
+  line-height:100px;
+  overflow:auto;
+  /*overflow-x:hidden;*/
+}
+
+/*
+定义右键下拉式菜单的弹出框
+*/
+.contextmentmodal {
+	tabindex="-1";
+	position:absolute;
+	z-index:9999;
+	display:none;	
+}
+
+.contextmentmodal ul {
+	display:block;
+	position:static;	
+}
+
+/*
+定义tab标签页的关闭图标
+*/
+.gboss-tabs {
+  border-bottom: 1px solid #AAAAAA;
+}
+
+.gboss-tabs .gboss-tabs-close {
+	position: relative;
+	display: inline-block;
+	font-family: 'Glyphicons Halflings';
+	font-style: normal;
+	font-weight: normal;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	float: left;
+	cursor:pointer;
+	padding:8px 10px 6px 0px;
+}
+
+.gboss-tabs .gboss-tabs-close:before {
+  content: "\e014";
+}
+
+.gboss-tabs > li {
+  float: left;
+  border: 1px solid #AAAAAA;
+  border-radius: 15px 15px 0 0;
+  background-image: url(../images/bg-blue.gif);
+  background-size: 100% 100%;
+  margin-bottom: -1px;
+}
+.gboss-tabs > li > a {
+  line-height: 1.428571429;
+  float: left;
+  padding: 3px 6px;
+}
+
+.gboss-tabs > li > a:hover {
+  border-radius: 15px 0px 0 0;
+}
+
+.gboss-tabs > li.active > a,
+.gboss-tabs > li.active > a:hover,
+.gboss-tabs > li.active > a:focus {
+	color: #555555;
+	background-color: transparent;
+	cursor: default;
+}
+
+/* 取消 nav li 的 hover focus 底色*/
+.gboss-tabs > li > a:hover,
+.gboss-tabs > li > a:focus {
+	color: #555555;
+	background-color: transparent;
+}
+
+.gboss-tabs > li.active,
+.gboss-tabs > li.active:hover,
+.gboss-tabs > li.active:focus {
+  background-image: none;
+  background-color: #FFFFFF;
+  border: 1px solid #AAAAAA;
+  border-radius: 15px 15px 0 0;
+  border-bottom-color: transparent;
+}
+
+.inputfile {
+	padding: 0px;
+}
+
+.callusertableheight {
+	width:100%;
+	height:300px;
+	overflow:auto;
+}
+
+.phonesaletableheight {
+	width:100%;
+	height:360px;
+	overflow:auto;
+}
+
+div.canselect {
+	tabindex="-1";
+	position:absolute;
+	z-index:1029;
+	display:block;
+	width: 100px;
+	top: 0;
+}

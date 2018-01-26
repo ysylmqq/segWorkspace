@@ -1,0 +1,80 @@
+body{
+	background: #F2F3EE;
+	font:12px arial;
+	overflow:hidden;
+}
+
+.login {
+	width:488px;
+	height:329px;
+	/*background:transparent url(../../images/login/bg.png) no-repeat top center;*/
+	position:absolute; 
+	top:50%; 
+	left:50%;
+	margin:-165px 0 0 -244px;
+}
+
+.name-password-field{
+	height: 18px;
+	width: 190px;
+}
+
+.input-field {
+	position:relative;
+	top: 135px;
+	left:130px;
+}
+
+.code-field{
+	height: 18px;
+	width: 125px;
+}
+
+.code-show{
+	text-align: left;
+	border: 1px solid green;
+	height: 22px;
+	width:55px;
+}
+
+.btns{
+	position:relative;
+	top: 155px;
+	left:220px;
+}
+
+.x-unselectable{
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select:ignore;
+}
+
+.btn-login{
+	cursor:hand;
+	text-align:center;
+	color: white;
+	width: 69px;
+	height: 27px;
+	background:transparent url(../images/login/button_01.png) no-repeat top center;
+}
+
+.btn-cancel{
+	cursor:hand;
+	text-align:center;
+	color: white;
+	width: 69px;
+	height: 27px;
+	background:transparent url(../images/login/button_01.png) no-repeat top center;
+}
+
+.copyright{
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	height: 60px;
+	width: 100%;
+	display:block;
+	background-color: #E0E3E8;
+	text-align: center;
+	line-height: 60px;
+}

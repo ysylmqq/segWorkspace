@@ -1,0 +1,215 @@
+package cc.chinagps.gateway.unit.beforemarket.hm.upload.beans;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.seg.lib.util.Util;
+
+import cc.chinagps.gateway.unit.beforemarket.common.util.BeforeMarketTimeFormatUtil;
+import cc.chinagps.gateway.util.HexUtil;
+
+public class HMGPSInfo {
+	private Date gpsTime;
+	
+	private boolean isLoc;
+	
+	private double lng;
+	
+	private double lat;
+	
+	private int speed;
+	
+	private int course;
+	
+	private int height;
+
+	public Date getGpsTime() {
+		return gpsTime;
+	}
+
+	public void setGpsTime(Date gpsTime) {
+		this.gpsTime = gpsTime;
+	}
+
+	public boolean isLoc() {
+		return isLoc;
+	}
+
+	public void setLoc(boolean isLoc) {
+		this.isLoc = isLoc;
+	}
+
+	public double getLng() {
+		return lng;
+	}
+
+	public void setLng(double lng) {
+		this.lng = lng;
+	}
+
+	public double getLat() {
+		return lat;
+	}
+
+	public void setLat(double lat) {
+		this.lat = lat;
+	}
+
+	public int getSpeed() {
+		return speed;
+	}
+
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+
+	public int getCourse() {
+		return course;
+	}
+
+	public void setCourse(int course) {
+		this.course = course;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+	
+	private static final double LAT_LNG_MUL = 10000000;
+	//public static final BigDecimal M_SPEED = new BigDecimal("0.1852");
+	public static final int DATA_LENGTH = 20;
+	
+	public static HMGPSInfo parse(byte[] data, int offset) throws Exception{
+		HMGPSInfo gpsInfo = new HMGPSInfo();
+		int position = offset;
+		
+		//int dataLength = data[position] & 0xFF;
+		//position += 1;
+		
+		String str_time = "20" + Util.bcd2str(data, position, 6);
+		position += 6;
+		Date gpsTime = BeforeMarketTimeFormatUtil.parseGMT0(str_time);
+		
+		byte flag = data[position];
+		position += 1;
+		boolean isLoc = (flag & 0x80) != 0;
+		boolean isBelowSea = (flag & 0x40) != 0;
+		
+		int course = (data[position] & 0xFF) * 10;
+		position += 1;
+		
+		double lat = Util.getInt(data, position) / LAT_LNG_MUL;
+		position += 4;
+		
+		double lng = Util.getInt(data, position) / LAT_LNG_MUL;
+		position += 4;
+		
+		int i_speed = Util.getShort(data, position) & 0xFFFF;
+		position += 2;
+		
+		int i_height = Util.getShort(data, position) & 0xFFFF;
+		position += 2;
+		if(isBelowSea){
+			i_height = -i_height;
+		}
+
+		gpsInfo.setGpsTime(gpsTime);
+		gpsInfo.setLng(lng);
+		gpsInfo.setLat(lat);
+		gpsInfo.setSpeed(i_speed);
+		gpsInfo.setCourse(course);
+		gpsInfo.setHeight(i_height);
+		gpsInfo.setLoc(isLoc);
+		
+		return gpsInfo;
+	}
+	
+	public byte[] encode() throws Exception{
+		byte[] data = new byte[20];
+		byte[] bs_time = BeforeMarketTimeFormatUtil.getTimeBCD(gpsTime.getTime());
+		
+		byte flag = 0;
+		if(isLoc){
+			flag |= 0x80;
+		}
+		
+		if(height < 0){
+			flag |= 0x40;
+		}
+		
+		byte[] bs_lat = Util.getIntByte((int) (lat * LAT_LNG_MUL));
+		byte[] bs_lng = Util.getIntByte((int) (lng * LAT_LNG_MUL));
+		byte[] bs_speed = Util.getShortByte((short) speed);
+		byte[] bs_height = Util.getShortByte((short) height);
+		
+		int position = 0;
+		System.arraycopy(bs_time, 0, data, position, bs_time.length);
+		position += 6;
+		
+		data[position] = flag;
+		position += 1;
+		
+		data[position] = (byte) (course / 10);
+		position += 1;
+		
+		System.arraycopy(bs_lat, 0, data, position, 4);
+		position += 4;
+		
+		System.arraycopy(bs_lng, 0, data, position, 4);
+		position += 4;
+		
+		System.arraycopy(bs_speed, 0, data, position, 2);
+		position += 2;
+		
+		System.arraycopy(bs_height, 0, data, position, 2);
+		position += 2;
+		
+		return data;
+	}
+	
+	public static void main(String[] args) throws Exception {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date date = sdf.parse("2014-05-01 10:11:12");
+		
+		HMGPSInfo gpsInfo = new HMGPSInfo();
+		gpsInfo.setGpsTime(date);
+		gpsInfo.setLoc(true);
+		gpsInfo.setCourse(80);
+		gpsInfo.setLat(23.123456);
+		gpsInfo.setLng(123.123456);
+		gpsInfo.setSpeed(60);
+		gpsInfo.setHeight(100);
+		
+		byte[] data = gpsInfo.encode();
+		System.out.println("encode:" + HexUtil.byteToHexStr(data));
+		
+		HMGPSInfo pgps1 = HMGPSInfo.parse(data, 0);
+		System.out.println("pgps:" + pgps1);
+		
+		String hex = "15032403170900000D851904441D5AF40025000000082400000000";
+		byte[] hex_bs = HexUtil.hexToBytes(hex);
+		HMGPSInfo pgps2 = HMGPSInfo.parse(hex_bs, 0);
+		System.out.println("pgps:" + pgps2);
+	}
+	
+	@Override
+	public String toString() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		StringBuilder sb = new StringBuilder();
+		sb.append("{");
+		sb.append("isLoc:").append(isLoc);
+		sb.append(", gpsTime:").append(sdf.format(gpsTime));
+		sb.append(", lng:").append(lng);
+		sb.append(", lat:").append(lat);
+		sb.append(", speed:").append(speed);
+		sb.append(", course:").append(course);
+		sb.append(", height:").append(height);
+		sb.append("}");
+		
+		return sb.toString();
+	}
+}

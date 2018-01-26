@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+
+<struts>
+	<package name="run" namespace="/run" extends="global">
+	  <result-types>
+            <result-type name="chart" class="org.apache.struts2.dispatcher.ChartResult"></result-type>
+        </result-types> 
+		<!-- 运营 -->
+		<action name="run_*" class="runAction" method="{1}">
+		    <result  name="success" type="chart">
+				<param name="width">700</param>
+				<param name="height">400</param>
+			</result>
+		</action>
+		
+		<!-- 指令 -->
+		<action name="command_*" class="commandAction" method="{1}">
+		</action>
+		
+		<!-- 历史位置 -->
+		<action name="history_*" class="historyAction" method="{1}">
+		</action>
+		
+		<!-- 警情 -->
+		<action name="alarm_*" class="alarmAction" method="{1}">
+		      <result  name="success" type="chart">
+				<param name="width">700</param>
+				<param name="height">400</param>
+			</result>
+		</action>
+		
+		<!--故障诊断 -->
+		<action name="malfunction_*" class="malfunctionAction" method="{1}">
+		    <result  name="success" type="chart">
+				<param name="width">700</param>
+				<param name="height">400</param>
+			</result>
+		</action>
+		
+		<!-- 终端换装 -->
+		<action name="unitreplace_*" class="unitReplaceAction" method="{1}">
+		</action>
+		
+		<!-- 机主服务 -->
+		<action name="owner_*" class="ownerAction" method="{1}">
+		</action>
+		
+		<!-- 电子风围栏 -->
+		<action name="fence_*" class="fenceAction" method="{1}">
+		</action>
+	</package>
+</struts>

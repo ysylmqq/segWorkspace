@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+ 
+<struts>
+	<package name="userInfo" namespace="/userInfo" extends="global">
+		
+		
+		<!-- 问题返馈 -->
+		<action name="userInfo_*" class="userInfoAction" method="{1}">
+		</action>
+		
+		<!-- 工程信息发布 -->
+		<action name="projectInfo_*" class="projectInfoAction" method="{1}">
+		</action>
+		
+		<!-- 调查问卷发布 -->
+		<action name="reseach_*" class="reseachAction" method="{1}">
+		</action>
+		
+		<!-- 调查问卷回复 -->
+		<action name="reseachAnswer_*" class="reseachAnswerAction" method="{1}">
+		</action>
+		
+		<!-- 消息推送 -->
+		<action name="message_*" class="messageAction" method="{1}">
+		</action>
+	</package>
+</struts>

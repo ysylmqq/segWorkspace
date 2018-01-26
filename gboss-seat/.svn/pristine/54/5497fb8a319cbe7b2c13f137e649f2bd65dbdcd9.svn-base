@@ -1,0 +1,291 @@
+package cc.chinagps.seat.util;
+
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import cc.chinagps.seat.bean.table.ServerTypeTable;
+import cc.chinagps.seat.service.ServerTypeService;
+import cc.chinagps.seat.springutil.SpringContextHolder;
+
+public final class Consts {
+	
+	public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
+	
+	/**短信发送参数key*/
+	public static final String SMS_API_PARAMS = "customer_params";
+	/**短信发送参数地址*/
+	public static final String SMS_API_URL = "url";
+	
+	/**短信接口动作*/
+	public static final String SMS_ACTION 	= "action";
+	public static final String SMS_USERID 	= "userid";
+	public static final String SMS_ACCOUNT 	= "account";
+	public static final String SMS_PASSWORD = "password";
+	public static final String SMS_MOBILE 	= "mobile";
+	public static final String SMS_CONTENT 	= "content";
+	public static final String SMS_SENDTIME	= "sendTime";
+	public static final String SMS_EXTNO	= "extno";
+	
+	/**发送接口*/
+	public static final int SMS_API_TYPE_SEND 	= 1;
+	public static final String SMS_ACTION_TYPE_SEND 	= "send";
+	/**余额及已发送量查询接口*/
+	public static final int SMS_API_TYPE_OVERAGE 	= 2;
+	public static final String SMS_ACTION_TYPE_OVERAGE	= "overage";
+	/**非法关键词查询*/
+	public static final int SMS_API_TYPE_CHECK_KEY_WORD = 3;
+	public static final String SMS_ACTION_TYPE_CHECKKEYWORD	= "checkkeyword";
+	/**状态报告接口*/
+	public static final int SMS_API_TYPE_QUERY 	= 4;
+	public static final String SMS_ACTION_TYPE_STATUS_QUERY	= "query";
+	/**上行接口*/
+	public static final int SMS_API_TYPE_DETAIL	= 5;
+	public static final String SMS_ACTION_TYPE_DETAIL_QUERY = "query";
+	
+	/**
+		 map.put( key, val );
+		 key	= 	子类ID
+		 value	=	servertype对象
+	 */
+	public static final Map<String,ServerTypeTable> SERVICE_TYPE_CACHE = new HashMap<String, ServerTypeTable>();
+	
+	
+	public static String formatDate(Date date) {
+		if (date == null) {
+			return "";
+		}
+		SimpleDateFormat format = new SimpleDateFormat(
+				DATE_FORMAT_PATTERN);
+		return format.format(date);
+	}
+	
+	public static final String SESSION_ATTR_LOGIN_USER = "seat.user";
+	
+	/**
+	 * 杂项配置文件
+	 */
+	public static final String PROPERTIES_MISC = 
+			System.getProperty("webapp.root") + "/config/misc.properties";
+
+	public static final String AUTH_HOST;
+	
+	/**
+	 * 是否鉴权功能不启用
+	 */
+	public static final boolean AUTH_DISABLE;
+	
+	/**
+	 * 通信中心内网ip端口
+	 */
+	public static final String COMMCENTER_HOSTS_INTRA;
+	/**
+	 * 通信中心外网ip端口
+	 */
+	public static final String COMMCENTER_HOSTS_OUTER;
+	
+	/**
+	 * 响应率。key为name，value为时间段范围
+	 */
+	public static final Map<String, long[]> RESP_RATIO;
+	
+	/**
+	 * 响应率数组，key=value格式。key为name，value为时间段范围。顺序为界面显示顺序
+	 */
+	private static final String[] RATIO = {
+		"5sec=0,5",
+		"10sec=0,10",
+		"before10sec=5,10",
+		"before30sec=10,30",
+		"1min=0,60",
+		"2min=0,120",
+		"3min=0,180",
+		"before3min=30,180",
+		"5min=0,300",
+		"10min=0,600",
+		"20min=0,1200",
+	};
+	
+	static {
+		ServerTypeService serverTypeService = SpringContextHolder.getBean("serverTypeService");
+		List<ServerTypeTable> ret_service_type_list = serverTypeService.getServertypes();
+		if(ret_service_type_list != null && ret_service_type_list.size() > 0 ){
+			for(ServerTypeTable stt:ret_service_type_list){
+				SERVICE_TYPE_CACHE.put(String.valueOf(stt.getSt_id()), stt);
+			}
+		}
+		System.out.println("##服务类型缓存大小##" + SERVICE_TYPE_CACHE.size());
+		Properties properties = PropertiesReader.readProperties(
+				Consts.PROPERTIES_MISC);
+		AUTH_HOST = properties.getProperty("auth.host");
+		AUTH_DISABLE = !Boolean.parseBoolean(properties.getProperty(
+				"auth.enable"));
+		COMMCENTER_HOSTS_INTRA = properties.getProperty("commcenter.hosts.intra");
+		COMMCENTER_HOSTS_OUTER = properties.getProperty("commcenter.hosts.outer");
+		@SuppressWarnings("unchecked")
+		ArrayList<String> keyList = (ArrayList<String>) Collections.list(
+				properties.propertyNames());
+		Map<String, long[]> map = new LinkedHashMap<String, long[]>(keyList.size());
+		for (String ratio : RATIO) {
+			String[] split = ratio.split("=");
+			String name = split[0];
+			String value = split[1];
+			split = value.split(",");
+			long[] intValue = {Long.parseLong(split[0]), Long.parseLong(split[1])};
+			map.put(name, intValue);
+		}
+		RESP_RATIO = Collections.unmodifiableMap(map);
+	}
+	
+	/**
+	 * 判断指定ip是否为内网ip。目前不支持IPv6格式的判断。只判断第一个IPv4的ip地址是否是内网ip。
+	 * 获取子网掩码，并将{@code ip}和本机ip分别与子网掩码进行与运算。如果相同，则为内网ip，否则为外网ip
+	 * @param ip
+	 * @return
+	 */
+	public static boolean isIntranet(String ip) {
+		try {
+			InetAddress ipAddr = InetAddress.getByName(ip);
+			// 本机ip直接返回
+			if (ipAddr.isLoopbackAddress()) {
+				return true;
+			}
+//			boolean isIpV4 = ipAddr instanceof Inet4Address;
+			//TODO:目前不支持传入的ip为ipv6
+			InetAddress localHost = InetAddress.getLocalHost();
+			NetworkInterface networkInterface = NetworkInterface.getByInetAddress(localHost);
+			for (InterfaceAddress iAddress : networkInterface.getInterfaceAddresses()) {
+				InetAddress address = iAddress.getAddress();
+				if (address instanceof Inet4Address) {
+					//子网掩码长度
+					int length = iAddress.getNetworkPrefixLength();
+					String[] split = localHost.getHostAddress().split("\\.");
+					String[] split2 = ip.split("\\.");
+					int tmpLength;
+					for (int i = 0; i < split.length; i++) {
+						if (length <= 0) {
+							tmpLength = 0;
+						} else if (length < 8) {
+							tmpLength = (1<<length) - 1;
+						} else {
+							tmpLength = (1<<8) - 1;
+						}
+						int first = Integer.parseInt(split[i]) & tmpLength;
+						int second = Integer.parseInt(split2[i]) & tmpLength;
+						if (first != second) {
+							return false;
+						}
+						length = length - 8;
+					}
+					break;
+				}
+			}
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * 来电
+	 */
+	public static final int BRIEFTYPE_CALLEE = 1;
+	
+	/**
+	 * 去电
+	 */
+	public static final int BRIEFTYPE_CALLER = 2;
+	
+	public static final int SUCCEED = 0;
+
+	/**
+	 * 电话号码
+	 */
+	public static final int TYPE_PHONENO = 1;
+
+	/**
+	 * 车辆id
+	 */
+	public static final int TYPE_VEHICLEID = 2;
+
+	/**
+	 * 电话信息类型：按客户
+	 */
+	public static final int PHONEINFO_TYPE_CUSTOMER = 1;
+
+	/**
+	 * 电话信息类型：按车辆
+	 */
+	public static final int PHONEINFO_TYPE_VEHICLE = 2;
+
+	public static final int MODIFY_PRIVATE_PWD_ERROR_NO_VEHICLE = 1;
+	public static final int MODIFY_PRIVATE_PWD_ERROR_PRIVATEPWD_ERROR = 2;
+
+	public static final int MODIFY_VEHICLE_REMARK_ERROR_NO_VEHICLE = 1;
+
+	/**
+	 * 不能为当前用户
+	 */
+	public static final int AUTHENTICATE_ERROR_CURRENT_USER = 1;
+
+	/**
+	 * 用户名或密码错误
+	 */
+	public static final int AUTHENTICATE_ERROR_USERNAME_OR_PWD_ERROR = 2;
+
+	
+	/**
+	 * 没有对应的警情
+	 */
+	public static final int ALARM_ERROR_NO_ALARM = 1;
+	
+	/**
+	 * 核实报警内容（警情内容）不能为空
+	 */
+	public static final int ALARM_ERROR_ALARM_CONTENT_IS_NULL = 2;
+	
+	/**
+	 * 没有对应的案发车辆
+	 */
+	public static final int ALARM_VEHICLE_ERROR_NO_VEHICLE_STATUS = 1;
+	
+	/**
+	 * 重复的案发车辆
+	 */
+	public static final int ALARM_VEHICLE_ERROR_DUPLICATE_VEHICLE_STATUS = 2;
+
+	/**
+	 * 警情状态错误
+	 */
+	public static final int ALARM_VEHICLE_ERROR_ALARM_STATUS_ERROR = 3;
+	
+	/**
+	 * 结束时间在开始时间之前
+	 */
+	public static final int ALARM_VEHICLE_ERROR_END_TIME_BEFORE_BEGIN_TIME = 4;
+	
+	/**
+	 * 已经结案
+	 */
+	public static final int ALARM_VEHICLE_ERROR_CASE_FINISHED = 5;
+
+	/**
+	 * 没有对应标注
+	 */
+	public static final int MAP_MARK_ERROR_NO_MARK = 1;
+	
+	/**
+	 * 已经存在第一联系人
+	 */
+	public static final int SAVE_LINKMAN_ERROR_FIRST_CONTACT_UNIQUE = 1;
+}

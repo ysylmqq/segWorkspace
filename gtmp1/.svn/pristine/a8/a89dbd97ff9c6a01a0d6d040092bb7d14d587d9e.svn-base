@@ -1,0 +1,216 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns:m="http://schemas.microsoft.com/office/2004/12/omml"
+xmlns:st1="urn:schemas-microsoft-com:office:smarttags"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=gb2312">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 12">
+<meta name=Originator content="Microsoft Word 12">
+<link id=Main-File rel=Main-File href="../CustomerOperationManual.htm">
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="Street"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="place"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="PlaceName"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="PlaceType"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="City"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="country-region"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="address"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="chsdate"/>
+<!--[if gte mso 9]><xml>
+ <o:shapedefaults v:ext="edit" spidmax="3074"/>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <o:shapelayout v:ext="edit">
+  <o:idmap v:ext="edit" data="2"/>
+ </o:shapelayout></xml><![endif]-->
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple>
+
+<div style='mso-element:footnote-separator' id=fs>
+
+<p class=MsoNormal><span lang=EN-US><span style='mso-special-character:footnote-separator'><![if !supportFootnotes]>
+
+<hr align=left size=1 width="33%">
+
+<![endif]></span></span></p>
+
+</div>
+
+<div style='mso-element:footnote-continuation-separator' id=fcs>
+
+<p class=MsoNormal><span lang=EN-US><span style='mso-special-character:footnote-continuation-separator'><![if !supportFootnotes]>
+
+<hr align=left size=1>
+
+<![endif]></span></span></p>
+
+</div>
+
+<div style='mso-element:endnote-separator' id=es>
+
+<p class=MsoNormal><span lang=EN-US><span style='mso-special-character:footnote-separator'><![if !supportFootnotes]>
+
+<hr align=left size=1 width="33%">
+
+<![endif]></span></span></p>
+
+</div>
+
+<div style='mso-element:endnote-continuation-separator' id=ecs>
+
+<p class=MsoNormal><span lang=EN-US><span style='mso-special-character:footnote-continuation-separator'><![if !supportFootnotes]>
+
+<hr align=left size=1>
+
+<![endif]></span></span></p>
+
+</div>
+
+<div style='mso-element:header' id=h1>
+
+<div style='mso-element:para-border-div;border:none;border-bottom:solid windowtext 1.0pt;
+mso-border-bottom-alt:solid windowtext .75pt;padding:0cm 0cm 1.0pt 0cm'>
+
+<p class=MsoHeader align=left style='text-align:left'><span lang=EN-US><!--[if gte vml 1]><v:shapetype
+ id="_x0000_t75" coordsize="21600,21600" o:spt="75" o:preferrelative="t"
+ path="m@4@5l@4@11@9@11@9@5xe" filled="f" stroked="f">
+ <v:stroke joinstyle="miter"/>
+ <v:formulas>
+  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+  <v:f eqn="sum @0 1 0"/>
+  <v:f eqn="sum 0 0 @1"/>
+  <v:f eqn="prod @2 1 2"/>
+  <v:f eqn="prod @3 21600 pixelWidth"/>
+  <v:f eqn="prod @3 21600 pixelHeight"/>
+  <v:f eqn="sum @0 0 1"/>
+  <v:f eqn="prod @6 1 2"/>
+  <v:f eqn="prod @7 21600 pixelWidth"/>
+  <v:f eqn="sum @8 21600 0"/>
+  <v:f eqn="prod @7 21600 pixelHeight"/>
+  <v:f eqn="sum @10 21600 0"/>
+ </v:formulas>
+ <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+ <o:lock v:ext="edit" aspectratio="t"/>
+</v:shapetype><v:shape id="_x0000_i1025" type="#_x0000_t75" style='width:116.25pt;
+ height:28.5pt;mso-position-horizontal-relative:page;
+ mso-position-vertical-relative:page' o:preferrelative="f">
+ <v:imagedata src="image055.jpg" o:title="中文logoz"/>
+ <o:lock v:ext="edit" rotation="t" aspectratio="f"/>
+</v:shape><![endif]--><span style='mso-tab-count:1'> </span><span
+style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><b
+style='mso-bidi-font-weight:normal'><span style='font-size:10.5pt;font-family:
+宋体;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman"'>部门：客户服务中心</span></b><b
+style='mso-bidi-font-weight:normal'><span style='font-size:10.5pt'> <span
+lang=EN-US><span style='mso-spacerun:yes'>&nbsp;&nbsp;</span><span
+style='mso-spacerun:yes'>&nbsp;</span></span></span></b><b style='mso-bidi-font-weight:
+normal'><span style='font-size:10.5pt;font-family:宋体;mso-ascii-font-family:
+"Times New Roman";mso-hansi-font-family:"Times New Roman"'>时间：</span></b><b
+style='mso-bidi-font-weight:normal'><span lang=EN-US style='font-size:10.5pt'> <st1:chsdate
+Year="2014" Month="3" Day="27" IsLunarDate="False" IsROCDate="False" w:st="on">2014-03-27</st1:chsdate><span
+style='mso-spacerun:yes'>&nbsp; </span><span
+style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;</span></span></b><b
+style='mso-bidi-font-weight:normal'><span style='font-size:10.5pt;font-family:
+宋体;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman"'>密级：保密</span></b><span
+lang=EN-US style='font-size:10.5pt'><span style='mso-spacerun:yes'>&nbsp;
+</span></span><span lang=EN-US><span style='mso-tab-count:1'>&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span><span
+lang=EN-US style='font-size:10.5pt'><o:p></o:p></span></p>
+
+</div>
+
+</div>
+
+<div style='mso-element:footer' id=f1>
+
+<p class=MsoFooter style='text-indent:8.55pt;mso-char-indent-count:.85'><b
+style='mso-bidi-font-weight:normal'><span lang=EN-US style='font-size:10.0pt;
+mso-bidi-font-size:10.5pt;font-family:黑体;mso-hansi-font-family:"Times New Roman";
+mso-no-proof:yes'><!--[if gte vml 1]><v:shapetype id="_x0000_t202" coordsize="21600,21600"
+ o:spt="202" path="m,l,21600r21600,l21600,xe">
+ <v:stroke joinstyle="miter"/>
+ <v:path gradientshapeok="t" o:connecttype="rect"/>
+</v:shapetype><v:shape id="_x0000_s2049" type="#_x0000_t202" style='position:absolute;
+ left:0;text-align:left;margin-left:364.85pt;margin-top:-.75pt;width:85.15pt;
+ height:18.1pt;text-indent:0;z-index:1' stroked="f">
+ <v:textbox style='mso-next-textbox:#_x0000_s2049'>
+  <![if !mso]>
+  <table cellpadding=0 cellspacing=0 width="100%">
+   <tr>
+    <td><![endif]>
+    <div>
+    <p class=MsoNormal><span style='font-size:9.0pt;mso-bidi-font-size:12.0pt;
+    font-family:宋体;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:
+    "Times New Roman"'>第</span><![if supportFields]><span class=MsoPageNumber><span
+    lang=EN-US style='font-size:9.0pt;mso-bidi-font-size:12.0pt'><span
+    style='mso-element:field-begin'></span> PAGE <span style='mso-element:field-separator'></span></span></span><![endif]><span
+    class=MsoPageNumber><span lang=EN-US style='font-size:9.0pt;mso-bidi-font-size:
+    12.0pt'><span style='mso-no-proof:yes'>1</span></span></span><![if supportFields]><span
+    class=MsoPageNumber><span lang=EN-US style='font-size:9.0pt;mso-bidi-font-size:
+    12.0pt'><span style='mso-element:field-end'></span></span></span><![endif]><span
+    style='font-size:9.0pt;mso-bidi-font-size:12.0pt;font-family:宋体;mso-ascii-font-family:
+    "Times New Roman";mso-hansi-font-family:"Times New Roman"'>页，共</span><span
+    class=MsoPageNumber><span lang=EN-US style='font-size:9.0pt;mso-bidi-font-size:
+    12.0pt'><span style='mso-field-code:" NUMPAGES "'><span style='mso-no-proof:
+    yes'>12</span></span></span></span><span style='font-size:9.0pt;mso-bidi-font-size:
+    12.0pt;font-family:宋体;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:
+    "Times New Roman"'>页</span><span lang=EN-US style='font-size:9.0pt;
+    mso-bidi-font-size:12.0pt'><o:p></o:p></span></p>
+    </div>
+    <![if !mso]></td>
+   </tr>
+  </table>
+  <![endif]></v:textbox>
+</v:shape><![endif]--><!--[if gte vml 1]><v:line id="_x0000_s2050" style='position:absolute;
+ left:0;text-align:left;z-index:2' from="0,-.75pt" to="450pt,-.75pt"
+ strokecolor="gray"/><![endif]--></span></b><b style='mso-bidi-font-weight:
+normal'><span style='font-size:10.5pt;font-family:黑体;mso-hansi-font-family:
+"Times New Roman"'>广 西 玉 柴 重 工 有 限 公 司<span lang=EN-US><o:p></o:p></span></span></b></p>
+
+<p class=MsoFooter style='text-indent:7.7pt;mso-char-indent-count:.85'><b><span
+lang=EN-US>Guangxi</span></b><b style='mso-bidi-font-weight:normal'><span
+lang=EN-US> <span style='mso-bidi-font-weight:bold'>Yuchai Heavy Industry Co., Ltd.<o:p></o:p></span></span></b></p>
+
+<p class=MsoFooter style='text-indent:7.65pt;mso-char-indent-count:.85'><span
+style='font-family:宋体;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:
+"Times New Roman"'>地址（</span><span lang=EN-US>Add</span><span style='font-family:
+宋体;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman"'>）：中国广西玉林市天桥路</span><span
+lang=EN-US>168</span><span style='font-family:宋体;mso-ascii-font-family:"Times New Roman";
+mso-hansi-font-family:"Times New Roman"'>号</span><span lang=EN-US>/<span
+style='color:black'> No. 168,</span> <st1:Street w:st="on"><st1:address w:st="on">Tianqiao
+  Road</st1:address></st1:Street><span style='color:black'>, </span><st1:PlaceName
+w:st="on">Yulin</st1:PlaceName> <st1:PlaceType w:st="on">City</st1:PlaceType>, <st1:place
+w:st="on"><st1:City w:st="on">Guangxi</st1:City>, <st1:country-region w:st="on">China</st1:country-region></st1:place></span></p>
+
+<p class=MsoFooter style='text-indent:7.65pt;mso-char-indent-count:.85'><span
+style='font-family:宋体;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:
+"Times New Roman"'>电话（</span><span lang=EN-US>Tel</span><span style='font-family:
+宋体;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman"'>）：</span><span
+lang=EN-US>+86 775 3227661<span style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;
+</span></span><span style='font-family:宋体;mso-ascii-font-family:"Times New Roman";
+mso-hansi-font-family:"Times New Roman"'>传真（</span><span lang=EN-US>Fax</span><span
+style='font-family:宋体;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:
+"Times New Roman"'>）：</span> <span lang=EN-US>+86 775 3285202<span
+style='mso-spacerun:yes'>&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span
+style='font-family:宋体;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:
+"Times New Roman"'>邮编（</span><span lang=EN-US>P.C</span><span style='font-family:
+宋体;mso-ascii-font-family:"Times New Roman";mso-hansi-font-family:"Times New Roman"'>）：</span><span
+lang=EN-US> 537005<span style='mso-bidi-font-weight:bold'><o:p></o:p></span></span></p>
+
+<p class=MsoFooter><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+</div>
+
+</body>
+
+</html>

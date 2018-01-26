@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+	<!-- 设置Struts2.1应用是否处于开发模式，通常在开发调试阶段设为true,正式上线后可设为false -->
+	<constant name="struts.devModel" value="true"></constant>
+	<constant name="struts.enable.DynamicMethodInvocation" value="true" />
+	<constant name="struts.action.extension" value="action" />
+	<!-- 设置整个项目最大上传附件大小 -->
+	<constant name="struts.multipart.maxSize" value="10485760" />
+
+	<include file="struts/struts-permission.xml"></include>
+	<include file="struts/struts-unit.xml"></include>
+	<include file="struts/struts-vehicle.xml"></include>
+	<include file="struts/struts-sys.xml"></include>
+	<include file="struts/struts-run.xml"></include>
+	<include file="struts/struts-report.xml"></include>
+	<include file="struts/struts-userInfo.xml"></include>
+	<include file="struts/struts-servicemanage.xml"></include>
+	<include file="struts/struts-sim.xml"></include>
+	
+
+	<package name="global" namespace="/" extends="struts-default">
+		<!--公共异常处理 <global-results> <result name="exception">/jsp/exception.jsp</result> 
+			</global-results> <global-exception-mappings> <exception-mapping exception="java.lang.Exception" 
+			result="exception"/> </global-exception-mappings> -->
+
+		<interceptors>
+			<!-- 操作日志 -->
+			<interceptor name="opLogInterceptor"
+				class="com.chinaGPS.gtmp.action.interceptor.OpLogInterceptor">
+			</interceptor>
+			<interceptor-stack name="myDefaultInterceptorStack">
+				<interceptor-ref name="opLogInterceptor"></interceptor-ref>
+				<interceptor-ref name="defaultStack"></interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="myDefaultInterceptorStack"></default-interceptor-ref>
+
+		<action name="checkCode" class="checkCodeAction">
+			<result name="success" type="stream">
+				<param name="contentType">image/jpeg</param>
+				<!-- 指定提供InputStream的filed name -->
+				<param name="inputName">imageStream</param>
+				<param name="bufferSize">1024</param>
+			</result>
+		</action>
+
+	</package>
+
+	<package name="login" namespace="/" extends="global">
+		<action name="login" class="loginAction" method="login">
+			<result name="success">index.jsp</result>
+			<result name="login">login.jsp</result>
+		</action>
+
+		<action name="loginOut" class="loginOutAction" method="loginOut">
+			<result name="login">login.jsp</result>
+		</action>
+	</package>
+
+</struts>

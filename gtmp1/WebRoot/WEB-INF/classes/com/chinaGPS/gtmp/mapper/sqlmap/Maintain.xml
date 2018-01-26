@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.MaintainMapper">
+	<!-- 用memcached做二级缓存 -->
+	<cache type="org.mybatis.caches.memcached.MemcachedCache" />
+	<select id="getVehicleInfo"  resultType="java.util.HashMap">
+		select  tdv.vehicle_def as vehicle_def,tpb.user_id as user_id,tc.totalworkinghours as total from t_push_bind tpb 
+    left join t_dealer_vehicle tdv on tpb.user_id = tdv.owner_id
+    left join t_vehicle tv on tdv.vehicle_def = tv.vehicle_def
+    left join t_vehicle_unit tvu on tv.vehicle_id = tvu.vehicle_id
+    left join t_last_conditions tc on tvu.unit_id = tc.unit_id 
+    <![CDATA[where tc.totalworkinghours>48 and tc.totalworkinghours<2000]]>
+	</select>
+	<select id="getMaintainPeriod" resultType="java.util.HashMap">
+		select m.num_times,m.trigger_time,m.maintain_name,m.maintain_type from t_mp_maintain_period m order by m.num_times
+	</select>
+	<select id="getPushBind" resultType="java.util.HashMap" parameterType="map">
+		 select user_id,token,device_type from t_push_bind 
+		 <where>
+		    <if test="@Ognl@isNotBlank(ids)">   
+        		 user_id in
+				  	   <foreach collection="ids" item="id" open="(" separator="," close=")">
+						      <if test="@Ognl@isNotBlank(id)">
+							   #{id} 
+							 </if>
+						</foreach> 
+    		</if>
+    	</where>
+	</select>
+	
+	<select id="countPushLogByUserId" resultType="int" parameterType="map">
+		 select count(*)
+		        from T_PUSH_LOG pl
+		       	where  pl.user_id= #{userId}
+		       	    and pl.MAINTAIN_NAME=#{maintainName}
+		       	    and pl.VEHICLE_DEF=#{vehicleDef}
+		        
+	</select>
+	
+	<insert id="insertPushLog" parameterType="map">
+			insert into T_PUSH_LOG
+				   (ID,
+				   	USER_ID,
+				   	MAINTAIN_NAME,
+				   	VEHICLE_DEF
+				   	)values
+				   	(
+				   	SEQ_PUSH_LOG.NEXTVAL,
+				   	#{userId},
+				   	#{maintainName},
+				   	#{vehicleDef}
+				   	)
+	</insert>
+	
+	
+</mapper>  

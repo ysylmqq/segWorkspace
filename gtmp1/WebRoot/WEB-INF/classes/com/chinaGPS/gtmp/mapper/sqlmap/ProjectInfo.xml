@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.chinaGPS.gtmp.mapper.ProjectInfoMapper"> 
+	
+	<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+	
+	<resultMap type="ProjectInfoPOJO" id="projectInfoMap">
+	    <id property="id" column="ID" jdbcType="BIGINT" />  
+	    <result property="title" column="TITLE" jdbcType="VARCHAR"/>
+	    <result property="content" column="CONTENT" jdbcType="VARCHAR"/>
+	    <!-- <result property="workProvince" column="WORK_PROVINCE" jdbcType="VARCHAR"/>
+	    <result property="workCity" column="WORK_CITY" jdbcType="VARCHAR"/> -->
+	    <result property="contact" column="CONTACT" jdbcType="VARCHAR"/>
+	    <result property="phoneNumber" column="PHONE_NUMBER" jdbcType="VARCHAR" />
+	    <result property="createName" column="CREATE_NAME" jdbcType="VARCHAR" />
+	    <result property="createId" column="CREATE_ID" jdbcType="BIGINT" />
+	    <result property="createTime" column="CREATE_TIME" jdbcType="TIMESTAMP"/> 
+        <result property="isValid" column="IS_VALID" jdbcType="INTEGER"/>
+	</resultMap>
+	
+	
+ 	
+ 	<insert id="addProjectInfo" parameterType="com.chinaGPS.gtmp.entity.ProjectInfoPOJO">
+		<selectKey keyProperty="id" resultType="Long" order="BEFORE">  
+			select SEQ_MP_CONSTRUCT_INFO.nextval from dual
+		</selectKey> 
+		
+		INSERT INTO T_MP_CONSTRUCT_INFO
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+		 	
+       		ID,
+           
+            <if test="@Ognl@isNotBlank(title)" >
+       		title,
+            </if>
+            <if test="@Ognl@isNotBlank(content)" >
+       		CONTENT,
+            </if>
+             <!-- <if test="@Ognl@isNotBlank(workProvince)" >
+       		WORK_PROVINCE,
+            </if>
+            <if test="@Ognl@isNotBlank(workCity)" >
+       		WORK_CITY,
+            </if> -->
+            <if test="@Ognl@isNotBlank(contact)" >
+       		CONTACT,
+            </if>
+             <if test="@Ognl@isNotBlank(phoneNumber)" >
+       		PHONE_NUMBER,
+            </if>
+             <if test="@Ognl@isNotBlank(createName)" >
+       		CREATE_NAME,
+            </if>
+             <if test="@Ognl@isNotBlank(createId)" >
+       		CREATE_ID,
+            </if>
+            IS_VALID,
+            
+       		CREATE_TIME
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+       		#{id},
+            <if test="@Ognl@isNotBlank(title)" >
+       		#{title,jdbcType=VARCHAR},
+            </if>
+            <if test="@Ognl@isNotBlank(content)" >
+       		#{content,jdbcType=VARCHAR},
+            </if>
+             <!-- <if test="@Ognl@isNotBlank(workProvince)" >
+       		#{workProvince,jdbcType=VARCHAR},
+            </if>
+            <if test="@Ognl@isNotBlank(workCity)" >
+       		#{workCity,jdbcType=VARCHAR},
+            </if> -->
+            <if test="@Ognl@isNotBlank(contact)" >
+       		#{contact,jdbcType=VARCHAR},
+            </if>
+            <if test="@Ognl@isNotBlank(phoneNumber)" >
+       		#{phoneNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="@Ognl@isNotBlank(createName)" >
+       		#{createName,jdbcType=VARCHAR},
+            </if>
+            <if test="@Ognl@isNotBlank(createId)" >
+       		#{createId,jdbcType=BIGINT},
+            </if>
+            0,
+       		sysdate
+		 </trim>
+ 	</insert>
+ 	
+ 	
+ 	<select id="countAll" parameterType="map" resultType="Integer">
+		SELECT COUNT(V.ID) 
+	    FROM T_MP_CONSTRUCT_INFO V
+	    WHERE IS_VALID = 0 
+		<if test="projectInfo!=null">
+			   <if test="@Ognl@isNotBlank(projectInfo.createId)">
+			    and  CREATE_ID=#{projectInfo.createId}
+			   </if>
+			   </if>
+
+	</select>
+	
+		<select id="selectProjectInfo" parameterType="map" resultMap="projectInfoMap" useCache="false">
+	select *
+	from   T_MP_CONSTRUCT_INFO 
+	where IS_VALID = 0 
+			<if test="projectInfo!=null">
+			   <if test="@Ognl@isNotBlank(projectInfo.createId)">
+			    and  CREATE_ID=#{projectInfo.createId}
+			   </if>
+			   </if>
+		order by CREATE_TIME desc
+	</select>
+ 	
+ 	<select id="getById" parameterType="Long" resultMap="projectInfoMap">
+		select * 
+	from   T_MP_CONSTRUCT_INFO 
+	    WHERE IS_VALID = 0 and id = #{id}
+	</select>
+	
+	<update id="edit" parameterType="ProjectInfoPOJO">
+		UPDATE T_MP_CONSTRUCT_INFO 
+		SET 
+    	<trim suffixOverrides=",">
+    		CREATE_TIME=sysdate,
+    		<if test="@Ognl@isNotBlank(isValid)">IS_VALID=#{isValid},</if> 
+    		<if test="@Ognl@isNotBlank(title)">TITLE=#{title},</if>
+            <if test="@Ognl@isNotBlank(content)">CONTENT=#{content},</if>
+            <if test="@Ognl@isNotBlank(contact)">CONTACT=#{contact},</if>
+            <if test="@Ognl@isNotBlank(phoneNumber)">PHONE_NUMBER=#{phoneNumber},</if>
+      	</trim>
+ 		WHERE id=#{id,jdbcType=BIGINT}
+	</update>
+ 	
+	
+</mapper>  

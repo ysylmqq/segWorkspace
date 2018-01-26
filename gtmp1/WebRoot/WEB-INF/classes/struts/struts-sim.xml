@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+ 
+<struts>
+	<package name="sim" namespace="/sim" extends="global">
+		<!-- 客户缴费付款-->
+	    <action name="customerPay_*" class="customerPayAction" method="{1}">
+	    </action>
+	    <!-- 公司缴费付款-->
+	    <action name="companyPay_*" class="companyPayAction" method="{1}">
+	    </action>
+	    <!-- 客户SIM卡服务 -->
+	    <action name="customerSim_*" class="customerSimAction" method="{1}">
+	    </action>
+	    <!-- 公司SIM卡服务-->
+	    <action name="companySim_*" class="companySimAction" method="{1}">
+		</action>
+	</package>
+</struts>

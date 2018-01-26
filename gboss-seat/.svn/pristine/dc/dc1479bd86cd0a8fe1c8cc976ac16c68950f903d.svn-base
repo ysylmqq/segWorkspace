@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="客诉服务">
+<meta name="description" content="客诉服务">
+
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../css/base.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/jquery.dataTables.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/data_style.css" rel="stylesheet" />
+<link href="../dist/plugins/css/datepicker.css" rel="stylesheet">
+<link href="../css/base.css" rel="stylesheet" />
+<title>客诉服务</title>
+</head>
+<body style="background-color:white;">
+	<div class="container-fluid Reports_page">
+		<h1>客诉服务</h1>
+        <div class="row c_area">
+            <div class="filter_box">
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">搜索：</h6>
+                    <div class="filter_content">
+                        <span class="reports_search_1" id="search_1">
+                            <input type="text" id="compplainPartNo" class="form-control reports_search_1_engine" placeholder="车牌号码或车载电话" style="width:308px;">
+                            <input type="hidden" class="search_plate_no">
+                            <input type="hidden" class="search_call_letter">
+                            <input type="hidden" class="search_vehicle_id" id="complainCarID">
+                            <ul class="reports_search_1_list" style="display:none;"></ul>
+                        </span>
+                        <span>
+                            <input type="text" class="form-control" placeholder="客户名称" id="complainCosName">
+                        </span>
+                        <span>
+                            <input type="text" class="form-control" placeholder="联系电话" id="complainPhone">
+                        </span>
+                        <span>
+                            <input type="text" class="form-control" placeholder="受理人" id="complainAccept">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">受理日期：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control form_datetime starTime">
+                            <span class="input-group-addon" style="padding:0;width:12px;">至</span>
+                            <input type="text" class="form-control form_datetime endTime" >
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">工单状态：</h6>
+                    <div class="filter_content">
+                        <select id="workState" class="form-control">
+                            <option value="99">全部</option>
+                            <option value="1">待处理</option>
+                            <option value="2">待回访</option>
+                            <option value="3">已完成</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">处理人：</h6>
+                    <div class="filter_content">
+                        <input type="text" class="form-control" id="handle">
+                    </div>
+                </div>
+
+                <div class="form-group clearfix btns">
+                    <a href="#" class="exportExcel" id="compSearch"><i class="glyphicon glyphicon-search"></i>查询</a>
+                    <a href="#" class="exportExcel" id="compExport"><i class="glyphicon glyphicon-export"></i>导出Excel</a>
+                    <a href="#" class="exportExcel" id="addButton" ><i class="glyphicon glyphicon-plus"></i>新增</a>
+                </div>
+            </div>            
+        </div>
+        <div class="tab-pane" id="complain">
+            <div class="phone-history">
+                <div class="complain-outbox" style="overflow-x:auto">
+                    <div class="complain-innerbox" style="width:1600px">
+                        <table id="complain-table" class="display compact table_borders dataTable no-footer" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <th style="width:30px;" class="sorting_disabled">序号</th>
+                                    <th style="width:60px;" class="sorting_disabled">受理编号</th>
+                                    <th style="width:160px;" class="sorting_disabled">受理日期</th>
+                                    <th style="width:60px;" class="sorting_disabled">受理人</th>
+                                    <th style="width:60px;" class="sorting_disabled">客户姓名</th>
+                                    <th style="width:80px;" class="sorting_disabled">车牌号</th>
+                                    <th style="width:70px;" class="sorting_disabled">车载电话</th>
+                                    <th style="width:90px;" class="sorting_disabled">归属公司</th>
+                                    <th style="width:90px;" class="sorting_disabled">投诉联系人</th>
+                                    <th style="width:80px;" class="sorting_disabled">联系电话</th>
+                                    <th style="width:80px;" class="sorting_disabled">投诉类型</th>
+                                    <th style="width:200px;" class="sorting_disabled">投诉内容</th>
+                                    <th style="width:80px;" class="sorting_disabled">处理人</th>
+                                    <th style="width:160px;" class="sorting_disabled">跟进日期</th>
+                                    <th style="width:60px;" class="sorting_disabled">工单状态</th>
+                                    <th style="display:none;">投诉id</th>
+                                    <th style="display:none;">车辆id</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- <tr>
+                                    <td>12</td>
+                                    <td>14026984514</td>
+                                    <td>2015-04-24 15:30:25</td>
+                                    <td>王冰</td>
+                                    <td>陈卓</td>
+                                    <td>粤A.43254</td>
+                                    <td>153654715484</td>
+                                    <td>广州分公司</td>
+                                    <td>张旺</td>
+                                    <td>13848741815</td>
+                                    <td>服务质量</td>
+                                    <td>售后服务不好</td>
+                                    <td>胡茜</td>
+                                    <td>2015-03-20 08:20:00</td>
+                                    <td>待回访</td>
+                                    <td style="display:none;">2343543</td>
+                                </tr> -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div> 
+	</div>
+<!-- 弹窗 新增客诉单 START -->
+<div class="modal fade addcomplist" id="addcomplist" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">新增客诉单</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" id="add_searchbox">
+                    <div class="filter_box">
+                        <div class="form-group clearfix">
+                            <h6 class="control_title">搜索：</h6>
+                            <div class="filter_content">
+                                <span class="reports_search_1" id="search_2">
+                                    <input type="text" class="form-control reports_search_1_engine" placeholder="车牌号码或车载电话" style="width:251px;">
+                                    <input type="hidden" class="search_plate_no">
+                                    <input type="hidden" class="search_call_letter">
+                                    <input type="hidden" class="search_vehicle_id" id="pop_addlist_vehId">
+                                    <ul class="reports_search_1_list" style="display:none;"></ul>
+                                </span>
+                                <div class="btns" style="padding-left:10px;">
+                                    <a href="#" id="createCompList"><i class="glyphicon glyphicon-duplicate"></i>生成投诉单</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <input type="hidden" id="addlist_vehicle_id" />
+                    <div class="comp_cusInfo">
+                        <div class="cus_block">
+                            <div class="row">
+                                <div class="col-xs-8">
+                                    <span class="col-xs-2 cusInfo_tit">受理日期：</span>
+                                    <span class="col-xs-5">
+                                        <input type="text" class="form-control form_datetime" id="addlist_date" />
+                                    </span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">编号：</span>
+                                    <span class="col-xs-8">
+                                        <input type="text" id="addlist_complain_no" class="form-control" disabled="disabled" />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cus_block">
+                            <div class="row padding0">
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">客户姓名：</span>
+                                    <span class="col-xs-8" id="addlist_custname"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">车牌号：</span>
+                                    <span class="col-xs-8" id="addlist_pla"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">车载电话：</span>
+                                    <span class="col-xs-8" id="addlist_callletter"></span>
+                                </div>
+                            </div>
+                            <div class="row padding0">
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">车型：</span>
+                                    <span class="col-xs-8" id="addlist_vehicletype"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">产品型号：</span>
+                                    <span class="col-xs-8" id="addlist_gpstype"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">销售经理：</span>
+                                    <span class="col-xs-8" id="addlist_sales"></span>
+                                </div>
+                            </div>
+                            <div class="row padding0">
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">安装地点：</span>
+                                    <span class="col-xs-8" id="addlist_place"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">升级时间：</span>
+                                    <span class="col-xs-8" id="addlist_servicedate"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <form id="add_form1">
+                            <div class="cus_block">
+                                <div class="row">
+                                    <span class="col-xs-2 cusInfo_tit comp_list_title" >投诉类型：</span>
+                                    <span class="col-xs-10 comp_list_content">
+                                        <label>
+                                            <input type="radio" name="comptype1" value="1">服务质量&nbsp;&nbsp;
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="comptype1" value="2">安装质量&nbsp;&nbsp;
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="comptype1" value="3">产品质量&nbsp;&nbsp;
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="comptype1" value="4">销售服务&nbsp;&nbsp;
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="comptype1" value="5">其他
+                                        </label>
+                                        <span style="width:291px;display:inline-block;">
+                                            <input type="text" class="form-control" id="add_typeElse"/>
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="row">
+                                    <span class="col-xs-2 cusInfo_tit comp_list_title" >投诉内容：</span>
+                                    <span class="col-xs-10 comp_list_content">
+                                        <textarea  type="text" class="form-control" id="add_content" style="height:48px;line-height:24px;"></textarea>
+                                    </span>
+                                </div>
+                                <div class="row">
+                                    <span class="col-xs-2 cusInfo_tit comp_list_title" >受理情况：</span>
+                                    <span class="col-xs-10 comp_list_content">
+                                        <textarea  type="text" class="form-control" id="add_accepted" style="height:48px;line-height:24px;"></textarea>
+                                    </span>
+                                </div>
+                                <div class="row">
+                                    <span class="col-xs-2 cusInfo_tit comp_list_title" >客户要求：</span>
+                                    <span class="col-xs-10 comp_list_content">
+                                        <textarea  type="text" class="form-control" id="add_req" style="height:48px;line-height:24px;"></textarea>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="cus_block">
+                                <div class="row">
+                                    <div class="col-xs-4">
+                                        <span class="col-xs-4 cusInfo_tit">投诉联系人:</span>
+                                        <span class="col-xs-8">
+                                            <input type="text" class="form-control" id="add_complainant" />
+                                        </span>
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <span class="col-xs-4 cusInfo_tit">联系方式：</span>
+                                        <span class="col-xs-8">
+                                            <input type="text" class="form-control" id="add_c_phone" />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="add_reset">重置</button>
+                <button type="button" class="btn btn-info" id="complain_submit">提交</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 新增客诉单 END -->
+<!-- 弹窗 修改客诉单 START -->
+<div class="modal fade addcomplist" id="altercomplist" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">修改客诉单</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <input type="hidden" id="altercomplist_vehicle_id" />
+                    <div class="comp_cusInfo">
+                        <div class="cus_block">
+                            <div class="row">
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">受理日期：</span>
+                                    <span class="col-xs-8" id="altercomplist_date"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">编号：</span>
+                                    <span class="col-xs-8" id="altercomplist_complain_no"></span>
+                                    <input type="hidden" id="altercomplist_complain_id" />
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">受理人：</span>
+                                    <span class="col-xs-8" id="altercomplist_complainer">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cus_block">
+                            <div class="row padding0">
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">客户姓名：</span>
+                                    <span class="col-xs-8" id="altercomplist_custname"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">车牌号：</span>
+                                    <span class="col-xs-8" id="altercomplist_pla"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">车载电话：</span>
+                                    <span class="col-xs-8" id="altercomplist_callletter"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <form id="add_form">
+                        <div class="cus_block">
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >投诉类型：</span>
+                                <span class="col-xs-10 comp_list_content">
+                                    <label>
+                                        <input type="radio" name="comptype2" value="1">服务质量&nbsp;&nbsp;
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="comptype2" value="2">安装质量&nbsp;&nbsp;
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="comptype2" value="3">产品质量&nbsp;&nbsp;
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="comptype2" value="4">销售服务&nbsp;&nbsp;
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="comptype2" value="5">其他
+                                    </label>
+                                    <span style="width:291px;display:inline-block;">
+                                        <input type="text" class="form-control" id="altercomplist_typeElse"/>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >投诉内容：</span>
+                                <span class="col-xs-10 comp_list_content">
+                                    <textarea  type="text" class="form-control" id="altercomplist_content" style="height:48px;line-height:24px;"></textarea>
+                                </span>
+                            </div>
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >受理情况：</span>
+                                <span class="col-xs-10 comp_list_content">
+                                    <textarea  type="text" class="form-control" id="altercomplist_accepted" style="height:48px;line-height:24px;"></textarea>
+                                </span>
+                            </div>
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >客户要求：</span>
+                                <span class="col-xs-10 comp_list_content">
+                                    <textarea  type="text" class="form-control" id="altercomplist_req" style="height:48px;line-height:24px;"></textarea>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="cus_block">
+                            <div class="row">
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">投诉联系人:</span>
+                                    <span class="col-xs-8">
+                                        <input type="text" class="form-control" id="altercomplist_complainant" />
+                                    </span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">联系方式：</span>
+                                    <span class="col-xs-8">
+                                        <input type="text" class="form-control" id="altercomplist_c_phone" />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" id="altercomplist_complain_submit">提交</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 修改客诉单 END -->
+<!-- 弹窗 查看详细 START -->
+<div class="modal fade addcomplist" id="complistDetail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">查看详细</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <input type="hidden" id="complistDetail_vehicle_id" />
+                    <div class="comp_cusInfo">
+                        <div class="cus_block">
+                            <div class="row">
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">受理日期：</span>
+                                    <span class="col-xs-8" id="complistDetail_date"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">编号：</span>
+                                    <span class="col-xs-8" id="complistDetail_complain_no">
+                                    </span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">受理人：</span>
+                                    <span class="col-xs-8" id="complistDetail_complainer">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cus_block">
+                            <div class="row padding0">
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">客户姓名：</span>
+                                    <span class="col-xs-8" id="complistDetail_custname"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">车牌号：</span>
+                                    <span class="col-xs-8" id="complistDetail_pla"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">车载电话：</span>
+                                    <span class="col-xs-8" id="complistDetail_callletter"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cus_block">
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >投诉类型：</span>
+                                <span class="col-xs-10 comp_list_content" id="complistDetail_type"></span>
+                            </div>
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >投诉内容：</span>
+                                <span class="col-xs-10 comp_list_content" id="complistDetail_content"></span>
+                            </div>
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >受理情况：</span>
+                                <span class="col-xs-10 comp_list_content" id="complistDetail_acceptance"></span>
+                            </div>
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >客户要求：</span>
+                                <span class="col-xs-10 comp_list_content" id="complistDetail_require"></span>
+                            </div>
+                        </div>
+                        <div class="cus_block">
+                            <div class="row">
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">投诉联系人:</span>
+                                    <span class="col-xs-8" id="complistDetail_linkman"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">联系方式：</span>
+                                    <span class="col-xs-8" id="complistDetail_linkphone"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cus_block">
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >跟进日期：</span>
+                                <span class="col-xs-10 comp_list_content" id="complistDetail_followDate"></span>
+                            </div>
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >跟进记录：</span>
+                                <span class="col-xs-10 comp_list_content" id="complistDetail_followLog"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 查看详细 END -->
+<!-- 弹窗 处理投诉 START -->
+<div class="modal fade deallist" id="deallist" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">处理投诉</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="comp_cusInfo">
+                        <div class="cus_block">
+                            <div class="row">
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">受理日期：</span>
+                                    <span class="col-xs-8" id="deallist_date"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">编号：</span>
+                                    <span class="col-xs-8" id="deallist_complain_no"></span>
+                                    <input type="hidden" id="deallist_complain_id" />
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">受理人：</span>
+                                    <span class="col-xs-8" id="deallist_complainer">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cus_block">
+                            <div class="row padding0">
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">客户姓名：</span>
+                                    <span class="col-xs-8" id="deallist_custname"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">车牌号：</span>
+                                    <span class="col-xs-8" id="deallist_pla"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">车载电话：</span>
+                                    <span class="col-xs-8" id="deallist_callletter"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cus_block">
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >投诉类型：</span>
+                                <span class="col-xs-10 comp_list_content" id="deallist_type"></span>
+                            </div>
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >事件内容：</span>
+                                <span class="col-xs-10 comp_list_content" id="deallist_content"></span>
+                            </div>
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >受理情况：</span>
+                                <span class="col-xs-10 comp_list_content" id="deallist_acceptance"></span>
+                            </div>
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >客户要求：</span>
+                                <span class="col-xs-10 comp_list_content" id="deallist_require"></span>
+                            </div>
+                        </div>
+                        <div class="cus_block">
+                            <div class="row">
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">投诉联系人:</span>
+                                    <span class="col-xs-8" id="deallist_linkman"></span>
+                                </div>
+                                <div class="col-xs-4">
+                                    <span class="col-xs-4 cusInfo_tit">联系方式：</span>
+                                    <span class="col-xs-8" id="deallist_linkphone"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cus_block">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <span class="col-xs-2 cusInfo_tit" style="width:11%" >跟进记录：</span>
+                                    <span class="col-xs-10" style="width:89%" >
+                                        <textarea id="deallist_Upreq" class="form-control" disabled="disabled" style="line-height:16px;height:50px;"></textarea>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <span class="col-xs-2 cusInfo_tit" style="width:11%">处理结果：</span>
+                                    <span class="col-xs-10" style="width:89%">
+                                        <textarea class="form-control" style="line-height:20px;height:60px;" id="deallist_followrecord" placeholder="请填写本次处理结果"></textarea>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <span class="col-xs-2 cusInfo_tit comp_list_title" >工单状态：</span>
+                                <span class="col-xs-10 comp_list_content" id="deallist_workState">
+                                    <label>
+                                        <input type="radio" name="workorder" value="1">待处理&nbsp;&nbsp;
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="workorder" value="2">待回访&nbsp;&nbsp;
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="workorder" value="3">已完成&nbsp;&nbsp;
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" id="deallist_submit">提交</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 处理投诉 END -->
+<!-- 弹窗 删除 START -->
+<div class="modal fade deletelist" id="deletelist" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">删除</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <span class="col-xs-12">确定要删除该条投诉记录吗？</span>
+                    <input type="hidden" id="deletelist_complain_id" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" id="deletelist_submit">确认删除</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 删除 END -->
+<!-- 右键菜单 -->
+<div id="list_menu" style="position:absolute;top:0;left:0;display:none;">
+    <ul class="list-group">
+        <li class="list-group-item"><a onclick="ViewDetails()" href="javascript:void(0)">查看详细</a></li>
+        <li class="list-group-item"><a onclick="AlterComp()" href="javascript:void(0)">修改</a></li>
+        <li class="list-group-item"><a onclick="DeleteComp()" href="javascript:void(0)">删除</a></li>
+        <li class="list-group-item"><a onclick="DealComp()" href="javascript:void(0)">处理投诉</a></li>
+        <!-- <li class="list-group-item"><a onclick="ReverseComp()" href="javascript:void(0)">流转</a></li> -->
+        <!-- <li class="list-group-item"><a onclick="DealComp()" href="javascript:void(0)">回访</a></li> -->
+    </ul>
+</div>
+
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/fnReloadAjax.js"></script>
+<script type="text/javascript" src="../dist/plugins/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/reports.js"></script>
+<script type="text/javascript" src="../js/jquery_recommend.js"></script>
+<script type="text/javascript">
+function selectTr(trNode, cancelAble){
+    var seled = $(trNode).hasClass("row_selected_bc");
+    if(seled){
+        if(cancelAble){
+            $(trNode).removeClass("row_selected_bc");
+        }
+    }else {
+        $(trNode).siblings("tr").removeClass("row_selected_bc");
+        $(trNode).addClass("row_selected_bc");
+    }
+}
+
+$("#complain-table").on("click",  "tbody tr", function(event){
+    selectTr(this);
+});
+
+$("#complain-table").on("dblclick",  "tbody tr", function(event){
+    selectTr(this);
+    //调整菜单位置
+    var width = $("#list_menu").width();
+    var height = $("#list_menu").height();
+    var allWidth = $(document.body).width();
+    var allHeight = $(document.body).height();
+    var left = event.pageX;
+    var top = event.pageY;
+    
+    if(left + width + 5 > allWidth){
+        left = allWidth - width - 5;
+    }
+
+    if(top + height + 5 > allHeight){
+        top = allHeight - height - 5;
+    }
+    
+    $("#list_menu").css({
+        display: "block",
+        left: left,
+        top: top
+    });
+});
+
+function initWaitListMenu(tableId, menuId){
+    $("#" + tableId).on("contextmenu", "tbody tr", function(event){
+        //选中表格的行
+        selectTr(this);
+        var seled = $(this).hasClass("row_selected_bc");
+        if(!seled){
+            selectTr(this);
+        }
+        
+        //调整菜单位置
+        var width = $("#" + menuId).width();
+        var height = $("#" + menuId).height();
+        var allWidth = $(document.body).width();
+        var allHeight = $(document.body).height();
+        var left = event.pageX;
+        var top = event.pageY;
+        
+        if(left + width + 5 > allWidth){
+            left = allWidth - width - 5;
+        }
+
+        if(top + height + 5 > allHeight){
+            top = allHeight - height - 5;
+        }
+        
+        $("#" + menuId).css({
+            display: "block",
+            left: left,
+            top: top
+        });
+        
+        return false;
+    });
+}
+
+$(document).ready(function(){
+    $("#search_1").bindSearch_Pla();//设为搜索框
+    $("#search_2").bindSearch_Pla();//设为搜索框
+    $("#search_comp_1").bindSearch_Company();
+
+    initWaitListMenu("complain-table", "list_menu");
+    $(document).click(function(){
+        $('#list_menu').hide(); //隐藏右键框
+    });
+
+    $(".endTime").val(NextDate()+" 00:00:00");//第二天
+
+    //投诉记录查询
+    var add_table;
+    var callparas;
+    var paras;
+    
+    $("#compSearch").click(function(){    
+        if(checkTimeBox()==0){//判断时间是否为空
+            return;
+        }else if($('.starTime').val() >= $('.endTime').val()){
+            alert("起始时间不能大于结束时间");
+            return;
+        }else{
+            if ( typeof(add_table) != "undefined") {
+                compServe();
+                add_table.fnReloadAjax("../app/complaint/queryComplaints?" + paras);
+            }
+            else{
+                compServe();
+            };
+        };
+     });
+
+    //投诉记录查询导出
+
+    $("#compExport").click(function(){
+        $(this).attr("href","../app/complaint/queryComplaints/export?"+callparas);
+    });
+
+    //投诉记录查询
+    function compServe(){
+        var ValvehicleId = $("#complainCarID").val();//车辆id
+        var ValpartNo =  $("#compplainPartNo").val();//部分车牌或车载
+        var Valname =  encodeURI($("#complainCosName").val());//客户名称
+        var Valphone =  $("#complainPhone").val();//联系电话
+        var ValAcceptP =  $("#complainAccept").val();//受理人
+        var ValbeginTime = $(".starTime").val();//开始时间
+        var ValendTime = $(".endTime").val();//结束时间
+        var ValworkState = $("#workState").val();//工单状态
+        var ValHandle =  $("#handle").val();//处理人
+
+        //拼接
+        if (ValvehicleId==''){//车辆id，部分车牌
+            compvehicleId='';
+            if ($("#compplainPartNo").val()==''){
+                complpartNo='';
+            }else{
+                complpartNo = 'partNo='+ValpartNo+'&';
+            };
+        }else{
+            compvehicleId = 'vehicle_id='+ValvehicleId+'&';
+            complpartNo='';
+        };
+
+        if (Valname==''){//客户名称拼接
+            complname='';
+        }else{
+            complname = 'customer_name='+Valname+'&';
+        };
+     
+        if (Valphone==''){//联系电话拼接
+            complphone = '';
+        }else{
+            complphone = 'cp_phone='+Valphone+'&';
+        };
+
+        if (ValAcceptP==''){//受理人拼接
+            complAcceptP = '';
+        }else{
+            complAcceptP = 'ac_op_name='+ValAcceptP+'&';
+        };
+
+        if(ValworkState == "99"){
+            workState = '';
+        }else{
+            workState = 'status_id='+ValworkState+'&';
+        }
+
+        if (ValHandle==''){//处理人拼接
+            Handle = '';
+        }else{
+            Handle = 'op_name='+ValHandle+'&';
+        };
+
+        if (ValbeginTime==''){//开始时间
+            beginTime='';
+        }else{
+            beginTime = 'beginTime='+ValbeginTime+'&';
+        };
+
+        if (ValendTime==''){//结束时间
+            endTime='';
+        }else{
+            endTime = 'endTime='+ValendTime;
+        };
+
+        callparas = compvehicleId+complpartNo+complname+complphone+complAcceptP+workState+Handle+beginTime+endTime;//车辆id、部分车牌或车载号、客户名称、联系电话、所属公司id
+        paras = callparas;//参数;
+        add_table = $("#complain-table").dataTable({
+            "bSort": false,//不排序
+            "filter": false,//去掉搜索框
+            "pagingType": "full_numbers",
+            "processing" : true,
+            "serverSide" : true,//后端处理
+            "bRetrieve": true,
+            "bDestroy": true,
+            "oLanguage": {
+                "sUrl":"../assets/data-tables/js/dataTable.cn.txt"
+            },
+            // "ajax" : "../app/report/stolenvehicle?now=" + new Date().getTime() + "&" + paras, //获取数据的API
+            "ajax" : {
+                "type":"POST",
+                "url":"../app/complaint/queryComplaints?" + paras, //获取数据的API
+            },             
+            "columns":[
+                {"data":"sn"},//0序号
+                {"data":"complaintTable.cp_no"},//1受理编号
+                {"data":"complaintTable.accept_time"},//2受理日期
+                {"data":"complaintTable.ac_op_name"},//3受理人
+                {"data":"customer_name"},//4客户姓名
+                {"data":"plate_no"},//5车牌号
+                {"data":"call_letter"},//6车载电话
+                {"data":"sname"},//7归属公司
+                {"data":"complaintTable.cp_name"},//8投诉联系人
+                {"data":"complaintTable.cp_phone"},//9联系电话
+                {"data":"complaintTable.cp_type_id"},//10投诉类型
+                {"data":"complaintTable.cp_content"},//11投诉内容
+                {"data":"complaintTable.op_name"},//12处理人
+                {"data":"complaintTable.follow_time"},//13跟进日期
+                {"data":"complaintTable.status_id"},//14工单状态
+                {"data":"complaintTable.cp_id"},//15投诉id
+                {"data":"complaintTable.vehicle_id"}//16车辆id
+            ],
+            "rowCallback": function(row,data) {
+                $('td:eq(10)',row).html(replaceComplaintType(data.complaintTable.cp_type_id));//投诉类型
+                $('td:eq(12)',row).html((data.complaintTable.op_name=="null")?"":data.complaintTable.op_name);//处理人
+                $('td:eq(14)',row).html(replaceWorkState(data.complaintTable.status_id));//工单类型
+                $('td:eq(15)',row).css("display","none");
+                $('td:eq(16)',row).css("display","none");
+            }
+        });
+        return add_table;
+    }
+});
+
+function replaceComplaintType(param){
+    var temp ="";
+    if( typeof(param) == 'number' ){
+        switch(param){
+            case 1: temp = "服务质量"; break;
+            case 2: temp = "安装质量"; break;
+            case 3: temp = "产品质量"; break;
+            case 4: temp = "销售服务"; break;
+            case 5: temp = "其他"; break;
+            default: temp = "";
+        }
+    } else{
+        switch(param){
+            case "服务质量": temp = 1; break;
+            case "安装质量": temp = 2; break;
+            case "产品质量": temp = 3; break;
+            case "销售服务": temp = 4; break;
+            case "其他": temp = 5; break;
+            default: temp = "";
+        }
+    }   
+    return temp;
+}
+
+function replaceWorkState(param){//工单状态
+    var temp ="";
+    switch(param){
+        case 1: temp = "待处理"; break;
+        case 2: temp = "待回访"; break;
+        case 3: temp = "已完成"; break;
+        default: temp = "";
+    }
+    return temp;
+}
+
+$("#addButton").click(function(){//新增
+    $("#search_1 input").val("");//外搜索框清空（bug修正）
+    cleanAddList();//清空新增窗口里的内容
+    $('#addcomplist').modal('show');
+});
+
+function cleanAddList(){//清空新增窗口里的内容
+    $("#add_form1")[0].reset();//表单清空
+    $(".reports_search_1_engine","#search_2").val("");//搜索框
+    $("#addlist_date,#addlist_complain_no,#addlist_complain_id").val("");//日期、编号、后台投诉id
+    $(".search_plate_no","#search_2").val("");//车牌
+    $(".search_call_letter","#search_2").val("");//车载
+    $(".search_vehicle_id","#search_2").val("");//车辆id
+    $(".reports_search_1_list","#search_2").html("");//下拉列表
+    $("#addlist_vehicle_id").val("");//车辆id
+    $("#addlist_custname,#addlist_pla,#addlist_callletter,#addlist_vehicletype,#addlist_gpstype,#addlist_sales,#addlist_place,#addlist_servicedate").html("");//资料栏
+}
+
+$("#createCompList").click(function(){//生成客诉单
+    var vehicle_id = $("#pop_addlist_vehId").val();//车辆id
+    var timestamp = new Date().getTime();
+    var now = ReDate();
+    $("#addlist_date").val(now);//受理时间
+    $("#addlist_complain_no").val(timestamp);//编号
+    searchCustInfo(vehicle_id);
+});
+
+function searchCustInfo(vehicle_id){//查询
+    if(vehicle_id!==""){
+        api_url = '../app/data/basicinfo'; 
+        params = {param:vehicle_id, type:2};
+        //开始调用接口
+        $.getJSON(api_url, params, function(result){
+            if(result && result.success==true){
+                $("#addlist_vehicle_id").val(vehicle_id);//车辆id
+                $("#addlist_custname").html(result.customer.name);//用户名
+                $("#addlist_pla").html(result.vehicle.plate_no);//车牌号
+                $("#addlist_callletter").html(result.unit.call_letter);//车载电话
+                $("#addlist_vehicletype").html(result.vehicle.modelName);//车型
+                $("#addlist_gpstype").html(result.unit.type);//产品型号
+                $("#addlist_sales").html(result.unit.sales);//销售经理
+                $("#addlist_place").html(result.unit.place);//安装地点
+                $("#addlist_servicedate").html(result.unit.update_date);//升级时间
+            };
+        });
+    };
+}
+
+$("#complain_submit").click(function(){//新增投诉信息
+    var c_no = $("#addlist_complain_no").val();//编号
+    var a_time = $("#addlist_date").val();//受理时间
+    var v_id = $("#addlist_vehicle_id").val();//车辆ID
+    var c_name = $("#add_complainant").val();//投诉人
+    var c_phone = $("#add_c_phone").val();// 投诉人联系电话
+    var c_typeid = $('input[name="comptype1"]:checked').val();//complaint_typeid 投诉类型
+    var c_type_remark = $("#add_typeElse").val();//投诉类型其他complaint_type_remark
+    var c_content = $("#add_content").val();//事件内容
+    var c_accept = $("#add_accepted").val();//#add_accepted 受理情况
+    var c_req = $("#add_req").val();//客户要求
+    
+    api_url = '../app/complaint/add'; 
+    params = {cp_no:c_no, accept_time:a_time, vehicle_id:v_id, cp_name:c_name, cp_phone:c_phone, cp_type_id:c_typeid, cp_type_remark:c_type_remark, cp_content:c_content, acceptance:c_accept, cp_request:c_req };
+    //开始调用接口
+    $.post(api_url, params, function(result){
+        result = eval('(' + result + ')');
+        if(result.success){
+            $('#addcomplist').modal('hide');
+            $("#compSearch").click();//刷新表格
+        } else{
+            alert("新增失败信息："+result.message);
+        }
+    });
+});
+
+$("#add_reset").click(function(){//重置新增框
+    cleanAddList();//清空列表
+});
+
+var ViewDetails = function(){//查看详细
+    $("#complistDetail").modal("show");
+
+    var data = getEachline();
+    var id = data.complain_id;//获取投诉id
+    api_url = '../app/complaint/getComplaint'; 
+    params = {cp_id:id};
+    //开始调用接口
+    $.getJSON(api_url, params, function(result){
+        if(result && result.success==true){
+            $("#complistDetail_date").empty().html(result.info.accept_time);//受理日期
+            $("#complistDetail_complain_no").empty().html(result.info.cp_no);//编号
+            $("#complistDetail_complainer").empty().html(result.info.ac_op_name);//受理人
+
+            if(result.info.cp_type_id==5){
+                $("#complistDetail_type").empty().html(replaceComplaintType(result.info.cp_type_id)+"（"+result.info.cp_type_remark+"）");//投诉类型
+            } else{
+                $("#complistDetail_type").empty().html(replaceComplaintType(result.info.cp_type_id));//投诉类型
+            }
+
+            $("#complistDetail_content").empty().html(result.info.cp_content);//事件内容
+            $("#complistDetail_acceptance").empty().html(result.info.acceptance);//受理情况
+            $("#complistDetail_require").html(result.info.cp_request);//客户要求
+
+            $("#complistDetail_linkman").empty().html(result.info.cp_name);//投诉联系人
+            $("#complistDetail_linkphone").empty().html(result.info.cp_phone);//联系方式
+
+            $("#complistDetail_followDate").empty().html(result.info.follow_time);//跟进日期
+            $("#complistDetail_followLog").empty().html(result.info.follow_rec);//跟进记录
+
+            $.getJSON('../app/data/basicinfo', {param:result.info.vehicle_id, type:2}, function(data){//车辆车载
+                if(data && data.success==true){
+                    $("#complistDetail_custname").empty().html(data.customer.name);//客户姓名
+                    $("#complistDetail_pla").empty().html(data.vehicle.plate_no);//车牌号
+                    $("#complistDetail_callletter").empty().html(data.unit.call_letter);//车载号
+                };
+            });
+        } else{
+            alert("详细资料导出失败："+result.message);
+        };
+    });
+}
+
+var alterInfo;//修改资料保存
+var AlterComp = function(){//alterlist 修改
+    $('#altercomplist').modal('show');
+
+    var data = getEachline();
+    var id = data.complain_id;//获取投诉id
+    var v_id = data.vehicle_id;//获取车辆id
+    $("#altercomplist_complain_id").val(id);//投诉id填入
+    $("#altercomplist_vehicle_id").val(v_id);//车辆id
+
+    //开始调用接口
+    $.getJSON('../app/complaint/getComplaint', {cp_id:id}, function(result){
+        if(result && result.success==true){
+            alterInfo = result.info;//修改原值保存
+
+            $("#altercomplist_date").empty().html(result.info.accept_time);//受理日期
+            $("#altercomplist_complain_no").empty().html(result.info.cp_no);//编号
+            $("#altercomplist_complain_id").empty().html(result.info.cp_id);//投诉id
+            $("#altercomplist_complainer").empty().html(result.info.ac_op_name);//受理人
+
+            var cp_type = result.info.cp_type_id;//投诉类型
+            var input;
+            $.each($('input[name="comptype2"]'),function(i,item){
+                input = $(item);
+                if(input.val()==cp_type){
+                    input.attr("checked","checked");
+                };
+            });
+            $("#altercomplist_typeElse").val(result.info.cp_type_remark);//其他内容
+            $("#altercomplist_content").val(result.info.cp_content);//投诉内容
+            $("#altercomplist_accepted").val(result.info.acceptance);//受理情况
+            $("#altercomplist_req").val(result.info.cp_request);//客户要求
+
+            $("#altercomplist_complainant").val(result.info.cp_name);//投诉联系人
+            $("#altercomplist_c_phone").val(result.info.cp_phone);//联系方式
+
+            $.getJSON('../app/data/basicinfo', {param:result.info.vehicle_id, type:2}, function(data){//车辆车载
+                if(data && data.success==true){
+                    $("#altercomplist_custname").empty().html(data.customer.name);//客户姓名
+                    $("#altercomplist_pla").empty().html(data.vehicle.plate_no);//车牌号
+                    $("#altercomplist_callletter").empty().html(data.unit.call_letter);//车载号
+                };
+            });
+        } else{
+            alert("详细资料导出失败："+result.message);
+        };
+    });
+}
+
+$("#altercomplist_complain_submit").click(function(){//修改提交
+    var cp_id = $("#altercomplist_complain_id").val();//id
+
+    var c_no = $("#altercomplist_complain_no").html();//编号
+    var a_time = $("#altercomplist_date").html();//受理日期
+    var v_id = $("#altercomplist_vehicle_id").val();//车辆ID
+    var c_name = $("#altercomplist_complainant").val();//投诉人
+    var c_phone = $("#altercomplist_c_phone").val();// 投诉人联系电话
+    var c_typeid = $('input[name="comptype2"]:checked').val();//complaint_typeid 投诉类型
+    var c_type_remark = $("#altercomplist_typeElse").val();//投诉类型其他complaint_type_remark
+    var c_content = $("#altercomplist_content").val();//事件内容
+    var c_accept = $("#altercomplist_accepted").val();//#add_accepted 受理情况
+    var c_req = $("#altercomplist_req").val();//客户要求
+    
+    //修改原json中的内容
+    alterInfo.cp_id = cp_id;
+    alterInfo.cp_no = c_no;
+    alterInfo.accept_time = a_time;
+    alterInfo.vehicle_id = v_id;
+    alterInfo.cp_name = c_name;
+    alterInfo.cp_phone = c_phone;
+    alterInfo.cp_type_id = c_typeid;
+    alterInfo.cp_type_remark = c_type_remark;
+    alterInfo.cp_content = c_content;
+    alterInfo.acceptance = c_accept;
+    alterInfo.cp_request = c_req;
+
+    api_url = '../app/complaint/add';
+    // params = {cp_id:cp_id, cp_no:c_no, accept_time:a_time, vehicle_id:v_id, cp_name:c_name, cp_phone:c_phone, cp_type_id:c_typeid, cp_type_remark:c_type_remark, cp_content:c_content, acceptance:c_accept, cp_request:c_req};
+    params = alterInfo;
+    //开始调用接口
+    $.post(api_url, params, function(result){
+        result = eval('(' + result + ')');
+        if(result.success){
+            $('#altercomplist').modal('hide');
+            $("#compSearch").click();//刷新表格
+        } else{
+            alert("修改提交失败："+result.message);
+        };
+    });
+});
+
+var DeleteComp = function(){//删除
+    var data = getEachline();
+    $("#deletelist_complain_id").val(data.complain_id);//重置投诉id
+    $('#deletelist').modal('show');
+}
+
+$("#deletelist_submit").click(function(){//删除提交
+    var id = $("#deletelist_complain_id").val();//id
+    api_url = '../app/complaint/delete'; 
+    params = {cp_id:id};
+    //开始调用接口
+    $.getJSON(api_url, params, function(result){
+        if(result && result.success==true){
+            $('#deletelist').modal('hide');
+            $("#compSearch").click();//刷新表格
+        } else{
+            alert("提交失败信息："+result.message);
+        }
+    });
+});
+
+function cleanDeallist(){//清空处理投诉框
+    $("#deallist_date,#deallist_complain_no,#deallist_complain_id").html("");//受理日期、编号、后台投诉id、受理人
+    $("#deallist_custname,#deallist_pla,#deallist_callletter").html("");//客户姓名、车牌号、车载电话
+    $("#deallist_type,#deallist_content,#deallist_acceptance,#deallist_require,#deallist_linkman,#deallist_linkphone").html("");//投诉类型、事件内容、受理情况、客户要求、投诉联系人、联系方式
+    $("#deallist_Upreq,#deallist_followrecord").val("");//跟进记录、处理结果
+    $("[name='workorder']").removeAttr("checked");//工单状态选项清空
+}
+
+var DealComp = function(){//处理投诉
+    cleanDeallist()//清空
+    $('#deallist').modal('show');
+
+    var data = getEachline();
+    var id = data.complain_id;//获取投诉id
+    //开始调用接口
+    $.getJSON('../app/complaint/getComplaint', {cp_id:id}, function(result){
+        if(result && result.success==true){
+            $("#deallist_date").empty().html(result.info.accept_time);//受理日期
+            $("#deallist_complain_no").empty().html(result.info.cp_no);//编号
+            $("#deallist_complain_id").val(result.info.cp_id);//投诉id
+            $("#deallist_complainer").empty().html(result.info.ac_op_name);//受理人
+
+            if(result.info.cp_type_id==5){
+                $("#deallist_type").empty().html(replaceComplaintType(result.info.cp_type_id)+"（"+result.info.cp_type_remark+"）");//投诉类型
+            } else{
+                $("#deallist_type").empty().html(replaceComplaintType(result.info.cp_type_id));//投诉类型
+            }
+
+            $("#deallist_content").empty().html(result.info.cp_content);//投诉内容
+            $("#deallist_acceptance").empty().html(result.info.acceptance);//受理情况
+            $("#deallist_require").empty().html(result.info.cp_request);//客户要求
+
+            $("#deallist_linkman").empty().html(result.info.cp_name);//投诉联系人
+            $("#deallist_linkphone").empty().html(result.info.cp_phone);//联系方式
+            $("#deallist_Upreq").val(result.info.follow_rec);//跟进记录
+            var work_type = result.info.status_id;//工单类型
+            var input;
+            $.each($('input[name="workorder"]'),function(i,item){
+                input = $(item);
+                if(input.val()==work_type){
+                    input.attr("checked","checked");
+                };
+            });
+
+            $.getJSON('../app/data/basicinfo', {param:result.info.vehicle_id, type:2}, function(data){//车辆车载
+                if(data && data.success==true){
+                    $("#deallist_custname").empty().html(data.customer.name);//客户姓名
+                    $("#deallist_pla").empty().html(data.vehicle.plate_no);//车牌号
+                    $("#deallist_callletter").empty().html(data.unit.call_letter);//车载号
+                };
+            });
+        } else{
+            alert("详细资料导出失败："+result.message);
+        };
+    });
+}
+
+$("#deallist_submit").click(function(){//处理投诉提交
+    var id = $("#deallist_complain_id").val();//id
+    var followrecord = $("#deallist_followrecord").val();//处理结果录入
+    var work_T =  $('input[name="workorder"]:checked').val();//工单状态
+
+    api_url = '../app/complaint/exchange';
+    params = {cp_id:id, follow_rec:followrecord, status_id:work_T};
+    //开始调用接口
+    $.post(api_url, params, function(result){
+        result = eval('(' + result + ')');
+        if(result.success){
+            $('#deallist').modal('hide');
+            $("#compSearch").click();//刷新表格
+        } else{
+            alert("提交失败信息："+result.message);
+        }
+    });
+});
+
+var getEachline = function(){
+    var $tr = $(".row_selected_bc");
+    var complain_id = $tr.children("td").eq(15).html();//投诉id
+    var vehicle_id = $tr.children("td").eq(16).html();//车辆id
+
+    var details = {
+        "complain_id":complain_id,
+        "vehicle_id":vehicle_id
+    }
+    return details;
+}
+
+// 时间datepicker 
+$( ".form_datetime" ).each(function(){
+    $(this).datepicker({
+        showButtonPanel: true,
+        // format:'yyyy-mm-dd HH:mm:ss'//"yyyy-mm-dd HH:mm:ss"//
+    });
+});
+</script>
+</body>
+</html>

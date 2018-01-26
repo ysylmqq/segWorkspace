@@ -1,0 +1,151 @@
+package com.chinaGPS.gtmp.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import org.apache.struts2.json.annotations.JSON;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * 终端换装POJO
+ * 
+ * @author Ben
+ * 
+ */
+@Component
+@Scope("prototype")
+public class UnitReplacePOJO implements Serializable {
+	private static final long serialVersionUID = 8753450278281300046L;
+
+	/** 日志ID */
+	private long logId;
+	/** 机械ID */
+	private String vehicleId;
+	/** 整机编号 */
+	private String vehicleDef;
+	/** 原终端ID */
+	private String oldUnitId;
+	/** 原终端序列号 */
+	private String oldUnitSn;
+	/** 现终端ID */
+	private String newUnitId;
+	/** 现终端序列号 */
+	private String newUnitSn;
+	/** 换装原因 */
+	private String reason;
+	/** 换装人 */
+	private String replaceMan;
+	/** 换装时间 */
+	private Date replaceTime;
+	/** 操作人 */
+	private String addMan;
+	/** 操作时间 */
+	private Date addTime;
+
+	public long getLogId() {
+		return logId;
+	}
+
+	public void setLogId(long logId) {
+		this.logId = logId;
+	}
+
+	public String getVehicleDef() {
+		return vehicleDef;
+	}
+
+	public void setVehicleDef(String vehicleDef) {
+		this.vehicleDef = vehicleDef;
+	}
+
+	public String getOldUnitId() {
+		return oldUnitId;
+	}
+
+	public void setOldUnitId(String oldUnitId) {
+		this.oldUnitId = oldUnitId;
+	}
+
+	public String getNewUnitId() {
+		return newUnitId;
+	}
+
+	public void setNewUnitId(String newUnitId) {
+		this.newUnitId = newUnitId;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+
+	public String getReplaceMan() {
+		return replaceMan;
+	}
+
+	public void setReplaceMan(String replaceMan) {
+		this.replaceMan = replaceMan;
+	}
+
+	@JSON(format = "yyyy-MM-dd HH:mm:ss")
+	public Date getReplaceTime() {
+		return replaceTime;
+	}
+
+	public void setReplaceTime(Date replaceTime) {
+		this.replaceTime = replaceTime;
+	}
+
+	public String getAddMan() {
+		return addMan;
+	}
+
+	public void setAddMan(String addMan) {
+		this.addMan = addMan;
+	}
+
+	@JSON(format = "yyyy-MM-dd HH:mm:ss")
+	public Date getAddTime() {
+		return addTime;
+	}
+
+	public void setAddTime(Date addTime) {
+		this.addTime = addTime;
+	}
+
+	public String getOldUnitSn() {
+		if (oldUnitId == null || oldUnitId.isEmpty()) {
+			return this.oldUnitSn;
+		} else {
+			return oldUnitId.substring(2);
+		}
+	}
+
+	public void setOldUnitSn(String oldUnitSn) {
+		this.oldUnitSn = oldUnitSn;
+	}
+
+	public String getNewUnitSn() {
+		if (newUnitId == null || newUnitId.isEmpty()) {
+			return this.newUnitSn;
+		} else {
+			return newUnitId.substring(2);
+		}
+	}
+
+	public void setNewUnitSn(String newUnitSn) {
+		this.newUnitSn = newUnitSn;
+	}
+
+	public String getVehicleId() {
+		return vehicleId;
+	}
+
+	public void setVehicleId(String vehicleId) {
+		this.vehicleId = vehicleId;
+	}
+}

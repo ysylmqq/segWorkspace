@@ -1,0 +1,12 @@
+eclipse.preferences.version=1
+encoding//WebRoot/css/style.css=UTF-8
+encoding//WebRoot/jsp/help/CustomerOperationManual.htm=UTF-8
+encoding//WebRoot/jsp/help/operate_doc.html=UTF-8
+encoding//WebRoot/jsp/operManage/company_pay.jsp=UTF-8
+encoding//WebRoot/jsp/operManage/company_sim.jsp=UTF-8
+encoding//src/activemq.properties=UTF-8
+encoding//src/com/chinaGPS/gtmp/action/sim/CompanySimAction.java=UTF-8
+encoding//src/com/chinaGPS/gtmp/action/sim/CustomerSimAction.java=UTF-8
+encoding//src/log4j.properties=UTF-8
+encoding//src/memcached.properties=UTF-8
+encoding/<project>=UTF-8

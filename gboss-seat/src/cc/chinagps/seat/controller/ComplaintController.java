@@ -1,0 +1,214 @@
+package cc.chinagps.seat.controller;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import cc.chinagps.seat.auth.User;
+import cc.chinagps.seat.bean.ReportCommonQuery;
+import cc.chinagps.seat.bean.ReportCommonResponse;
+import cc.chinagps.seat.bean.ReportComplanint;
+import cc.chinagps.seat.bean.table.ComplaintTable;
+import cc.chinagps.seat.service.ComplaintService;
+import cc.chinagps.seat.util.Consts;
+
+import com.googlecode.jsonplugin.JSONException;
+import com.googlecode.jsonplugin.JSONUtil;
+
+@Controller
+public class ComplaintController extends BasicController {
+	
+	//@Autowired
+	private ComplaintService complaintService;
+	
+	@RequestMapping("/complaint/queryComplaints")
+	@ResponseBody
+	public String queryComplaints( 
+			@Valid ReportCommonQuery query,
+			ComplaintTable complaintTable,
+			HttpServletRequest request,
+			@RequestParam Map<String, String> param) throws JSONException {
+		Map<String, Object> resultMap = getComplaint(query, request,complaintTable, param);
+		return JSONUtil.serialize(resultMap);
+	}
+
+	@RequestMapping("/complaint/queryComplaints/export")
+	public ModelAndView exportComplaints(
+			@Valid ReportCommonQuery query,
+			ComplaintTable complaintTable,
+			HttpServletRequest request,
+			@RequestParam Map<String, String> param) {
+		Map<String, Object> resultMap = getComplaint(query, request, complaintTable,param);
+		return new ModelAndView("exportComplaints", resultMap);
+	}
+	
+	private Map<String, Object> getComplaint(
+			ReportCommonQuery query, 
+			HttpServletRequest request,
+			ComplaintTable complaintTable,
+			Map<String, String> param) {		
+		
+		System.out.println(complaintTable);
+		
+		if(complaintTable.getStatus_id() > 0){
+			param.put("status_id", String.valueOf(complaintTable.getStatus_id()));
+		}
+		
+		if(StringUtils.hasText(complaintTable.getCp_phone())){
+			param.put("cp_phone", String.valueOf(complaintTable.getCp_phone()));
+		}
+		
+		if(StringUtils.hasText(complaintTable.getAc_op_name())){
+			param.put("ac_op_name", String.valueOf(complaintTable.getAc_op_name()));
+		}
+		
+		if(StringUtils.hasText(complaintTable.getOp_name())){
+			param.put("op_name", String.valueOf(complaintTable.getOp_name()));
+		}
+		
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		List<ReportComplanint> list;
+		ReportCommonResponse commResp = complaintService.getComplaintCommonResp(query, param);
+		if (commResp.getRecordsTotal() == 0) {
+			list = new ArrayList<ReportComplanint>();
+		} else {
+			list = complaintService.getComplaint(query, param);
+		}
+		resultMap.putAll(commResp.getCommonRespMap());
+		resultMap.put("data", list);
+		resultMap.put("success", true);
+		return resultMap;
+	}
+	
+	@RequestMapping("/complaint/add")
+	@ResponseBody
+	public String addComplaint(
+			@Valid ComplaintTable complaint,@RequestParam Map<String, String> param,
+			Locale locale,HttpServletRequest request) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("success", false);
+		int result = 1;
+		
+		String acceptTime = param.get("acceptTime");
+		if(acceptTime != null && !acceptTime.equals("")){
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			try {
+				complaint.setAccept_time(sdf.parse(acceptTime));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}
+		if(complaint.getCp_type_id() != 5){
+			complaint.setCp_type_remark("");
+		}
+		User user = getLoginUser(request);
+		complaint.setAc_op_id(Long.valueOf(user.getOpId()));
+		complaint.setAc_op_name(user.getOpName());
+		complaint.setStatus_id(1);
+		complaint.setStamp(new Date());
+		result = complaintService.saveOrUpdate(complaint);
+		
+		if (result != Consts.SUCCEED) {
+			resultMap.put("message", 
+					getText("complaint_save " + result, 
+							locale,
+							complaint.getVehicle_id()));
+		} else {
+			resultMap.put("success", true);
+		}
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@RequestMapping("/complaint/delete")
+	@ResponseBody
+	public String deleteComplaint(
+			@Valid ComplaintTable complaint,Locale locale	,HttpServletRequest request) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("success", false);
+		int result = 1;
+//		String s_complaint_id = request.getParameter("complaint_id");
+//		s_complaint_id = s_complaint_id == null ? "0" : s_complaint_id;
+//		complaint.setCp_id(Long.valueOf(s_complaint_id));
+		if(complaint.getCp_id() != 0){
+			result = complaintService.deleteComplaint(complaint.getCp_id());
+			if (result != Consts.SUCCEED) {
+				resultMap.put("message", 
+						getText("complaint_delete " + result, 
+								locale,
+								complaint.getVehicle_id()));
+			} else {
+				resultMap.put("success", true);
+			}
+		}
+		
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@RequestMapping("/complaint/exchange")
+	@ResponseBody
+	public String exchangeComplaint(
+			@Valid ComplaintTable complaint,Locale locale,HttpServletRequest request) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("success", false);
+		int result = 1;
+		if(complaint.getCp_id() != 0){
+			ComplaintTable complaintTable = complaintService.getById(complaint.getCp_id());
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			User user = getLoginUser(request);
+			if(complaintTable.getFollow_rec()==null){
+				complaintTable.setFollow_rec(user.getOpName() + "," + sdf.format(new Date())+" "+complaint.getFollow_rec());
+			}else{
+				complaintTable.setFollow_rec(complaintTable.getFollow_rec()+" | "+ user.getOpName() + "," + sdf.format(new Date())+" "+complaint.getFollow_rec());
+			}
+			
+			if(complaint.getStatus_id()!=0){
+				complaintTable.setStatus_id(complaint.getStatus_id());
+			}
+			complaintTable.setOp_id(Long.valueOf(user.getOpId()));
+			complaintTable.setOp_name(user.getOpName());
+			complaintTable.setFollow_time(new Date());
+			result = complaintService.saveOrUpdate(complaintTable);
+			if (result != Consts.SUCCEED) {
+				resultMap.put("message",getText("complaint_delete " + result,locale,complaint.getVehicle_id()));
+			} else {
+				resultMap.put("success", true);
+			}
+		}
+		
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@RequestMapping("/complaint/getComplaint")
+	@ResponseBody
+	public String getSingle(
+			@Valid ComplaintTable complaint,Locale locale) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("success", false);
+		if(complaint.getCp_id() != 0){
+			ComplaintTable complaintTable = complaintService.getById(complaint.getCp_id());
+			if (complaintTable == null) {
+				resultMap.put("message","获取失败");
+			} else {
+				resultMap.put("success", true);
+				resultMap.put("info", complaintTable);
+			}
+		}
+		return JSONUtil.serialize(resultMap);
+	}
+}

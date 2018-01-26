@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.HistoryMapper"> 
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+    <resultMap type="HistoryPOJO" id="historyMap"> 
+        <id property="historyId" column="history_id" jdbcType="BIGINT" /> 
+        <result property="unitId" column="UNIT_ID" jdbcType="VARCHAR" />  
+       <result property="lon" column="lon" jdbcType="FLOAT"/>
+        <result property="lat" column="lat" jdbcType="FLOAT" />
+        <result property="vehicleDef" column="VEHICLE_DEF" jdbcType="VARCHAR"/>
+        <result property="direction" column="direction" jdbcType="INTEGER"/>
+        <result property="speed" column="speed" jdbcType="FLOAT"/>  
+        <result property="locationState" column="location_state" jdbcType="INTEGER"/>
+        <result property="vehicleState" column="vehicle_state" jdbcType="VARCHAR"/>
+        <result property="gpsTime" column="gps_time" jdbcType="TIMESTAMP"/>
+        <result property="referencePosition" column="reference_position" jdbcType="VARCHAR"/>
+        <result property="rawData" column="raw_data" jdbcType="VARCHAR"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+        
+        <result property="alarmFlag" column="alarmFlag" jdbcType="INTEGER"/>
+        <result property="nowTime" column="nowTime" jdbcType="TIMESTAMP"/>
+        
+        <result property="startTime" column="start_time" jdbcType="DATE"/>
+        <result property="endTime" column="end_time" jdbcType="DATE"/>
+    </resultMap>
+	<sql id="listCondision">
+		<where>
+				and v.vehicle_def is not null
+				<if test="@Ognl@isNotBlank(unitId)">
+					AND h.unit_Id=#{unitId}
+				</if>
+				<if test="@Ognl@isNotBlank(startTime) and @Ognl@isNotBlank(vehicleState)">
+					<![CDATA[ AND ${vehicleState}   >=#{startTime}]]>
+				</if>
+				<if test="@Ognl@isNotBlank(endTime) and @Ognl@isNotBlank(vehicleState)">
+					<![CDATA[ AND ${vehicleState}  <=#{endTime}]]>
+				</if>
+		</where>
+	</sql>
+		
+	<select id="getList" parameterType="HistoryPOJO" resultMap="historyMap">
+		SELECT h.*,h.stamp as nowTime, v.vehicle_def FROM t_history h
+		left join t_vehicle_unit vu on vu.unit_id = h.unit_id
+		left join t_vehicle v on v.vehicle_id = vu.vehicle_id
+		<include refid="listCondision"/>
+		ORDER BY h.stamp asc
+	</select>
+	
+</mapper>  

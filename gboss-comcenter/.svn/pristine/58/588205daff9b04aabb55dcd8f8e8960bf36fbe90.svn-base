@@ -1,0 +1,96 @@
+log4j.rootCategory=stdout
+
+##DEBUG, INFO, WARN, ERROR, FATAL
+log4j.rootLogger=INFO
+
+## loggers
+##下发指令存储logger
+log4j.logger.nameCmd=INFO,appenderCmd
+##未解析数据存储logger
+log4j.logger.nameUnknownCmd=INFO,appenderUnknownCmd
+##异常信息logger
+log4j.logger.nameException=INFO,appenderException
+##一类警情logger
+log4j.logger.nameAlarm=INFO,appenderAlarm
+##其他logger
+log4j.logger.nameOthers=INFO,appenderOthers
+##调试logger
+log4j.logger.nameDebug=DEBUG,appenderDebug
+##统计GPS
+log4j.logger.nameCalcGPS=INFO,appenderCalcGPS
+##第三方软件
+log4j.logger.com.meetup.memcached=ERROR,appenderThird
+log4j.logger.org.apache.activemq=ERROR,appenderThird
+log4j.logger.org.eclipse.jetty=ERROR,appenderThird
+log4j.logger.org.apache.zookeeper=ERROR,appenderThird
+log4j.logger.org.apache.hadoop=INFO,appenderThird
+
+## appenders
+##输出到控制台
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%d %-5p [%t] %-17c{2} (%13F:%L) %3x - %m%n
+
+##输出到指令日志文件目录
+log4j.appender.appenderCmd=org.apache.log4j.RollingFileAppender
+log4j.appender.appenderCmd.File=logs/cmd/cmd.log
+log4j.appender.appenderCmd.MaxFileSize=200MB
+log4j.appender.appenderCmd.MaxBackupIndex=5
+log4j.appender.appenderCmd.layout=org.apache.log4j.PatternLayout
+log4j.appender.appenderCmd.layout.ConversionPattern=%d{yyyy-MM-dd HH\:mm\:ss} - %m%n
+
+##输出到未解析数据文件目录
+log4j.appender.appenderUnknownCmd=org.apache.log4j.RollingFileAppender
+log4j.appender.appenderUnknownCmd.File=logs/unkown/unkown.log
+log4j.appender.appenderUnknownCmd.MaxFileSize=200MB
+log4j.appender.appenderUnknownCmd.MaxBackupIndex=5
+log4j.appender.appenderUnknownCmd.layout=org.apache.log4j.PatternLayout
+log4j.appender.appenderUnknownCmd.layout.ConversionPattern=%d{yyyy-MM-dd HH\:mm\:ss} - %m%n
+
+##输出到异常信息日志文件目录
+log4j.appender.appenderException=org.apache.log4j.RollingFileAppender
+log4j.appender.appenderException.File=logs/exception/exception.log
+log4j.appender.appenderException.MaxFileSize=200MB
+log4j.appender.appenderException.MaxBackupIndex=5
+log4j.appender.appenderException.layout=org.apache.log4j.PatternLayout
+log4j.appender.appenderException.layout.ConversionPattern=%d{yyyy-MM-dd HH\:mm\:ss} - %m%n
+
+##输出到一类警情日志文件目录
+log4j.appender.appenderAlarm=org.apache.log4j.RollingFileAppender
+log4j.appender.appenderAlarm.File=logs/alarm/alarm.log
+log4j.appender.appenderAlarm.MaxFileSize=200MB
+log4j.appender.appenderAlarm.MaxBackupIndex=5
+log4j.appender.appenderAlarm.layout=org.apache.log4j.PatternLayout
+log4j.appender.appenderAlarm.layout.ConversionPattern=%d{yyyy-MM-dd HH\:mm\:ss} - %m%n
+
+##输出到其他日志文件目录
+log4j.appender.appenderOthers=org.apache.log4j.RollingFileAppender
+log4j.appender.appenderOthers.File=logs/others.log
+log4j.appender.appenderOthers.MaxFileSize=200MB
+log4j.appender.appenderOthers.MaxBackupIndex=5
+log4j.appender.appenderOthers.layout=org.apache.log4j.PatternLayout
+log4j.appender.appenderOthers.layout.ConversionPattern=%d{yyyy-MM-dd HH\:mm\:ss} - %m%n
+
+##输出到调试信息日志文件目录
+log4j.appender.appenderDebug=org.apache.log4j.RollingFileAppender
+log4j.appender.appenderDebug.File=logs/debug/debug.log
+log4j.appender.appenderDebug.MaxFileSize=200MB
+log4j.appender.appenderDebug.MaxBackupIndex=5
+log4j.appender.appenderDebug.layout=org.apache.log4j.PatternLayout
+log4j.appender.appenderDebug.layout.ConversionPattern=%d{yyyy-MM-dd HH\:mm\:ss} - %m%n
+
+##统计GPS
+log4j.appender.appenderCalcGPS=org.apache.log4j.RollingFileAppender
+log4j.appender.appenderCalcGPS.File=logs/gps/calcgps.log
+log4j.appender.appenderCalcGPS.MaxFileSize=200MB
+log4j.appender.appenderCalcGPS.MaxBackupIndex=5
+log4j.appender.appenderCalcGPS.layout=org.apache.log4j.PatternLayout
+log4j.appender.appenderCalcGPS.layout.ConversionPattern=%d{yyyy-MM-dd HH\:mm\:ss} - %m%n
+
+##第三方软件
+log4j.appender.appenderThird=org.apache.log4j.RollingFileAppender
+log4j.appender.appenderThird.File=logs/third/third.log
+log4j.appender.appenderThird.MaxFileSize=200MB
+log4j.appender.appenderThird.MaxBackupIndex=1
+log4j.appender.appenderThird.layout=org.apache.log4j.PatternLayout
+log4j.appender.appenderThird.layout.ConversionPattern=%d{yyyy-MM-dd HH\:mm\:ss} - %m%n

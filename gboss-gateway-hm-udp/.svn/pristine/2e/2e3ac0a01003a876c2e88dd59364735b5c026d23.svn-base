@@ -1,0 +1,11 @@
+##web端口
+port=8082
+
+##resource目录
+resourceBase=web
+
+##登录用户名admin
+user=admin
+
+##登录密码pwd(MD5)
+password=9003d1df22eb4d3820015070385194c8

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="IE=10" />
+    <title>坐席Demo</title>
+</head>
+<body onload="onbodyload()">
+    <div>
+	   <textarea id="log" style="width: 100%; height: 400px"></textarea>
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div style="width: 100%">
+        <span>终端呼号：</span>
+		<input type="text" style="width: 45%" id="callletter" placeholder="多个呼号用半角分号隔开 ALLUNIT表示所有终端" value="1613912345001">
+		<input type="hidden" id="alarmcaller"> <!-- 保存处警流程中的呼号 -->
+		<input type="hidden" id="alarmsn"> <!-- 保存处警流程中的警情SN -->
+		<input type="hidden" id="cancelcaller" value=""> <!-- 保存挂警的呼号 -->
+		<input type="hidden" id="cancelalarmsn" value=""> <!-- 保存挂警的警情SN -->
+        <span>消息类型：</span>
+		<input type="text" style="width: 20%" id="infotype" placeholder="多个消息类型用半角分号隔开,-1表示全部" value="-1">
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div style="width: 100%">
+        <span>序&nbsp&nbsp列&nbsp&nbsp号：</span>
+		<input type="text" style="width: 45%" id="sn">
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div>
+        <span>通信中心：</span>
+		<input type="text" style="width: 12%" id="comcenterhost" value="90.0.12.135:28090">
+        <span>坐席名称：</span>
+		<input type="text" style="width: 8%" id="seatname" value="zhangxz1">
+        <span>编号</span>
+		<input type="text" style="width: 8%" id="seatid" value="1001">
+        <span>密码</span>
+		<input type="password" style="width: 8%" id="seatpwd" value="123456">
+        <span>客户类型</span>
+		<input type="text" style="width: 8%" id="usertype" value="IOS-HAIMA">
+        <span>客户版本</span>
+		<input type="text" style="width: 4%" id="userversion" value="1.0">
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div>
+		<button onclick="Connect()">登录通信中心</button>
+		<button onclick="AddMonitor()">添加车辆监控</button>
+		<button onclick="RemoveMonitor()">删除车辆监控</button>
+		<button onclick="Logout()">退出通信中心</button>
+		<button onclick="Reconnect()">重新登录</button>
+		<button onclick="CloseConnect()">断开连接</button>
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div>
+		<button onclick="GetLastPosition()">最后位置</button>
+		<button onclick="GetLastOBD()">最后OBD</button>
+		<button onclick="GetLastTravel()">最后行程</button>
+		<button onclick="GetLastFault()">最后故障</button>
+		<button onclick="GetLastSm()">最后短信</button>
+		<button onclick="GetLastAlarm()">最后警情</button>
+		<button onclick="GetLastUnitLoginout()">最后登退录</button>
+		<button onclick="GetLastFaultLight()">最后故障灯</button>
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div style="width: 100%">
+		<button onclick="NoParamCommand(0x0001)">查车</button>
+		<button onclick="NoParamCommand(0x0013)">找车</button>
+		<button onclick="NoParamCommand(0x0005)">开门</button>
+		<button onclick="NoParamCommand(0x0004)">锁门</button>
+		<button onclick="NoParamCommand(0x0006)">断油电</button>
+		<button onclick="NoParamCommand(0x0007)">恢复油电</button>
+		<button onclick="NoParamCommand(0x006A)">发动机熄火</button>
+		<button onclick="NoParamCommand(0x0061)">开灯</button>
+		<button onclick="NoParamCommand(0x0062)">关灯</button>
+		<button onclick="NoParamCommand(0x0063)">打开后尾箱</button>
+		<button onclick="NoParamCommand(0x80B4)">读车辆配置简码</button>
+		<button onclick="NoParamCommand(0x00B4)">查看配置</button>
+		<button onclick="NoParamCommand(0x00B3)">写TBOX配置</button>
+		<button onclick="NoParamCommand(0x00B5)">读终端信息</button>
+		<button onclick="NoParamCommand(0x0064)">读空调参数</button>
+		<button onclick="NoParamCommand(0x00B7)">读侧翻参数</button>
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div style="width: 100%">
+        <span>指令参数：</span>
+		<input type="text" style="width: 40%" id="commandparams" value="202.105.139.92;24002;TGS80_H208.bin" placeholder="多个参数用半角分号隔开">
+		<button onclick="EngineOn()">发动机点火</button>
+		<button onclick="Trace()">跟踪</button>
+		<button onclick="IntervalDeliver()">定时上传</button>
+		<button onclick="Listen()">监听</button>
+		<button onclick="UnitSMS()">终端短信</button>
+		<button onclick="SendSMS()">发送手机短信</button>
+		<button onclick="SetSOS()">设置SOS号码</button>
+		<button onclick="Navgate()">一键导航</button>
+		<button onclick="OpenAirConditioner()">打开空调</button>
+		<button onclick="NoParamCommand(0x0066)">关闭空调</button>
+		<button onclick="BeiCarControl()">北汽远程控制</button>
+		<button onclick="SetRollOverParameter()">设置侧翻参数</button>
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div style="width: 100%">
+        <span>开始时间</span>
+		<input type="text" style="width: 12%" id="starttime">
+        <span>结束时间</span>
+		<input type="text" style="width: 12%" id="stoptime">
+		<button onclick="GetCommandHistory()">查询指令记录</button>
+		<button onclick="GetHistoryNextPage()">下一页</button>
+		<button onclick="StopHistory()">结束读历史</button>
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div style="width: 100%">
+		<button onclick="GetHistoryGPS()">历史位置</button>
+		<button onclick="GetHistorySimpleGps()">历史位置主要信息</button>
+		<button onclick="GetHistoryOBD()">历史OBD</button>
+		<button onclick="GetHistoryTravel()">历史行程</button>
+		<button onclick="GetHistoryFault()">历史故障</button>
+		<button onclick="GetHistorySm()">历史短信</button>
+		<button onclick="GetHistoryAlarm()">历史警情</button>
+		<button onclick="GetHistoryUnitLoginout()">历史登退录</button>
+		<button onclick="GetHistoryFaultLight()">历史故障灯</button>
+	</div>
+	<script src="Math.uuid.min.js"></script>  <!-- 随机序列号 -->
+	<script src="Long.min.js"></script>       <!-- protobuf需要 -->
+	<script src="ByteBuffer.min.js"></script> <!-- protobuf需要 -->
+	<script src="ProtoBuf.min.js"></script>   <!-- protobuf需要 -->
+	<script src="comcenterprotobuf.js"></script>
+	<script src="zlib.min.js"></script>
+	<script src="segutil_ws.min.js"></script>
+	<script src="segseatlib.js"></script>
+    <script src="seatdemo.js"></script>   <!-- 坐席协议  -->
+    <script src="seatdemoevent.js"></script>   <!-- 坐席接收到通信中心的事件  -->
+</body>
+</html>

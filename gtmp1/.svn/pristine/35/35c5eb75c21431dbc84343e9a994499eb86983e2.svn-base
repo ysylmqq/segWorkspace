@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+
+<struts>
+	<package name="unit" namespace="/unit" extends="global">
+	
+	 <global-results>
+            <result name="exception">/jsp/exception.jsp</result>
+      </global-results>
+      <global-exception-mappings>
+           <exception-mapping exception="java.lang.Exception" result="exception"/>
+      </global-exception-mappings>
+       
+		<!-- GPS终端 -->
+		<action name="unit_*" class="unitAction" method="{1}">
+		   <result name="input">/jsp/unit/file_upload_exception.jsp</result>
+			<exception-mapping exception="java.lang.Exception" result="exception"/>
+			<interceptor-ref name="fileUpload">
+<!--大家可以设置成自己的配置，想文件类型和大小等限制			-->
+			<param name="maximumSize">2097152</param><!-- 单位是字节	2M（2097152B）8M 8388608		-->
+				</interceptor-ref>
+				<interceptor-ref name="defaultStack">
+				</interceptor-ref>
+				<interceptor-ref name="myDefaultInterceptorStack"></interceptor-ref>
+		</action>
+		
+	</package>
+</struts>

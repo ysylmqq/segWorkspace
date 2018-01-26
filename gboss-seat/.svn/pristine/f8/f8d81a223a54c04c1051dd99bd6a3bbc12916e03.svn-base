@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="外呼情况统计">
+<meta name="description" content="外呼情况统计">
+
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/jquery.dataTables.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/data_style.css" rel="stylesheet" />
+<link href="../dist/plugins/css/datepicker.css" rel="stylesheet">
+<link href="../css/base.css" rel="stylesheet" />
+<title>外呼情况统计</title>
+
+</head>
+<body style="background-color:white;">
+	<div class="container-fluid Reports_page">
+		<h1>外呼情况统计</h1>
+		<div class="row c_area">
+            <div class="filter_box">
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">归属公司：</h6>
+                    <div class="filter_content">
+                        <span class="filiale">
+                            <input type="text" class="form-control reports_search_4_engine" id="calloutStatistics_Com_search" value="全部"/>
+                            <i class="glyphicon glyphicon-chevron-down filialeDown"></i>
+                            <input type="hidden" class="search_filiale_id" id="calloutStatistics_ID_search" value="0">
+                            <ul class="reports_search_4_list" style="display:none;"></ul>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">搜索：</h6>
+                    <div class="filter_content">
+                        <span class="reports_search_1">
+                            <input type="text" id="calloutStatisticsCar_partNo" class="form-control reports_search_1_engine" placeholder="车牌号码或车载电话" style="width:250px;">
+                            <input type="hidden" class="search_plate_no">
+                            <input type="hidden" class="search_call_letter">
+                            <input type="hidden" class="search_vehicle_id" id="calloutStatisticsCarID">
+                            <ul class="reports_search_1_list" style="display:none;">
+                                <!--
+                            	<li><span class="p_plate_no">粤B.123456</span> <span class="p_call_letter">13698521459</span></li>
+                            	-->
+                            </ul>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">呼出时间：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control form_datetime starTime">
+                            <span class="input-group-addon">至</span>
+                            <input type="text" class="form-control form_datetime endTime" >
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix" style="width:100%;">
+                    <h6 class="control-label control_title">服务大类：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <label class="TOS_checkall"><input type="checkbox" id="TOS_opt_in_checkall"/>全选</label>
+                        </span>
+                        <span class="TOS_opt" id="TOS_opt_out1"></span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">颗粒度：</h6>
+                    <div class="filter_content">
+                        <select id="kld">
+                            <option value="1">小时</option>
+                            <option value="2">天</option>
+                            <option value="3">月</option>
+                            <option value="4">年</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group clearfix btns">
+                    <a href="#" class="exportExcel" id="calloutStatisticsSearch"><i class="glyphicon glyphicon-search"></i>查询</a>
+                    <a href="#" class="exportExcel" id="calloutStatisticsExport"><i class="glyphicon glyphicon-export"></i>导出Excel</a>
+                </div>
+            </div>            
+        </div>
+        <div class="row r_scroll">
+            <div class="Reports_box" style="width:1000px;">
+                <table id="calloutStatistics-table" class="display compact table_borders dataTable" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th style="width:20px;"></th>
+                            <th style="width:70px;">归属公司</th>
+                            <th style="width:120px;">日期</th>
+                            <th style="width:90px;">服务类型</th>
+                            <th style="width:60px;">呼出次数</th>
+                            <th style="width:80px;">成功呼出次数</th>
+                            <th style="width:70px;">呼出成功率</th>
+                            <th style="width:80px;">总通话时长(秒)</th>
+                            <th style="width:100px;">平均通话时长(秒)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+	</div>
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/fnReloadAjax.js"></script>
+<script type="text/javascript" src="../dist/plugins/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/reports.js"></script>
+<script type="text/javascript">
+    //呼出业务明细查询
+    $("#calloutStatisticsSearch").click(function(){    
+        if(checkTimeBox()==0){//判断时间是否为空
+            return;
+        }else if($('.starTime').val() >= $('.endTime').val()){
+            alert("起始时间不能大于结束时间");
+            return;
+        }else{
+            if ( typeof(add_table) != "undefined") {
+                calloutStatusReport();
+                add_table.fnReloadAjax("../app/callbrief/callout_success_statistics?" + paras);
+            }
+            else{
+                calloutStatusReport();
+            };
+        };
+     });
+
+    //呼出业务明细导出
+    $("#calloutStatisticsExport").click(function(){
+        $(this).attr("href","../app/callbrief/callout_success_statistics/export?"+callparas);
+    });
+
+    //呼出业务明细查询
+    function calloutStatusReport(){
+        var ValcompanyNo = [];//所属公司id
+        var ValvehicleId = $("#calloutStatisticsCarID").val();//车辆id（隐藏）
+        var ValpartNo =  $("#calloutStatisticsCar_partNo").val();//部分车牌或车载
+        var ValbeginTime = $(".starTime").val();//开始时间
+        var ValendTime = $(".endTime").val();//结束时间
+        var ValserverType = [];//服务大类
+        if($("#TOS_opt_out1 label input:checked").length>0){
+            $.each($("#TOS_opt_out1 label input:checked"),function(i,item){
+                ValserverType.push(parseInt($(item).val()));
+            });
+        }
+
+        ValcompanyNo[0] = $("#calloutStatistics_ID_search").val();
+        if ($("#calloutStatistics_ID_search").val()=='0'){//所属公司拼接
+            calloutStatuscompanyNo='';
+        }else{
+            calloutStatuscompanyNo = 'companyNo='+ValcompanyNo+'&';
+        };
+
+        if (ValvehicleId == ''){//车辆id或部分车牌车载拼接
+            calloutStatusvehicleId = '';
+            if (ValpartNo==''){
+                calloutStatuspartNo='';
+            }else{
+                calloutStatuspartNo = 'partNo='+ValpartNo+'&';
+            };
+        }else{
+            calloutStatusvehicleId = 'vehicleId='+ValvehicleId+'&';
+            calloutStatuspartNo='';
+        };
+
+        if ($("#TOS_opt_in_checkall").is(":checked")){//（是否全选）服务大类拼接
+            calloutStatusserverType = '';
+        }else{
+            if(ValserverType.length==0){
+                calloutStatusserverType = '';
+            } else{
+                calloutStatusserverType = 'serverType='+ValserverType+'&';
+            }
+        };     
+
+        if (ValbeginTime==''){//开始时间
+            calloutStatusbeginTime='';
+        }else{
+            calloutStatusbeginTime = 'beginTime='+ValbeginTime+'&';
+        };
+
+        if (ValendTime==''){//结束时间
+            calloutStatusendTime='';
+        }else{
+            calloutStatusendTime = 'endTime='+ValendTime+'&';
+        };
+
+        calloutStatusKLD = 'kld='+$("#kld").val();//颗粒度
+
+        callparas = calloutStatuscompanyNo+calloutStatusvehicleId+calloutStatuspartNo+calloutStatusbeginTime+calloutStatusendTime+calloutStatusserverType+calloutStatusKLD;//归属公司、车辆id、、时间段、服务大类、颗粒度
+        // alert(callparas);
+        paras = callparas;//参数;
+        add_table = $("#calloutStatistics-table").dataTable({
+            "bSort": false,//不排序
+            "filter": false,//去掉搜索框
+            "pagingType": "full_numbers",
+            "processing" : true,
+            "serverSide" : true,//后端处理
+            "bRetrieve": true,
+            "bDestroy": true,
+            "oLanguage": {
+                "sUrl":"../assets/data-tables/js/dataTable.cn.txt"
+            },
+            "ajax" : {
+                "type":"POST",
+                "url":"../app/callbrief/callout_success_statistics?" + paras //获取数据的API
+            },             
+            "columns":[
+                {"data":"sn"},//序列号
+                {"data":"company_name"},//归属公司
+                {"data":"stamp"},//日期
+                {"data":"st_name"},//服务类型
+                {"data":"all_call_num"},//呼出次数
+                {"data":"success_call_num"},//成功呼出次数
+                {"data":"success_rate"},//呼出成功率
+                {"data":"all_talk_time"},//总通话时长
+                {"data":"avg_talk_time"}//平均通话时长
+            ]
+        });
+        return add_table;
+    }
+</script>
+</body>
+</html>

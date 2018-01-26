@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.OwnerUserMapper">
+	<!-- 用memcached做二级缓存 -->
+	<cache type="org.mybatis.caches.memcached.MemcachedCache" />
+	
+	<resultMap type="UserPOJO" id="userMap">  
+        <id property="userId" column="USER_ID" jdbcType="BIGINT" />  
+        <result property="loginName" column="LOGIN_NAME" jdbcType="VARCHAR"/>
+        <result property="password" column="PASSWORD" jdbcType="VARCHAR"/>
+        <result property="userName" column="USER_NAME" jdbcType="VARCHAR"/>
+        <result property="sex" column="sex" jdbcType="VARCHAR"/>
+        <result property="tel" column="TEL" jdbcType="VARCHAR"/>
+        <result property="isValid" column="IS_VALID" jdbcType="INTEGER"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>  
+    </resultMap>
+    
+    <resultMap type="OwnerPOJO" id="ownerMap">  
+        <id property="ownerId" column="OWNER_ID" jdbcType="BIGINT" />  
+        <result property="ownerName" column="LOGIN_NAME" jdbcType="VARCHAR"/>
+        <result property="password" column="PASSWORD" jdbcType="VARCHAR"/>
+        <result property="ownerPhoneNumber" column="OWNER_PHONE_NUMBER" jdbcType="VARCHAR"/>
+        <result property="sex" column="SEX" jdbcType="VARCHAR"/>
+        <result property="isValid" column="IS_VALID" jdbcType="INTEGER"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>  
+    </resultMap>
+    
+	<resultMap type="UserPOJO"  id="userInfoResultMap" extends="userMap">
+	    <collection property="roles" ofType="RolePOJO" resultMap="com.chinaGPS.gtmp.mapper.RoleMapper.roleMap" />
+	</resultMap>
+
+	<select id="getUserByLoginNamePwd" parameterType="com.chinaGPS.gtmp.entity.UserPOJO" resultMap="userInfoResultMap" useCache="false">
+		SELECT 
+			o.owner_id user_id,o.login_name,o.password,o.owner_name user_name,o.sex,o.owner_phone_number tel,
+			o.is_valid,o.stamp,r.role_id,r.role_name,r.is_valid,r.stamp 
+		FROM t_owner o
+		LEFT JOIN t_p_user_role ur ON o.owner_id = ur.user_id
+		LEFT JOIN t_p_role r ON ur.role_id = r.role_id
+		WHERE o.login_name= #{loginName}
+		AND o.is_valid= 0 AND ur.user_type = 1
+	</select>
+
+	<insert id="add" parameterType="com.chinaGPS.gtmp.entity.OwnerPOJO" flushCache="true">
+		INSERT INTO t_owner
+			(owner_id, owner_name, owner_phone_number, sex, login_name, password, is_valid, stamp)
+		VALUES
+			(SEQ_OWNER.NEXTVAL, #{ownerName}, #{ownerPhoneNumber}, #{sex}, #{loginName}, #{password}, 0, sysdate)
+	</insert>
+
+	<sql id="getByPageCondition">
+		<where>
+			<if test="owner.ownerName != null and owner.ownerName != ''">
+				AND owner_name LIKE '%${owner.ownerName}%'
+			</if>
+			AND is_valid = 0
+		</where>
+	</sql>
+	
+	<select id="countAll" parameterType="map" resultType="integer" useCache="true">
+		SELECT COUNT(1) FROM t_owner
+		<include refid="getByPageCondition"/>
+	</select>
+ 	
+	<select id="getByPage" parameterType="map" resultType="com.chinaGPS.gtmp.entity.OwnerPOJO" useCache="true">
+		SELECT
+			owner_id ownerId,login_name loginName,owner_name ownerName,sex,owner_phone_number ownerPhoneNumber,is_valid isValid,stamp
+		FROM
+			t_owner
+		<include refid="getByPageCondition"/>
+	</select>
+	
+	<select id="getById" parameterType="com.chinaGPS.gtmp.entity.OwnerPOJO" resultType="com.chinaGPS.gtmp.entity.OwnerPOJO" useCache="true">
+		SELECT
+			owner_id ownerId, login_name loginName, owner_name ownerName, sex, owner_phone_number ownerPhoneNumber
+		FROM
+			t_owner
+		WHERE 
+			ownerId = #{ownerId}
+	</select>
+	
+	<update id="edit" parameterType="com.chinaGPS.gtmp.entity.OwnerPOJO" flushCache="true">
+		UPDATE t_owner SET
+		<trim suffixOverrides=",">
+			<if test="ownerName != null and ownerName != ''">
+				owner_name = #{ownerName},
+			</if>
+			<if test="ownerPhoneNumber != null and ownerPhoneNumber != ''">
+				owner_phone_number = #{ownerPhoneNumber},
+			</if>
+			<if test="sex != null and sex != ''">
+				sex = #{sex},
+			</if>
+			<if test="loginName != null and loginName != ''">
+				login_name = #{loginName},
+			</if>
+			<if test="password != null and password != ''">
+				password = #{password},
+			</if>
+			<if test="isValid != null and isValid != ''">
+				is_valid = #{isValid},
+			</if>
+			<if test="stamp != null and stamp !=''">
+				stamp = sysdate,
+			</if>
+		</trim>
+		WHERE owner_id = #{ownerId}
+	</update>
+	
+	<select id="getOwnerRoles" parameterType="com.chinaGPS.gtmp.entity.UserRolePOJO" resultType="com.chinaGPS.gtmp.entity.UserRolePOJO" useCache="false">
+		SELECT user_id userId,role_id roleId FROM t_p_user_role
+			<where>
+				<if test="@Ognl@isNotBlank(userId)">
+					AND user_id = #{userId}
+			    </if>
+				<if test="@Ognl@isNotBlank(roleId)">
+					AND role_id = #{roleId}
+				</if>
+				AND user_type = 1
+			</where>
+	</select>
+	
+	<select id="get" parameterType="com.chinaGPS.gtmp.entity.OwnerPOJO" resultMap="ownerMap" useCache="false">
+		SELECT 
+			owner_id,login_name,password,owner_name,sex,owner_phone_number,is_valid,stamp
+		FROM
+			t_owner
+		<where>
+		    <if  test="@Ognl@isNotBlank(loginName)">
+		        login_name = #{loginName}
+		    </if>
+			<if  test="@Ognl@isNotBlank(ownerName)">
+		       and owner_name = #{ownerName}
+		    </if>
+			<if test="@Ognl@isNotBlank(ownerId)"> 
+				AND owner_id != #{ownerId}
+			</if>
+		</where>
+	</select>
+	
+</mapper>  

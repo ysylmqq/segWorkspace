@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.RoleMapper"> 
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+    <resultMap type="RolePOJO" id="roleMap">  
+        <id property="roleId" column="ROLE_ID" jdbcType="BIGINT" />  
+        <result property="roleName" column="ROLE_NAME" jdbcType="VARCHAR"/>
+        <result property="isValid" column="IS_VALID" jdbcType="INTEGER"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+    </resultMap>
+	
+	<sql id="getByPageCondition">
+		<if test="role!=null">
+			 <if test="@Ognl@isNotBlank(role.roleName)">   
+        		AND R.ROLE_NAME LIKE '%'||#{role.roleName}||'%' 
+    		</if>
+   		</if>
+	</sql>
+	
+	<sql id="getRoleByRoleNameCondition">
+		<where>
+			<if test="role!=null">
+			r.is_valid=0
+				<if test="@Ognl@isNotBlank(role.roleName)">   
+	        		AND R.ROLE_NAME= #{role.roleName}
+	    		</if>
+
+				<!-- 防重判断-->
+				<if test="@Ognl@isNotBlank(role.roleId)"> 
+					AND R.ROLE_ID!= #{role.roleId}
+				</if>
+				 
+    		</if>
+		</where>
+	</sql>
+	
+	<select id="getList" parameterType="RolePOJO" resultMap="roleMap">
+		SELECT R.* FROM t_p_role R where R.IS_VALID = 0
+		<if test="role!=null">
+			<if test="@Ognl@isNotBlank(roleName)">   
+	        		AND R.ROLE_NAME LIKE '%'||#{roleName}||'%'
+	    		</if>
+		</if>
+	</select>
+	
+	<!-- 分页查询用户 -->
+	<select id="getByPage" parameterType="map" resultMap="roleMap">
+		SELECT R.* FROM t_p_role R where R.IS_VALID =0
+		<include refid="getByPageCondition"/>   
+	</select>
+	<select id="countAll" parameterType="map" resultType="Integer">
+		SELECT COUNT(R.ROLE_ID) FROM t_p_role R where R.IS_VALID =0
+		<include refid="getByPageCondition"/>   
+	</select> 
+	
+	<select id="getById" parameterType="Long" resultMap="roleMap">
+		SELECT R.* FROM t_p_role R WHERE R.ROLE_ID= #{id}
+	</select>
+	
+	<select id="getRoleByRoleName" parameterType="map" resultMap="roleMap">
+		SELECT R.* FROM t_p_role R
+		<include refid="getRoleByRoleNameCondition"/>   
+	</select>
+	
+	<delete id="removeById" parameterType="Long" >
+		delete from t_p_role R WHERE R.ROLE_ID= #{id}
+	</delete>
+	
+	<insert id="add" parameterType="RolePOJO">
+		INSERT INTO t_p_role
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+		 	ROLE_ID,
+		 	<if test="@Ognl@isNotBlank(roleName)" >
+       		ROLE_NAME,
+            </if>
+            IS_VALID,
+       		STAMP
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	SEQ_ROLE.NEXTVAL,
+		 	<if test="@Ognl@isNotBlank(roleName)" >
+       		#{roleName},
+            </if>
+            0,
+            sysdate
+		 </trim>
+ 	</insert>
+ 
+	<update id="edit" parameterType="RolePOJO">
+		UPDATE t_p_role
+   SET 
+    	<trim  suffixOverrides=",">
+	        <if test="@Ognl@isNotBlank(roleName)"> 
+	      	 	ROLE_NAME = #{roleName},
+	       </if>
+	       <if test="@Ognl@isNotBlank(isValid)"> 
+	      		IS_VALID = #{isValid},
+	       </if>
+	       		STAMP = sysdate
+      </trim>
+ WHERE ROLE_ID = #{roleId,jdbcType=BIGINT}
+	</update>
+</mapper>  

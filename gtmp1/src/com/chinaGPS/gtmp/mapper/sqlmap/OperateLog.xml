@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.OperateLogMapper"> 
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+    <resultMap type="OperateLogPOJO" id="operateLogMap">  
+       <id property="logId" column="log_Id" jdbcType="VARCHAR" />  
+       <result property="userId" column="user_Id" jdbcType="BIGINT"/>
+       <result property="logType" column="LOG_TYPE" jdbcType="VARCHAR"/>
+       <result property="logContent" column="log_Content" jdbcType="VARCHAR"/>
+        <result property="ip" column="ip" jdbcType="VARCHAR"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+        
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+	<sql id="getByPageCondition">
+		<where>
+			<if test="@Ognl@isNotBlank(opl)">
+				<if test="@Ognl@isNotBlank(opl.userId)"> AND U.user_Id=#{opl.userId}</if>
+    			
+				<if test="@Ognl@isNotBlank(opl.userName)">
+					AND U.user_Name LIKE '%${opl.userName}%'
+				</if>
+				<if test="@Ognl@isNotBlank(opl.logType)">
+					AND lo.log_type = #{opl.logType}
+				</if>
+    			<if test="@Ognl@isNotBlank(opl.stamp)">
+					AND lo.stamp &gt;=#{opl.stamp}
+				</if>
+				<if test="@Ognl@isNotBlank(opl.stamp2)">
+					AND lo.stamp &lt;=#{opl.stamp2}
+				</if>
+    		</if>
+		</where>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="getByPage" parameterType="map" resultMap="operateLogMap">
+		select lo.*, u.user_name
+		  from t_log_operation lo
+		  left join t_p_user u on lo.user_id = u.user_id
+		<include refid="getByPageCondition"/> 
+		order by lo.STAMP desc  
+	</select>
+	<select id="countAll" parameterType="map" resultType="Integer">
+		select count(lo.log_id)
+		  from t_log_operation lo
+		  left join t_p_user u on lo.user_id = u.user_id
+		<include refid="getByPageCondition"/>
+		order by lo.STAMP desc   
+	</select>
+	
+	<select id="getSelectData" resultType="map">
+		SELECT DISTINCT(log_type) logType FROM t_log_operation WHERE log_type IS NOT NULL
+	</select>
+	 
+</mapper>  

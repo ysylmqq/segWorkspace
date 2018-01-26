@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+encoding//logs/debug/debug.log=GBK
+encoding//src/main/java/cc/chinagps/gateway=gb18030
+encoding//src/main/java/cc/chinagps/gateway/unit/oem/test/Sender.java=GBK
+encoding/web=UTF-8

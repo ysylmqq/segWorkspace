@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  <display-name>gboss-seat</display-name>
+  <context-param>
+    <param-name>log4jConfigLocation</param-name>
+    <param-value>/WEB-INF/log4j.properties</param-value>
+  </context-param>
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>
+            classpath:/applicationContext-servlet.xml
+<!--             classpath:/applicationContext-dao.xml
+ -->            classpath:/applicationContext-service.xml
+            /WEB-INF/applicationContext*.xml
+        </param-value>
+  </context-param>
+  <filter>
+    <filter-name>encodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceEncoding</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>encodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <listener>
+    <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+  </listener>
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  <!-- <context-param>
+    <param-name>casServerLogoutUrl</param-name>
+    <param-value>https://cas.952100.com:8443/cas/logout</param-value>
+  </context-param>
+  <context-param>
+    <param-name>loginUrl</param-name>
+    <param-value>http://localhost:8080/seat</param-value>
+  </context-param> -->
+  <listener>
+    <listener-class>  
+            org.jasig.cas.client.session.SingleSignOutHttpSessionListener   
+        </listener-class>
+  </listener>
+  <servlet>
+    <servlet-name>springMVC</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>springMVC</servlet-name>
+    <url-pattern>/app/*</url-pattern>
+  </servlet-mapping>
+  
+ <!--  <filter>
+    <filter-name>CAS Authentication Filter</filter-name>
+    <filter-class>
+			com.gboss.cas.CASAuthenticationFilter
+		</filter-class>
+    <init-param>
+      <param-name>casServerLoginUrl</param-name>
+      <param-value>https://cas.952100.com:8443/cas/login</param-value>
+    </init-param>
+    <init-param>
+      <param-name>renew</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <init-param>
+      <param-name>gateway</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <init-param>
+      <param-name>serverName</param-name>
+      <param-value>http://localhost:8080</param-value>
+    </init-param>
+    <init-param>
+      <param-name>ExcludeFile</param-name>
+      <param-value>.png,.gif,.js,.css,task_list.html,bill_add_cl.html,task/findTasksBycl,customer/getDetailMsgBycl,task/getTaskNo,getCompanySaleManager_cl,getLinkMan,findProducts,task/save_cl,bill_view_cl.html,task/deleteTasks,task/endTasks,getCurrentCompany_cl,print_bill.html,print_task.html</param-value>
+    </init-param>
+  </filter> 
+   <filter>
+    <filter-name>CAS Validation Filter</filter-name>
+    <filter-class>
+			com.gboss.cas.Cas20ProxyReceivingTicketValidationFilter
+		</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+      <param-name>casServerUrlPrefix</param-name>
+      <param-value>https://cas.952100.com:8443/cas</param-value>
+    </init-param>
+    <init-param>
+      <param-name>serverName</param-name>
+      <param-value>http://localhost:8080</param-value>
+    </init-param>
+    <init-param>
+      <param-name>useSession</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>redirectAfterValidation</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>ExcludeFile</param-name>
+      <param-value>.png,.gif,.js,.css,task_list.html,bill_add_cl.html,task/findTasksBycl,customer/getDetailMsgBycl,task/getTaskNo,getCompanySaleManager_cl,getLinkMan,findProducts,task/save_cl,bill_view_cl.html,task/deleteTasks,task/endTasks,getCurrentCompany_cl,print_bill.html,print_task.html</param-value>
+    </init-param>
+  </filter>
+  
+   
+  <filter>
+    <filter-name>CAS HttpServletRequest WrapperFilter</filter-name>
+    <filter-class>
+			com.gboss.cas.HttpServletRequestWrapperFilter
+		</filter-class>
+  </filter>
+  <filter>
+    <filter-name>CAS Assertion Thread Local Filter</filter-name>
+    <filter-class>
+			com.gboss.cas.AssertionThreadLocalFilter
+		</filter-class>
+  </filter>
+  <filter>
+    <filter-name>CAS Single Sign Out Filter</filter-name>
+    <filter-class>  
+            org.jasig.cas.client.session.SingleSignOutFilter   
+        </filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>CAS Authentication Filter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>CAS Validation Filter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>CAS HttpServletRequest WrapperFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>CAS Assertion Thread Local Filter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>CAS Single Sign Out Filter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping> 
+   -->
+  
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+</web-app>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="分公司电话权限">
+<meta name="description" content="分公司电话权限">
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../css/base.css" rel="stylesheet" />
+<title>分公司电话权限设置</title>
+</head>
+<body style="background-color:white;overflow:auto;">
+	<div class="container-fluid Reports_page">
+		<h1>分公司电话权限</h1>
+        <div class="row r_scroll">
+            <div class="Reports_box sub_page">
+                <div class="row">
+                    <div class="col-xs-2">
+                        <p class="title">分公司名称</p>
+                        <ul class="sub_list">
+                            <!-- <li><label><input type="radio" value="1" name="callOutNums">深圳分公司</label></li> -->
+                        </ul>
+                    </div>
+                    <div class="col-xs-10">
+                        <div class="callIn_list_block">
+                            <p class="title">呼入权限</p>
+                            <ul id="callIn_list">
+                                <!-- <li>
+                                    <div class="call_box" serverTypeId="105">
+                                        <span class="call_title">未上报通知</span>
+                                        <span class="call_list">
+                                            <label><input type="checkbox" value="1" name="callOutNums">服务费</label>
+                                        </span>
+                                    </div>
+                                </li> -->
+                            </ul>
+                        </div>
+                        <div class="callOut_list_block">
+                            <p class="title">外呼权限</p>
+                            <ul id="callOut_list">
+                                <!-- <li>
+                                    <div class="call_box">
+                                        <span class="call_title">未上报通知</span>
+                                        <span class="call_list">
+                                            <label><input type="checkbox" value="1" name="callOutNums">服务费</label>
+                                        </span>
+                                    </div>
+                                </li> -->
+                            </ul>
+                        </div>
+                        <div class="col-xs-12">
+                            <button class="btn btn-xs btn-primary pull-right" id="submitCallList" disabled="disabled">确认修改</button>
+                            <label id="sub_checkall"><input type="checkbox">全选</label>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+	</div>
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $.getJSON("../app/servertype/queryOrg", function(data){//请求分公司
+            if(data && data.success == true){
+                if(data.info && data.info.length>0){
+                    var htmls = "";
+                    $.each(data.info,function(i,item){
+                        htmls += "<li><label><input type='radio' value='"+ item.value +"' name='sub_list_item'>"+ item.name +"</label></li>";
+                    });
+                    $(".sub_list").empty().append(htmls);
+
+                    $("input[name='sub_list_item']").click(function(){//点击事件
+                        // alert($(this).val());
+                        findCallRules($(this).val());
+                        $("#submitCallList").removeAttr("disabled");
+                    });
+                }
+            }
+        });
+
+        $.getJSON("../app/servertype/queryAll", function(data){//请求所有选项
+            if(data && data.success == true){
+                if(data.callininfo && data.callininfo.length>0){
+                    $("#callIn_list").empty();
+                    $.each(data.callininfo,function(i,item){
+                        var li = $('<li></li>'); // li
+                        var div = $('<div></div>').addClass("call_box").attr("serverTypeId",item.st_id); // div
+                        var span_title = $('<span></span>').addClass("call_title").html(item.st_name); // 标题
+                        var span_list = $('<span></span>').addClass("call_list"); // 内容
+                        var html_items = "";
+                        if(item.childList && item.childList.length>0){
+                            $.each(item.childList, function(k,v){
+                                html_items += "<label><input type='checkbox' value='"+ v.st_id +"'>"+ v.st_name +"</label>";
+                            });
+                            span_list.append(html_items);
+                        } else{
+                            span_list.css("height","32px")
+                        }
+                        div.append(span_title).append(span_list);
+                        li.append(div);
+                        $("#callIn_list").append(li);
+                    });
+                }
+
+                if(data.calloutinfo && data.calloutinfo.length>0){
+                    $("#callOut_list").empty();
+                    $.each(data.calloutinfo,function(i,item){
+                        var li = $('<li></li>'); // li
+                        var div = $('<div></div>').addClass("call_box").attr("serverTypeId",item.st_id); // div
+                        var span_title = $('<span></span>').addClass("call_title").html(item.st_name); // 标题
+                        var span_list = $('<span></span>').addClass("call_list"); // 内容
+                        var html_items = "";
+                        if(item.childList && item.childList.length>0){
+                            $.each(item.childList, function(k,v){
+                                html_items += "<label><input type='checkbox' value='"+ v.st_id +"'>"+ v.st_name +"</label>";
+                            });
+                            span_list.append(html_items);
+                        } else{
+                            span_list.css("height","32px")
+                        }
+                        div.append(span_title).append(span_list);
+                        li.append(div);
+                        $("#callOut_list").append(li);
+                    });
+                }
+            }
+        });
+    });
+
+    function findCallRules(subid){//通过机构id查找呼入规则
+        $("#callIn_list li input,#callOut_list li input").removeAttr("checked");//清空选项
+        var url = "../app/servertype/queryServerByOrg";
+        var params = {orgId:subid};
+        $.getJSON( url, params, function(data){
+            if(data && data.success == true){
+                if(data.callininfo && data.callininfo.length>0){//呼入信息
+                    var serverTypeId = "";//服务类型
+                    var input = "";//服务类型input
+                    $.each(data.callininfo,function(i,item){
+                        // console.log(item);
+                        serverTypeId = item.st_id;//获取服务类型
+                        input = $("[serverTypeId='"+ serverTypeId +"'] .call_list");//获取所有选项
+                        if(item.childList && item.childList.length>0){
+                            $.each(item.childList, function(k,v){
+                                input.find("input[value='"+ v.st_id +"']").attr("checked","checked");
+                            });
+                        }
+                    });
+                }
+
+                if(data.calloutinfo && data.calloutinfo.length>0){//外呼信息
+                    var serverTypeId2 = "";//服务类型
+                    var input2 = "";//服务类型input
+                    $.each(data.calloutinfo,function(i,item){
+                        // console.log(item);
+                        serverTypeId2 = item.st_id;//获取服务类型
+                        input2 = $("[serverTypeId='"+ serverTypeId2 +"'] .call_list");//获取所有选项
+                        // console.log(input2);
+                        if(item.childList && item.childList.length>0){
+                            $.each(item.childList, function(k,v){
+                                input2.find("input[value='"+ v.st_id +"']").attr("checked","checked");
+                            });
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    $("#submitCallList").click(function(){//保存信息
+        var subid = $("input[name='sub_list_item']:checked").val();//获取选中的分公司id
+        var serverTypeIds = [];
+        var input = $("#callIn_list input:checked,#callOut_list input:checked");
+        $.each(input, function(i,item){
+            serverTypeIds.push(parseInt(item.value));
+        });
+        // console.log(serverTypeIds);
+        var url = "";
+        var params = {};
+        if(serverTypeIds.length>0){//修改
+            url = "../app/servertype/addOrgServer";
+            params = {orgId:subid,serverTypeIds:serverTypeIds};
+            $.getJSON( url, params, function(data){
+                if(data && data.success == true){
+                    alert("修改成功！");
+                } else{
+                    alert("修改分公司电话权限失败！");
+                }
+            });
+        } else{//清空操作
+            url = "../app/servertype/clearServers";
+            params = {orgId:subid};
+            $.getJSON( url, params, function(data){
+                if(data && data.success == true){
+                    alert("修改成功！");
+                } else{
+                    alert("修改分公司电话权限失败！");
+                }
+            });
+        }
+            
+    });
+
+    $("#sub_checkall").click(function(){//全选
+        if ($("#sub_checkall").children("input").attr("checked")=="checked") {
+            $("#callIn_list input,#callOut_list input").attr("checked","checked");            
+        }else{
+            $("#callIn_list input,#callOut_list input").removeAttr("checked");            
+        };
+    });
+</script>
+</body>
+</html>

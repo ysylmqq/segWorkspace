@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.ModuleMapper"> 
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+    <resultMap type="ModulePOJO" id="moduleMap">  
+        <id property="moduleId" column="Module_ID" jdbcType="BIGINT" />  
+        <result property="moduleName" column="module_name" jdbcType="VARCHAR"/>
+        <result property="parentId" column="PARENT_ID" jdbcType="INTEGER"/>
+        <result property="url" column="url" jdbcType="VARCHAR"/>
+        <result property="control1" column="CONTROL1" jdbcType="VARCHAR"/>
+        <result property="control2" column="CONTROL2" jdbcType="VARCHAR"/>
+        <result property="control3" column="CONTROL3" jdbcType="VARCHAR"/>
+        <result property="listNo" column="list_no" jdbcType="INTEGER"/>
+        <result property="moduleType" column="module_type" jdbcType="INTEGER"/>
+        <result property="isValid" column="is_valid" jdbcType="INTEGER"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+    </resultMap>
+	
+	<sql id="getByPageCondition">
+		<if test="module!=null">
+			 <if test="@Ognl@isNotBlank(module.moduleName)">   
+        		AND M.module_name LIKE '%'||#{module.moduleName}||'%' 
+    		</if>
+   		</if>
+	</sql>
+	
+	<sql id="getModuleByModuleNameCondition">
+		<where>
+			<if test="module!=null">
+				<if test="@Ognl@isNotBlank(module.moduleName)">   
+	        		AND M.module_name= #{module.moduleName}
+	    		</if>
+
+				<!-- 防重判断-->
+				<if test="@Ognl@isNotBlank(module.moduleId)"> 
+					AND M.Module_ID!= #{module.moduleId}
+				</if>
+				 
+    		</if>
+		</where>
+	</sql>
+	
+	<select id="getList" parameterType="ModulePOJO" resultMap="moduleMap" useCache="false">
+			SELECT M.* FROM 
+		(SELECT * FROM T_P_MODULE START WITH parent_id is null
+        CONNECT BY PRIOR MODULE_ID = PARENT_ID) M
+		where M.is_valid = 0
+	</select>
+	
+	<!-- 分页查询用户 -->
+	<select id="getByPage" parameterType="map" resultMap="moduleMap" useCache="false">
+		SELECT M.* FROM 
+		(SELECT * FROM T_P_MODULE START WITH MODULE_ID = 0
+        CONNECT BY PRIOR MODULE_ID = PARENT_ID) M
+		where M.is_valid = 0
+		<include refid="getByPageCondition"/>   
+	</select>
+	<select id="countAll" parameterType="map" resultType="Integer" useCache="false">
+		SELECT COUNT(M.Module_ID) FROM t_p_Module M where M.is_valid = 0
+		<include refid="getByPageCondition"/>   
+	</select> 
+	
+	<select id="getById" parameterType="Long" resultMap="moduleMap">
+		SELECT M.* FROM t_p_Module M WHERE M.Module_ID= #{id}
+	</select>
+	
+	<select id="getChildren" parameterType="Long" resultMap="moduleMap">
+		SELECT M.* FROM t_p_Module M WHERE M.PARENT_ID = #{parentId} AND M.is_valid = 0 order by M.list_no,M.MODULE_ID
+	</select>
+	
+	<select id="getChecked" parameterType="Long" resultMap="moduleMap">
+		SELECT * from t_p_role_module WHERE ROLE_ID = #{roleId} 
+	</select>
+	
+	<insert id="addRoleModule" parameterType="ModulePOJO">
+		insert into t_p_role_module(ROLE_ID,MODULE_ID) values (#{roleId},#{moduleId})
+	</insert>
+	
+	<delete id="removeRoleModule" parameterType="ModulePOJO">
+		delete from t_p_role_module where role_id = #{roleId}
+	</delete>
+	
+	<select id="getModuleByModuleName" parameterType="map" resultMap="moduleMap">
+		SELECT M.* FROM t_p_Module M
+		<include refid="getModuleByModuleNameCondition"/>   
+	</select>
+	
+	<delete id="removeById" parameterType="Long" >
+		delete from t_p_Module M WHERE M.Module_ID= #{id}
+	</delete>
+	
+	<insert id="add" parameterType="ModulePOJO">
+		INSERT INTO t_p_Module
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+		 	<if test="@Ognl@isNotBlank(moduleName)" >
+       		module_name,
+            </if>
+            <if test="@Ognl@isNotBlank(parentId)" >
+       		parent_id,
+            </if>
+            <if test="@Ognl@isNotBlank(url)" >
+       		url,
+            </if>
+            <if test="@Ognl@isNotBlank(control1)" >
+       		CONTROL1,
+            </if>
+            <if test="@Ognl@isNotBlank(control2)" >
+       		CONTROL2,
+            </if>
+            <if test="@Ognl@isNotBlank(control3)" >
+       		CONTROL3,
+            </if>
+            <if test="@Ognl@isNotBlank(moduleType)" >
+       		module_type,
+            </if>
+            <if test="@Ognl@isNotBlank(listNo)" >
+       		list_no,
+            </if>
+            is_valid,
+       		STAMP
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	SEQ_MODULE.NEXTVAL,
+		 	<if test="@Ognl@isNotBlank(moduleName)" >
+       		#{moduleName},
+            </if>
+            <if test="@Ognl@isNotBlank(parentId)" >
+       		#{parentId},
+            </if>
+             <if test="@Ognl@isNotBlank(url)" >
+       		url,
+            </if>
+            <if test="@Ognl@isNotBlank(control1)" >
+       		#{control1},
+            </if>
+            <if test="@Ognl@isNotBlank(control2)" >
+       		#{control2},
+            </if>
+            <if test="@Ognl@isNotBlank(control3)" >
+       		#{control3},
+            </if>
+             <if test="@Ognl@isNotBlank(moduleType)" >
+       		#{moduleType},
+            </if>
+            <if test="@Ognl@isNotBlank(listNo)" >
+       		#{listNo},
+            </if>
+            0,
+            sysdate
+		 </trim>
+ 	</insert>
+ 
+	<update id="edit" parameterType="ModulePOJO">
+		UPDATE t_p_Module
+   SET 
+    	<trim  suffixOverrides=",">
+	       <if test="@Ognl@isNotBlank(moduleName)" >
+       		module_name = #{moduleName},
+            </if>
+            <if test="@Ognl@isNotBlank(parentId)" >
+       		PARENT_ID = #{parentId},
+            </if>
+             <if test="@Ognl@isNotBlank(url)" >
+       		url = #{url},
+            </if>
+            <if test="@Ognl@isNotBlank(control1)" >
+       		CONTROL1 = #{control1},
+            </if>
+            <if test="@Ognl@isNotBlank(control2)" >
+       		CONTROL2 = #{control2},
+            </if>
+            <if test="@Ognl@isNotBlank(control3)" >
+       		CONTROL3 = #{control3},
+            </if>
+            <if test="@Ognl@isNotBlank(listNo)" >
+       		list_No = #{listNo},
+            </if>
+            <if test="@Ognl@isNotBlank(moduleType)" >
+       		module_Type = #{moduleType},
+            </if>
+            <if test="@Ognl@isNotBlank(isValid)" >
+       		is_valid = #{isValid},
+            </if>
+            STAMP = sysdate
+      </trim>
+ WHERE Module_ID = #{moduleId,jdbcType=BIGINT}
+	</update>
+	<insert id="addRoleModules" parameterType="java.util.List" >
+    insert into t_p_role_module
+                                     (role_id, module_id)
+ <foreach collection="list" item="item" index="index" separator="union all">
+ select  #{item.roleId}, #{item.moduleId}
+ from dual
+ </foreach>
+ </insert>
+ 
+ <select id="getList4Role" parameterType="ModulePOJO" resultMap="moduleMap">
+		  SELECT M.Module_Id,m.module_name,m.parent_id,decode(rm.role_id,null,'0','1') as url FROM 
+    (SELECT * FROM T_P_MODULE START WITH parent_id is null
+        CONNECT BY PRIOR MODULE_ID = PARENT_ID) M left join (select * from t_p_role_module 
+		<where>
+		  <if test="@Ognl@isNotBlank(roleId)">
+		   role_id=#{roleId}
+		  </if>
+		</where>        
+        ) rm 
+        on m.module_id=rm.module_id
+		where M.is_valid = 0
+	</select>
+</mapper>  

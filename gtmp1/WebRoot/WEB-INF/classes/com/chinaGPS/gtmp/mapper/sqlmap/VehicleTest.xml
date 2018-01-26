@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.VehicleTestMapper"> 
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+    <resultMap type="TestPOJO" id="vehicleTestMap"> 
+        <id property="testId" column="TEST_ID" jdbcType="BIGINT" />  
+        <result property="unitId" column="unit_Id" jdbcType="VARCHAR"/>
+        <result property="testUserId" column="test_user_Id" jdbcType="BIGINT"/>
+        <result property="testTime" column="TEST_TIME" jdbcType="TIMESTAMP"/>
+        <result property="testLocation" column="test_Location" jdbcType="INTEGER"/>
+        <result property="testAEnable" column="test_A_Enable" jdbcType="INTEGER"/>
+        <result property="testADisable" column="test_A_Disable" jdbcType="INTEGER"/>
+        <result property="testBEnable" column="test_B_Enable" jdbcType="INTEGER"/>
+        <result property="testBDisable" column="test_B_Disable" jdbcType="INTEGER"/>
+        <result property="testProtectEnable" column="test_Protect_Enable" jdbcType="INTEGER"/>
+        <result property="testProtectDisable" column="test_Protect_Disable" jdbcType="INTEGER"/>
+        <result property="testResult" column="test_Result" jdbcType="INTEGER"/>
+        <result property="result" column="RESULT" jdbcType="VARCHAR"/>
+        <result property="qaUserId" column="qa_user_Id" jdbcType="BIGINT"/>
+        <result property="qaTime" column="qa_Time" jdbcType="TIMESTAMP"/>
+        <result property="qaResult" column="qa_Result" jdbcType="INTEGER"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+        <result property="testFlag" column="TEST_FLAG" jdbcType="INTEGER"/>
+         
+        <result property="vehicleId" column="VEHICLE_ID" jdbcType="BIGINT" />  
+        <result property="vehicleDef" column="VEHICLE_DEF" jdbcType="VARCHAR"/>
+        <result property="testUserName" column="test_user_name" jdbcType="VARCHAR"/>
+        <result property="qaUserName" column="qa_user_name" jdbcType="VARCHAR"/>
+         <result property="supperierSn" column="supperier_sn" jdbcType="VARCHAR"/>
+     
+    </resultMap>
+	 <resultMap type="TestCommandPOJO" id="testCommandMap"> 
+        <id property="commandId" column="command_id" jdbcType="BIGINT" />  
+        <result property="commandSn" column="command_sn" jdbcType="BIGINT"/>
+        <result property="unitId" column="unit_Id" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="BIGINT"/>
+        <result property="commandTypeId" column="command_type_id" jdbcType="INTEGER"/>
+        <result property="param" column="param" jdbcType="VARCHAR"/>
+        <result property="commandResult" column="command_result" jdbcType="INTEGER"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+        <result property="ownerName" column="owner_name" jdbcType="VARCHAR"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        <result property="commandTypeName" column="command_type_name" jdbcType="VARCHAR"/>
+    </resultMap>
+	<insert id="add" parameterType="TestPOJO" flushCache="true">
+		INSERT INTO t_test
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+		 	test_id,
+		 	<if test="@Ognl@isNotBlank(unitId)" >
+       		unit_id,
+            </if>
+            <if test="@Ognl@isNotBlank(testUserId)" >
+       		test_user_id,
+            </if>
+            <if test="@Ognl@isNotBlank(testTime)" >
+       		test_time,
+            </if>
+            <if test="@Ognl@isNotBlank(testLocation)" >
+       		test_location,
+            </if>
+            <if test="@Ognl@isNotBlank(testAEnable)" >
+       		test_a_enable,
+            </if>
+            <if test="@Ognl@isNotBlank(testADisable)" >
+       		test_a_disable,
+            </if>
+            <if test="@Ognl@isNotBlank(testBEnable)" >
+       		test_b_enable,
+            </if>
+            <if test="@Ognl@isNotBlank(testBDisable)" >
+       		test_b_disable,
+            </if>
+            <if test="@Ognl@isNotBlank(testProtectEnable)" >
+       		test_protect_enable,
+            </if>
+            <if test="@Ognl@isNotBlank(testProtectDisable)" >
+       		test_protect_disable,
+            </if>
+             <if test="@Ognl@isNotBlank(testResult)" >
+       		test_result,
+            </if>
+              <if test="@Ognl@isNotBlank(qaUserId)" >
+       		qa_user_id,
+            </if>
+              <if test="@Ognl@isNotBlank(qaTime)" >
+       		qa_time,
+            </if>
+              <if test="@Ognl@isNotBlank(qaResult)" >
+       		qa_result,
+            </if>
+       		STAMP
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	SEQ_TEST.NEXTVAL,
+		 	<if test="@Ognl@isNotBlank(unitId)" >
+       		#{unitId},
+            </if>
+             <if test="@Ognl@isNotBlank(testUserId)" >
+       		#{testUserId},
+            </if>
+            <if test="@Ognl@isNotBlank(testTime)" >
+       		#{testTime},
+            </if>
+            <if test="@Ognl@isNotBlank(testLocation)" >
+       		#{testLocation},
+            </if>
+            <if test="@Ognl@isNotBlank(testAEnable)" >
+       		#{testAEnable},
+            </if>
+            <if test="@Ognl@isNotBlank(testADisable)" >
+       		#{testADisable},
+            </if>
+            <if test="@Ognl@isNotBlank(testBEnable)" >
+       		#{testBEnable},
+            </if>
+            <if test="@Ognl@isNotBlank(testBDisable)" >
+       		#{testBDisable},
+            </if>
+            <if test="@Ognl@isNotBlank(testProtectEnable)" >
+       		#{testBDisable},
+            </if>
+            <if test="@Ognl@isNotBlank(testProtectDisable)" >
+       		#{testBDisable},
+            </if>
+             <if test="@Ognl@isNotBlank(testResult)" >
+       		#{testResult},
+            </if>
+              <if test="@Ognl@isNotBlank(qaUserId)" >
+       		#{qaUserId},
+            </if>
+              <if test="@Ognl@isNotBlank(qaTime)" >
+       		#{qaTime},
+            </if>
+              <if test="@Ognl@isNotBlank(qaResult)" >
+       		#{qaResult},
+            </if>
+            sysdate
+		 </trim>
+ 	</insert>
+
+<update id="edit" parameterType="TestPOJO">
+		UPDATE t_test 
+		SET 
+    	<trim suffixOverrides=",">
+    		STAMP=sysdate, 
+    		<if test="@Ognl@isNotBlank(unitId)">unit_id=#{unitId},</if>
+		 	<if test="@Ognl@isNotBlank(testUserId)">test_user_id=#{testUserId},</if>
+		 	<if test="@Ognl@isNotBlank(testTime)">test_time=#{testTime},</if>
+		 	<if test="@Ognl@isNotBlank(testLocation)">test_location=#{testLocation},</if>
+            <if test="@Ognl@isNotBlank(testAEnable)">test_a_enable=#{testAEnable},</if>
+		 	<if test="@Ognl@isNotBlank(testADisable)">test_a_disable=#{testADisable},</if>
+            <if test="@Ognl@isNotBlank(testBEnable)">test_b_enable=#{testBEnable},</if>
+            <if test="@Ognl@isNotBlank(testBDisable)">test_b_disable=#{testBDisable},</if>
+            <if test="@Ognl@isNotBlank(testProtectEnable)">test_protect_enable=#{testProtectEnable},</if>
+            <if test="@Ognl@isNotBlank(testProtectDisable)">test_protect_disable=#{testProtectDisable},</if>
+            <if test="@Ognl@isNotBlank(testResult)">test_result=#{testResult},</if>
+            <if test="@Ognl@isNotBlank(qaUserId)">qa_user_id=#{qaUserId},</if>
+            <if test="@Ognl@isNotBlank(qaTime)">qa_time=#{qaTime},</if>
+      	</trim>
+ 		WHERE test_id=#{testId,jdbcType=BIGINT}
+	</update>
+	
+	<sql id="getByPageCondition">
+		<where>
+		 and v.vehicle_def is not null
+			<if test="@Ognl@isNotBlank(test)">
+				<if test="@Ognl@isNotBlank(test.vehicleDef)">   
+	       			AND lower(V.VEHICLE_DEF) LIKE '%'||lower(#{test.vehicleDef})||'%' 
+	  			</if>
+				<if test="@Ognl@isNotBlank(test.supperierSn)">AND U.SUPPERIER_SN=#{test.supperierSn}</if>
+				<if test="@Ognl@isNotBlank(test.testResult)">AND t.test_result=#{test.testResult}</if>
+				 <if test="@Ognl@isNotBlank(test.testTime)">
+					AND t.test_time &gt;=#{test.testTime}
+				</if>
+				<if test="@Ognl@isNotBlank(test.testTime2)">
+					AND t.test_time &lt;=#{test.testTime2}
+				</if>
+				<if test="@Ognl@isNotBlank(test.qaResult)">AND t.qa_result=#{test.qaResult}</if>
+				<if test="@Ognl@isNotBlank(test.qaTime)">
+					AND t.qa_time &gt;=#{test.qaTime}
+				</if>
+				<if test="@Ognl@isNotBlank(test.qaTime2)">
+					AND t.qa_time &lt;=#{test.qaTime2}
+				</if>
+				<!-- 是否测试 -->
+				<if test="@Ognl@isNotBlank(test.testAEnable)">
+					AND v.TEST_FLAG =#{test.testAEnable}
+				</if>
+				
+				<!-- 是否已质检 -->
+				<if test="@Ognl@isNotBlank(test.testLocation)">
+				 <choose>
+				  <when test="test.testLocation==1">
+				    AND v.VEHICLE_STATUS=#{test.testLocation} 
+				  	AND t.qa_time is  null
+				  </when>
+				  <otherwise>
+				   <!-- AND v.VEHICLE_STATUS!=1 -->
+				   AND t.qa_time is not null
+				  </otherwise>
+				 </choose>
+				</if>
+				
+			</if>
+		</where>
+	</sql>
+	
+	<!-- 分页查询测试信息 -->
+	<select id="getByPage" parameterType="map" resultMap="vehicleTestMap" useCache="false">
+		select test_id,
+       t.unit_id,
+       test_user_id,
+       test_time,
+       test_location,
+       test_a_enable,
+       test_a_disable,
+       test_b_enable,
+       test_b_disable,
+       test_protect_enable,
+       test_protect_disable,
+       test_reserve1,
+       test_reserve2,
+       test_reserve3,
+       test_reserve4,
+       test_result,
+       qa_user_id,       
+       qa_time,
+       qa_result,
+       t.stamp,
+       v.vehicle_Id,
+       v.vehicle_def,
+       v.TEST_FLAG,
+       pu.user_name as test_user_name,
+       pu1.user_name as qa_user_name,
+       ds.supperier_name as supperier_sn
+  from t_test t 
+  left join t_vehicle_unit vu on t.unit_id=vu.unit_id
+  left join t_vehicle v on v.vehicle_id=vu.vehicle_id
+  left join t_unit u on u.unit_id=t.unit_id
+  left join t_p_user pu on pu.user_id=t.test_user_id
+  left join t_p_user pu1 on pu1.user_id=t.qa_user_id
+  left join t_dic_supperier ds on u.supperier_sn=ds.supperier_sn
+		<include refid="getByPageCondition"/> 
+		order by t.stamp desc  
+	</select>
+	<select id="countAll" parameterType="map" resultType="Integer" useCache="false">
+		select count(test_id)
+  from t_test t 
+  left join t_vehicle_unit vu on t.unit_id=vu.unit_id
+  left join t_vehicle v on v.vehicle_id=vu.vehicle_id
+  left join t_unit u on u.unit_id=t.unit_id
+   left join t_p_user pu on pu.user_id=t.test_user_id
+    left join t_dic_supperier ds on u.supperier_sn=ds.supperier_sn
+		<include refid="getByPageCondition"/>   
+	</select> 
+	
+	
+	<sql id="getByPageTestCommandCondition">
+		<where>
+			<if test="@Ognl@isNotBlank(testCommand)">
+				<if test="@Ognl@isNotBlank(testCommand.unitId)">
+				AND tc.unit_id=#{testCommand.unitId}
+				</if>
+			</if>
+		</where>
+	</sql>
+	
+	<!-- 分页查询测试指令 -->
+	<select id="getByPageTestCommand" parameterType="map" resultMap="testCommandMap" useCache="false">
+		select command_id,
+       command_sn,
+       tc.unit_id,
+       tc.user_id,
+       tc.command_type_id,
+       param,
+       command_result,
+       tc.stamp,
+       u.user_name,
+       dct.command_type_name
+  from t_test_command tc
+   left join t_dic_command_type dct on tc.command_type_id=dct.command_type_id
+   left join t_p_user u on tc.user_id = u.user_id
+  <include refid="getByPageTestCommandCondition"/> 
+  order by tc.stamp desc   
+	</select>
+	<select id="countTestCommand" parameterType="map" resultType="Integer" useCache="false">
+select count(command_id)
+  from t_test_command tc 
+  left join t_dic_command_type dct on tc.command_type_id=dct.command_type_id
+		<include refid="getByPageTestCommandCondition"/>   
+	</select> 
+	
+		<update id="editTest" parameterType="map">
+		update t_test set 
+		<if test="@Ognl@isNotBlank(qaResult)">
+					qa_result=#{qaResult},
+		</if>
+		<if test="@Ognl@isNotBlank(qaUserId)">
+					qa_user_id=#{qaUserId},
+		</if>
+        qa_time=sysdate,
+        stamp=sysdate
+		  <where>
+           <if test="@Ognl@isNotBlank(testIds)">
+	    			and 
+		    		<foreach collection="testIds" item="item" open="(" separator=" or " close=")">
+			 			 test_id =#{item} 
+					</foreach>
+			</if>
+		  </where>
+	</update>
+	
+	
+	<update id="editVehicleStatus" parameterType="map">
+		update T_VEHICLE set 
+		<if test="@Ognl@isNotBlank(status)">
+					VEHICLE_STATUS=#{status},
+		</if>
+		<if test="@Ognl@isNotBlank(testFlag)">
+					TEST_FLAG=#{testFlag},
+		</if>
+        stamp=sysdate
+		  <where>
+           <if test="@Ognl@isNotBlank(vehicleIds)">
+	    			and 
+		    		<foreach collection="vehicleIds" item="item" open="(" separator=" or " close=")">
+			 			 VEHICLE_ID =#{item} 
+					</foreach>
+			</if>
+		  </where>
+	</update>
+	
+	
+	<!-- 分页查询测试信息 -->
+	<select id="getList" parameterType="TestPOJO" resultMap="vehicleTestMap">
+		select test_id,
+       t.unit_id,
+       test_user_id,
+       test_time,
+       test_location,
+       test_a_enable,
+       test_a_disable,
+       test_b_enable,
+       test_b_disable,
+       test_protect_enable,
+       test_protect_disable,
+       test_reserve1,
+       test_reserve2,
+       test_reserve3,
+       test_reserve4,
+       test_result,
+       qa_user_id,
+       qa_time,
+       qa_result,
+       t.stamp,
+       v.vehicle_Id,
+       v.vehicle_def,
+        pu.user_name as test_user_name,
+         ds.supperier_name as supperier_sn
+  from t_test t 
+  left join t_vehicle_unit vu on t.unit_id=vu.unit_id
+  left join t_vehicle v on v.vehicle_id=vu.vehicle_id
+  left join t_unit u on u.unit_id=t.unit_id
+   left join t_p_user pu on pu.user_id=t.test_user_id
+    left join t_dic_supperier ds on u.supperier_sn=ds.supperier_sn
+		<where>
+				<if test="@Ognl@isNotBlank(vehicleDef)">   
+	       			AND lower(V.VEHICLE_DEF) LIKE '%'||lower(#{vehicleDef})||'%' 
+	  			</if>
+				<if test="@Ognl@isNotBlank(supperierSn)">AND U.SUPPERIER_SN=#{supperierSn}</if>
+				<if test="@Ognl@isNotBlank(testResult)">AND t.test_result=#{testResult}</if>
+				 <if test="@Ognl@isNotBlank(testTime)">
+					AND t.test_time &gt;=#{testTime}
+				</if>
+				<if test="@Ognl@isNotBlank(testTime2)">
+					AND t.test_time &lt;=#{testTime2}
+				</if>
+				<if test="@Ognl@isNotBlank(qaTime)">
+					AND t.qa_time &gt;=#{qaTime}
+				</if>
+				<if test="@Ognl@isNotBlank(qaTime2)">
+					AND t.qa_time &lt;=#{qaTime2}
+				</if>
+				<if test="@Ognl@isNotBlank(qaResult)">AND t.qa_result=#{qaResult}</if>
+				<!-- 是否测试 -->
+				<if test="@Ognl@isNotBlank(testAEnable)">
+					AND v.TEST_FLAG =#{testAEnable}
+				</if>
+				
+				<!-- 是否已质检 -->
+				<if test="@Ognl@isNotBlank(testLocation)">
+				 <choose>
+				  <when test="testLocation==1">
+				    AND v.VEHICLE_STATUS=#{testLocation} 
+				  	AND t.qa_time is  null
+				  </when>
+				  <otherwise>
+				   <!-- AND v.VEHICLE_STATUS!=1 -->
+				   AND t.qa_time is not null
+				  </otherwise>
+				 </choose>
+				</if>
+		</where>
+		order by t.stamp desc  
+	</select>
+	
+	<insert id="saveOrUpdateTest" parameterType="TestPOJO">
+  
+  <if test="hasdata > 0">
+    update t_test 
+    set test_user_id=#{testUserId}, 
+    test_time=sysdate,
+    stamp = sysdate,
+    test_result = #{testResult},
+    test_location=#{testLocation},
+    test_a_enable=#{testAEnable},
+    test_a_disable=#{testADisable},
+    test_b_enable=#{testBEnable},
+    test_b_disable=#{testBDisable},
+    test_protect_enable=#{testProtectEnable},
+    test_protect_disable=#{testProtectDisable},
+    test_reserve1=#{test_reserve1} 
+    where unit_id = #{unitId}
+  </if>
+  <if test="hasdata == 0">
+    INSERT INTO t_test
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+		 	test_id,
+		 	<if test="@Ognl@isNotBlank(unitId)" >
+       		unit_id,
+            </if>
+            <if test="@Ognl@isNotBlank(testUserId)" >
+       		test_user_id,
+            </if>
+            
+       		test_time,
+            
+            <if test="@Ognl@isNotBlank(testLocation)" >
+       		test_location,
+            </if>
+            <if test="@Ognl@isNotBlank(testAEnable)" >
+       		test_a_enable,
+            </if>
+            <if test="@Ognl@isNotBlank(testADisable)" >
+       		test_a_disable,
+            </if>
+            <if test="@Ognl@isNotBlank(testBEnable)" >
+       		test_b_enable,
+            </if>
+            <if test="@Ognl@isNotBlank(testBDisable)" >
+       		test_b_disable,
+            </if>
+            <if test="@Ognl@isNotBlank(testProtectEnable)" >
+       		test_protect_enable,
+            </if>
+            <if test="@Ognl@isNotBlank(testProtectDisable)" >
+       		test_protect_disable,
+            </if>
+             <if test="@Ognl@isNotBlank(testResult)" >
+       		test_result,
+            </if>
+              <if test="@Ognl@isNotBlank(qaUserId)" >
+       		qa_user_id,
+            </if>
+              <if test="@Ognl@isNotBlank(qaTime)" >
+       		qa_time,
+            </if>
+              <if test="@Ognl@isNotBlank(qaResult)" >
+       		qa_result,
+            </if>
+       		STAMP
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	SEQ_TEST.NEXTVAL,
+		 	<if test="@Ognl@isNotBlank(unitId)" >
+       		#{unitId},
+            </if>
+             <if test="@Ognl@isNotBlank(testUserId)" >
+       		#{testUserId},
+            </if>            
+       		sysdate,            
+            <if test="@Ognl@isNotBlank(testLocation)" >
+       		#{testLocation},
+            </if>
+            <if test="@Ognl@isNotBlank(testAEnable)" >
+       		#{testAEnable},
+            </if>
+            <if test="@Ognl@isNotBlank(testADisable)" >
+       		#{testADisable},
+            </if>
+            <if test="@Ognl@isNotBlank(testBEnable)" >
+       		#{testBEnable},
+            </if>
+            <if test="@Ognl@isNotBlank(testBDisable)" >
+       		#{testBDisable},
+            </if>
+            <if test="@Ognl@isNotBlank(testProtectEnable)" >
+       		#{testBDisable},
+            </if>
+            <if test="@Ognl@isNotBlank(testProtectDisable)" >
+       		#{testBDisable},
+            </if>
+             <if test="@Ognl@isNotBlank(testResult)" >
+       		#{testResult},
+            </if>
+              <if test="@Ognl@isNotBlank(qaUserId)" >
+       		#{qaUserId},
+            </if>
+              <if test="@Ognl@isNotBlank(qaTime)" >
+       		#{qaTime},
+            </if>
+              <if test="@Ognl@isNotBlank(qaResult)" >
+       		#{qaResult},
+            </if>
+            sysdate
+		 </trim>
+  </if>  
+ </insert>
+ 
+  <select id="getTestByUnitId" parameterType="string" resultMap="vehicleTestMap" useCache="false">
+	select test_id,
+       t.unit_id,
+       test_user_id,
+       test_time,
+       test_location,
+       test_a_enable,
+       test_a_disable,
+       test_b_enable,
+       test_b_disable,
+       test_protect_enable,
+       test_protect_disable,
+       test_reserve1,
+       test_reserve2,
+       test_reserve3,
+       test_reserve4,
+       test_result,       
+       t.stamp 
+       from t_test t 
+       where unit_id = #{unitId}		 
+	</select>
+
+</mapper>  

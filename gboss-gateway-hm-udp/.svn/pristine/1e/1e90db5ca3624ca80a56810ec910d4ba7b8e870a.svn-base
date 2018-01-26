@@ -1,0 +1,34 @@
+package cc.chinagps.gateway.unit.oem.test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.jms.JMSException;
+
+import cc.chinagps.gateway.log.LogManager;
+import cc.chinagps.gateway.mq.MQManager;
+import cc.chinagps.gateway.mq.export.ExportMQMult;
+import cc.chinagps.gateway.seat.cmd.CmdUtil;
+
+
+public class Sender {
+	public static void main(String[] args) {
+		ExportMQMult exportMQMult=new ExportMQMult();
+		try {
+			LogManager.init();
+			MQManager.init();
+			exportMQMult.init();
+			String callLetter = "13800000028";
+			int cmdId =CmdUtil.CMD_ID_REMOTE_CONTROL_VEHICLE;
+			List<String> params = new ArrayList<String>();
+			params.add("1");
+			exportMQMult.addCommand(callLetter, cmdId , params);
+			
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+}

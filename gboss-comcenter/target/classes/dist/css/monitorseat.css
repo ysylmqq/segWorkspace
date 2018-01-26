@@ -1,0 +1,70 @@
+/*!
+ * monitorseat.css v0.0.1
+ */
+#monitorseatwrap {
+  height: 918px;
+  padding: 0;
+  width: 100%;
+}
+
+.mainpanel-left {
+	width:17%;
+	float:left !important;
+}
+
+.mainpanel-right {
+	width:83%;
+	float:right !important;
+}
+
+.mainpanel-height {
+	height:880px;
+  	border:1px solid #dddddd;
+}
+
+.table > tbody > tr {
+	height: 60px;
+}
+
+.table > tbody > tr > td {
+	vertical-align: middle;
+	text-align: right;
+}
+
+.phoneline {
+	display: inline-block;
+	margin: 8px 2px;
+}
+
+.phoneico-open:before {
+	/*background-image: url(../images/phone-open.png);
+	background-size: 100% 100%;*/
+	content: url('../images/phone-open.png');
+}
+
+.phoneico-close:before {
+	content: url('../images/phone-close.png');
+}
+
+.phoneline > span {
+	margin-right: 30px;
+}
+
+.seattable > tbody > tr > td {
+	text-align: center;
+}
+
+.seatttableheight {
+	width:100%;
+	height:750px;
+	overflow:auto;
+}
+
+.seattable > tbody > tr {
+	height: 10px;
+}
+
+.seattable tr > td.row_selected_bc {
+	background-color: #B0BED9 !important;
+}
+

@@ -1,0 +1,1032 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.DealerAreaMapper"> 
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+    <resultMap type="DealerAreaPOJO" id="dealerAreaMap">  
+        <id property="id" column="id" jdbcType="VARCHAR" />  
+       <result property="name" column="name" jdbcType="VARCHAR"/>
+       <result property="pid" column="pid" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="INTEGER"/>
+        <result property="dtype" column="dtype" jdbcType="INTEGER"/>  
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+    </resultMap>
+		
+	<resultMap type="DealerVehiclePOJO" id="dealerVehicleMap">  
+        <id property="dealerId" column="dealer_Id" jdbcType="VARCHAR" />  
+         <!-- 机械列表 -->
+	    <collection property="vehicleList" ofType="VehicleUnitPOJO"  resultMap="vehicleUnitMap">
+		</collection>
+    </resultMap>
+    
+      <resultMap type="VehicleUnitPOJO" id="vehicleUnitMap">  
+        <result property="vehicleId" column="VEHICLE_ID" jdbcType="BIGINT" />  
+        <result property="unitId" column="UNIT_ID" jdbcType="VARCHAR"/>
+        <result property="vehicleDef" column="VEHICLE_DEF" jdbcType="VARCHAR"/>
+        <result property="typeId" column="VEHICLE_TYPE" jdbcType="BIGINT"/>
+        <result property="modelId" column="VEHICLE_MODEL" jdbcType="BIGINT"/>
+        <result property="status" column="VEHICLE_STATUS" jdbcType="INTEGER"/>
+        <result property="supperierSn" column="supperier_sn" jdbcType="VARCHAR"/>
+        <result property="unitSn" column="unit_sn" jdbcType="VARCHAR"/>
+        <result property="unitTypeSn" column="unit_type_sn" jdbcType="VARCHAR"/>
+        <result property="materialNo" column="MATERIAL_NO" jdbcType="VARCHAR"/>
+        <result property="simNo" column="SIM_NO" jdbcType="VARCHAR"/>
+        <result property="steelNo" column="STEEL_NO" jdbcType="VARCHAR"/>
+        
+        <result property="isLogin" column="is_Login" jdbcType="INTEGER"/>
+        <result property="lon" column="lon" jdbcType="FLOAT"/>
+        <result property="lat" column="lat" jdbcType="FLOAT" />
+        <result property="direction" column="direction" jdbcType="INTEGER"/>
+        <result property="speed" column="speed" jdbcType="FLOAT"/>  
+        <result property="locationState" column="location_state" jdbcType="INTEGER"/>
+        <result property="vehicleState" column="vehicle_state" jdbcType="VARCHAR"/>
+        <result property="gpsTime" column="gps_time" jdbcType="TIMESTAMP"/>
+        <result property="referencePosition" column="reference_position" jdbcType="VARCHAR"/>
+        <result property="alarmFlag" column="alarmFlag" jdbcType="INTEGER"/>
+        <result property="nowTime" column="nowTime" jdbcType="TIMESTAMP"/>
+        <result property="alock" column="a_lock" jdbcType="INTEGER"/>
+        <result property="block" column="b_lock" jdbcType="INTEGER"/>
+        <result property="clock" column="c_lock" jdbcType="INTEGER"/>
+    </resultMap>
+    
+     <resultMap type="CompositePOJO" id="compositeResultMap">  
+        <!-- 机械信息 -->
+        <result property="vehicleId" column="VEHICLE_ID" jdbcType="BIGINT" />  
+         <result property="vehicleDef" column="VEHICLE_DEF" jdbcType="VARCHAR"/>
+        <result property="typeId" column="VEHICLE_TYPE" jdbcType="BIGINT"/>
+        <result property="modelId" column="VEHICLE_MODEL" jdbcType="BIGINT"/>
+   		<result property="fixMan" column="FIX_MAN" jdbcType="TIMESTAMP"/>
+        <result property="fixDate" column="FIX_DATE" jdbcType="VARCHAR"/>
+        <result property="status" column="VEHICLE_STATUS" jdbcType="INTEGER"/>
+        <!-- 销售信息 -->
+        <result property="saleDate" column="sale_date" jdbcType="TIMESTAMP"/>
+        <result property="dealerName" column="dealer_Name" jdbcType="BIGINT"/>
+   		<result property="ownerName" column="owner_name" jdbcType="VARCHAR"/>
+        <result property="ownerPhone" column="owner_phone_number" jdbcType="INTEGER"/>
+      
+        <!-- 终端信息 -->
+        <result property="unitId" column="UNIT_ID" jdbcType="VARCHAR"/>
+        <result property="supperierSn" column="supperier_sn" jdbcType="VARCHAR"/>
+        <result property="unitSn" column="unit_sn" jdbcType="VARCHAR"/>
+        <result property="unitTypeSn" column="unit_type_sn" jdbcType="VARCHAR"/>
+        <result property="unitType" column="unit_type" jdbcType="VARCHAR"/>
+        <result property="materialNo" column="MATERIAL_NO" jdbcType="VARCHAR"/>
+        <result property="simNo" column="SIM_NO" jdbcType="VARCHAR"/>
+        <result property="steelNo" column="STEEL_NO" jdbcType="VARCHAR"/>
+        <result property="hardwareVersion" column="hardware_version" jdbcType="VARCHAR" />
+        <result property="softwareVersion" column="SOFTWARE_VERSION" jdbcType="VARCHAR" />
+        <result property="productionDate" column="production_date" jdbcType="DATE" />
+        <!-- GPS信息 -->
+          <result property="lon" column="lon" jdbcType="FLOAT"/>
+        <result property="lat" column="lat" jdbcType="FLOAT" />
+        <result property="direction" column="direction" jdbcType="INTEGER"/>
+        <result property="speed" column="speed" jdbcType="FLOAT"/>  
+        <result property="locationState" column="location_state" jdbcType="INTEGER"/>
+        <result property="vehicleState" column="vehicle_state" jdbcType="VARCHAR"/>
+        <result property="gpsTime" column="gps_time" jdbcType="TIMESTAMP"/>
+        <result property="referencePosition" column="reference_position" jdbcType="VARCHAR"/>
+     	<result property="isLogin" column="is_Login" jdbcType="INTEGER"/>
+     	<result property="alarmFlag" column="alarmFlag" jdbcType="INTEGER"/>
+       <!-- 工况信息 -->
+            
+          <result property="engineCoolantTemperature" column="engineCoolantTemperature" jdbcType="INTEGER"/>
+        <result property="engineCoolantLevel" column="engineCoolantLevel" jdbcType="FLOAT" />
+        <result property="engineOilPressure" column="engineOilPressure" jdbcType="FLOAT"/>
+        <result property="engineFuelLevel" column="engineFuelLevel" jdbcType="FLOAT"/>  
+        <result property="engineSpeed" column="engineSpeed" jdbcType="INTEGER"/>
+        <result property="hydraulicOilTemperature" column="hydraulicOilTemperature" jdbcType="INTEGER"/>
+        <result property="systemVoltage" column="systemVoltage" jdbcType="FLOAT"/>
+        <result property="beforePumpMainPressure" column="beforePumpMainPressure" jdbcType="FLOAT"/>
+        <result property="afterPumpMainPressure" column="afterPumpMainPressure" jdbcType="FLOAT"/>
+         <result property="pilotPressure1" column="pilotPressure1" jdbcType="FLOAT"/>
+        <result property="pilotPressure2" column="pilotPressure2" jdbcType="FLOAT" />
+        <result property="beforePumpPressure" column="beforePumpPressure" jdbcType="FLOAT"/>
+        <result property="afterPumpPressure" column="afterPumpPressure" jdbcType="FLOAT"/>  
+        <result property="proportionalCurrent1" column="proportionalCurrent1" jdbcType="INTEGER"/>
+        <result property="proportionalCurrent2" column="proportionalCurrent2" jdbcType="INTEGER"/>
+        <result property="totalWorkingHours" column="totalWorkingHours" jdbcType="FLOAT"/>
+        <result property="correctHours" column="correctHours" jdbcType="FLOAT"/>
+        <result property="gear" column="gear" jdbcType="INTEGER"/>
+        <result property="highEngineCoolantTemperVal" column="highEngineCoolantTemperVal" jdbcType="INTEGER"/>
+        <result property="lowEngineOilPressureAlarmValue" column="lowEngineOilPressureAlarmValue" jdbcType="FLOAT" />
+        <result property="highVoltageAlarmValue" column="highVoltageAlarmValue" jdbcType="FLOAT"/>
+        <result property="lowVoltageAlarmValue" column="lowVoltageAlarmValue" jdbcType="FLOAT"/>
+        <result property="highHydraulicOilTemperAlarmVal" column="highHydraulicOilTemperAlarmVal" jdbcType="INTEGER"/>  
+        <result property="toothNumberValue" column="toothNumberValue" jdbcType="INTEGER"/>
+        <result property="monitorSoftwareCode" column="monitorSoftwareCode" jdbcType="VARCHAR"/>
+        <result property="monitorYcSoftwareCode" column="monitorYcSoftwareCode" jdbcType="VARCHAR"/>
+        <result property="controllerSoftwareCode" column="controllerSoftwareCode" jdbcType="VARCHAR"/>
+        <result property="controllerYcSoftwareCode" column="controllerYcSoftwareCode" jdbcType="VARCHAR"/>
+        <result property="faultCode" column="FAULTCODE" jdbcType="INTEGER"/>
+        <result property="engineOilTemperature" column="ENGINEOILTEMPERATURE" jdbcType="INTEGER"/>
+        <result property="productCode" column="productCode" jdbcType="VARCHAR" />
+        <result property="alock" column="A_LOCK" jdbcType="INTEGER"/>
+        <result property="block" column="B_LOCK" jdbcType="INTEGER"/>
+        <result property="clock" column="C_LOCK" jdbcType="VARCHAR" />
+        
+        <result property="rawData" column="raw_data" jdbcType="VARCHAR"/>
+        <result property="isWork" column="is_Work" jdbcType="INTEGER"/>
+       <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+        <!-- 中文名称 -->
+        <result property="typeName" column="type_name" jdbcType="VARCHAR"/>
+        <result property="modelName" column="model_name" jdbcType="VARCHAR"/>
+        <result property="supperierName" column="supperier_name" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+      <resultMap type="CompositeQueryConditionPOJO" id="compositeQueryConditionMap" extends="compositeResultMap">
+       <result property="gpsTime" column="gps_time2" jdbcType="TIMESTAMP"/> 
+    </resultMap>
+    
+     <resultMap type="ConditionsPOJO" id="conditionsResultMap">  
+        <result property="conId" column="con_Id" jdbcType="BIGINT"/>
+        <result property="unitId" column="UNIT_ID" jdbcType="VARCHAR"/>
+        <result property="engineCoolantTemperature" column="engineCoolantTemperature" jdbcType="INTEGER"/>
+        <result property="engineCoolantLevel" column="engineCoolantLevel" jdbcType="FLOAT" />
+        <result property="engineOilPressure" column="engineOilPressure" jdbcType="FLOAT"/>
+        <result property="engineFuelLevel" column="engineFuelLevel" jdbcType="FLOAT"/>  
+        <result property="engineSpeed" column="engineSpeed" jdbcType="INTEGER"/>
+        <result property="hydraulicOilTemperature" column="hydraulicOilTemperature" jdbcType="INTEGER"/>
+        <result property="systemVoltage" column="systemVoltage" jdbcType="FLOAT"/>
+        <result property="beforePumpMainPressure" column="beforePumpMainPressure" jdbcType="FLOAT"/>
+        <result property="afterPumpMainPressure" column="afterPumpMainPressure" jdbcType="FLOAT"/>
+         <result property="pilotPressure1" column="pilotPressure1" jdbcType="FLOAT"/>
+        <result property="pilotPressure2" column="pilotPressure2" jdbcType="FLOAT" />
+        <result property="beforePumpPressure" column="beforePumpPressure" jdbcType="FLOAT"/>
+        <result property="afterPumpPressure" column="afterPumpPressure" jdbcType="FLOAT"/>  
+        <result property="proportionalCurrent1" column="proportionalCurrent1" jdbcType="INTEGER"/>
+        <result property="proportionalCurrent2" column="proportionalCurrent2" jdbcType="INTEGER"/>
+        <result property="totalWorkingHours" column="totalWorkingHours" jdbcType="FLOAT"/>
+        <result property="correctHours" column="correctHours" jdbcType="FLOAT"/>
+        <result property="gear" column="gear" jdbcType="INTEGER"/>
+        <result property="highEngineCoolantTemperVal" column="highEngineCoolantTemperVal" jdbcType="INTEGER"/>
+        <result property="lowEngineOilPressureAlarmValue" column="lowEngineOilPressureAlarmValue" jdbcType="FLOAT" />
+        <result property="highVoltageAlarmValue" column="highVoltageAlarmValue" jdbcType="FLOAT"/>
+        <result property="lowVoltageAlarmValue" column="lowVoltageAlarmValue" jdbcType="FLOAT"/>
+        <result property="highHydraulicOilTemperAlarmVal" column="highHydraulicOilTemperAlarmVal" jdbcType="INTEGER"/>  
+        <result property="toothNumberValue" column="toothNumberValue" jdbcType="INTEGER"/>
+        <result property="monitorSoftwareCode" column="monitorSoftwareCode" jdbcType="VARCHAR"/>
+        <result property="monitorYcSoftwareCode" column="monitorYcSoftwareCode" jdbcType="VARCHAR"/>
+        <result property="controllerSoftwareCode" column="controllerSoftwareCode" jdbcType="VARCHAR"/>
+        <result property="controllerYcSoftwareCode" column="controllerYcSoftwareCode" jdbcType="VARCHAR"/>
+        <result property="faultCode" column="FAULTCODE" jdbcType="INTEGER"/>
+        <result property="engineOilTemperature" column="ENGINEOILTEMPERATURE" jdbcType="INTEGER"/>
+        <result property="productCode" column="productCode" jdbcType="VARCHAR" />
+        <result property="alock" column="A_LOCK" jdbcType="INTEGER"/>
+        <result property="block" column="B_LOCK" jdbcType="INTEGER"/>
+        <result property="clock" column="C_LOCK" jdbcType="VARCHAR" />
+        <result property="vehicleDef" column="VEHICLE_DEF" jdbcType="VARCHAR"/>
+        <result property="rawData" column="raw_data" jdbcType="VARCHAR"/>
+        <result property="isWork" column="is_Work" jdbcType="INTEGER"/>
+    </resultMap>
+    
+    <resultMap type="VehicleSalePOJO" id="vehicleSaleMap" >  
+          <id property="vehicleId" column="VEHICLE_ID" jdbcType="BIGINT" />  
+        <result property="vehicleDef" column="VEHICLE_DEF" jdbcType="VARCHAR"/>
+        <result property="status" column="VEHICLE_STATUS" jdbcType="INTEGER"/>
+         <result property="saleDate" column="sale_date" jdbcType="TIMESTAMP"/>
+         <!-- 销售信息 -->
+        <result property="dealerId" column="dealer_Id" jdbcType="VARCHAR"/>
+        <result property="dealerName" column="dealer_Name" jdbcType="VARCHAR"/>
+        <result property="ownerId" column="owner_Id" jdbcType="VARCHAR"/>
+   		<result property="ownerName" column="owner_name" jdbcType="VARCHAR"/>
+        <result property="ownerPhone" column="owner_phone_number" jdbcType="VARCHAR"/>
+    </resultMap>
+	<select id="getList" parameterType="DealerAreaPOJO" resultMap="dealerAreaMap">
+		SELECT distinct id, name, pid, is_valid, to_char(stamp,'yyyy-mm-dd hh24:mi:ss') as stamp, dtype  from t_dealer_area a
+         <if test="@Ognl@isNotBlank(dealerVehicleList)">
+                 start with
+                 	<foreach collection="dealerVehicleList" item="item" open="(" separator=" or " close=")">
+			 			 a.id=#{item.dealerId} 
+					</foreach>
+				 connect by  prior a.pid=a.id
+          </if>
+        <where>
+       <!--  id not in (select distinct pid from t_dealer_area where dtype=2) -->
+          <if test="@Ognl@isNotBlank(dtype)">
+                 and a.dtype=#{dtype}
+          </if>
+           <if test="@Ognl@isNotBlank(isValid)">
+                 and a.is_valid=#{isValid}
+          </if>
+           <if test="@Ognl@isNotBlank(pid)">
+                 and a.pid=#{pid}
+          </if>
+          <if test="@Ognl@isNotBlank(name)">
+                 and a.name=#{name}
+          </if>
+        </where>
+        order by name		
+	</select>
+	
+	<sql id="getVehicleInDealerCon">
+		 <where>		  
+          <if test="@Ognl@isNotBlank(dealerId)">
+                 and  exists (select 'x' from t_dealer_vehicle dv where dv.vehicle_def=v.vehicle_def
+			  and dv.dealer_id=#{dealerId}
+			   )
+          </if>
+           <if test="@Ognl@isNotBlank(unitId)">
+                 and u.unit_Id=#{unitId}
+          </if>
+            <if test="@Ognl@isNotBlank(vehicleStatus)">
+                 and v.vehicle_Status=#{vehicleStatus}
+          </if>
+            <if test="@Ognl@isNotBlank(isValid)">
+                 and v.is_valid=#{isValid}
+          </if>
+          
+           <if test="@Ognl@isNotBlank(vehicleDef)">   
+	       			AND (lower(V.VEHICLE_DEF) LIKE '%'||lower(#{vehicleDef})||'%' 
+	       			or u.sim_no like '%'||#{vehicleDef}||'%')
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(typeId)"> 
+	       			AND V.vehicle_type=#{typeId}
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(modelId)">  
+	       			AND V.vehicle_model =#{modelId}
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(fixMan)">   
+	       			AND V.FIX_MAN LIKE '%'||#{fixMan}||'%'
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(fixDateStart)">   
+	       			AND V.FIX_DATE &gt;=#{fixDateStart}
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(fixDateEnd)">   
+	       			AND V.FIX_DATE &lt;=#{fixDateEnd}
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(materialNo)"> 
+	  				AND U.MATERIAL_NO LIKE '%'||#{materialNo}||'%'
+	  			</if>
+	    		<if test="@Ognl@isNotBlank(unitSn)">
+	    		 	AND U.unit_sn LIKE '%'||#{unitSn}||'%'
+	    		  </if>
+	    		<if test="@Ognl@isNotBlank(simNo)">
+	    		 	AND U.SIM_NO LIKE '%'||#{simNo}||'%'
+	    		 </if>
+				<if test="@Ognl@isNotBlank(steelNo)">
+				 	AND U.STEEL_NO LIKE '%'||#{steelNo}||'%' 
+				 </if>
+				 <if test="@Ognl@isNotBlank(vehicleStatusList)">
+				 	<![CDATA[AND v.vehicle_Status in (${vehicleStatusList}) ]]>
+				 </if>
+				 <!-- 在线、离线 -->
+			
+				 	 <if test="isLogin==0">
+				    AND lp.is_login=0 and sysdate-lp.gps_time&lt;1/24*6
+				     </if>
+				     <if test="isLogin==1">
+				    AND (lp.is_login=1 or sysdate-lp.gps_time&gt;=1/24*6)
+				     </if>
+				     
+				 <!-- 拉框搜索 -->
+				 <!-- 左上坐标 -->
+				 <if test="@Ognl@isNotBlank(lon) and @Ognl@isNotBlank(lat)">
+				 	AND lp.lon&gt;=#{lon}
+				 	AND lp.lat&lt;=#{lat}  
+				 </if>
+				 <!-- 右下坐标 -->
+				 <if test="@Ognl@isNotBlank(lon2) and @Ognl@isNotBlank(lat2)">
+				 	AND lp.lon&lt;=#{lon2}
+				 	AND lp.lat&gt;=#{lat2}  
+				 </if>
+				  <!-- 判断是否是融资租赁的用户 -->
+        		 <if test="@Ognl@isNotBlank(leaseFlag)">
+					AND v.lease_flag = #{leaseFlag} 
+				</if>
+        </where>
+	</sql>
+	<select id="getVehilclesInDealer" parameterType="map" resultMap="vehicleUnitMap">
+		SELECT  v.* ,u.supperier_sn,u.unit_id,u.unit_sn,u.unit_type_sn,u.sim_no,u.material_no,
+		 u.steel_no ,
+         lp.is_login,lp.lon, lp.lat, lp.direction, lp.speed, lp.location_state,
+        lp.vehicle_state, to_char(lp.gps_time,'yyyy-mm-dd hh24:mi:ss') as gps_time, lp.reference_position, lp.province, lp.city, lp.county,
+        lp.alarmflag,to_char(lp.stamp,'yyyy-mm-dd hh24:mi:ss') as nowTime,lc.a_lock,lc.b_lock,lc.c_lock
+  from t_vehicle V
+  left join t_vehicle_unit Vu on vu.vehicle_id = v.vehicle_id
+  left join t_unit u on vu.unit_id = u.unit_id
+  left join t_last_position lp on lp.unit_id=u.unit_id
+  left join t_last_conditions lc on lc.unit_id = u.unit_id
+       		<include refid="getVehicleInDealerCon"/>
+	</select>
+	
+	<select id="getVehilclesCount" parameterType="map" resultType="Integer">
+		select count(v.vehicle_id)
+		 from t_vehicle V
+  left join t_vehicle_unit Vu on vu.vehicle_id = v.vehicle_id
+  left join t_unit u on vu.unit_id = u.unit_id
+     left join t_last_position lp on lp.unit_id=u.unit_id
+        <include refid="getVehicleInDealerCon"/>	
+	</select>
+	
+	<sql id="getVehiclesCondition">
+	 <where>
+               <if test="@Ognl@isNotBlank(dealerIds)">
+                   and 
+						<foreach collection="dealerIds" item="item" open="(" separator=" or " close=")">
+			 			 dv.dealer_id=#{item} 
+					</foreach>
+               </if>
+               <if test="@Ognl@isNotBlank(vehicleDef)">   
+	       			AND (lower(V.VEHICLE_DEF) LIKE '%'||lower(#{vehicleDef})||'%' 
+	       			or u.sim_no like '%'||#{vehicleDef}||'%')
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(typeId)"> 
+	       			AND V.vehicle_type=#{typeId}
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(modelId)">  
+	       			AND V.vehicle_model =#{modelId}
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(fixMan)">   
+	       			AND V.FIX_MAN LIKE '%'||#{fixMan}||'%'
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(fixDateStart)">   
+	       			AND V.FIX_DATE &gt;=#{fixDateStart}
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(fixDateEnd)">   
+	       			AND V.FIX_DATE &lt;=#{fixDateEnd}
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(materialNo)"> 
+	  				AND U.MATERIAL_NO LIKE '%'||#{materialNo}||'%'
+	  			</if>
+	    		<if test="@Ognl@isNotBlank(unitSn)">
+	    		 	AND U.unit_sn LIKE '%'||#{unitSn}||'%'
+	    		  </if>
+	    		<if test="@Ognl@isNotBlank(simNo)">
+	    		 	AND U.SIM_NO LIKE '%'||#{simNo}||'%'
+	    		 </if>
+				<if test="@Ognl@isNotBlank(steelNo)">
+				 	AND U.STEEL_NO LIKE '%'||#{steelNo}||'%' 
+				 </if>
+				  <if test="@Ognl@isNotBlank(vehicleStatus)">
+                 	  and v.vehicle_status=#{vehicleStatus}
+		          </if>
+		           <if test="@Ognl@isNotBlank(isValid)">
+		              and v.is_valid=#{isValid}
+		          </if>
+		           <!-- 在线、离线 -->
+				 <if test="@Ognl@isNotBlank(isLogin)">
+				 	AND lp.is_login=#{isLogin}
+				 </if>
+				  <!-- 是否工作 -->
+				 <if test="@Ognl@isNotBlank(isWork)">
+				 	AND lc.is_work=#{isWork}
+				 </if>
+				   <!-- 判断是否是融资租赁的用户 -->
+        		 <if test="@Ognl@isNotBlank(leaseFlag)">
+					AND v.lease_flag = #{leaseFlag} 
+				</if>
+        </where>	
+	</sql>
+	
+	<select id="getVehilcles" parameterType="map" resultMap="dealerVehicleMap">
+		select dv.dealer_id,
+       v.vehicle_id,
+       v.vehicle_def,
+       v.vehicle_type,
+       v.vehicle_model,
+       u.unit_id,
+       u.unit_sn,
+       u.unit_type_sn,
+       u.material_no,
+       u.supperier_sn,
+       u.sim_no,
+       u.steel_no,
+       lc.a_lock,
+       lc.b_lock,
+       lc.c_lock,
+       lp.is_login,lp.lon, lp.lat, lp.direction, lp.speed, lp.location_state,
+        lp.vehicle_state, to_char(lp.gps_time,'yyyy-mm-dd hh24:mi:ss') as gps_time, lp.reference_position, lp.province, lp.city, lp.county,
+        lp.alarmflag,to_char(lp.stamp,'yyyy-mm-dd hh24:mi:ss') as nowTime
+  from t_dealer_vehicle dv
+  left join t_vehicle V on dv.vehicle_def = v.vehicle_def
+  left join t_vehicle_unit Vu on vu.vehicle_id = v.vehicle_id
+  left join t_unit u on vu.unit_id = u.unit_id
+  left join t_last_position lp on lp.unit_id=u.unit_id
+  left join T_LAST_CONDITIONS lc on lc.unit_id=u.unit_id
+        	<include refid="getVehiclesCondition"/>
+	</select>
+	
+	<sql id="compositeCondition">
+	   <where>
+	       <if test="@Ognl@isNotBlank(condition)">
+	   			<!-- 机械条件 -->
+	    	   <if test="@Ognl@isNotBlank(condition.dealerIds)">
+                   and 
+						<foreach collection="condition.dealerIds" item="item" open="(" separator=" or " close=")">
+			 			 dv.dealer_id=#{item} 
+					</foreach>
+               </if>
+               <if test="@Ognl@isNotBlank(condition.vehicleDef)">   
+	       			AND lower(V.VEHICLE_DEF) LIKE '%'||lower(#{condition.vehicleDef})||'%' 
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(condition.typeId)"> 
+	       			AND V.vehicle_type=#{condition.typeId}
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(condition.vehicleId)">  
+	       			AND V.vehicle_Id =#{condition.vehicleId}
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(condition.modelId)">  
+	       			AND V.vehicle_model =#{condition.modelId}
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(condition.fixMan)">   
+	       			AND V.FIX_MAN LIKE '%'||#{condition.fixMan}||'%'
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(condition.fixDate)">   
+	       			AND V.FIX_DATE &gt;=#{condition.fixDate}
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(condition.fixDate2)">   
+	       			AND V.FIX_DATE &lt;=#{condition.fixDate2}+1
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(condition.status)">  
+	       			AND V.VEHICLE_STATUS =#{condition.status}
+	  			</if>
+		        <if test="@Ognl@isNotBlank(isValid)">
+		              and v.is_valid=#{isValid}
+		        </if>
+		        <if test="@Ognl@isNotBlank(condition.saleDate)">   
+	       			AND V.sale_Date &gt;=#{condition.saleDate}
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(condition.saleDate2)">   
+	       			AND V.sale_Date &lt;=#{condition.saleDate2}+1
+	  			</if>
+	  			
+	  			<if test="@Ognl@isNotBlank(condition.ownerName)">   
+	       			AND o.owner_Name LIKE '%'||#{condition.ownerName}||'%' 
+	  			</if>
+	  			
+	  			<!-- 终端条件 -->
+	  			<if test="@Ognl@isNotBlank(condition.unitTypeSn)">  
+	       			AND u.unit_type_sn =#{condition.unitTypeSn}
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(condition.supperierSn)">  
+	       			AND u.supperier_Sn =#{condition.supperierSn}
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(condition.materialNo)"> 
+	  				AND U.MATERIAL_NO LIKE '%'||#{condition.materialNo}||'%'
+	  			</if>
+	    		<if test="@Ognl@isNotBlank(condition.unitSn)">
+	    		 	AND U.unit_sn LIKE '%'||#{condition.unitSn}||'%'
+	    		  </if>
+	    		<if test="@Ognl@isNotBlank(condition.simNo)">
+	    		 	AND U.SIM_NO LIKE '%'||#{condition.simNo}||'%'
+	    		 </if>
+				<if test="@Ognl@isNotBlank(condition.steelNo)">
+				 	AND U.STEEL_NO LIKE '%'||#{condition.steelNo}||'%' 
+				 </if>
+				 
+				<!-- GPS条件 -->
+	  			<if test="@Ognl@isNotBlank(condition.speed)"> 
+	  				AND lp.speed&gt;=#{condition.speed}
+	  			</if>
+	    		<if test="@Ognl@isNotBlank(condition.speed2)"> 
+	  				AND lp.speed&lt;=#{condition.speed2}
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(condition.gpsTime)"> 
+	  				AND lp.gps_Time&gt;=#{condition.gpsTime}
+	  			</if>
+	    		<if test="@Ognl@isNotBlank(condition.gpsTime2)"> 
+	  				AND lp.gps_Time&lt;=#{condition.gpsTime2}
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(condition.province)">
+				 	AND lp.province=#{condition.province} 
+				 </if>
+				 <if test="@Ognl@isNotBlank(condition.city)">
+				 	AND lp.city=#{condition.city} 
+				 </if>
+				 <if test="@Ognl@isNotBlank(condition.isLogin)">
+				 	AND lp.is_login=#{condition.isLogin}
+				 </if>
+				 <!-- n天未上报 -->
+				 <if test="@Ognl@isNotBlank(condition.daysUnuplad)">
+					  <choose>
+					    <when test="condition.daysUnuplad==8">
+						  AND lp.stamp &lt;=(sysdate- #{condition.daysUnuplad})
+					    </when>
+					    <otherwise>
+					    AND lp.stamp &lt;(sysdate- #{condition.daysUnuplad})
+					    and lp.stamp &gt;(sysdate-#{condition.daysUnuplad}-1)
+					    </otherwise>
+					  </choose>
+					</if>
+				<!-- 是否有警 -->
+				 <if test="@Ognl@isNotBlank(condition.alarmFlag)">
+				 	AND lp.alarmFlag=#{condition.alarmFlag}
+				 </if>
+				 	
+				 <!-- 工况条件 -->
+				 <!-- n天未工作-->
+				 <if test="@Ognl@isNotBlank(condition.daysUnwork)">
+					  <!-- <choose>
+					    <when test="condition.daysUnwork==8"> -->
+						  AND lc.stamp &lt;=(sysdate- #{condition.daysUnwork})
+					  <!--   </when> -->
+					   <!--  <otherwise>
+					    AND lc.stamp &lt;(sysdate- #{condition.daysUnwork})
+					    and lc.stamp &gt;(sysdate-#{condition.daysUnwork}-1)
+					    </otherwise> 
+					  </choose>-->
+					</if>
+				<!-- 是否工作 -->
+				 <if test="@Ognl@isNotBlank(condition.isWork)">
+				 	AND lc.is_work=#{condition.isWork}
+				 </if>
+				 
+	  			<if test="@Ognl@isNotBlank(condition.totalWorkingHours)"> 
+	  				AND (lc.totalWorkingHours-lc.correcthours)&gt;=#{condition.totalWorkingHours}
+	  			</if>
+	    		<if test="@Ognl@isNotBlank(condition.totalWorkingHours2)"> 
+	  				AND (lc.totalWorkingHours-lc.correcthours)&lt;=#{condition.totalWorkingHours2}
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(condition.lock) and @Ognl@isNotBlank(condition.alock)">
+				 	AND <![CDATA[ lc.${condition.lock}=${condition.alock}]]>
+				 </if>
+			</if>
+	   </where>
+	  
+	</sql>
+	
+	<!-- 综合查询 -->
+	<select id="queryComposite"  parameterType="map" resultMap="compositeResultMap">
+    select v.vehicle_id,
+                           v.vehicle_def,
+                           v.vehicle_type,
+                           v.vehicle_model,
+                           v.fix_man,
+                           to_char(v.fix_date,'yyyy-mm-dd hh24:mi:ss') as fix_date,
+                           v.VEHICLE_STATUS,
+                           to_char(v.sale_date,'yyyy-mm-dd hh24:mi:ss') as sale_date,
+                           da.name as dealer_name,
+                           o.owner_name,
+                           o.owner_phone_number,
+                           u.unit_id,
+                           u.supperier_sn,
+                           u.unit_sn,
+                           u.unit_type_sn,
+                           dut.unit_type,
+                           u.hardware_version,
+                           u.software_version,
+                           u.sim_no,
+                           u.material_no,
+                           u.steel_no,
+                           u.production_date,
+                           lp.lon,
+                           lp.lat,
+                           lp.direction,
+                           lp.speed,
+                           lp.location_state,
+                           lp.vehicle_state,
+                           to_char(lp.gps_time,'yyyy-mm-dd hh24:mi:ss') as gps_time,
+                           lp.reference_position,
+                           lp.province,
+                           lp.city,
+                           lp.county,
+                           lp.is_login,
+                           ds.supperier_name ,
+                           dvt.type_name ,
+                           dvm.model_name,
+                           lc.enginecoolanttemperature,
+                           enginecoolantlevel, engineoilpressure, enginefuellevel, enginespeed, hydraulicoiltemperature, systemvoltage, beforepumpmainpressure, afterpumpmainpressure, pilotpressure1, pilotpressure2, beforepumppressure, afterpumppressure, proportionalcurrent1, proportionalcurrent2, 
+                           totalworkinghours, 
+                           correcthours, gear, highenginecoolanttemperval, lowengineoilpressurealarmvalue, highvoltagealarmvalue, lowvoltagealarmvalue, highhydraulicoiltemperalarmval, toothnumbervalue, monitorsoftwarecode, monitorycsoftwarecode, controllersoftwarecode, controllerycsoftwarecode, lc.raw_data,
+                           FAULTCODE,ENGINEOILTEMPERATURE,PRODUCTCODE, is_work ,
+                           A_LOCK,
+					       B_LOCK,
+					       C_LOCK,
+					       to_char(lc.stamp,'yyyy-mm-dd hh24:mi:ss') as stamp
+                               
+  from t_vehicle v
+  inner join t_vehicle_unit vn on v.vehicle_id=vn.vehicle_id
+  left join t_unit u on vn.unit_id=u.unit_id
+  left join t_last_position lp on u.unit_id=lp.unit_id
+  left join t_dealer_vehicle dv on v.vehicle_def=dv.vehicle_def
+  left join t_dic_supperier ds on u.supperier_sn=ds.supperier_sn
+  left join t_dic_vehicle_type dvt on dvt.type_id=v.vehicle_type
+  left join t_dic_unit_type dut on dut.unit_type_sn=u.unit_type_sn
+  left join t_dic_vehicle_model dvm on dvm.model_id=v.vehicle_model
+  left join t_last_conditions lc on lc.unit_id=vn.unit_id
+  left join t_dealer_area da on dv.dealer_id=da.id
+  left join t_owner o on o.owner_id=dv.owner_id
+	<include refid="compositeCondition"/>
+	</select>
+	
+	<select id="countComposite" parameterType="map" resultType="Integer">
+	      select count(v.vehicle_id)
+  from t_vehicle v
+  inner join t_vehicle_unit vn on v.vehicle_id=vn.vehicle_id
+  left join t_unit u on vn.unit_id=u.unit_id
+  left join t_last_position lp on u.unit_id=lp.unit_id
+  left join t_dealer_vehicle dv on v.vehicle_def=dv.vehicle_def
+  left join t_dic_supperier ds on u.supperier_sn=ds.supperier_sn
+  left join t_dic_vehicle_type dvt on dvt.type_id=v.vehicle_type
+  left join t_dic_unit_type dut on dut.unit_type_sn=u.unit_type_sn
+  left join t_dic_vehicle_model dvm on dvm.model_id=v.vehicle_model
+  left join t_last_conditions lc on lc.unit_id=vn.unit_id
+  left join t_dealer_area da on dv.dealer_id=da.id
+  left join t_owner o on o.owner_id=dv.owner_id
+	<include refid="compositeCondition"/>
+	</select>
+	
+	
+	<sql id="historyCondition">
+	   <where>
+	    	 <if test="@Ognl@isNotBlank(unitId)">
+	    	   c.unit_id=#{unitId}
+             </if>
+              <if test="@Ognl@isNotBlank(startTime)">
+					AND c.stamp &gt;=#{startTime}
+				</if>
+				<if test="@Ognl@isNotBlank(endTime)">
+					AND c.stamp &lt;=#{endTime}
+				</if>
+             </where>
+    </sql>
+	<!-- 历史工况查询 -->
+	<select id="queryHistoryCondition"  parameterType="map" resultMap="conditionsResultMap">
+    select con_id,
+       c.unit_id,
+       enginecoolanttemperature,
+       enginecoolantlevel,
+       engineoilpressure,
+       enginefuellevel,
+       enginespeed,
+       hydraulicoiltemperature,
+       systemvoltage,
+       beforepumpmainpressure,
+       afterpumpmainpressure,
+       pilotpressure1,
+       pilotpressure2,
+       beforepumppressure,
+       afterpumppressure,
+       proportionalcurrent1,
+       proportionalcurrent2,
+       totalworkinghours,
+       gear,
+       highenginecoolanttemperval,
+       lowengineoilpressurealarmvalue,
+       highvoltagealarmvalue,
+       lowvoltagealarmvalue,
+       highhydraulicoiltemperalarmval,
+       toothnumbervalue,
+       monitorsoftwarecode,
+       monitorycsoftwarecode,
+       controllersoftwarecode,
+       controllerycsoftwarecode,
+       FAULTCODE,ENGINEOILTEMPERATURE,PRODUCTCODE,
+       raw_data,
+       is_work,
+       A_LOCK,
+       B_LOCK,
+       C_LOCK,
+       c.stamp,
+       vehicle_def
+  from t_conditions c
+  left join t_vehicle_unit vu on c.unit_id=vu.unit_id
+  left join t_vehicle v on vu.vehicle_id=v.vehicle_id
+	<include refid="historyCondition"/>
+	order by c.stamp desc
+	</select>
+	
+	<!-- 导入工况信息 -->
+	<insert id="insertWorkinfo" parameterType="ConditionsPOJO">
+	INSERT INTO t_conditions
+	<trim prefix="(" suffix=")" suffixOverrides=",">
+		con_id,
+		<if test="@Ognl@isNotBlank(unitId)">
+			unit_id,
+		 </if>
+		<if test="@Ognl@isNotBlank(engineCoolantTemperature)">
+			enginecoolanttemperature,
+       </if>
+		<if test="@Ognl@isNotBlank(engineCoolantLevel)">
+			enginecoolantlevel,
+       </if>
+		<if test="@Ognl@isNotBlank(engineOilPressure)">
+			engineoilpressure,</if>
+		<if test="@Ognl@isNotBlank(engineFuelLevel)">
+			enginefuellevel,
+       </if>
+		<if test="@Ognl@isNotBlank(engineSpeed)">
+			enginespeed,
+       </if>
+		<if test="@Ognl@isNotBlank(hydraulicOilTemperature)">
+			hydraulicoiltemperature,
+       </if>
+		<if test="@Ognl@isNotBlank(systemVoltage)">
+			systemvoltage,
+       </if>
+		<if test="@Ognl@isNotBlank(beforePumpMainPressure)">
+			beforepumpmainpressure,
+       </if>
+		<if test="@Ognl@isNotBlank(afterPumpMainPressure)">
+			afterpumpmainpressure,
+       </if>
+		<if test="@Ognl@isNotBlank(pilotPressure1)">
+			pilotpressure1,
+       </if>
+		<if test="@Ognl@isNotBlank(pilotPressure2)">
+			pilotpressure2,
+       </if>
+		<if test="@Ognl@isNotBlank(beforePumpPressure)">
+			beforepumppressure,
+       </if>
+		<if test="@Ognl@isNotBlank(afterPumpPressure)">
+			afterpumppressure,
+       </if>
+		<if test="@Ognl@isNotBlank(proportionalCurrent1)">
+			proportionalcurrent1,
+       </if>
+		<if test="@Ognl@isNotBlank(proportionalCurrent2)">
+			proportionalcurrent2,
+       </if>
+		<if test="@Ognl@isNotBlank(totalWorkingHours)">
+			totalworkinghours,
+       </if>
+		<if test="@Ognl@isNotBlank(gear)">
+			gear,
+       </if>
+		<if test="@Ognl@isNotBlank(highEngineCoolantTemperVal)">
+			highenginecoolanttemperval,
+       </if>
+		<if test="@Ognl@isNotBlank(lowEngineOilPressureAlarmValue)">
+			lowengineoilpressurealarmvalue,
+       </if>
+		<if test="@Ognl@isNotBlank(highVoltageAlarmValue)">
+			highvoltagealarmvalue,
+       </if>
+		<if test="@Ognl@isNotBlank(lowVoltageAlarmValue)">
+			lowvoltagealarmvalue,
+       </if>
+		<if test="@Ognl@isNotBlank(highHydraulicOilTemperAlarmVal)">
+			highhydraulicoiltemperalarmval,
+       </if>
+		<if test="@Ognl@isNotBlank(toothNumberValue)">
+			toothnumbervalue,</if>
+		<if test="@Ognl@isNotBlank(monitorSoftwareCode)">
+			monitorsoftwarecode,
+       </if>
+		<if test="@Ognl@isNotBlank(monitorYcSoftwareCode)">
+			monitorycsoftwarecode,
+       </if>
+		<if test="@Ognl@isNotBlank(controllerSoftwareCode)">
+			controllersoftwarecode,
+       </if>
+		<if test="@Ognl@isNotBlank(controllerYcSoftwareCode)">
+			controllerycsoftwarecode,
+       </if>
+		<if test="@Ognl@isNotBlank(faultCode)">
+			FAULTCODE,
+       </if>
+		<if test="@Ognl@isNotBlank(engineOilTemperature)">
+			ENGINEOILTEMPERATURE,
+		 </if>
+		<if test="@Ognl@isNotBlank(productCode)">
+			PRODUCTCODE,
+       </if>
+		<if test="@Ognl@isNotBlank(rawData)">
+			raw_data,
+       </if>
+		<if test="@Ognl@isNotBlank(isWork)">
+			is_work,
+       </if>
+		<if test="@Ognl@isNotBlank(alock)">
+			A_LOCK,
+       </if>
+		<if test="@Ognl@isNotBlank(block)">
+			B_LOCK,
+       </if>
+		<if test="@Ognl@isNotBlank(clock)">
+			C_LOCK,
+       </if>		
+			stamp       
+	</trim>
+	<trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	SEQ_CONDITIONS.NEXTVAL,
+		 <if test="@Ognl@isNotBlank(unitId)">
+			#{unitId},
+		 </if>
+		<if test="@Ognl@isNotBlank(engineCoolantTemperature)">
+			#{engineCoolantTemperature},
+       </if>
+		<if test="@Ognl@isNotBlank(engineCoolantLevel)">
+			#{engineCoolantLevel},
+       </if>
+		<if test="@Ognl@isNotBlank(engineOilPressure)">
+			#{engineOilPressure},</if>
+		<if test="@Ognl@isNotBlank(engineFuelLevel)">
+			#{engineFuelLevel},
+       </if>
+		<if test="@Ognl@isNotBlank(engineSpeed)">
+			#{engineSpeed},
+       </if>
+		<if test="@Ognl@isNotBlank(hydraulicOilTemperature)">
+			#{hydraulicOilTemperature},
+       </if>
+		<if test="@Ognl@isNotBlank(systemVoltage)">
+			#{systemVoltage},
+       </if>
+		<if test="@Ognl@isNotBlank(beforePumpMainPressure)">
+			#{beforePumpMainPressure},
+       </if>
+		<if test="@Ognl@isNotBlank(afterPumpMainPressure)">
+			#{afterPumpMainPressure},
+       </if>
+		<if test="@Ognl@isNotBlank(pilotPressure1)">
+			#{pilotPressure1},
+       </if>
+		<if test="@Ognl@isNotBlank(pilotPressure2)">
+			#{pilotPressure2},
+       </if>
+		<if test="@Ognl@isNotBlank(beforePumpPressure)">
+			#{beforePumpPressure},
+       </if>
+		<if test="@Ognl@isNotBlank(afterPumpPressure)">
+			#{afterPumpPressure},
+       </if>
+		<if test="@Ognl@isNotBlank(proportionalCurrent1)">
+			#{proportionalCurrent1},
+       </if>
+		<if test="@Ognl@isNotBlank(proportionalCurrent2)">
+			#{proportionalCurrent2},
+       </if>
+		<if test="@Ognl@isNotBlank(totalWorkingHours)">
+			#{totalWorkingHours},
+       </if>
+		<if test="@Ognl@isNotBlank(gear)">
+			#{gear},
+       </if>
+		<if test="@Ognl@isNotBlank(highEngineCoolantTemperVal)">
+			#{highEngineCoolantTemperVal},
+       </if>
+		<if test="@Ognl@isNotBlank(lowEngineOilPressureAlarmValue)">
+			#{lowEngineOilPressureAlarmValue},
+       </if>
+		<if test="@Ognl@isNotBlank(highVoltageAlarmValue)">
+			#{highVoltageAlarmValue},
+       </if>
+		<if test="@Ognl@isNotBlank(lowVoltageAlarmValue)">
+			#{lowVoltageAlarmValue},
+       </if>
+		<if test="@Ognl@isNotBlank(highHydraulicOilTemperAlarmVal)">
+			#{highHydraulicOilTemperAlarmVal},
+       </if>
+		<if test="@Ognl@isNotBlank(toothNumberValue)">
+			#{toothNumberValue},
+		</if>
+		<if test="@Ognl@isNotBlank(monitorSoftwareCode)">
+			#{monitorSoftwareCode},
+       </if>
+		<if test="@Ognl@isNotBlank(monitorYcSoftwareCode)">
+			#{monitorYcSoftwareCode},
+       </if>
+		<if test="@Ognl@isNotBlank(controllerSoftwareCode)">
+			#{controllerSoftwareCode},
+       </if>
+		<if test="@Ognl@isNotBlank(controllerYcSoftwareCode)">
+			#{controllerYcSoftwareCode},
+       </if>
+		<if test="@Ognl@isNotBlank(faultCode)">
+			#{faultCode},
+       </if>
+		<if test="@Ognl@isNotBlank(engineOilTemperature)">
+			#{engineOilTemperature},
+		 </if>
+		<if test="@Ognl@isNotBlank(productCode)">
+			#{productCode},
+       </if>
+		<if test="@Ognl@isNotBlank(rawData)">
+			#{rawData},
+       </if>
+		<if test="@Ognl@isNotBlank(isWork)">
+			#{isWork},
+       </if>
+		<if test="@Ognl@isNotBlank(alock)">
+			#{alock},
+       </if>
+		<if test="@Ognl@isNotBlank(block)">
+			#{block},
+       </if>
+		<if test="@Ognl@isNotBlank(clock)">
+			#{clock},
+       </if>
+		sysdate
+    </trim>
+</insert>
+	<select id="countHistoryCondition" parameterType="map"
+		resultType="Integer">
+		select count(con_id)
+		from t_conditions c
+		<include refid="historyCondition" />
+	</select>
+	  			
+	  		<!-- 查询机械已销售信息 -->
+	<select id="getVehicleSaleByPage" parameterType="map" resultMap="vehicleSaleMap">
+select v.vehicle_id,v.vehicle_def,v.vehicle_status,v.sale_date,dv.dealer_id,dv.owner_id,da.name as dealer_name,o.owner_name,o.owner_phone_number  
+from t_dealer_vehicle dv
+left join t_vehicle v on dv.vehicle_def=v.vehicle_def
+left join t_dealer_area da on da.id=dv.dealer_id
+left join t_owner o on dv.owner_id=o.owner_id
+		<include refid="getVehicleSaleByPage"/>  
+		order by V.vehicle_id desc  
+	</select>
+	
+	<select id="countVehicleSale" parameterType="map" resultType="Integer">
+		SELECT COUNT(V.VEHICLE_ID) 
+	    FROM T_VEHICLE V
+	   left join t_dealer_vehicle dv on dv.vehicle_def=v.vehicle_def
+left join t_dealer_area da on da.id=dv.dealer_id
+left join t_owner o on dv.owner_id=o.owner_id
+		<include refid="getVehicleSaleByPage"/>   
+	</select> 
+	
+	<sql id="getVehicleSaleByPage">
+	   <where>
+	   and v.vehicle_status=3
+	       <if test="@Ognl@isNotBlank(vehicleSale)">
+               <if test="@Ognl@isNotBlank(vehicleSale.vehicleDef)">   
+	       			AND lower(V.VEHICLE_DEF) LIKE '%'||lower(#{vehicleSale.vehicleDef})||'%' 
+	  			</if>
+	  			
+	  			</if>
+	  			</where>
+	  			</sql>
+	  			
+	  			
+	   <select id="getVehicle4sale" parameterType="map" resultType="map">
+		select v.vehicle_id,v.vehicle_def from t_vehicle v
+		<where>
+		   <if test="@Ognl@isNotBlank(vehicleStatus)">
+		     v.vehicle_status=#{vehicleStatus}
+		   </if>
+		    <if test="@Ognl@isNotBlank(vehicleDef)">
+		      and v.vehicle_def like  '%'||#{vehicleDef}||'%'
+		   </if>
+		</where>   
+	</select>  
+	
+	  <select id="getOwner4sale" parameterType="map" resultType="map">
+		select o.owner_id,o.owner_name from t_owner o where o.is_valid=0  
+	</select> 
+	
+	
+	<insert id="addDealerVechicle" parameterType="VehicleSalePOJO">
+		insert into t_dealer_vehicle
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+		 	<if test="@Ognl@isNotBlank(dealerId)">dealer_id,</if>
+		 	<if test="@Ognl@isNotBlank(vehicleDef)">vehicle_def,</if>
+		 	<if test="@Ognl@isNotBlank(ownerId)">owner_id,</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+		 	<if test="@Ognl@isNotBlank(dealerId)">#{dealerId},</if>
+		 	<if test="@Ognl@isNotBlank(vehicleDef)">#{vehicleDef},</if>
+		 	<if test="@Ognl@isNotBlank(ownerId)">#{ownerId},</if> 
+		 </trim>
+ 	</insert>
+ 
+	<update id="editDealerVechicle" parameterType="VehicleSalePOJO">
+		update t_dealer_vehicle
+   set 
+    	<trim suffixOverrides=",">
+		 	<if test="@Ognl@isNotBlank(ownerId)">owner_id=#{ownerId},</if>
+		 	<if test="@Ognl@isNotBlank(dealerId)">dealer_id=#{dealerId},</if>
+      	</trim>
+ 		WHERE  vehicle_def = #{vehicleDef}
+	</update>
+	<select id="isDataByDealer" parameterType="map" resultType="Integer">
+	    select count(*) from t_dealer_vehicle v  where v.vehicle_def=#{vehicleDef} 	    
+	</select>
+	
+	<update id="editVechicle" parameterType="VehicleSalePOJO">
+		update t_vehicle
+   set 
+    	<trim suffixOverrides=",">
+		 	<if test="@Ognl@isNotBlank(status)" >
+            VEHICLE_STATUS=#{status},
+            </if>
+             <if test="@Ognl@isNotBlank(saleDate)" >
+            sale_Date=#{saleDate},
+            </if>
+         STAMP=sysdate
+      </trim>
+ 		WHERE  vehicle_def = #{vehicleDef}
+	</update>	
+</mapper>  

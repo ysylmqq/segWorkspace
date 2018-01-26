@@ -1,0 +1,109 @@
+package cc.chinagps.seat.util;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.util.Enumeration;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+
+import cc.chinagps.seat.springutil.SpringContextHolder;
+
+import com.googlecode.jsonplugin.JSONException;
+import com.googlecode.jsonplugin.JSONUtil;
+
+/**
+ * HttpClient调用工具类
+ * @author Administrator
+ *
+ */
+public final class HttpClientUtil {
+
+	/**
+	 * 把request对象中的请求参数封装到bean中
+	 * @param <T>
+	 * @param request
+	 * @param clazz
+	 * @return
+	 */
+	public static <T> T request2Bean(HttpServletRequest request,Class<T> clazz){
+		try{
+			
+			T bean = clazz.newInstance();
+			Enumeration e = request.getParameterNames(); 
+			while(e.hasMoreElements()){
+				String name = (String) e.nextElement();
+				String value = request.getParameter(name);
+//				System.out.println("name:" + name + ",val=" + value  );
+				BeanUtils.setProperty(bean, name, value);
+			}
+			return bean;
+		}catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
+	}
+
+	
+	public static <T> T execute(HttpUriRequest request) 
+			throws ClientProtocolException, IOException {
+		/*HttpComponentsClientHttpRequestFactory factory = 
+				SpringContextHolder.getBean("httpClientFactory");
+		CloseableHttpClient client =
+				(CloseableHttpClient) factory.getHttpClient();*/
+		
+		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:springMVC-servlet.xml");
+    	
+    	
+    	HttpComponentsClientHttpRequestFactory factory = 
+    			(HttpComponentsClientHttpRequestFactory) applicationContext.getBean("httpClientFactory");
+    	
+		CloseableHttpClient client =
+				(CloseableHttpClient) factory.getHttpClient();
+		return client.execute(request, new CommonResponseHandler<T>());
+	}
+	
+	private static class CommonResponseHandler<T> implements 
+		ResponseHandler<T> {
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		public T handleResponse(HttpResponse response)
+				throws ClientProtocolException, IOException {
+			StatusLine statusLine = response.getStatusLine();
+			HttpEntity entity = response.getEntity();
+	        if (statusLine.getStatusCode() >= 300) {
+	            throw new HttpResponseException(
+	                    statusLine.getStatusCode(),
+	                    statusLine.getReasonPhrase());
+	        }
+	        if (entity == null) {
+	            throw new ClientProtocolException("Response contains no content");
+	        }
+	        ContentType contentType = ContentType.getOrDefault(entity);
+	        Charset charset = contentType.getCharset();
+	        Reader reader = new InputStreamReader(
+	        		entity.getContent(), charset);
+	        try {
+	        	return (T)JSONUtil.deserialize(reader);
+			} catch (JSONException e) {
+				throw new IOException(e);
+			}
+		}
+	}
+}

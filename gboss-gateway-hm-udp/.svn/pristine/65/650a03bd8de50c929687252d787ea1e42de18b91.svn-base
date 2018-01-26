@@ -1,0 +1,131 @@
+package cc.chinagps.gateway.unit.beforemarket.hm.upload.cmd;
+
+import org.apache.log4j.Logger;
+import org.seg.lib.util.Util;
+
+import cc.chinagps.gateway.buff.CommandBuff;
+import cc.chinagps.gateway.buff.CommandBuff.Command;
+import cc.chinagps.gateway.buff.CommandBuff.CommandResponse.Builder;
+import cc.chinagps.gateway.buff.GBossDataBuff.GpsInfo;
+import cc.chinagps.gateway.log.LogManager;
+import cc.chinagps.gateway.seat.cmd.CmdResponseUtil;
+import cc.chinagps.gateway.seat.cmd.ServerToUnitCommand;
+import cc.chinagps.gateway.unit.UnitServer;
+import cc.chinagps.gateway.unit.UnitSocketSession;
+import cc.chinagps.gateway.unit.beforemarket.common.CheckLoginHandler;
+import cc.chinagps.gateway.unit.beforemarket.common.pkg.BeforeMarketPackage;
+import cc.chinagps.gateway.unit.beforemarket.common.util.BeforeMarketPkgUtil;
+import cc.chinagps.gateway.unit.beforemarket.hm.upload.HMUploadUtil;
+import cc.chinagps.gateway.unit.beforemarket.hm.upload.beans.HMGPSInfo;
+import cc.chinagps.gateway.unit.beforemarket.hm.upload.beans.HMStatus;
+import cc.chinagps.gateway.unit.beforemarket.hm.util.HMProtobufUtil;
+import cc.chinagps.gateway.util.Constants;
+
+/**
+ * 控制指令应答
+ */
+public class Cmd05 extends CheckLoginHandler{
+	private Logger logger_debug = Logger.getLogger(LogManager.LOGGER_NAME_DEBUG);
+	@Override
+	public boolean handlerPackageSessionChecked(BeforeMarketPackage ppkg,
+			UnitServer server, UnitSocketSession session) throws Exception {
+		String callLetter = session.getUnitInfo().getCallLetter();
+		String cacheSN = BeforeMarketPkgUtil.getCmdCacheSn(callLetter, ppkg.getHead().getSn());
+		ServerToUnitCommand cache = server.getServerToUnitCommandCache().getAndRemoveCommand(cacheSN);
+		
+		if(cache != null){
+			byte[] body = ppkg.getBody();
+			int unit_ack_result = Util.getShort(body, 1) & 0xFFFF;
+			
+			//make protobuf
+			Command usercmd = cache.getUserCommand();
+			logger_debug.debug("[hm] cmd05 get command from cache,cmd["+usercmd.getCmdId()+"] unit_ack_result:"+unit_ack_result);
+			Builder builder = CommandBuff.CommandResponse.newBuilder();
+			builder.setSn(usercmd.getSn());
+			builder.setCallLetter(callLetter);
+			builder.setCmdId(usercmd.getCmdId());
+			if(unit_ack_result == 0){
+				builder.setResult(Constants.RESULT_SUCCESS);
+				
+				int position = 3;
+				HMGPSInfo gps = HMGPSInfo.parse(body, position);
+				HMStatus status = HMStatus.parse(body, position + HMGPSInfo.DATA_LENGTH);
+				
+				GpsInfo pgps = HMProtobufUtil.transformGPSInfo(callLetter, ppkg, gps, status, null, null, false);
+				builder.addGpsInfos(pgps);
+				
+				//保存gps
+				HMUploadUtil.handleGPS(ppkg, server, session, gps, status, null, null, false);
+			}else{
+				builder.setResult(Constants.RESULT_UNIT_ACK_FAIL);
+				builder.addParams(String.valueOf(unit_ack_result));
+			}
+			
+			//byte[] data = builder.build().toByteArray();
+			CmdResponseUtil.simpleCommandResponse(cache, builder);
+		}else{
+			//未找到缓存，可能是唤醒后的数据
+			byte[] body = ppkg.getBody();
+			int unit_ack_result = Util.getShort(body, 1) & 0xFFFF;
+			
+			int subCmdId = body[0] & 0xFF;
+			logger_debug.debug("[hm] cmd05 can not find command from cache,cmd["+getInnerCmdId(subCmdId)+"] unit_ack_result:"+unit_ack_result);
+			Builder builder = CommandBuff.CommandResponse.newBuilder();
+			builder.setSn("");
+			builder.setCallLetter(callLetter);
+			builder.setCmdId(getInnerCmdId(subCmdId));
+			
+			if(unit_ack_result == 0){
+				builder.setResult(Constants.RESULT_SUCCESS);
+				
+				int position = 3;
+				HMGPSInfo gps = HMGPSInfo.parse(body, position);
+				HMStatus status = HMStatus.parse(body, position + HMGPSInfo.DATA_LENGTH);
+				
+				GpsInfo pgps = HMProtobufUtil.transformGPSInfo(callLetter, ppkg, gps, status, null, null, false);
+				builder.addGpsInfos(pgps);
+				
+				//保存gps
+				HMUploadUtil.handleGPS(ppkg, server, session, gps, status, null, null, false);
+			}else{
+				builder.setResult(Constants.RESULT_UNIT_ACK_FAIL);
+				builder.addParams(String.valueOf(unit_ack_result));
+			}
+			
+			builder.setUnitsn(ppkg.getHead().getSn() & 0xFFFF);
+			//byte[] data = builder.build().toByteArray();
+			server.getExportMQ().addCommandResponse(builder.build());
+		}
+		
+		return true;
+	}
+	
+	private static int getInnerCmdId(int subCmdId){
+		switch (subCmdId) {
+			case 0x1:		
+				return 0x0004;
+			case 0x2:
+				return 0x0061;
+			case 0x3:
+				return 0x000E;
+			case 0x4:
+				return 0x0065;
+			case 0x5:	
+				return 0x0063;
+			case 0x6:
+				return 0x0013;
+			case 0x8:
+				return 0x00A2;
+			case 0xA:
+				return 0x0069;
+			case 0xB:
+				return 0x00F3;
+			case 0xC:
+				return 0x00F5;
+			case 0xD:
+				return 0x00F7;
+			default:
+				return 0;
+		}
+	}
+}

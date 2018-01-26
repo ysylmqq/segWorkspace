@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="IE=10" />
+    <title>海马巡检</title>
+</head>
+<body>
+    <div>
+	   <textarea id="log" style="width: 100%; height: 500px"></textarea>
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div style="width: 100%">
+        <span>终端呼号：</span>
+		<input type="text" style="width: 45%" id="callletter">
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div>
+		<button onclick="Connect()">登录通信中心</button>
+		<button onclick="AddMonitor()">添加车辆监控</button>
+		<button onclick="NoParamCommand(0x0001)">查车</button>
+		<button onclick="GetLastPosition()">读最后位置</button>
+	</div>
+	<script src="Math.uuid.js"></script>  <!-- 随机序列号 -->
+	<script src="Long.min.js"></script>       <!-- protobuf需要 -->
+	<script src="ByteBuffer.min.js"></script> <!-- protobuf需要 -->
+	<script src="ProtoBuf.min.js"></script>   <!-- protobuf需要 -->
+	<script src="comcenterprotobuf.js"></script>
+	<script src="zlib.min.js"></script>
+	<script src="segutil_ws.js"></script>
+	<script src="segseatlib.js"></script>
+    <script src="haima.js"></script>   <!-- 坐席协议  -->
+    <script src="haimaevent.js"></script>   <!-- 坐席接收到通信中心的事件  -->
+</body>
+</html>

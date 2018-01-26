@@ -1,0 +1,210 @@
+package com.chinaGPS.gtmp.action.permission;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+import com.chinaGPS.gtmp.action.common.BaseAction;
+import com.chinaGPS.gtmp.entity.DealerAreaPOJO;
+import com.chinaGPS.gtmp.entity.DepartPOJO;
+import com.chinaGPS.gtmp.entity.TreeNode;
+import com.chinaGPS.gtmp.service.IDealerAreaService;
+import com.chinaGPS.gtmp.service.IDepartService;
+import com.chinaGPS.gtmp.util.OperationLog;
+import com.opensymphony.xwork2.ModelDriven;
+
+/**
+ * Depart Action 机构管理控制器
+ * 
+ * @author zfy
+ */
+@Scope("prototype")
+@Controller
+public class DepartAction extends BaseAction implements ModelDriven<DepartPOJO> {
+	private static final long serialVersionUID = 6903672315114604986L;
+	private static Logger logger = LoggerFactory.getLogger(DepartAction.class);
+
+	@Resource
+	private IDepartService departService;
+	@Resource
+	private DepartPOJO departPOJO;
+	@Resource
+	private IDealerAreaService dealerAreaService;
+	/**
+	 * 查询机构信息
+	 */
+	@SuppressWarnings("rawtypes")
+	public String search() {
+		List<TreeNode> treeNodeList = new ArrayList<TreeNode>();
+		
+		try {
+			//如果是机构管理，则不显示终端供应商；如果是用户设置所属经销商则显示出来
+			List<DepartPOJO> departList = departService.getList(departPOJO);			
+			Map mapRreaMap = new HashMap();
+			
+			for (DepartPOJO depart : departList) {
+				TreeNode node = new TreeNode();
+				node.setId(depart.getDepartId().toString());
+				node.setText(depart.getDepartName());
+				if (depart.getPid() != null) {
+					node.setParentId(depart.getPid().toString());
+				}
+				mapRreaMap.put(depart.getDepartId(), node);
+			}
+			TreeNode pnode ,cnode;
+			for (DepartPOJO depart2 : departList) {
+				if (depart2.getPid() != null) { // 有父节点
+					if (depart2.getPid() != 3) {
+						pnode = (TreeNode) mapRreaMap.get(depart2.getPid());
+						cnode = (TreeNode) mapRreaMap.get(depart2.getDepartId());
+						if (cnode != null && pnode != null) {
+							pnode.addChild(cnode);
+						}
+					}
+				} else {// 无父节点
+					treeNodeList.add((TreeNode) mapRreaMap.get(depart2.getDepartId()));
+				}
+			}
+			DealerAreaPOJO dealerAreaPOJO = new DealerAreaPOJO();
+			dealerAreaPOJO.setDtype(2);
+			dealerAreaPOJO.setIsValid(0);
+			List<DealerAreaPOJO> saleList = dealerAreaService.getList(dealerAreaPOJO);
+			List<TreeNode> list = treeNodeList.get(0).getChildren();
+ 			for(TreeNode entity:list){
+				if(entity.getId().equals("3")){
+					List<TreeNode> childreList = new ArrayList<TreeNode>();
+					for(DealerAreaPOJO dealer :saleList){
+						TreeNode treeNode = new TreeNode();
+						treeNode.setId(dealer.getId());
+						treeNode.setText(dealer.getName());
+						treeNode.setParentId("3");	
+						childreList.add(treeNode);
+					}
+					entity.setChildren(childreList);
+				}
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		renderObject(treeNodeList);
+		return NONE;
+	}
+
+	/**
+	 * 查询机构信息,根据用户查询
+	 */
+	public String search4user() {
+		List<TreeNode> treeNodeList = new ArrayList<TreeNode>();
+		
+		try {
+		List<DepartPOJO> departList = departService.getList4User(departPOJO);
+		Map mapRreaMap = new HashMap();
+		for (DepartPOJO depart : departList) {
+			TreeNode node = new TreeNode();
+			node.setId(depart.getDepartId().toString());
+			node.setText(depart.getDepartName());
+			if (depart.getPid() != null) {
+				node.setParentId(depart.getPid().toString());
+			}
+			mapRreaMap.put(depart.getDepartId(), node);
+
+		}
+		for (DepartPOJO depart2 : departList) {
+			if (depart2.getPid() != null) { // 有父节点
+				TreeNode pnode = (TreeNode) mapRreaMap.get(depart2.getPid());
+				TreeNode cnode = (TreeNode) mapRreaMap.get(depart2.getDepartId());
+				pnode.addChild(cnode);
+
+			} else {// 无父节点
+				treeNodeList.add((TreeNode) mapRreaMap.get(depart2
+						.getDepartId()));
+			}
+		}
+		} catch (Exception e) {
+			logger.error(e.getMessage() , e);
+		}
+		renderObject(treeNodeList);
+		return NONE;
+	}
+
+	public String getById() {
+		try {
+			departPOJO = departService.getById(departPOJO.getDepartId());
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		renderObject(departPOJO);
+		return NONE;
+	}
+
+	@OperationLog(description = "机构删除")
+	public String deleteDepartById() {
+		boolean flag = true;
+		String msg = OP_SUCCESS;
+		try {
+			departService.deleteDepartById(departPOJO.getDepartId());
+			// logger("机构删除(departId="+departPOJO.getDepartId()+")");//写入操作日志
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			flag = false;
+			msg = OP_FAIL;
+		}
+		renderMsgJson(flag, msg);
+		return NONE;
+	}
+
+	@OperationLog(description = "机构保存")
+	public String saveOrUpdate() {
+		boolean flag = true;
+		String msg = OP_SUCCESS;
+		try {
+			if (departService.hasDepartByName(departPOJO) > 0) {
+				flag = false;
+				msg = "该机构名称在本级机构中已存在";
+			} else {
+				/*
+				 * if(departPOJO.getDepartId()!=null){
+				 * logger("机构修改(departName="+departPOJO.getDepartName()+")");//写入操作日志
+				 * }else{
+				 * logger("机构新增(departName="+departPOJO.getDepartName()+")");//写入操作日志 }
+				 */
+				departService.saveOrUpdate(departPOJO);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			flag = false;
+			msg = OP_FAIL;
+		}
+		renderMsgJson(flag, msg);
+		return NONE;
+	}
+
+	@OperationLog(description = "机构修改")
+	public String update() {
+		boolean flag = true;
+		String msg = OP_SUCCESS;
+		try {
+			departService.saveOrUpdate(departPOJO);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			flag = false;
+			msg = OP_FAIL;
+		}
+		renderMsgJson(flag, msg);
+		return NONE;
+	}
+
+	@Override
+	public DepartPOJO getModel() {
+		return departPOJO;
+	}
+
+}

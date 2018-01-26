@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.VehicleTypeMapper"> 
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+    <resultMap type="VehicleTypePOJO" id="vehicleTypeMap">  
+        <id property="typeId" column="TYPE_ID" jdbcType="VARCHAR" />  
+        <result property="typeName" column="TYPE_NAME" jdbcType="VARCHAR"/>
+        <result property="listNo" column="LIST_NO" jdbcType="INTEGER"/>
+        <result property="isValid" column="IS_VALID" jdbcType="INTEGER"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+        <result property="modelName" column="MODEL_NAME" jdbcType="VARCHAR"/>
+        <result property="vehicleCode" column="VEHICLE_CODE" jdbcType="VARCHAR"/>
+        <result property="vehicleArg" column="VEHICLE_ARG" jdbcType="VARCHAR"/>
+        <result property="modelId" column="MODEL_ID" jdbcType="BIGINT"/>
+        <result property="indexId" column="INDEX_ID" jdbcType="BIGINT"/>
+    </resultMap>
+	
+	
+	<select id="getList" parameterType="VehicleTypePOJO" resultMap="vehicleTypeMap" useCache="false">
+		SELECT * FROM t_vehicle_type ds
+		<where>
+				
+				<if test="@Ognl@isNotBlank(vehicleCode)">
+					AND ds.VEHICLE_CODE =#{vehicleCode}
+				</if>
+				
+				<if test="@Ognl@isNotBlank(vehicleArg)">
+					AND ds.VEHICLE_ARG =#{vehicleArg}
+				</if>
+				
+				<if test="@Ognl@isNotBlank(modelId)">
+					AND ds.MODEL_ID = #{modelId}
+				</if>
+				
+				<!-- <if test="@Ognl@isNotBlank(isValid)">
+					AND ds.IS_VALID = #{isValid}
+				</if> -->
+				
+		</where>
+		   
+		    order by ds.list_No
+	</select>
+	
+	<sql id="getByPageCondition">
+		<where>
+			<if test="@Ognl@isNotBlank(vehicleType)">
+				
+				<if test="@Ognl@isNotBlank(vehicleType.vehicleCode)">
+					AND tt.VEHICLE_CODE LIKE '%'||#{vehicleType.vehicleCode}||'%'
+				</if>
+				
+				<if test="@Ognl@isNotBlank(vehicleType.vehicleArg)">
+					AND tt.VEHICLE_ARG LIKE '%'||#{vehicleType.vehicleArg}||'%'
+				</if>
+				
+			</if>
+		</where>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="getByPage" parameterType="map" resultMap="vehicleTypeMap">
+		select ds.model_name,tt.* from t_vehicle_type tt
+		left join T_DIC_VEHICLE_MODEL ds on ds.model_id = tt.model_id
+		<include refid="getByPageCondition"/>  
+		ORDER BY ds.list_no 
+	</select>
+	
+	<select id="countAll" parameterType="map" resultType="Integer">
+		select count(1) from t_vehicle_type tt
+		left join T_DIC_VEHICLE_MODEL ds on ds.model_id = tt.model_id
+		<include refid="getByPageCondition"/>  
+		ORDER BY ds.list_no 
+	</select> 
+	
+	<select id="get" parameterType="VehicleTypePOJO" resultMap="vehicleTypeMap">
+		SELECT sp.* FROM t_vehicle_type sp WHERE sp.index_id=#{indexId} 
+	</select>
+	
+	<delete id="remove" parameterType="VehicleTypePOJO" >
+			delete t_vehicle_type
+ 			where index_id =#{indexId}
+	</delete>
+	
+	<insert id="add" parameterType="VehicleTypePOJO">
+		INSERT INTO t_vehicle_type
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+		 INDEX_ID,
+		 	<if test="@Ognl@isNotBlank(modelId)">MODEL_ID,</if>
+		 	<if test="@Ognl@isNotBlank(vehicleCode)">VEHICLE_CODE,</if>
+		 	<if test="@Ognl@isNotBlank(vehicleArg)">VEHICLE_ARG,</if>
+		 	<if test="@Ognl@isNotBlank(listNo)">list_no,</if>
+		 	<if test="@Ognl@isNotBlank(isValid)">is_Valid,</if>
+            stamp
+		 </trim>
+		
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		  SEQ_VEHICLE_TYPE.NEXTVAL,
+		 	<if test="@Ognl@isNotBlank(modelId)">#{modelId},</if>
+		 	<if test="@Ognl@isNotBlank(vehicleCode)">#{vehicleCode},</if>
+		 	<if test="@Ognl@isNotBlank(vehicleArg)">#{vehicleArg},</if>
+		 	<if test="@Ognl@isNotBlank(listNo)">#{listNo},</if>
+		 	<if test="@Ognl@isNotBlank(isValid)">#{isValid},</if>
+            sysdate
+		 </trim>
+ 	</insert>
+ 
+	<update id="edit" parameterType="VehicleTypePOJO">
+		UPDATE t_vehicle_type 
+		SET 
+    	<trim suffixOverrides=",">
+    		STAMP=sysdate, 
+		 	<if test="@Ognl@isNotBlank(vehicleCode)">VEHICLE_CODE=#{vehicleCode},</if>
+		 	<if test="@Ognl@isNotBlank(vehicleArg)">VEHICLE_ARG=#{vehicleArg},</if>
+		 	<if test="@Ognl@isNotBlank(listNo)">list_no=#{listNo},</if>
+		 	<if test="@Ognl@isNotBlank(isValid)">is_Valid=#{isValid},</if>
+      	</trim>
+ 		WHERE 
+ 		 	INDEX_ID=#{indexId,jdbcType=BIGINT}
+	</update>
+	
+</mapper>  

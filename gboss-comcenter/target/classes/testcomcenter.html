@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="IE=10" />
+    <title>测试通信中心WEBSOCKET协议</title>
+</head>
+<body onload="onbodyload()">
+    <div>
+	   <textarea id="log" style="width: 100%; height: 400px"></textarea>
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div style="width: 100%">
+        <span>终端呼号：</span>
+		<input type="text" style="width: 60%" id="callletter" placeholder="多个呼号用半角分号隔开 ALLUNIT表示所有终端" value="13912345001">
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div style="width: 100%">
+        <span>消息类型：</span>
+		<input type="text" style="width: 40%" id="infotype" placeholder="多个消息类型用半角分号隔开,-1表示全部" value="2001;2002">
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div>
+		<button onclick="Connect();">Connect</button>
+		<!-- button onclick="Logout()">Logout</button>
+		<button onclick="ActiveLink()">ActiveLink</button -->
+		<button onclick="AddMonitor()">添加车辆监控</button>
+		<button onclick="RemoveMonitor()">删除车辆监控</button>
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div>
+		<button onclick="GetLastPosition()">读最后位置</button>
+		<button onclick="GetLastTravel()">读最后行程</button>
+		<button onclick="GetLastFault()">读最后故障</button>
+		<button onclick="GetLastOperate()">读最后运营数据</button>
+		<button onclick="GetLastSm()">读最后短信</button>
+		<button onclick="GetLastAlarm()">读最后警情</button>
+	</div>
+	<!-- div style="width: 100%; height: 10px"></div>
+	<div>
+		<button onclick="TestDeliverGPS()">测试递交GPS</button>
+		<button onclick="TestDeliverOperateData()">测试递交运营数据</button>
+		<button onclick="TestDeliverSMS()">测试递交短消息</button>
+		<button onclick="TestDeliverUnitLoginOut()">测试递交终端登退录</button>
+		<button onclick="TestDeliverTravel()">测试递交行程</button>
+		<button onclick="TestDeliverFault()">测试递交故障</button>
+		<button onclick="TestDeliverAlarm()">测试递交终端警情</button>
+	</div -->
+	<div style="width: 100%; height: 10px"></div>
+	<div style="width: 100%">
+        <span>序列号：</span>
+		<input type="text" style="width: 30%" id="sn" value="SN_GPS_2014_123456">
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div style="width: 100%">
+        <span>开始时间：</span>
+		<input type="text" style="width: 20%" id="starttime" value="2014-07-01">
+        <span>结束时间：</span>
+		<input type="text" style="width: 20%" id="stoptime" value="2014-07-02">
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div>
+		<button onclick="GetHistoryGPS()">读历史位置</button>
+		<button onclick="GetHistoryTravel()">读历史行程</button>
+		<button onclick="GetHistoryFault()">读历史故障</button>
+		<button onclick="GetHistoryOperate()">读历史运营数据</button>
+		<button onclick="GetHistorySm()">读历史短信</button>
+		<button onclick="GetHistoryAlarm()">读历史警情</button>
+		<button onclick="GetHistorySimpleGps()">读历史位置主要信息</button>
+		<button onclick="GetHistoryNextPage()">下一页</button>
+		<button onclick="StopHistory()">结束读</button>
+	</div>
+	<div style="width: 100%; height: 10px"></div>
+	<div>
+		<button onclick="Position()">查车</button>
+		<button onclick="FindCar()">找车</button>
+		<button onclick="OpenDoor()">开门</button>
+		<button onclick="LockDoor()">锁门</button>
+		<button onclick="LockOil()">断油电</button>
+		<button onclick="OpenOil()">恢复油电</button>
+		<button onclick="Trace()">跟踪</button>
+		<button onclick="IntervalDeliver()">定时上传</button>
+		<button onclick="Listen()">监听</button>
+		<button onclick="UnitSMS()">终端短信</button>
+		<button onclick="SendSMS()">发送手机短信</button>
+	</div>
+	
+	<script src="Math.uuid.js"></script>  <!-- 随机序列号 -->
+	<script src="Long.min.js"></script>       <!-- protobuf需要 -->
+	<script src="ByteBuffer.min.js"></script> <!-- protobuf需要 -->
+	<script src="ProtoBuf.min.js"></script>   <!-- protobuf需要 -->
+	<script src="comcenterprotobuf.js"></script>
+	<script src="zlib.min.js"></script>
+	<script src="segutil_ws.js"></script>
+	<script src="segseatlib.js"></script>
+    <script src="testcomcenter.js"></script>   <!-- 测试通信协议  -->
+    <script src="seatdemoevent.js"></script>
+</body>
+</html>

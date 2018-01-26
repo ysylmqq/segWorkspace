@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="产品库管理">
+<meta name="description" content="产品库管理">
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../css/base.css" rel="stylesheet" />
+<title>产品库管理</title>
+</head>
+<body style="background-color:white;">
+	<div class="container-fluid Reports_page phoneCallNum_page">
+		<h1 style="text-align:center">产品列表</h1>
+        <div class="row r_scroll">
+            <div class="Reports_box" style="width:1000px;margin:0 auto;">
+                <div class="btn_group_pro">
+                    <button class="btn btn-xs btn-default" id="delete_pro_btn">删除</button>
+                    <button class="btn btn-xs btn-default" id="alter_pro_btn">修改</button>
+                    <!-- <button class="btn btn-xs btn-primary" id="uploading_btn">上传附件</button> -->
+                    <button class="btn btn-xs btn-primary" id="addPro_btn">新增产品</button>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <table id="productInf-tab" class="display compact" cellspacing="0" width="100%" border="1">
+                            <thead>
+                                <tr>
+                                    <th style="width:10px;"></th>
+                                    <th style="width:80px;">产品型号</th>
+                                    <th style="width:80px;">产品类型</th>
+                                    <th style="width:90px;">销售名称</th>
+                                    <th style="width:450px;">产品功能</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>TGR30</td>
+                                    <td>产品类型</td>
+                                    <td>天王星SHA30/12V</td>
+                                    <td>产品功能产品功能产品功能产品功能产品功能</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</div>
+<!-- 弹窗 产品新增 START $("#pro_add").modal("show") -->
+<div class="modal fade Casereg" id="pro_add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:740px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">新增产品</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- <p class="col-xs-1">产品型号</p>
+                    <p class="col-xs-5"><input type="text" id="p_add_py" class="form-control" ></p> -->
+                    <p class="col-xs-1">销售名称</p>
+                    <p class="col-xs-5"><input type="text" id="p_add_cz" class="form-control"></p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-1">产品型号</p>
+                    <div class="col-xs-11" style="max-height:300px;overflow-y:auto;">
+                        <ul id="Prolist">
+                            <!-- <li><label><input type="radio" name="Prolist" value="">天王星SHA30/12V</label></li> -->
+                        </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <p class="col-xs-1">产品功能</p>
+                    <p class="col-xs-11"><textarea type="text" id="p_add_cpgn" class="form-control" style="height:192px;line-height:24px;"></textarea></p>
+                </div>
+                <div class="row">
+                    <input type='file' name='upload_file1' id='upload_file1'/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="pro_add_submit">确定</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 产品新增记录 END -->
+<!-- 修改 START $("#pro_alter").modal("show") -->
+<div class="modal fade Casereg" id="pro_alter" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:740px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">修改</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="alter_proId">
+                <div class="row">
+                    <p class="col-xs-1">产品型号</p>
+                    <p class="col-xs-5"><input type="text" id="a_alter_xh" class="form-control" disabled="disabled"></p>
+                    <p class="col-xs-1">产品类型</p>
+                    <p class="col-xs-5"><input type="text" id="a_alter_lx" class="form-control" disabled="disabled"></p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-1">销售名称</p>
+                    <p class="col-xs-5"><input type="text" id="a_alter_xsmc" class="form-control" ></p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-1">产品功能</p>
+                    <p class="col-xs-11"><textarea type="text" id="a_alter_cpgn" class="form-control" style="height:192px;line-height:24px;"></textarea></p>
+                </div>
+                <div class="row">
+                    <input type='file' name='upload_file2' id='upload_file2'/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="pro_alter_submit">提交</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 修改 END -->
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/ajaxfileupload.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    getList();//获取列表
+    getTypeList();//获取类型
+});
+
+$("#addPro_btn").click(function(){//添加产品
+    $("#p_add_cz,#p_add_cpgn,#upload_file1").val("");//销售名称,产品型号,产品功能,上传文件
+    $("#pro_add").modal("show");
+});
+
+$("#alter_pro_btn").click(function(){//修改产品
+    var tr_input = $("#productInf-tab input:checked");//选中的条目
+    if(tr_input.length==0){//未选
+        alert("请选择要修改的记录");
+    } else if(tr_input.length>1){//多条
+        alert("请选择唯一条目");
+    } else{
+        $("#a_alter_xh,#a_alter_lx,#a_alter_xsmc,#a_alter_cpgn,#upload_file1").val("");//产品型号,产品类型,销售名称,产品功能清空,上传文件
+        $("#pro_alter").modal("show");
+
+        var tr = tr_input.parent().parent();
+        $("#alter_proId").val(tr_input.val());//产品id
+        $("#a_alter_xh").val(tr.children("td").eq(1).html());//产品型号
+        $("#a_alter_lx").val(tr.children("td").eq(2).html());//产品类型
+        $("#a_alter_xsmc").val(tr.children("td").eq(3).html());//销售名称
+        $("#a_alter_cpgn").val(tr.children("td").eq(4).html());//产品功能
+    };
+});
+
+function getList(){//获取列表
+    $("#productInf-tab tbody").empty();//写入表格
+    var api_url = '../app/nl/productlib?draw=1&start=0';//url
+    var params = {};//参数
+    $.getJSON(api_url, params, function(result){
+        if(result && result.success==true){
+            if(result.data!==[null]){
+                var row = '';
+                $.each(result.data, function(i,item){
+                    row = '<tr><td><input type="checkbox" value="'+ item.productId +'"></td><td>'+ item.unitType +'</td><td>'+ item.classType +'</td><td>'+ item.cname +'</td><td>'+ item.memo +'</td></tr>';
+                    $("#productInf-tab tbody").prepend(row);//写入表格
+                });
+            }
+                
+        }
+    });
+}
+
+function getTypeList(){//获取类型
+    $("#Prolist").empty();//写入ul
+    var api_url = '../app/nl/unit_types';//url
+    var params = {};//参数
+    $.getJSON(api_url, params, function(result){
+        if(result && result.success==true){
+            if(result.data.length>0){
+                var htmls = "";
+                $.each(result.data, function(i,item){
+                    if(i==0){
+                        htmls = '<li><label><input type="radio" name="Prolist" checked="checked" value="'+ item.typeId +'">'+ item.type +'</label></li>';
+                    } else{
+                        htmls = '<li><label><input type="radio" name="Prolist" value="'+ item.typeId +'">'+ item.type +'</label></li>';
+                    }
+                    
+                    $("#Prolist").append(htmls);
+                });
+            }
+        }
+    });
+}
+
+$("#pro_add_submit").click(function(){//新增确认提交
+    if($("#p_add_cz").val()!=="" && $("#p_add_cpgn").val()!==""){
+        ajaxFileUpload(1);//新增
+        return;
+    }
+    alert("请输入完整产品信息");
+});
+
+$("#pro_alter_submit").click(function(){//修改确认提交
+    if($("#a_alter_xsmc").val()!=="" && $("#a_alter_cpgn").val()!==""){
+        ajaxFileUpload(2);//修改
+        return;
+    }
+    alert("请输入完整产品信息");
+});
+
+function ajaxFileUpload(type){//上传文件
+    var p_productId = "";//产品id
+    var p_cname = "";//销售名称
+    var p_memo = "";//产品功能
+    var p_product_code = "";//产品型号
+    var p_unittype_id = ""//产品类型id
+    var file_ID = "";//文件上传域的ID
+
+    if(type==1){//新增
+        p_productId = "";//无
+        p_cname = $("#p_add_cz").val();//销售名称
+        p_memo = $("#p_add_cpgn").val();//产品功能
+        // p_product_code = $("#p_add_py").val();//产品型号
+        p_product_code = $("input[name='Prolist']:checked").parent().text();//产品型号名称
+        p_unittype_id = $("input[name='Prolist']:checked").val();//产品类型id
+        file_ID = "upload_file1";//文件上传域的ID
+    } else if(type==2){//修改
+        p_productId = $("#alter_proId").val();//产品id
+        p_cname = $("#a_alter_xsmc").val();//销售名称
+        p_memo = $("#a_alter_cpgn").val();//产品功能
+        file_ID = "upload_file2";//文件上传域的ID
+    };
+
+    $.ajaxFileUpload({
+        url: '../app/nl/edit_product', //用于文件上传的服务器端请求地址
+        secureuri: false, //是否需要安全协议，一般设置为false
+        fileElementId: file_ID, //文件上传域的ID
+        dataType: 'json', //返回值类型 一般设置为json
+        data: {productId:p_productId, cname:p_cname, memo:p_memo, product_code:p_product_code, unittype_id:p_unittype_id},
+        success: function (data, status)  //服务器成功响应处理函数
+        {   
+            // console.log(data);
+            // alert(data.message);
+            if(data.success==true){
+                $("#pro_add,#pro_alter").modal("hide");//弹窗消失
+                getList();//获取列表(刷新)
+            } else{
+                alert("提交失败："+data.message);
+            };
+            
+        },
+        error: function (data, status, e)//服务器响应失败处理函数
+        {
+            alert(e);
+        }
+    });
+    return false;
+}
+
+// $("#delete_btn").click(function(){//删除弹窗
+//     var tr_input = $("#detailInf-tab input:checked");
+//     if(tr_input.length==0){
+//         alert("请选择要修改的记录");
+//     } else{
+//         $("#p_delete").modal("show");
+//     }
+// });
+
+$("#delete_pro_btn").click(function(){//提交删除
+    var tr_input = $("#productInf-tab input:checked");//选中的条目
+    if(tr_input.length==0){
+        alert("请选择要删除的记录");
+    } else{
+        var pids_id = [];//phonebookId参数
+        $.each(tr_input,function(i,item){
+            pids_id.push(parseInt($(item).val()));
+        });
+        // console.log(pids_id);
+        var api_url = '../app/nl/del_products';//url
+        var params = {pids:pids_id};//参数
+        var params_t = decodeURIComponent($.param(params,true));
+        $.getJSON(api_url+"?"+params_t,function(result){
+            if(result && result.success==true){
+                getList();//获取列表
+            } else{
+                alert("产品删除失败");
+            };
+        });
+    };
+});
+
+</script>
+</body>
+</html>

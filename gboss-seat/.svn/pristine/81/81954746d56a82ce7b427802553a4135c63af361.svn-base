@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="gboss-seat"
+  id="myeclipse.1432535861157"
+  context-root="/seat"
+  j2ee-spec="5.0"
+  archive="gboss-seat.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

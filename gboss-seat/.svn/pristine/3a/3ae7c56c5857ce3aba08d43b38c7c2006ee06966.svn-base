@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="外呼业务汇总">
+<meta name="description" content="外呼业务汇总">
+
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/jquery.dataTables.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/data_style.css" rel="stylesheet" />
+<link href="../dist/plugins/css/datepicker.css" rel="stylesheet">
+<link href="../css/base.css" rel="stylesheet" />
+<title>外呼服务明细</title>
+
+</head>
+<body style="background-color:white;">
+	<div class="container-fluid Reports_page">
+		<h1>外呼服务明细</h1>
+		<div class="row c_area">
+            <div class="filter_box">
+                <div class="form-group clearfix" style="width:100%;">
+                    <h6 class="control-label control_title">统计选择：</h6>
+                    <div class="filter_content">
+                        <span id="serversType">
+                            <label><input type="radio" name="recentRep_option1" checked="checked" id="Reports1_btn" value="1"/>未上报统计</label>
+                            <label><input type="radio" name="recentRep_option1" id="Reports2_btn" value="2" />故障通知</label>
+                            <label><input type="radio" name="recentRep_option1" id="Reports3_btn" value="2" />服务费催收</label>
+                            <label><input type="radio" name="recentRep_option1" id="Reports4_btn" value="2" />营销</label>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">归属公司：</h6>
+                    <div class="filter_content">
+                        <span class="filiale">
+                            <input type="text" class="form-control reports_search_4_engine" id="calloutTotal_Com_search" value="全部"/>
+                            <i class="glyphicon glyphicon-chevron-down filialeDown"></i>
+                            <input type="hidden" class="search_filiale_id" id="calloutTotal_ID_search" value="0">
+                            <ul class="reports_search_4_list" style="display:none;"></ul>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">时间：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control form_datetime starTime">
+                            <span class="input-group-addon">至</span>
+                            <input type="text" class="form-control form_datetime endTime" >
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="form-group clearfix btns">
+                    <a href="#" class="exportExcel" id="calloutTotalSearch"><i class="glyphicon glyphicon-search"></i>查询</a>
+                    <a href="#" class="exportExcel" id="calloutTotalExport"><i class="glyphicon glyphicon-export"></i>导出Excel</a>
+                </div>
+            </div>            
+        </div>
+        <div class="row r_scroll">
+            <div class="Reports_box" id="Reports1" style="width:1000px;">
+                <b class="Reports_box_title">未上报统计</b>
+                <table id="recentReported-table" class="display compact table_borders dataTable" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th style="width:30px;"></th>
+                            <th style="width:80px;">客户名称</th>
+                            <th style="width:90px;">车载电话</th>
+                            <th style="width:100px;">车牌号码</th>
+                            <th style="width:120px;">最后上报时间</th>
+                            <th style="width:120px;">安装时间</th>
+                            <th style="width:110px;">车辆类型</th>
+                            <th style="width:80px;">通信模式</th>
+                            <th style="width:80px;">销售经理</th>
+                            <th style="width:80px;">归属公司</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="Reports_box" id="Reports2" style="width:1000px;display:none;">
+                <b class="Reports_box_title">故障通知</b>
+                <table id="locatefault-table" class="display compact table_borders dataTable" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th style="width:30px;"></th>
+                            <th style="width:80px;">客户名称</th>
+                            <th style="width:90px;">车载电话</th>
+                            <th style="width:100px;">车牌号码</th>
+                            <th style="width:120px;">故障</th>
+                            <th style="width:120px;">安装时间</th>
+                            <th style="width:110px;">车辆类型</th>
+                            <th style="width:80px;">通信模式</th>
+                            <th style="width:80px;">销售经理</th>
+                            <th style="width:80px;">归属公司</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="display:none;">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="Reports_box" id="Reports3" style="width:1400px;display:none;">
+                <b class="Reports_box_title">服务费催收</b>
+                <table id="locatefault-table" class="display compact table_borders dataTable" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th style="width:30px;"></th>
+                            <th style="width:80px;">客户名称</th>
+                            <th style="width:100px;">车牌号码</th>
+                            <th style="width:90px;">车载电话</th>
+                            <th style="width:100px;">终端类型</th>
+                            <th style="width:80px;">销售经理</th>
+                            <th style="width:120px;">开通日期</th>
+                            <th style="width:120px;">费用总额</th>
+                            <th style="width:110px;">服务费(元)</th>
+                            <th style="width:80px;">托收标记</th>
+                            <th style="width:80px;">服务费截止时间</th>
+                            <th style="width:80px;">归属公司</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="display:none;">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="Reports_box" id="Reports4" style="width:1500px;display:none;">
+                <b class="Reports_box_title">营销</b>
+                <table id="locatefault-table" class="display compact table_borders dataTable" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th style="width:30px;"></th>
+                            <th style="width:80px;">客户名称</th>
+                            <th style="width:100px;">车牌号码</th>
+                            <th style="width:80px;">车载电话</th>
+                            <th style="width:60px;">车辆颜色</th>
+                            <th style="width:100px;">用户身份证</th>
+                            <th style="width:120px;">安装时间</th>
+                            <th style="width:80px;">用户电话</th>
+                            <th style="width:80px;">车辆型号</th>
+                            <th style="width:80px;">引擎号</th>
+                            <th style="width:80px;">车架号</th>
+                            <th style="width:120px;">公司盗抢险</th>
+                            <th style="width:100px;">公司保险</th>
+                            <th style="width:100px;">车圣U宝</th>
+                            <th style="width:180px;">车辆初次登记日期</th>
+                            <th style="width:80px;">归属公司</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="display:none;">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+	</div>
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/fnReloadAjax.js"></script>
+<script type="text/javascript" src="../dist/plugins/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/reports.js"></script>
+<script type="text/javascript">
+    $("#serversType label input").click(function(){
+        var id = $(this).attr("id");//获取id
+        var cutId = id.split('_');
+        var targetId = cutId[0];//获取目标id
+        $("#"+targetId).show().siblings().hide();
+    });
+</script>
+</body>
+</html>

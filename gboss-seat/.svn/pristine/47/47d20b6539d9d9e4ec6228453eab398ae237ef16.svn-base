@@ -1,0 +1,117 @@
+package cc.chinagps.seat.controller;
+
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import cc.chinagps.seat.auth.User;
+import cc.chinagps.seat.bean.table.MarkTable;
+import cc.chinagps.seat.bean.table.NavTable;
+import cc.chinagps.seat.service.MapService;
+import cc.chinagps.seat.util.Consts;
+
+import com.googlecode.jsonplugin.JSONException;
+import com.googlecode.jsonplugin.JSONUtil;
+
+@Controller
+@RequestMapping("/map")
+public class MapController extends BasicController {
+	
+	@Autowired
+	private MapService service;
+	
+	@RequestMapping("/marks")
+	@ResponseBody
+	public String getAllMarks(HttpServletRequest request) 
+			throws JSONException {
+		User loginUser = getLoginUser(request);
+		List<MarkTable> allMarks = service.getAllMarks(
+				loginUser.getOpId(), loginUser.getCompanyInfoList());
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("success", true);
+		resultMap.put("mark", allMarks);
+		
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@RequestMapping("/marks/add")
+	@ResponseBody
+	public String addMark(@Valid MarkTable mark,
+			HttpServletRequest request) 
+			throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		if (mark.getCompanyNo() == null) {
+			mark.setCompanyNo(getLoginUserCompanyNo(request));
+		}
+		User user = getLoginUser(request);
+		mark.setOpId(user.getOpId());
+		mark.setOpName(user.getOpName());
+		long markId = service.addMark(mark);
+		resultMap.put("success", true);
+		resultMap.put("id", markId);
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@RequestMapping("/marks/del")
+	@ResponseBody
+	public String delMark(
+			@RequestParam("id")Long id,
+			@RequestParam(value = "companyNo", required = false)
+			BigInteger[] companyNo,
+			HttpServletRequest request,
+			Locale locale) 
+			throws JSONException {
+		
+		if (companyNo == null) {
+			companyNo = getLoginUserCompanyNo(request);
+		}
+		service.delMarkCompany(id, companyNo);
+		int result = service.delMark(id, companyNo);
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		if (result == Consts.SUCCEED) {
+			resultMap.put("success", true);
+		} else {
+			resultMap.put("success", false);
+			resultMap.put("message", getText("mark.no.mark", locale, id));
+		}
+		
+		return JSONUtil.serialize(resultMap);
+	}
+
+	@RequestMapping("/nav/save")
+	@ResponseBody
+	public String saveNav(@Valid NavTable nav, 
+			HttpServletRequest request) 
+			throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		nav.setOpId(getLoginUser(request).getOpId());
+		service.saveNav(nav);
+		resultMap.put("success", true);
+		return JSONUtil.serialize(resultMap);
+	}
+
+	@RequestMapping("/nav")
+	@ResponseBody
+	public String loadNav(@RequestParam("vehicleId") Long vehicleId, 
+			HttpServletRequest request) throws JSONException {
+		NavTable nav = service.loadLastNav(vehicleId,
+				getLoginUser(request).getOpId());
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("success", true);
+		if (nav != null) {
+			resultMap.put("nav", nav);
+		}
+		return JSONUtil.serialize(resultMap);
+	}
+}

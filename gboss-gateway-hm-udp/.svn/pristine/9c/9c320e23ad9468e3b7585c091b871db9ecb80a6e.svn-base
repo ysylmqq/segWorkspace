@@ -1,0 +1,139 @@
+package cc.chinagps.gateway.unit.oem.download;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.seg.lib.util.Util;
+
+import cc.chinagps.gateway.buff.CommandBuff.Command;
+import cc.chinagps.gateway.exceptions.WrongFormatException;
+import cc.chinagps.gateway.log.LogManager;
+import cc.chinagps.gateway.seat.cmd.CmdUtil;
+import cc.chinagps.gateway.seat.cmd.ServerToUnitCommand;
+import cc.chinagps.gateway.stream.OutputPackageEncoder;
+import cc.chinagps.gateway.unit.UnitSocketSession;
+import cc.chinagps.gateway.unit.oem.pkg.OEMPackage;
+import cc.chinagps.gateway.unit.seg.download.SegServerToUnitCommand;
+import cc.chinagps.gateway.util.ConvertUtil;
+import cc.chinagps.gateway.util.HexUtil;
+
+public class OEMDownloadCmdEncoder implements OutputPackageEncoder {
+	private Logger logger_debug = Logger.getLogger(LogManager.LOGGER_NAME_DEBUG);
+	@Override
+	public ServerToUnitCommand encode(Command userCmd,
+			UnitSocketSession unitSession) throws Exception {
+		int cmdIdx = userCmd.getCmdId();
+		switch (cmdIdx) {
+		case CmdUtil.CMD_ID_START_UPLOAD_BY_INTERVAL://设置定时上报
+			return getDeliverByIntervalCmd(userCmd, unitSession, (byte) 0x16,
+					OutputPackageEncoder.SUCCESS_AFTER_RESPONSE);
+		/*
+		 * case CmdUtil.CMD_ID_POSITION://清除报警状态位 return
+		 * getQueryPositionCmd(userCmd, unitSession,(byte)0x22);
+		 */
+		case CmdUtil.CMD_ID_POSITION:// 点名查车
+			return getCommonOperationCmd(userCmd, unitSession, (byte) 0x30,
+					OutputPackageEncoder.SUCCESS_AFTER_RESPONSE);
+
+		case CmdUtil.CMD_ID_RESET:// 车台复位
+			return getCommonOperationCmd(userCmd, unitSession, (byte) 0x32,
+					OutputPackageEncoder.SUCCESS_AFTER_SEND);
+			/*
+			 * case CmdUtil.CMD_ID_RESET://开启防盗 return
+			 * getQueryPositionCmd(userCmd, unitSession,(byte)0x63); case
+			 * CmdUtil.CMD_ID_RESET://关闭防盗 return getQueryPositionCmd(userCmd,
+			 * unitSession,(byte)0x64);
+			 */
+		case CmdUtil.CMD_ID_OPEN_DOOR:// 远程控制开车门
+			return getCommonOperationCmd(userCmd, unitSession, (byte) 0x67,
+					OutputPackageEncoder.SUCCESS_AFTER_SEND);
+
+		case CmdUtil.CMD_ID_LOCK_DOOR:// 远程控制锁车门
+			return getCommonOperationCmd(userCmd, unitSession, (byte) 0x68,
+					OutputPackageEncoder.SUCCESS_AFTER_SEND);
+
+		case CmdUtil.CMD_ID_CUT_OFF_OIL:// 远程控制终端断油
+
+			return getCommonOperationCmd(userCmd, unitSession, (byte) 0x39,
+					OutputPackageEncoder.SUCCESS_AFTER_SEND);
+
+		case CmdUtil.CMD_ID_RESUME_OIL:// 远程控制终端恢复油路
+			return getCommonOperationCmd(userCmd, unitSession, (byte) 0x38,
+					OutputPackageEncoder.SUCCESS_AFTER_SEND);
+		default:
+			throw new WrongFormatException("(oem)no encoder, cmdId:" + cmdIdx);
+		}
+	}
+
+	private ServerToUnitCommand getDeliverByIntervalCmd(Command userCmd, UnitSocketSession unitSession, byte mainCmdId,
+			int responseType) throws Exception{
+		// TODO Auto-generated method stub
+		
+		List<String> params = userCmd.getParamsList();
+		if (params.size() < 1) {
+			throw new WrongFormatException(
+					"(oem)not enough params, min: 1, current:" + params.size());
+		}
+		short interval = (short)Integer.valueOf(params.get(0)).intValue();
+		if(interval < 5){
+			throw new WrongFormatException(
+					"(oem)Deliver interval value can not smaller than 5s....");
+		}
+		
+		OEMPackage pkg = new OEMPackage();
+		pkg.setMainCmdId(mainCmdId);
+		pkg.setBodyLen((short) 8);
+		pkg.setData(Util.getShortByte(interval));
+		pkg.setVip(HexUtil.hexToBytes(ConvertUtil.deviceIdToWIP(unitSession
+				.getUnitInfo().getIMEI())));
+
+		SegServerToUnitCommand serverToUnitCommand = new SegServerToUnitCommand();
+		serverToUnitCommand.setUserCommand(userCmd);
+		String cachedSn = CmdUtil.getCmdCacheSn(unitSession.getUnitInfo()
+				.getCallLetter(), userCmd.getCmdId());
+		serverToUnitCommand.setCachedSn(cachedSn);
+		serverToUnitCommand.setData(pkg.encode());
+		serverToUnitCommand.setResponseType(responseType);
+		logger_debug.debug("[oem] OEMDownloadCmdEncoder 0x16:"+HexUtil.byteToHexStr(serverToUnitCommand.getData()));
+		return serverToUnitCommand;
+	}
+
+	private ServerToUnitCommand getCommonOperationCmd(Command userCmd,
+			UnitSocketSession unitSession, byte mainCmdId, int responseType)
+			throws Exception {
+
+		OEMPackage pkg = new OEMPackage();
+		pkg.setMainCmdId(mainCmdId);
+		pkg.setBodyLen((short) 6);
+		pkg.setData(new byte[0]);
+		pkg.setVip(HexUtil.hexToBytes(ConvertUtil.deviceIdToWIP(unitSession
+				.getUnitInfo().getIMEI())));
+
+		SegServerToUnitCommand serverToUnitCommand = new SegServerToUnitCommand();
+		serverToUnitCommand.setUserCommand(userCmd);
+		String cachedSn = CmdUtil.getCmdCacheSn(unitSession.getUnitInfo()
+				.getCallLetter(), userCmd.getCmdId());
+		serverToUnitCommand.setCachedSn(cachedSn);
+		serverToUnitCommand.setData(pkg.encode());
+		serverToUnitCommand.setResponseType(responseType);
+		return serverToUnitCommand;
+	}
+
+	public static void main(String[] args) {
+		try {
+			OEMPackage pkg = new OEMPackage();
+			pkg.setMainCmdId((byte) 0x38);
+			pkg.setBodyLen((short) 6);
+			pkg.setData(new byte[0]);
+			pkg.setVip(HexUtil.hexToBytes(ConvertUtil
+					.deviceIdToWIP("13866004518")));
+
+			System.out.println(HexUtil.byteToHexStr(pkg.encode()));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+}

@@ -1,0 +1,145 @@
+package cc.chinagps.seat.controller;
+
+import java.math.BigInteger;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import cc.chinagps.seat.auth.User;
+import cc.chinagps.seat.bean.table.ServerTypeCompanyTable;
+import cc.chinagps.seat.bean.table.ServerTypeTable;
+import cc.chinagps.seat.bean.table.SysValueTable;
+import cc.chinagps.seat.service.ServerTypeService;
+
+import com.googlecode.jsonplugin.JSONException;
+import com.googlecode.jsonplugin.JSONUtil;
+
+@Controller
+@RequestMapping("/servertype")
+public class ServerTypeController extends BasicController {
+	
+	//@Autowired
+	private ServerTypeService serverTypeService;
+	
+	@RequestMapping("/query")
+	@ResponseBody
+	public String getServerTypeList(@Valid ServerTypeTable table,HttpServletRequest request) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		User user = getLoginUser(request);
+		table.setOp_id(BigInteger.valueOf(user.getOpId()));
+		table.setCall_type((byte)1);
+		List<ServerTypeTable> list_callType1 = serverTypeService.getServerTypeList(table);
+		table.setCall_type((byte)2);
+		List<ServerTypeTable> list_callType2 = serverTypeService.getServerTypeList(table);
+		resultMap.put("success", true);
+		resultMap.put("callininfo", list_callType1);
+		resultMap.put("calloutinfo", list_callType2);
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@RequestMapping("/queryServerByOrg")
+	@ResponseBody
+	public String getServerByOrgList(@Valid Integer orgId,HttpServletRequest request) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		List<ServerTypeTable> list_callType1  = serverTypeService.getServerByOrgList(orgId,1);
+		List<ServerTypeTable> list_callType2  = serverTypeService.getServerByOrgList(orgId,2);
+		resultMap.put("success", true);
+		resultMap.put("callininfo", list_callType1);
+		resultMap.put("calloutinfo", list_callType2);
+		return JSONUtil.serialize(resultMap);
+	}
+
+	@RequestMapping("/add")
+	@ResponseBody
+	public String saveServerType(@Valid ServerTypeTable table,
+			HttpServletRequest request,
+			Locale locale) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		User user = getLoginUser(request);
+		table.setOp_id(BigInteger.valueOf(user.getOpId()));		
+		resultMap.put("success", true);
+		resultMap.put("id", serverTypeService.saveServerType(table));		
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@RequestMapping("/delete")
+	@ResponseBody
+	public String deleteServerType(@Valid Integer id,
+			HttpServletRequest request,
+			Locale locale) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();	
+		resultMap.put("success", true);
+		resultMap.put("id", serverTypeService.deleteServerType(id));		
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@RequestMapping("/clearServers")
+	@ResponseBody
+	public String clearServers(@Valid Integer orgId,
+			HttpServletRequest request,
+			Locale locale) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();	
+		resultMap.put("success", true);
+		serverTypeService.clearServers(orgId);
+		resultMap.put("id", 1);		
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@RequestMapping("/queryAll")
+	@ResponseBody
+	public String getServerTypeAllList(@Valid ServerTypeTable table,HttpServletRequest request) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		table.setCall_type((byte)1);
+		List<ServerTypeTable> list_callType1 = serverTypeService.getServerTypeAllList(table);
+		table.setCall_type((byte)2);
+		List<ServerTypeTable> list_callType2 = serverTypeService.getServerTypeAllList(table);
+		resultMap.put("success", true);
+		resultMap.put("callininfo", list_callType1);
+		resultMap.put("calloutinfo", list_callType2);
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@RequestMapping("/queryOrg")
+	@ResponseBody
+	public String getOrgList(HttpServletRequest request) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		List<SysValueTable> list = serverTypeService.getOrgList();
+		resultMap.put("success", true);
+		resultMap.put("info", list);
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@RequestMapping("/addOrgServer")
+	@ResponseBody
+	public String saveOrgServerType(@Valid Integer orgId,
+			@RequestParam(value = "serverTypeIds[]")Integer[] serverTypeIds,
+			HttpServletRequest request,
+			Locale locale) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		try {
+			serverTypeService.deleteServerTypeCompany(orgId);
+			User user = getLoginUser(request);
+			for (Integer id : serverTypeIds) {
+				ServerTypeCompanyTable entity = new ServerTypeCompanyTable(id,orgId,user.getOpId(),new Date());
+				serverTypeService.saveServerTypeCompany(entity);
+				resultMap.put("success", true);
+				resultMap.put("message", "服务类型配置成功！");
+			}
+		}catch (Exception e) {
+        	resultMap.put("success", false);
+        	resultMap.put("message", "服务类型配置失败！");
+		}
+		return JSONUtil.serialize(resultMap);
+	}
+}

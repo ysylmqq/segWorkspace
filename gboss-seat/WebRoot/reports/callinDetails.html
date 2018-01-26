@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="呼入业务明细">
+<meta name="description" content="呼入业务明细">
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/jquery.dataTables.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/data_style.css" rel="stylesheet" />
+<link href="../dist/plugins/css/datepicker.css" rel="stylesheet">
+<link href="../css/base.css" rel="stylesheet" />
+<title>呼入业务明细</title>
+
+</head>
+<body style="background-color:white;">
+	<div class="container-fluid Reports_page">
+		<h1>呼入业务明细</h1>
+		<div class="row c_area">
+            <div class="filter_box">
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">归属公司：</h6>
+                    <div class="filter_content">
+                        <span class="filiale">
+                            <input type="text" class="form-control reports_search_4_engine" id="callinDetails_Com_search" value="全部" />
+                            <i class="glyphicon glyphicon-chevron-down filialeDown"></i>
+                            <input type="hidden" class="search_filiale_id" id="callinDetails_ID_search" value="0">
+                            <ul class="reports_search_4_list" style="display:none;"></ul>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">搜索：</h6>
+                    <div class="filter_content">
+                        <span class="reports_search_1">
+                            <input type="text" class="form-control reports_search_1_engine" placeholder="车牌号码或车载电话" style="width:251px;" id="callinDetailsCar_partNo">
+                            <input type="hidden" class="search_plate_no">
+                            <input type="hidden" class="search_call_letter">
+                            <input type="hidden" class="search_vehicle_id" id="callinDetailsCarID">
+                            <ul class="reports_search_1_list" style="display:none;">
+                                <!--
+                            	<li><span class="p_plate_no">粤B.123456</span> <span class="p_call_letter">13698521459</span></li>
+                            	-->
+                            </ul>
+                        </span>
+                        <span>
+                            <input type="text" class="form-control" placeholder="客户名称" id="callinDetailsCosName">
+                        </span>
+                        <span>
+                            <input type="text" class="form-control" placeholder="呼入电话" id="callinDetailsPhone">
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">呼入时间：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control form_datetime starTime">
+                            <span class="input-group-addon">至</span>
+                            <input type="text" class="form-control form_datetime endTime" >
+                        </span>
+                    </div>
+                </div>
+
+                <!-- <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">呼入组别：</h6>
+                    <div class="filter_content">
+                        <select id="callinGroup">
+                            <option value="0">全部</option>
+                            <option value="1">在线组</option>
+                            <option value="2">海马组</option>
+                            <option value="3">全网组</option>
+                            <option value="4">外呼组</option>
+                            <option value="5">客诉组</option>
+                            <option value="6">资料组</option>
+                            <option value="7">催收回访组</option>
+                            <option value="8">保险组</option>
+                        </select>
+                    </div>
+                </div> -->
+
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">受理工号：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control" id="jobNum">                  
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix" style="width:100%;">
+                    <h6 class="control-label control_title">服务大类：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <label class="TOS_checkall"><input type="checkbox" id="TOS_opt_in_checkall"/>全选</label>
+                        </span>
+                        <span class="TOS_opt" id="TOS_opt_in1"></span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix" style="width:100%;height:auto;">
+                    <h6 class="control-label control_title">业务类型：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <label class="TOS_checkall"><input type="checkbox" id="TOS_opt_in2_checkall" />全选</label>
+                        </span>
+                        <span class="TOS_opt" id="TOS_opt_in2"></span>
+                    </div>
+                </div>
+                
+                <div class="form-group clearfix btns">
+                    <a href="#" class="exportExcel" id="callinDetailsSearch"><i class="glyphicon glyphicon-search"></i>查询</a>
+                    <a href="#" class="exportExcel" id="callinDetailsExport"><i class="glyphicon glyphicon-export"></i>导出Excel</a>
+                </div>
+            </div>            
+        </div>
+        <div class="row r_scroll">
+            <div class="Reports_box callinDetails">
+                <table id="callinDetails-table" class="display compact table_borders dataTable" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th style="width:30px;"></th>
+                            <th style="width:90px;">车牌号</th>
+                            <th style="width:90px;">客户姓名</th>
+                            <th style="width:100px;">车载电话</th>
+                            <th style="width:80px;">呼入号码</th>
+                            <th style="width:180px;">呼入时间</th>
+                            <th style="width:70px;">受理人</th>
+                            <th style="width:70px;">服务类型</th>
+                            <th style="width:150px;">业务类型</th>
+                            <th style="width:100px;">处理结果</th>
+                            <th style="width:60px;">归属公司</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+	</div>
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/fnReloadAjax.js"></script>
+<script type="text/javascript" src="../dist/plugins/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/reports.js"></script>
+<script type="text/javascript">
+    //呼入业务明细查询
+    $("#callinDetailsSearch").click(function(){    
+        if(checkTimeBox()==0){//判断时间是否为空
+            return;
+        }else if($('.starTime').val() >= $('.endTime').val()){
+            alert("起始时间不能大于结束时间");
+            return;
+        }else{
+            if ( typeof(add_table) != "undefined") {
+                callinDetailsReport();
+                add_table.fnReloadAjax("../app/callbrief/call_in?" + paras);
+            }
+            else{
+                callinDetailsReport();
+            };
+        };
+     });
+
+    //呼入业务明细导出
+
+    $("#callinDetailsExport").click(function(){
+        $(this).attr("href","../app/callbrief/call_in/export?"+callparas);
+    });
+
+    //呼入业务明细查询
+    function callinDetailsReport(){
+        var ValcompanyNo = [];//所属公司id
+        var ValvehicleId = $("#callinDetailsCarID").val();//车辆id（隐藏）
+        var ValpartNo =  $("#callinDetailsCar_partNo").val();//部分车牌或车载
+        var Valname =  encodeURI($("#callinDetailsCosName").val());//客户名称
+        var Valphone =  $("#callinDetailsPhone").val();//呼入电话
+        var ValbeginTime = $(".starTime").val();//开始时间
+        var ValendTime = $(".endTime").val();//结束时间
+        // var ValcallinGroup = $("#callinGroup").val();//呼入组别(0:全部 1:在线组 2.海马组....)
+        var ValjobNum = $("#jobNum").val();//受理工号
+        var ValserverType = [];//服务大类
+        if($("#TOS_opt_in1 label input:checked").length>0){
+            $.each($("#TOS_opt_in1 label input:checked"),function(i,item){
+                ValserverType.push(parseInt($(item).val()));
+            });
+        }
+        var ValbusinessType = [];//业务类型
+        if($("#TOS_opt_in2 label input:checked").length>0){
+            $.each($("#TOS_opt_in2 label input:checked"),function(i,item){
+                ValbusinessType.push(parseInt($(item).val()));
+            });
+        }
+
+        ValcompanyNo[0] = $("#callinDetails_ID_search").val();
+        if ($("#callinDetails_ID_search").val()=='0'){//所属公司拼接
+            callinDetailscompanyNo='';
+        }else{
+            callinDetailscompanyNo = 'companyNo='+ValcompanyNo+'&';
+        };
+
+        if (ValvehicleId == ''){//车辆id或部分车牌车载拼接
+            callinDetailsvehicleId = '';
+            if (ValpartNo==''){
+                callinDetailspartNo='';
+            }else{
+                callinDetailspartNo = 'partNo='+ValpartNo+'&';
+            };
+        }else{
+            callinDetailsvehicleId = 'vehicleId='+ValvehicleId+'&';
+            callinDetailspartNo='';
+        };
+
+        if (Valname==''){//客户名称拼接
+            callinDetailsname = '';
+        }else{
+            callinDetailsname = 'name='+Valname+'&';
+        };
+     
+        if (Valphone==''){//联系电话拼接
+            callinDetailsphone = '';
+        }else{
+            callinDetailsphone = 'phone='+Valphone+'&';
+        };
+
+        // if (ValcallinGroup == 0){//呼入组别拼接
+        //     callinDetailscallinGroup = '';
+        // }else{
+        //     callinDetailscallinGroup = 'callinGroup='+ValcallinGroup+'&';
+        // };
+
+        if (ValjobNum == 0){//受理工号拼接
+            callinDetailsjobNum = '';
+        }else{
+            callinDetailsjobNum = 'jobNum='+ValjobNum+'&';
+        };
+
+        if ($("#TOS_opt_in_checkall").is(":checked")){//（是否全选）服务大类拼接
+            callinDetailsserverType = '';
+        }else{
+            if(ValserverType.length==0){
+                callinDetailsserverType = '';
+            } else{
+                callinDetailsserverType = 'serverType='+ValserverType+'&';
+            }
+        };
+
+        if ($("#TOS_opt_in2_checkall").is(":checked")){//（是否全选）业务类型拼接
+            callinDetailsbusinessType = '';
+        }else{
+            if(ValbusinessType.length==0){
+                callinDetailsbusinessType = '';
+            } else{
+                callinDetailsbusinessType = 'businessType='+ValbusinessType+'&';
+            }            
+        };
+
+        if (ValbeginTime==''){//开始时间
+            callinDetailsbeginTime='';
+        }else{
+            callinDetailsbeginTime = 'beginTime='+ValbeginTime+'&';
+        };
+
+        if (ValendTime==''){//结束时间
+            callinDetailsendTime='';
+        }else{
+            callinDetailsendTime = 'endTime='+ValendTime;
+        };
+
+        callparas = callinDetailscompanyNo+callinDetailsvehicleId+callinDetailspartNo+callinDetailsname+callinDetailsphone+callinDetailsjobNum+callinDetailsserverType+callinDetailsbusinessType+callinDetailsbeginTime+callinDetailsendTime;//归属公司、车辆id、客户名称、呼入电话、时间段、呼入组别、受理工号、服务大类、业务类型
+        // alert(callparas);
+        paras = callparas;//参数;
+        add_table = $("#callinDetails-table").dataTable({
+            "bSort": false,//不排序
+            "filter": false,//去掉搜索框
+            "pagingType": "full_numbers",
+            "processing" : true,
+            "serverSide" : true,//后端处理
+            "bRetrieve": true,
+            "bDestroy": true,
+            "oLanguage": {
+                "sUrl":"../assets/data-tables/js/dataTable.cn.txt"
+            },
+            "ajax" : {
+                "type":"POST",
+                "url":"../app/callbrief/call_in?" + paras //获取数据的API
+            },             
+            "columns":[
+                {"data":"sn"},//序列号************************
+                {"data":"plate_no"},//车牌号
+                {"data":"customer_name"},//客户名称
+                {"data":"call_letter"},//车载电话
+                {"data":"phone"},//呼入号码
+                {"data":"stamp"},//呼入时间
+                {"data":"op_name"},//受理人
+                {"data":"super_servertype_name"},//服务类型
+                {"data":"content"},//业务类型
+                {"data":"result"},//处理结果
+                {"data":"company_name"}//归属公司
+            ]
+        });
+        return add_table;
+    }
+</script>
+</body>
+</html>

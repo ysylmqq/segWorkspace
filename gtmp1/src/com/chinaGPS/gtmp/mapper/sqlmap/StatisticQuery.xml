@@ -1,0 +1,875 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper">
+
+<!-- 用memcached做二级缓存 -->
+<cache type="org.mybatis.caches.memcached.MemcachedCache" />
+
+    <resultMap type="VehicleWorkPOJO" id="vehicleWorkMap">
+        <result property="unitId" column="UNIT_ID" jdbcType="VARCHAR" />  
+       <result property="lon" column="lon" jdbcType="FLOAT"/>
+        <result property="lat" column="lat" jdbcType="FLOAT" />
+        <result property="direction" column="direction" jdbcType="INTEGER"/>
+        <result property="speed" column="speed" jdbcType="FLOAT"/>  
+        <result property="locationState" column="location_state" jdbcType="INTEGER"/>
+        <result property="vehicleState" column="vehicle_state" jdbcType="VARCHAR"/>
+        <result property="gpsTime" column="gps_time" jdbcType="TIMESTAMP"/>
+        <result property="referencePosition" column="reference_position" jdbcType="VARCHAR"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+       <result property="vehicleCode" column="vehicle_code" jdbcType="VARCHAR"/>
+       <result property="vehicleArg" column="vehicle_arg" jdbcType="VARCHAR"/>
+         <result property="vehicleDef" column="VEHICLE_DEF" jdbcType="VARCHAR"/>
+        <result property="typeName" column="TYPE_NAME" jdbcType="VARCHAR"/>
+        <result property="modelName" column="MODEl_NAME" jdbcType="VARCHAR"/>
+        
+         <result property="ownerName" column="owner_name" jdbcType="VARCHAR"/>
+        <result property="ownerPhoneNumber" column="owner_phone_number" jdbcType="VARCHAR"/>
+        <result property="dealerName" column="dealer_Name" jdbcType="VARCHAR"/>
+        <result property="areaName" column="area_Name" jdbcType="VARCHAR"/>
+        <result property="vehicleStatus" column="VEHICLE_STATUS" jdbcType="VARCHAR"/>
+        <result property="lastWorkDate" column="LAST_WORKDATE" jdbcType="TIMESTAMP"/>
+    </resultMap>
+	<sql id="getUnWorkByPageCondition">
+		<where>
+		     v.vehicle_def is not null
+			<if test="@Ognl@isNotBlank(vehicle)">
+					  <if test="@Ognl@isNotBlank(vehicle.dealerIds)">
+	                   and 
+							<foreach collection="vehicle.dealerIds" item="item" open="(" separator=" or " close=")">
+				 			 dv.dealer_id=#{item} 
+						</foreach>
+	               </if>
+					<if test="@Ognl@isNotBlank(vehicle.vehicleDef)">
+						AND lower(v.vehicle_def) like '%'||lower(#{vehicle.vehicleDef})||'%' 
+					</if>
+					<if test="@Ognl@isNotBlank(vehicle.direction)">
+					AND lc.stamp &lt;=(sysdate- #{vehicle.direction})
+					 <!--  <choose>
+					    <when test="vehicle.direction==8">
+						  AND lc.stamp &lt;=(sysdate- #{vehicle.direction})
+					    </when>
+					    <otherwise>
+					    AND lc.stamp &lt;(sysdate- #{vehicle.direction})
+					    and lc.stamp &gt;(sysdate-#{vehicle.direction}-1)
+					    </otherwise>
+					  </choose> -->
+					</if>
+					<if test="@Ognl@isNotBlank(vehicle.modelId)">
+					     AND v.VEHICLE_MODEL = #{vehicle.modelId}
+					 </if>
+					 <if test="@Ognl@isNotBlank(vehicle.vehicleStatus)">
+					     AND v.VEHICLE_STATUS = #{vehicle.vehicleStatus}
+					 </if>
+					 <if test="@Ognl@isNotBlank(vehicle.vehicleCode)">
+					     AND v.vehicle_code = #{vehicle.vehicleCode}
+					 </if>
+					 <if test="@Ognl@isNotBlank(vehicle.vehicleArg)">
+					     AND v.vehicle_arg = #{vehicle.vehicleArg}
+					 </if>
+			</if>
+		</where>
+	</sql>
+	<!-- 未工作分页查询 -->
+	<select id="getUnWorkByPage" parameterType="map" resultMap="vehicleWorkMap">
+		select  lp.*,v.vehicle_def,v.vehicle_code,v.vehicle_arg,dvt.type_name,dvm.model_name,
+o.owner_name,o.owner_phone_number,da.name as dealer_name,daa.name as area_name,lc.stamp as LAST_WORKDATE,
+	       decode(v.vehicle_status,1,'测试组',2,'已测组',3,'销售组',8,'法务组',9,'停用组') as vehicle_status
+  from t_last_conditions lc 
+  left join t_last_position lp  on lp.unit_id=lc.unit_id
+ left join t_vehicle_unit vu on lc.unit_id=vu.unit_id
+  left join t_vehicle v on v.vehicle_id=vu.vehicle_id
+  left join t_dic_vehicle_type dvt on dvt.type_id=v.vehicle_type
+left join t_dic_vehicle_model dvm on dvm.model_id=v.vehicle_model
+left join T_DEALER_VEHICLE dv on dv.vehicle_def=v.vehicle_def
+left join T_OWNER o on o.owner_id=dv.owner_id
+left join t_Dealer_Area da on da.id=dv.dealer_id
+left join t_Dealer_Area daa on daa.id=da.pid
+		<include refid="getUnWorkByPageCondition"/>  
+		order by daa.name asc,da.name asc,lc.stamp desc
+	</select>
+	<select id="countUnWorkAll" parameterType="map" resultType="Integer">
+		select count(v.vehicle_def)
+  from t_last_conditions lc 
+  left join t_last_position lp  on lp.unit_id=lc.unit_id
+ left join t_vehicle_unit vu on lc.unit_id=vu.unit_id
+  left join t_vehicle v on v.vehicle_id=vu.vehicle_id
+  left join t_dic_vehicle_type dvt on dvt.type_id=v.vehicle_type
+left join t_dic_vehicle_model dvm on dvm.model_id=v.vehicle_model
+left join T_DEALER_VEHICLE dv on dv.vehicle_def=v.vehicle_def
+left join T_OWNER o on o.owner_id=dv.owner_id
+left join t_Dealer_Area da on da.id=dv.dealer_id
+		<include refid="getUnWorkByPageCondition"/> 			
+	</select> 
+	
+	<sql id="getUnUploadByPageCondition">
+		<where>
+		 v.vehicle_def is not null and lp.stamp is not null
+			<if test="@Ognl@isNotBlank(vehicle)">
+					  <if test="@Ognl@isNotBlank(vehicle.dealerIds)">
+	                   and 
+							<foreach collection="vehicle.dealerIds" item="item" open="(" separator=" or " close=")">
+				 			 dv.dealer_id=#{item} 
+						</foreach>
+	               </if>
+						<if test="@Ognl@isNotBlank(vehicle.vehicleDef)">
+						AND lower(v.vehicle_def) like '%'||lower(#{vehicle.vehicleDef})||'%' 
+					</if>		
+					<if test="@Ognl@isNotBlank(vehicle.direction)">
+					    <![CDATA[
+					    and vu.unit_id not in (
+                        select unit_id from t_last_position 
+                        where stamp >= to_date(to_char(sysdate-#{vehicle.direction},'yyyy-mm-dd'),'yyyy-mm-dd'))				    
+					    ]]> 
+					</if>
+				 <if test="@Ognl@isNotBlank(vehicle.modelId)">
+				     AND v.VEHICLE_MODEL = #{vehicle.modelId}
+				 </if>
+				 <if test="@Ognl@isNotBlank(vehicle.vehicleStatus)">
+				     AND v.VEHICLE_STATUS = #{vehicle.vehicleStatus}
+				 </if>
+				 <if test="@Ognl@isNotBlank(vehicle.vehicleCode)">
+				     AND v.vehicle_code = #{vehicle.vehicleCode}
+				 </if>
+				 <if test="@Ognl@isNotBlank(vehicle.vehicleArg)">
+				     AND v.vehicle_arg = #{vehicle.vehicleArg}
+				 </if>
+				 <if test="@Ognl@isNotBlank(vehicle.province)">
+				     AND lp.province=#{vehicle.province}
+				 </if>
+				 <if test="@Ognl@isNotBlank(vehicle.city)">
+				     AND lp.city=#{vehicle.city}
+				 </if>
+				 <!-- 机械状态，用于机械分布 -->
+				 <if test="@Ognl@isNotBlank(vehicle.speed)">
+				     and  v.VEHICLE_STATUS=#{vehicle.speed}
+				 </if>
+			</if>
+		</where>
+	</sql>
+	<!-- 未上报分页查询 -->
+	<select id="getUnUploadByPage" parameterType="map" resultMap="vehicleWorkMap" useCache="false">
+		select lp.*,v.vehicle_def,v.vehicle_code,v.vehicle_arg,dvt.type_name,dvm.model_name,
+        o.owner_name,o.owner_phone_number,da.name as dealer_name,daa.name as area_name,
+	    decode(v.vehicle_status,1,'测试组',2,'已测组',3,'销售组',8,'法务组',9,'停用组') as vehicle_status
+        from  t_vehicle v
+        left join t_vehicle_unit vu on v.vehicle_id = vu.vehicle_id
+        left join t_last_position lp  on vu.unit_id = lp.unit_id
+        left join t_dic_vehicle_type dvt on dvt.type_id=v.vehicle_type
+        left join t_dic_vehicle_model dvm on dvm.model_id=v.vehicle_model
+        left join T_DEALER_VEHICLE dv on dv.vehicle_def=v.vehicle_def
+        left join T_OWNER o on o.owner_id=dv.owner_id
+        left join t_Dealer_Area da on da.id=dv.dealer_id
+        left join t_Dealer_Area daa on daa.id=da.pid
+		<include refid="getUnUploadByPageCondition"/>  
+		order by daa.name asc,da.name asc,lp.stamp desc
+	</select>
+	<select id="countUnUploadAll" parameterType="map" resultType="Integer" useCache="false">
+		select count(v.vehicle_def)
+        from  t_vehicle v
+        left join t_vehicle_unit vu  on v.vehicle_id = vu.vehicle_id
+        left join t_last_position lp on vu.unit_id = lp.unit_id
+        left join t_dic_vehicle_type dvt on dvt.type_id=v.vehicle_type
+        left join t_dic_vehicle_model dvm on dvm.model_id=v.vehicle_model
+        left join T_DEALER_VEHICLE dv on dv.vehicle_def=v.vehicle_def
+        left join T_OWNER o on o.owner_id=dv.owner_id
+        left join t_Dealer_Area da on da.id=dv.dealer_id
+		<include refid="getUnUploadByPageCondition"/> 
+	</select> 
+	
+	
+<select id="statisticTimeQuantum" parameterType="map" resultType="com.chinaGPS.gtmp.entity.AvgWorkTime" > 
+select   
+ model_name as modelName,
+ count(cc.a) as aCount,
+ count(cc.b) as bCount,
+ count(cc.c) as cCount,
+ count(cc.d) as dCount,
+ count(cc.e) as eCount,
+ count(cc.f) as fCount,
+ count(cc.g) as gCount
+  from (select 
+        model_name,
+        <![CDATA[
+        case    when   (totalworkinghours>0 and totalworkinghours<100)     then  '0-100' end  as a,
+        case    when   (totalworkinghours>=100 and totalworkinghours<200)    then  '100-200' end  as b,
+        case    when   (totalworkinghours>=200 and totalworkinghours<500)    then  '200-500' end  as c,
+        case    when   (totalworkinghours>=500 and totalworkinghours<1000)   then  '500-1000' end  as d,
+        case    when   (totalworkinghours>=1000 and totalworkinghours<2000)  then  '1000-2000' end  as e,
+        case    when   (totalworkinghours>=2000 and totalworkinghours<3000)  then  '2000-3000' end  as f,
+        case    when   (totalworkinghours>3000)    then    '3000以上'   end  as g  
+        ]]>  
+       from t_last_conditions lc
+       left join t_vehicle_unit vu on vu.unit_id = lc.unit_id
+       left join t_vehicle v on v.vehicle_id = vu.vehicle_id
+       left join t_dic_vehicle_model tvm on tvm.MODEL_ID = v.VEHICLE_MODEL
+       left join t_dealer_vehicle dv on dv.vehicle_def = v.vehicle_def
+       <where>
+         and v.vehicle_def is not null
+
+        <if test="@Ognl@isNotBlank(dealerIds)">
+                            and dv.dealer_id in
+			<foreach collection="dealerIds" item="item" open="(" separator=" , " close=")">
+			 			  #{item} 
+		    </foreach>
+        </if>
+        <if test="@Ognl@isNotBlank(modelNameId)">
+                   and v.vehicle_model=#{modelNameId} 
+        </if>
+        <if test="@Ognl@isNotBlank(vehicleCode)">
+                   and v.vehicle_code=#{vehicleCode} 
+        </if>
+        <if test="@Ognl@isNotBlank(vehicleArg)">
+                   and v.vehicle_arg=#{vehicleArg} 
+        </if>
+        <if test="@Ognl@isNotBlank(vehicleStatus)">
+				   and v.vehicle_status = #{vehicleStatus}
+		</if>
+         
+  </where>
+         )cc 
+        group by model_name
+        order by  model_name
+	</select>
+
+<!-- 工作时间段统计详细信息-->	
+	<sql id="getTimeQuanDetailByPageCondition">
+		<where>
+			and v.vehicle_def is not null
+					  
+					<if test="@Ognl@isNotBlank(startHours)">
+						AND lc.totalworkinghours &gt;=#{startHours}
+					</if>
+					<if test="@Ognl@isNotBlank(endHours)">
+						AND lc.totalworkinghours &lt;#{endHours}
+					</if>
+					 <if test="@Ognl@isNotBlank(modelTypeId)">
+				       and  v.VEHICLE_MODEL=#{modelTypeId}
+				   </if>
+				   <if test="@Ognl@isNotBlank(vehicleModel)">
+				       and v.vehicle_model = #{vehicleModel}
+				   </if>
+   					 <if test="@Ognl@isNotBlank(vehicleCode)">
+				       and  v.VEHICLE_CODE=#{vehicleCode}
+				   </if>
+  					 <if test="@Ognl@isNotBlank(vehicleArg)">
+				       and  v.VEHICLE_ARG=#{vehicleArg}
+				   </if>
+				    <if test="@Ognl@isNotBlank(startTime)">
+						AND lc.stamp &gt;=#{startTime}
+					</if>
+					<if test="@Ognl@isNotBlank(endTime)">
+						AND lc.stamp &lt;=#{endTime}
+					</if>
+					
+					<if test="@Ognl@isNotBlank(startYears)">
+						AND to_char(sysdate,'YYYY')-to_char(v.sale_date,'YYYY')&gt;=#{startYears}
+					</if>
+					<if test="@Ognl@isNotBlank(endYears)">
+						AND to_char(sysdate,'YYYY')-to_char(v.sale_date,'YYYY') &lt;#{endYears}
+					</if>
+					
+					<if test="@Ognl@isNotBlank(vehicleDef)">
+						AND v.vehicle_def=#{vehicleDef}
+					</if>
+					<if test="@Ognl@isNotBlank(vehicleStatus)">
+				       AND v.vehicle_status = #{vehicleStatus}
+			         </if>
+					<if test="@Ognl@isNotBlank(dealerIds)">
+                            and dv.dealer_id in
+						<foreach collection="dealerIds" item="item" open="(" separator=" , " close=")">
+			 			  #{item} 
+					</foreach>
+            </if>
+		</where>
+	</sql>
+	<select id="getTimeQuanDetailPage" parameterType="map" resultMap="com.chinaGPS.gtmp.mapper.VehicleMapper.vehicleMap" useCache="false">
+	 select lc.totalworkinghours as VEHICLE_STATUS,v.vehicle_id,v.vehicle_def,v.vehicle_code,v.vehicle_arg,v.vehicle_type,v.vehicle_model,
+     v.fix_man,v.fix_date,v.sale_date,vp.type_name,vm.model_name
+     from t_worktimecount lc
+	left join t_vehicle_unit vu on vu.unit_id=lc.unit_id
+    left join t_vehicle v on v.vehicle_id=vu.vehicle_id
+    left join t_dealer_vehicle dv on dv.vehicle_def=v.vehicle_def
+  	LEFT JOIN T_DIC_VEHICLE_TYPE VP ON V.VEHICLE_TYPE = VP.TYPE_ID
+		LEFT JOIN T_DIC_VEHICLE_MODEL VM ON V.VEHICLE_MODEL = VM.MODEL_ID
+		<where>
+				lc.productcode is not null and vm.MODEL_NAME is not null
+    and v.vehicle_code is not null and lc.totalworkinghours >0
+				   <if test="@Ognl@isNotBlank(modelNameId)">
+				       and  v.VEHICLE_MODEL=#{modelNameId}
+				   </if>
+   				   
+   				   <if test="@Ognl@isNotBlank(vehicleCode)">
+				       and  v.VEHICLE_CODE=#{vehicleCode}
+				   </if>
+  				   <if test="@Ognl@isNotBlank(vehicleArg)">
+				       and  v.VEHICLE_ARG=#{vehicleArg}
+				   </if>
+				   <if test="@Ognl@isNotBlank(dealerIds)">
+                       and dv.dealer_id in
+						<foreach collection="dealerIds" item="item" open="(" separator=" , " close=")">
+			 			  #{item} 
+					</foreach>
+                  </if>
+       			   <if test="@Ognl@isNotBlank(workTime)">
+        	<choose>
+					    <when test="workTime==100">
+						  and lc.totalworkinghours &lt;=100
+                   		  and lc.totalworkinghours &gt;0
+					    </when>
+					    <when test="workTime==200">
+						  and lc.totalworkinghours &lt;=200
+                   		  and lc.totalworkinghours &gt;100
+					    </when>
+					    <when test="workTime==500">
+						  and lc.totalworkinghours &lt;=500
+                   		  and lc.totalworkinghours &gt;200
+					    </when>
+					    <when test="workTime==1000">
+						  and lc.totalworkinghours &lt;=1000
+                   		  and lc.totalworkinghours &gt;500
+					    </when>
+					    <when test="workTime==2000">
+						  and lc.totalworkinghours &lt;=2000
+                   		  and lc.totalworkinghours &gt;500
+					    </when>
+					    <when test="workTime==3000">
+						  and lc.totalworkinghours &lt;=3000
+                   		  and lc.totalworkinghours &gt;2000
+					    </when>
+					    <otherwise>
+					       and lc.totalworkinghours &gt;3000
+					    </otherwise>
+					  </choose>
+        </if>
+         
+  </where>
+		
+		
+		<!-- <include refid="getTimeQuanDetailByPageCondition"/> -->  
+	</select>
+	
+<select id="getTimeQuanDetailPageVehicle" parameterType="map" resultMap="com.chinaGPS.gtmp.mapper.VehicleMapper.vehicleMap" useCache="false">
+       select   
+       v.vehicle_def, 
+       fix_man,
+       fix_date,
+       da.name as dealer_name,
+       daa.name as area_name,
+       decode(v.vehicle_status,1,'测试组',2,'已测组',3,'销售组',8,'法务组',9,'停用组') as vehicle_status1,    
+       model_name,
+       vehicle_code,
+       vehicle_arg ,
+       lc.totalworkinghours
+       from t_last_conditions lc
+       left join t_vehicle_unit vu on vu.unit_id = lc.unit_id
+       left join t_vehicle v on v.vehicle_id = vu.vehicle_id
+       left join t_dic_vehicle_model tvm on tvm.MODEL_ID = v.VEHICLE_MODEL
+       left join t_dealer_vehicle dv on dv.vehicle_def = v.vehicle_def
+       left join t_dealer_area da on dv.dealer_id=da.id
+       left join t_Dealer_Area daa on daa.id=da.pid
+      <include refid="timeQuanDetailCondition"/> 
+        order by daa.id,da.id,v.vehicle_def
+	</select>
+	
+	<select id="countTimeQuanDetail" parameterType="map" resultType="Integer">
+	   select count(*)
+       from t_last_conditions lc
+       left join t_vehicle_unit vu on vu.unit_id = lc.unit_id
+       left join t_vehicle v on v.vehicle_id = vu.vehicle_id
+       left join t_dic_vehicle_model tvm on tvm.MODEL_ID = v.VEHICLE_MODEL
+       left join t_dealer_vehicle dv on dv.vehicle_def = v.vehicle_def
+       left join t_dealer_area da on dv.dealer_id=da.id
+       left join t_Dealer_Area daa on daa.id=da.pid
+       <include refid="timeQuanDetailCondition"/>	
+</select> 
+	
+<sql id="timeQuanDetailCondition">
+		 <where>
+          and v.vehicle_def is not null and lc.totalworkinghours>0			  
+				   <if test="@Ognl@isNotBlank(modelName)">
+				       and  tvm.model_name=#{modelName}
+				   </if>
+   				   <if test="@Ognl@isNotBlank(vehicleCode)">
+				       and  v.VEHICLE_CODE=#{vehicleCode}
+				   </if>
+  				   <if test="@Ognl@isNotBlank(vehicleArg)">
+				       and  v.VEHICLE_ARG=#{vehicleArg}
+				   </if>
+				   <if test="@Ognl@isNotBlank(vehicleStatus)">
+				       and v.vehicle_status = #{vehicleStatus}
+		           </if>
+				   <if test="@Ognl@isNotBlank(dealerIds)">
+                       and dv.dealer_id in
+						<foreach collection="dealerIds" item="item" open="(" separator=" , " close=")">
+			 			  #{item} 
+					</foreach>
+                  </if>
+       			   <if test="@Ognl@isNotBlank(workTime)">
+        	<choose>
+					    <when test="workTime==100">
+						  and lc.totalworkinghours &lt;=100
+                   		  and lc.totalworkinghours &gt;0
+					    </when>
+					    <when test="workTime==200">
+						  and lc.totalworkinghours &lt;=200
+                   		  and lc.totalworkinghours &gt;100
+					    </when>
+					    <when test="workTime==500">
+						  and lc.totalworkinghours &lt;=500
+                   		  and lc.totalworkinghours &gt;200
+					    </when>
+					    <when test="workTime==1000">
+						  and lc.totalworkinghours &lt;=1000
+                   		  and lc.totalworkinghours &gt;500
+					    </when>
+					    <when test="workTime==2000">
+						  and lc.totalworkinghours &lt;=2000
+                   		  and lc.totalworkinghours &gt;500
+					    </when>
+					    <when test="workTime==3000">
+						  and lc.totalworkinghours &lt;=3000
+                   		  and lc.totalworkinghours &gt;2000
+					    </when>
+					    <otherwise>
+					       and lc.totalworkinghours &gt;3000
+					    </otherwise>
+					  </choose>
+        </if>
+         
+  </where>
+	</sql>	
+	
+<!-- 平均工作时间统计 -->
+<select id="statisticAvgWorkHours" parameterType="map" resultMap="com.chinaGPS.gtmp.mapper.MalfunctionMapper.statisticMalfunctonMap"> 
+	       select 
+	      		saw.model_type_id as type_id,
+       			dvm.model_name as type_name,
+       			
+       			to_char(saw.date_ymd, 'yyyy') as date_label
+		       <foreach collection="columns" item="id" >
+				 		, <![CDATA[
+				 		  sum(decode(to_char(saw.date_ymd, 'yyyy-mm'),
+		                  to_char(saw.date_ymd, 'yyyy') ||'-' ||replace('${id}','m',''),
+		                  round(saw.worked_hours/saw.mcount,2),
+		                  0)) as ${id}
+		                 ]]>
+					</foreach>
+		  from t_stat_avg_workhours saw
+			    left join t_dic_vehicle_model dvm on dvm.model_id = saw.model_type_id
+			    left join t_vehicle tv on tv.vehicle_code = saw.vehicle_code
+			    left join t_dealer_vehicle tdv on tdv.vehicle_def = tv.vehicle_def
+			    left join t_dealer_area tda on tda.id = tdv.dealer_id
+		 <where>
+		      saw.worked_hours != saw.total_hours
+		     <![CDATA[ and saw.worked_hours>0 and saw.worked_hours<saw.mcount*24 ]]>
+		   <if test="@Ognl@isNotBlank(modelTypeId)">
+		       and  saw.model_type_id=#{modelTypeId}
+		   </if>
+			 <if test="@Ognl@isNotBlank(startTime)">
+				AND saw.date_ymd &gt;=#{startTime}
+			</if>
+			<if test="@Ognl@isNotBlank(endTime)">
+				AND saw.date_ymd &lt;=#{endTime}
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleCode)">
+				AND saw.VEHICLE_CODE =#{vehicleCode}
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleArg)">
+				AND saw.VEHICLE_ARG =#{vehicleArg}
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleStatus)">
+				AND tv.vehicle_status = #{vehicleStatus}
+			</if>
+			<if test="@Ognl@isNotBlank(dealerIds)">
+				  	     and a.tda.id in
+				  	    <foreach collection="dealerIds" item="id" open="(" separator="," close=")">
+						      <if test="@Ognl@isNotBlank(id)">
+							   #{id} 
+							 </if>
+						</foreach>
+			</if>
+			
+			
+		 </where>
+		 group by saw.model_type_id,dvm.model_name, to_char(saw.date_ymd, 'yyyy')
+		 order by saw.model_type_id
+	  
+	</select>
+	
+	<!-- 机械使用年数统计 -->
+	<select id="statisticWorkedYears" parameterType="map" resultType="map"> 
+		SELECT v.vehicle_model AS type_id, dvm.model_name,
+  			SUM(DECODE(to_char(sysdate, 'yyyy')-to_char(v.sale_date,'yyyy'),0,1, 0)) AS one,
+ 			SUM(DECODE(to_char(sysdate, 'yyyy')-to_char(v.sale_date,'yyyy'),1,1, 0)) AS two,
+  			SUM(DECODE(to_char(sysdate, 'yyyy')-to_char(v.sale_date,'yyyy'),2,1, 0)) AS three,  
+    		SUM(DECODE(to_char(sysdate, 'yyyy')-to_char(v.sale_date,'yyyy'),3,1, 0)) AS four,
+      		SUM(DECODE(to_char(sysdate, 'yyyy')-to_char(v.sale_date,'yyyy'),4,1, 0)) AS five,
+        	SUM(DECODE(to_char(sysdate, 'yyyy')-to_char(v.sale_date,'yyyy'),5,1, 0)) AS six
+  		FROM t_vehicle v
+  			LEFT JOIN t_dic_vehicle_model dvm ON v.vehicle_model = dvm.model_id
+  			LEFT JOIN t_dealer_vehicle dv ON v.vehicle_def = dv.vehicle_def
+	  	<where>
+	    	v.sale_date IS NOT NULL
+	       <if test="@Ognl@isNotBlank(dealerIds)">
+                   and dv.dealer_id in
+						<foreach collection="dealerIds" item="item" open="(" separator=" , " close=")">
+			 			  #{item} 
+					</foreach>
+            </if>
+	        <if test="@Ognl@isNotBlank(vehicleModel)">
+				AND v.vehicle_model = #{vehicleModel}
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleCode)">
+				AND v.vehicle_code = #{vehicleCode}
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleArg)">
+				AND v.vehicle_arg = #{vehicleArg}
+			</if>
+			
+			<if test="@Ognl@isNotBlank(vehicleStatus)">
+				AND v.vehicle_status = #{vehicleStatus}
+			</if>
+	  	</where>
+		GROUP BY v.vehicle_model,dvm.model_name
+	</select>
+	
+<!-- 机械分布统计用于地图展示 -->
+<select id="statisticDistribute" parameterType="map" resultMap="com.chinaGPS.gtmp.mapper.DealerAreaMapper.vehicleUnitMap" useCache="false"> 
+select  ${area} as vehicle_Def,mca.lon/1000000 as lon,mca.lat/1000000 as lat,count(lp.unit_id) as VEHICLE_TYPE
+from t_last_position lp
+ left join t_vehicle_unit vu on vu.unit_id = lp.unit_id
+ left join t_vehicle v on v.vehicle_id = vu.vehicle_id
+  left join t_dealer_vehicle dv on dv.vehicle_def = v.vehicle_def
+  <choose>
+  	<when test="area=='lp.province'">
+  	left join t_map_china_province mca on mca.name=lp.province
+  	</when>
+  	<otherwise>
+  	left join t_map_china_city mca on mca.name=lp.city
+  	</otherwise>
+  </choose>
+  where lp.province is not null
+  and v.vehicle_def is not null
+	 and lp.province&lt;&gt;'未知省名'
+   and lp.city is not null
+   and lp.city&lt;&gt;'未知市名'
+        <if test="@Ognl@isNotBlank(modelTypeId)">
+				and  v.VEHICLE_MODEL=#{modelTypeId}
+		</if>
+		<if test="@Ognl@isNotBlank(vehicleCode)">
+				and  v.VEHICLE_CODE=#{vehicleCode}
+		</if>
+		<if test="@Ognl@isNotBlank(vehicleArg)">
+				and  v.VEHICLE_ARG=#{vehicleArg}
+		</if>
+		 <if test="@Ognl@isNotBlank(province)">
+				and  lp.province=#{province}
+		</if>
+		 <if test="@Ognl@isNotBlank(city)">
+				and  lp.city=#{city}
+		</if>
+		<!-- 机械状态组 -->
+		 <if test="@Ognl@isNotBlank(status)">
+				and  v.vehicle_status=#{status}
+		</if>
+		<if test="@Ognl@isNotBlank(dealerIds)">
+                   and 
+						<foreach collection="dealerIds" item="item" open="(" separator=" or " close=")">
+			 			 dv.dealer_id=#{item} 
+					</foreach>
+        </if>
+	group by ${area},mca.lon,mca.lat
+	</select>	
+<!-- 机械分布统计用于导出 -->
+<select id="statisticDistribute4Export" parameterType="map" resultMap="vehicleWorkMap" useCache="false"> 
+select lp.province,lp.city,lp.county,da.name as owner_name,dvm.model_name, count(lp.unit_id) as direction
+  from t_last_position lp
+ left join t_vehicle_unit vu on vu.unit_id = lp.unit_id
+ left join t_vehicle v on v.vehicle_id = vu.vehicle_id
+  left join t_dealer_vehicle dv on dv.vehicle_def = v.vehicle_def
+  left join t_dealer_area da on dv.dealer_id=da.id
+   left join t_dic_vehicle_model dvm on dvm.model_id=v.vehicle_model
+  where lp.province is not null
+	and lp.province&lt;&gt;'未知省名'
+   and lp.city is not null
+   and lp.city&lt;&gt;'未知市名'
+  and v.vehicle_def is not null
+  and dv.dealer_id is not null
+  and v.vehicle_model is not null
+
+        <if test="@Ognl@isNotBlank(modelTypeId)">
+				and  v.VEHICLE_MODEL=#{modelTypeId}
+		</if>
+		<if test="@Ognl@isNotBlank(vehicleCode)">
+				and  v.VEHICLE_CODE=#{vehicleCode}
+		</if>
+		<if test="@Ognl@isNotBlank(vehicleArg)">
+				and  v.VEHICLE_ARG=#{vehicleArg}
+		</if>
+		 <if test="@Ognl@isNotBlank(province)">
+				and  lp.province=#{province}
+		</if>
+		 <if test="@Ognl@isNotBlank(city)">
+				and  lp.city=#{city}
+		</if>
+		<!-- 机械状态组 -->
+		 <if test="@Ognl@isNotBlank(status)">
+				and  v.vehicle_status=#{status}
+		</if>
+		<if test="@Ognl@isNotBlank(dealerIds)">
+                   and 
+						<foreach collection="dealerIds" item="item" open="(" separator=" or " close=")">
+			 			 dv.dealer_id=#{item} 
+					</foreach>
+        </if>
+	group by lp.province,lp.city,lp.county,dv.dealer_id,da.name,v.vehicle_model,dvm.model_name 
+
+	</select>	
+<!-- 机械工作时间 -->
+<select id="statisticWorkHours" parameterType="map" resultMap="com.chinaGPS.gtmp.mapper.MalfunctionMapper.statisticMalfunctonMap" useCache="false" > 
+	      <!-- select rownum,a.* from(select sw.vehicle_def as type_name ,da.name as dealer_name,daa.name as area_name,
+	       decode(tv.vehicle_status,1,'测试组',2,'已测组',3,'销售组',8,'法务组',9,'停用组') as vehicle_status,
+	       tv.VEHICLE_CODE,tv.VEHICLE_ARG,tvm.MODEL_NAME as vehicle_type,	      
+	        <if test="@Ognl@isNotBlank(typeId)">
+						<choose>
+						  <when test="typeId==1">
+						  	to_char(sw.date_ymd, 'yyyy-mm') as date_label
+						  	 <foreach collection="columns" item="id" >
+					 		, <![CDATA[
+					 		  sum(decode(to_char(sw.date_ymd, 'yyyy-mm-dd'),
+			                  to_char(sw.date_ymd, 'yyyy-mm') ||'-' ||replace('${id}','d',''),
+			                  sw.worked_hours,
+			                  0)) as ${id}
+			                 ]]>
+			                 </foreach>
+						  </when>
+						 <when test="typeId==2">
+						  	to_char(sw.date_ymd, 'yyyy') as date_label
+						  	 <foreach collection="columns" item="id" >
+				 		, <![CDATA[
+				 		  sum(decode(to_char(sw.date_ymd, 'yyyy-mm'),
+		                  to_char(sw.date_ymd, 'yyyy') ||'-' ||replace('${id}','m',''),
+		                  sw.worked_hours,
+		                  0)) as ${id}
+		                 ]]>
+					</foreach>
+						  </when>
+						</choose>
+				</if>
+		   ,sum(sw.worked_hours) as add_hours, max(sw.total_hours) as total_hours,
+	       round(sum(sw.worked_hours)/${count},2) as avg_hours 		
+		 from t_stat_workhours sw
+		 left join t_dealer_vehicle dv on dv.vehicle_def=sw.vehicle_def
+		 left join t_vehicle tv on tv.vehicle_def=sw.vehicle_def
+		 left join t_dic_vehicle_model tvm on tv.VEHICLE_MODEL = tvm.MODEL_ID
+         left join t_Dealer_Area da on da.id=dv.dealer_id
+         left join t_Dealer_Area daa on daa.id=da.pid
+		 <where>
+		     tv.VEHICLE_CODE is not null and sw.worked_hours != 0 
+		     <if test="@Ognl@isNotBlank(dealerIds)">
+                   and 
+						<foreach collection="dealerIds" item="item" open="(" separator=" or " close=")">
+			 			 dv.dealer_id=#{item} 
+					</foreach>
+               </if>
+		 	 <if test="@Ognl@isNotBlank(vehicleDef)">
+				AND lower(sw.vehicle_def) like '%'||lower(#{vehicleDef})||'%' 
+			</if>
+			 <if test="@Ognl@isNotBlank(startTime)">
+				AND sw.date_ymd &gt;=#{startTime}
+			</if>
+			 <if test="@Ognl@isNotBlank(startTime)">
+				AND sw.date_ymd &gt;= 
+				to_date ( to_char(trunc(add_months(last_day(#{startTime}), -1) + 1), 'yyyy/mm/dd'),'yyyy/mm/dd' ) 
+			</if>
+			<if test="@Ognl@isNotBlank(endTime)">
+				AND sw.date_ymd &lt;= to_date( to_char(last_day(#{endTime}), 'yyyy/mm/dd'),'yyyy/mm/dd' )
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleCode)">
+				AND tv.VEHICLE_CODE =#{vehicleCode}
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleArg)">
+				AND tv.VEHICLE_ARG =#{vehicleArg}
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleStatus)">
+				AND tv.vehicle_status =#{vehicleStatus}
+			</if>	
+		 </where>
+		 group by sw.vehicle_def,tv.VEHICLE_CODE,tv.VEHICLE_ARG, tvm.MODEL_NAME, da.name,daa.name,tv.vehicle_status,
+		     <if test='typeId==1'>
+		          to_char(sw.date_ymd, 'yyyy-mm') 
+		     </if>
+		     <if test='typeId==2'>
+		          to_char(sw.date_ymd, 'yyyy')
+		     </if>
+	   order by daa.name,da.name) a -->
+	   
+	   select rownum,a.* from(
+	   	select temp.*,tsw.total_hours from (
+	   	  select sw.vehicle_def as type_name ,da.name as dealer_name,daa.name as area_name,
+	       decode(tv.vehicle_status,1,'测试组',2,'已测组',3,'销售组',8,'法务组',9,'停用组') as vehicle_status,
+	       tv.VEHICLE_CODE,tv.VEHICLE_ARG,tvm.MODEL_NAME as vehicle_type,	      
+	        <if test="@Ognl@isNotBlank(typeId)">
+						<choose>
+						  <when test="typeId==1">
+						  	to_char(sw.date_ymd, 'yyyy-mm') as date_label
+						  	 <foreach collection="columns" item="id" >
+					 		, <![CDATA[
+					 		  sum(decode(to_char(sw.date_ymd, 'yyyy-mm-dd'),
+			                  to_char(sw.date_ymd, 'yyyy-mm') ||'-' ||replace('${id}','d',''),
+			                  sw.worked_hours,
+			                  0)) as ${id}
+			                 ]]>
+			                 </foreach>
+						  </when>
+						 <when test="typeId==2">
+						  	to_char(sw.date_ymd, 'yyyy') as date_label
+						  	 <foreach collection="columns" item="id" >
+				 		, <![CDATA[
+				 		  sum(decode(to_char(sw.date_ymd, 'yyyy-mm'),
+		                  to_char(sw.date_ymd, 'yyyy') ||'-' ||replace('${id}','m',''),
+		                  sw.worked_hours,
+		                  0)) as ${id}
+		                 ]]>
+					</foreach>
+						  </when>
+						</choose>
+				</if>
+		   ,sum(sw.worked_hours) as add_hours,
+		   max(sw.date_ymd) as max_date_ymd,
+	       round(sum(sw.worked_hours)/${count},2) as avg_hours 		
+		 from t_stat_workhours sw
+		 left join t_dealer_vehicle dv on dv.vehicle_def=sw.vehicle_def
+		 left join t_vehicle tv on tv.vehicle_def=sw.vehicle_def
+		 left join t_dic_vehicle_model tvm on tv.VEHICLE_MODEL = tvm.MODEL_ID
+         left join t_Dealer_Area da on da.id=dv.dealer_id
+         left join t_Dealer_Area daa on daa.id=da.pid
+		 <where>
+		     tv.VEHICLE_CODE is not null
+		     <if test="@Ognl@isNotBlank(dealerIds)">
+                   and 
+						<foreach collection="dealerIds" item="item" open="(" separator=" or " close=")">
+			 			 dv.dealer_id=#{item} 
+					</foreach>
+               </if>
+		 	 <if test="@Ognl@isNotBlank(vehicleDef)">
+				AND lower(sw.vehicle_def) like '%'||lower(#{vehicleDef})||'%' 
+			</if>
+			 <if test="@Ognl@isNotBlank(startTime)">
+				AND sw.date_ymd &gt;=#{startTime}
+			</if>
+			 <if test="@Ognl@isNotBlank(startTime)">
+				AND sw.date_ymd &gt;= 
+				to_date ( to_char(trunc(add_months(last_day(#{startTime}), -1) + 1), 'yyyy/mm/dd'),'yyyy/mm/dd' ) 
+			</if>
+			<if test="@Ognl@isNotBlank(endTime)">
+				AND sw.date_ymd &lt;= to_date( to_char(last_day(#{endTime}), 'yyyy/mm/dd'),'yyyy/mm/dd' )
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleCode)">
+				AND tv.VEHICLE_CODE =#{vehicleCode}
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleArg)">
+				AND tv.VEHICLE_ARG =#{vehicleArg}
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleStatus)">
+				AND tv.vehicle_status =#{vehicleStatus}
+			</if>	
+		 </where>
+		 group by sw.vehicle_def,tv.VEHICLE_CODE,tv.VEHICLE_ARG, tvm.MODEL_NAME, da.name,daa.name,tv.vehicle_status,
+		     <if test='typeId==1'>
+		          to_char(sw.date_ymd, 'yyyy-mm') 
+		     </if>
+		     <if test='typeId==2'>
+		          to_char(sw.date_ymd, 'yyyy')
+		     </if>
+	   order by daa.name,da.name
+	   	   )temp left join  t_stat_workhours tsw on temp.type_name = tsw.vehicle_def  and  temp.max_date_ymd  =  tsw.date_ymd
+	   ) a
+	</select>
+	
+<!-- 机械年工作时间 -->
+<select id="statisticWorkHoursYear" parameterType="map" resultType="com.chinaGPS.gtmp.entity.VehicleWorkPOJO"> 
+	      select rownum,a.* from(
+	      select
+	       sw.vehicle_def as typeName,
+	       da.name as dealerName,
+	       daa.name as areaName,
+	        decode(tv.vehicle_status,1,'测试组',2,'已测组',3,'销售组',9,'停用组') as vehicleStatus,
+	       tv.VEHICLE_CODE as vehicleCode,
+	       tv.VEHICLE_ARG as vehicleArg,
+	       tvm.MODEL_NAME as modelName,	      
+	       to_char(sw.date_ymd, 'yyyy') as endYears,
+	       sum(sw.worked_hours) as addTime,
+	       max(sw.total_hours) as totalTime
+	       
+	       
+		 from t_stat_workhours sw
+		 left join t_dealer_vehicle dv on dv.vehicle_def=sw.vehicle_def
+		 left join t_vehicle tv on tv.vehicle_def=sw.vehicle_def
+		 left join t_dic_vehicle_model tvm on tv.VEHICLE_MODEL = tvm.MODEL_ID
+         left join t_Dealer_Area da on da.id=dv.dealer_id
+         left join t_Dealer_Area daa on daa.id=da.pid
+		 <where>
+		     tv.VEHICLE_CODE is not null and sw.worked_hours != 0
+		     <if test="@Ognl@isNotBlank(dealerIds)">
+                   and 
+						<foreach collection="dealerIds" item="item" open="(" separator=" or " close=")">
+			 			 dv.dealer_id=#{item} 
+					</foreach>
+               </if>
+		 	 <if test="@Ognl@isNotBlank(vehicleDef)">
+				AND lower(sw.vehicle_def) like '%'||lower(#{vehicleDef})||'%' 
+			</if>
+			
+			 <if test="@Ognl@isNotBlank(yearTime)">
+				AND to_char(sw.date_ymd,'yyyy/mm/dd') like '${yearTime}%'
+			</if>
+			
+			
+			<if test="@Ognl@isNotBlank(vehicleType)">
+				AND tv.VEHICLE_MODEL =#{vehicleType}
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleCode)">
+				AND tv.VEHICLE_CODE =#{vehicleCode}
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleArg)">
+				AND tv.VEHICLE_ARG =#{vehicleArg}
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleStatus)">
+				AND tv.vehicle_status =#{vehicleStatus}
+			</if>	
+		 </where>
+		 group by sw.vehicle_def,tv.VEHICLE_CODE,tv.VEHICLE_ARG, tvm.MODEL_NAME, da.name,daa.name,tv.vehicle_status,
+		        to_char(sw.date_ymd, 'yyyy')
+	   		order by daa.name,da.name) a
+	</select>	
+	
+	
+	
+	<select id="getWorkedYearsDetailPage" parameterType="map" resultMap="com.chinaGPS.gtmp.mapper.VehicleMapper.vehicleMap" useCache="false">
+	 select lc.totalworkinghours as VEHICLE_STATUS,v.vehicle_id,v.vehicle_def,v.vehicle_type,v.vehicle_model,
+  v.fix_man,v.fix_date,v.sale_date,vp.type_name,vm.model_name, 
+  da.name as dealerName,daa.name as areaName
+  from t_vehicle v 
+  left join t_vehicle_unit vu on v.vehicle_id=vu.vehicle_id
+  left join t_last_conditions lc  on vu.unit_id=lc.unit_id
+  left join t_dealer_vehicle dv on dv.vehicle_def=v.vehicle_def
+  LEFT JOIN T_DIC_VEHICLE_TYPE VP ON V.VEHICLE_TYPE = VP.TYPE_ID
+  LEFT JOIN T_DIC_VEHICLE_MODEL VM ON V.VEHICLE_MODEL = VM.MODEL_ID
+  left join t_Dealer_Area da on da.id=dv.dealer_id
+  left join t_Dealer_Area daa on daa.id=da.pid
+		<include refid="getTimeQuanDetailByPageCondition"/>  
+	</select>
+	
+	<select id="countWorkedYearsDetail" parameterType="map" resultType="Integer">
+		select count(v.vehicle_id)
+  from t_vehicle v 
+  left join t_vehicle_unit vu on v.vehicle_id=vu.vehicle_id
+  left join t_last_conditions lc  on vu.unit_id=lc.unit_id
+  left join t_dealer_vehicle dv on dv.vehicle_def=v.vehicle_def
+		<include refid="getTimeQuanDetailByPageCondition"/> 
+	</select> 
+	
+</mapper>  

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="外呼日志统计">
+<meta name="description" content="外呼日志统计">
+
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/jquery.dataTables.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/data_style.css" rel="stylesheet" />
+<link href="../dist/plugins/css/datepicker.css" rel="stylesheet">
+<link href="../css/base.css" rel="stylesheet" />
+<title>外呼日志统计</title>
+
+</head>
+<body style="background-color:white;">
+	<div class="container-fluid Reports_page">
+		<h1>外呼日志统计</h1>
+		<div class="row c_area">
+            <div class="filter_box">
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">接通情况：</h6>
+                    <div class="filter_content">
+                        <select id="isConnect">
+                            <option value="0">全部</option>
+                            <option value="1">已接通</option>
+                            <option value="2">未接通</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">时间：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control form_datetime starTime" id="calloutLogStatisticsStartTime">
+                            <span class="input-group-addon">至</span>
+                            <input type="text" class="form-control form_datetime endTime" id="calloutLogStatisticsEndTime">
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix" style="width:100%;">
+                    <h6 class="control-label control_title">服务大类：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <label class="TOS_checkall"><input type="checkbox" id="TOS_opt_in_checkall"/>全选</label>
+                        </span>
+                        <span class="TOS_opt" id="TOS_opt_out1"></span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">颗粒度：</h6>
+                    <div class="filter_content">
+                        <select id="kld">
+                            <option value="1">小时</option>
+                            <option value="2">天</option>
+                            <option value="3">月</option>
+                            <option value="4">年</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix btns">
+                    <a href="#" class="exportExcel" id="calloutLogStatisticsSearch"><i class="glyphicon glyphicon-search"></i>查询</a>
+                    <a href="#" class="exportExcel" id="calloutLogStatisticsExport"><i class="glyphicon glyphicon-export"></i>导出Excel</a>
+                </div>
+            </div>            
+        </div>
+        <div class="row r_scroll">
+            <div class="Reports_box" style="width:800px;">
+                <table class="tatal_table" id="calloutLogStatistics-table" cellspacing="0" width="100%" border="1">
+                    <thead>
+                        <tr>
+                            <th style="width:30px;"></th>
+                            <th style="width:60px;">归属公司</th>
+                            <th style="width:120px;">时间</th>
+                            <th style="width:60px;">服务内容</th>
+                            <th style="width:60px;">数量</th>
+                            <th style="width:60px;">接通情况</th>
+                            <th style="width:60px;">数量</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+	</div>
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/fnReloadAjax.js"></script>
+<script type="text/javascript" src="../dist/plugins/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/reports.js"></script>
+<script type="text/javascript">
+    var params_t = "";//参数
+    $("#calloutLogStatisticsSearch").click(function(){//查询
+        $("#calloutLogStatistics-table tbody").empty();//清空
+        var ValisConnect = $("#isConnect").val();//是否接通
+        var ValbeginTime = $(".starTime").val();//开始时间
+        var ValendTime = $(".endTime").val();//结束时间
+        var ValserverType = [];//服务大类
+        if ($("#TOS_opt_in_checkall").is(":checked")){//（是否全选）服务大类
+            ValserverType = [];
+        }else{
+            if($("#TOS_opt_out1 label input:checked").length>0){
+                $.each($("#TOS_opt_out1 label input:checked"),function(i,item){
+                    ValserverType.push(parseInt($(item).val()));
+                });
+            }
+        };
+        var ValKLD = $("#kld").val();//颗粒度
+
+        var api_url = '../app/callbrief/call_log_statistics';
+        var params = {isConnect:ValisConnect,beginTime:ValbeginTime,endTime:ValendTime,serverType:ValserverType,kld:ValKLD};
+        params_t = decodeURIComponent($.param(params,true));
+        $.getJSON(api_url+"?"+params_t, function(result){
+            if(result && result.success==true){
+                if(result.data.length>0){
+                    var html1 = "";
+                    var d_length = "";
+                    $.each(result.data,function(i,item){
+                        d_length = item.sub_data.length;//明细长度
+                        html1 = "<td rowspan='"+d_length+"'>"+ item.sn +"</td><td rowspan='"+d_length+"'>"+ item.company_name +"</td><td rowspan='"+d_length+"'>"+ item.super_time +"</td><td rowspan='"+d_length+"'>"+ item.super_st_name +"</td><td rowspan='"+d_length+"'>"+ item.super_num+"</td>";
+                        //alert(html1);
+                        if(item.sub_data.length>0){
+                            $.each(item.sub_data,function(v,k){
+                                var mTr = $('<tr></tr>');
+                                var mTd1 = $('<td></td>').html(calloutSituation(k.flag));
+                                var mTd2 = $('<td></td>').html(k.sub_num);
+                                mTr.append(mTd1).append(mTd2);
+                                if(v==0){//第一条数据
+                                    mTr.prepend(html1);
+                                }
+                                $("#calloutLogStatistics-table tbody").append(mTr);
+                            });
+                        }
+                    });
+                } else{//查询成功无数据
+                    $("#calloutLogStatistics-table tbody").html("<tr><td colspan='7'>没有数据</td></tr>");
+                }
+            } else{//success==false
+                $("#calloutLogStatistics-table tbody").html("<tr><td colspan='7'>查询失败</td></tr>");
+            }
+        });
+    });
+
+    //导出
+    $("#calloutLogStatisticsExport").click(function(){
+        $(this).attr("href","../app/callbrief/call_log_statistics/export?"+params_t);
+    });
+</script>
+</body>
+</html>

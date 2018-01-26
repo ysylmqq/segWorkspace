@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="座席">
+<meta name="description" content="座席">
+
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/jquery.dataTables.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/data_style.css" rel="stylesheet" />
+<link href="../dist/plugins/css/datepicker.css" rel="stylesheet">
+<link href="../css/base.css" rel="stylesheet" />
+
+<title>定位故障通知</title>
+</head>
+<body style="background-color:white;">
+	<div class="container-fluid Reports_page">
+		<h1>定位故障通知</h1>
+		<div class="row c_area">
+            <div class="filter_box">
+                <!--<span class="control-label filter_term">查询条件：</span>-->
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">分公司：</h6>
+                    <div class="filter_content">
+                        <span class="filiale">
+                            <input type="text" class="form-control reports_search_4_engine" id="LocaF_Com_search" />
+                            <i class="glyphicon glyphicon-chevron-down filialeDown"></i>
+                            <input type="hidden" class="search_filiale_id" id="LocaF_ID_search">
+                            <ul class="reports_search_4_list" style="display:none;"></ul>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">客户名称：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control" id="LocaFCosName">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">经度：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control" id="LocaFLon">                  
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">纬度：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control" id="LocaFLat">                  
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix" style="width:100%;">
+                    <h6 class="control-label control_title">故障类型：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <label class="TOS_checkall"><input type="checkbox" />全选</label>               
+                        </span>
+                        <span class="TOS_opt" id="LocaFdefaltType">
+                            <label><input type="checkbox" value="10" /><span>定时时间过长</span></label>
+                            <label><input type="checkbox" value="16" /><span>定位无输出</span></label>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">日期：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <label><input type="radio" name="loca_option1" value="1" checked="checked"/>当天</label>
+                        </span>
+                        <span>
+                            <label><input type="radio" name="loca_option1" value="2" id="locateFDate" />选择时间段</label>
+                            <input type="text" class="form-control form_datetime starTime" id="LocaFStartTime">
+                            <span class="input-group-addon">至</span>
+                            <input type="text" class="form-control form_datetime endTime" id="LocaFEndTime">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h6 class="control-label control_title">天数差：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control" placeholder="接收时间-gps时间" id="LocaFtimeDif">天
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix btns">
+                    <a href="#" class="exportExcel" id="LocaFSearch"><i class="glyphicon glyphicon-search"></i>查询</a>
+                    <a href="#" class="exportExcel" id="LocaFExport"><i class="glyphicon glyphicon-export"></i>导出Excel</a>
+                </div>
+            </div>
+        </div>
+        <div class="row r_scroll">
+            <div class="Reports_box locatefault">
+                <table id="locatefault-example" class="display compact table_borders dataTable" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th style="min-width:30px;"></th>
+                            <th style="min-width:60px;">客户姓名</th>
+                            <th style="min-width:60px;">客户电话</th>
+                            <th style="min-width:60px;">车牌号</th>
+                            <th style="min-width:60px;">车载号码</th>
+                            <th style="min-width:50px;">通讯模式</th>
+                            <th style="min-width:100px;">车辆状态</th>
+                            <th style="min-width:120px;">接收时间</th>
+                            <th style="min-width:120px;">定位时间</th>
+                            <th style="min-width:60px;">经度</th>
+                            <th style="min-width:60px;">纬度</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    	<!--
+                        <tr>
+                            <td>10004</td>
+                            <td>金海斌</td>
+                            <td>13567412569</td>
+                            <td>粤B.326Y2</td>
+                            <td>13521023654</td>
+                            <td>GSM</td>
+                            <td>车门已上锁</td>
+                            <td>2012-11-16 10:30:19</td>
+                            <td>2012-11-16 10:30:19</td>
+                            <td>1234324</td>
+                            <td>3454344</td>
+                        </tr>
+                        -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+	</div>
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/fnReloadAjax.js"></script>
+<script type="text/javascript" src="../dist/plugins/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/reports.js"></script>
+
+</body>
+</html>

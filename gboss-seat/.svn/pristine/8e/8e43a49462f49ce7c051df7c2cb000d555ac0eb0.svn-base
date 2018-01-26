@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="座席">
+<meta name="description" content="座席">
+
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/jquery.dataTables.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/data_style.css" rel="stylesheet" />
+<link href="../dist/plugins/css/datepicker.css" rel="stylesheet">
+<link href="../css/base.css" rel="stylesheet" />
+<title>大量上报前50名</title>
+</head>
+<body style="background-color:white;">
+	<div class="container-fluid Reports_page">
+		<h1>大量上报前50名</h1>
+		<div class="row c_area">
+            <div class="filter_box">
+
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">报警时间：</h6>
+                    <div class="filter_content"><span><input type="text" class="form-control form_datetime starTime startTD" id="CallStartTime" /><span class="space_middle">至</span><input type="text" class="form-control form_datetime endTime endTD" id="CallEndTime" /></span></div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">通信模式：</h6>
+                    <div class="filter_content">
+                        <span id="RepType">
+                            <label id="underreport_btn"><input type="radio" name="recentRep_option1" checked="checked" value="0"><span>GSM</span></label>
+                            <label id="beenreported_btn"><input type="radio" name="recentRep_option1" value="1"><span>GPRS</span></label>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix btns">
+                    <a href="#" class="exportExcel" id="operatorSearch"><i class="glyphicon glyphicon-search"></i>查询</a>
+                    <a href="#" class="exportExcel" id="operatorExport"><i class="glyphicon glyphicon-export"></i>导出Excel</a>
+                </div>
+            </div>            
+        </div>
+        <div class="row r_scroll">
+            <div class="Reports_box callinQuery">
+                <table id="callinQuery-example" class="display compact table_borders dataTable" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th style="width:30px;"></th>
+                            <th style="min-width:70px;">日期</th>
+                            <th style="min-width:70px;">车牌号码</th>
+                            <th style="min-width:70px;">车载电话</th>
+                            <th style="min-width:70px;">联系电话</th>
+                            <th style="min-width:70px;">车主姓名</th>
+                            <th style="min-width:70px;">车型/颜色</th>
+                            <th style="min-width:70px;">安装日期</th>
+                            <th style="min-width:140px;">产品型号</th>
+                            <th style="min-width:140px;">上报警情状态</th>
+                            <th style="min-width:70px;">数量</th>
+                            <th style="min-width:140px;">维修安排/上门安排</th>
+                            <th style="min-width:140px;">传真时间</th>
+                            <th style="min-width:140px;">备注</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+	</div>
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/fnReloadAjax.js"></script>
+<script type="text/javascript" src="../dist/plugins/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/reports.js"></script>
+
+</body>
+</html>

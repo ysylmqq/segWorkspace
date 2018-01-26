@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.MapTagMapper"> 
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+    <resultMap type="MapTagPOJO" id="mapTagMap"> 
+        <id property="tagId" column="tag_id" jdbcType="BIGINT" />  
+       <result property="userId" column="user_id" jdbcType="BIGINT"/>
+       <result property="tagName" column="tag_name" jdbcType="VARCHAR"/>
+       <result property="lon" column="lon" jdbcType="FLOAT"/>
+        <result property="lat" column="lat" jdbcType="FLOAT"/>
+        <result property="mlevel" column="mlevel" jdbcType="INTEGER"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+	<select id="getList" parameterType="MapTagPOJO" resultMap="mapTagMap">
+		select m.* from t_map_tag m
+		<where>
+		   <if test="@Ognl@isNotBlank(userId)">
+		      and m.user_id=#{userId}
+		   </if>
+		</where>
+	</select>
+	
+	
+	<delete id="removeById" parameterType="String" >
+			delete t_map_tag
+ 			where tag_id =#{tagId}
+	</delete>
+	
+	<insert id="add" parameterType="MapTagPOJO">
+		INSERT INTO t_map_tag
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+		 	tag_id,
+		 	<if test="@Ognl@isNotBlank(userId)">user_id,</if>
+		 	<if test="@Ognl@isNotBlank(tagName)">tag_name,</if>
+		 	<if test="@Ognl@isNotBlank(lon)">lon,</if>
+		 	<if test="@Ognl@isNotBlank(lat)">lat,</if>
+            <if test="@Ognl@isNotBlank(mlevel)">mlevel,</if>
+            stamp
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	seq_map_tag.nextval,
+		 	<if test="@Ognl@isNotBlank(userId)">#{userId},</if>
+		 	<if test="@Ognl@isNotBlank(tagName)">#{tagName},</if>
+		 	<if test="@Ognl@isNotBlank(lon)">#{lon},</if>
+		 	<if test="@Ognl@isNotBlank(lat)">#{lat},</if>
+            <if test="@Ognl@isNotBlank(mlevel)">#{mlevel},</if>
+            sysdate
+		 </trim>
+ 	</insert>
+ 
+	<update id="edit" parameterType="MapTagPOJO">
+		UPDATE t_map_tag 
+		SET 
+    	<trim suffixOverrides=",">
+    		STAMP=sysdate, 
+    		<if test="@Ognl@isNotBlank(userId)">user_id=#{userId},</if>
+		 	<if test="@Ognl@isNotBlank(tagName)">tag_name=#{tagName},</if>
+		 	<if test="@Ognl@isNotBlank(lon)">lon=#{lon},</if>
+		 	<if test="@Ognl@isNotBlank(lat)">lat=#{lat},</if>
+            <if test="@Ognl@isNotBlank(mlevel)">mlevel=#{mlevel},</if>
+      	</trim>
+ 		WHERE tag_id=#{tagId,jdbcType=BIGINT}
+	</update>
+</mapper>  

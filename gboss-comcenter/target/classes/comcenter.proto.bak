@@ -1,0 +1,509 @@
+/***********************************************************************
+* 
+* 2014-06-13 zhangxz:
+* 最后信息和历史信息的返回都增加运营数据、短信、警情内容, 并增加相应的错误代码
+*
+* 2014-06-17 zhangxz:
+* 增加单独取历史位置简单信息的指令，减少和车圣宝典的通信量
+*
+* 2014-07-11 zhangxz:
+* 手机APP一般都是一个号码，为了减少通信次数，登录时，把终端呼号带上，自动添加监控列表
+*
+* 2014-07-12 zhangxz:
+* 字符集都是以UTF-8为字符集
+
+* 2014-07-23 zhangxz:
+* 增加OBD Deliver, 但是不提供接口
+
+* 2014-07-29 zhangxz:
+* 历史信息查询，添加一个字段（reversed）表示是否按逆序输出，默认(false), 按时间顺序输出
+
+* 2014-08-21 zhangxz:
+* 增加警情队列的消息类型和结果
+* 其他程序添加警情到警情队列
+
+* 2014-09-05 zhangxz:
+* 增加通信中心分布式部署，处理队列协调的UDP组播命令(AlarmArray.proto)
+
+* 2014-10-13 zhangxz:
+* 登录时，添加坐席编号（不是坐席登录名）,只有坐席登录才有，其他APP，应用程序等不用
+
+* 2014-10-16 zhangxz:
+* 添加监控列表时，增加一项，是否清除原来的，默认不清除
+* 发送指令时，增加一项，是否加入监控列表，默认不加入
+
+* 2014-10-28 zhangxz:
+* 添加指令发送成功的回应，指令成功要回应二次, 第一次回应发送成功, 第二次回应终端回应信息（或者超时回应）
+* 
+* 2014-11-07 zhangxz:
+* 如果终端有警情，实时GPS添加警情ID，及警情名称
+* 
+* 2016-10-29 zhangxz:
+* 最后信息和历史信息都增加入库时间
+*
+***********************************************************************/
+
+package gboss;
+
+import "GBoss160829.proto";
+
+option java_package = "cc.chinagps.gboss.comcenter.buff";
+option java_outer_classname = "ComCenterDataBuff";
+
+/*************************************************************************************
+* 通信中心和客户端（第三方系统、坐席）通信协议，基本格式，具体内容由content再解析，第一个字段只是表示消息类型
+* 包括内部通信协议、Websocket协议
+* 因为内部通信协议已经实现了登录、退录、链路检测，所以不用前三组
+*************************************************************************************/
+/*************************************************************************************
+* 消息类型
+*************************************************************************************/
+/* 建议不用枚举类型，直接在代码中用常量定义, 不用protoc生成
+enum MessageType {
+    Type_Login = 1001;               //登录
+    Type_Login_ACK = 8001;           //登录应答
+    Type_Logout = 1002;              //退录
+    Type_Logout_ACK = 8002;          //退录应答
+    Type_ActiveLink = 1003;          //链路检测（心跳）
+    Type_ActiveLink_ACK = 8003;      //链路检测（心跳）应答
+    
+    Type_AddMonitor = 1011;          //添加监控列表
+    Type_AddMonitor_ACK = 8011;      //添加监控列表应答
+    Type_RemoveMonitor = 1012;       //删除监控列表
+    Type_RemoveMonitor_ACK = 8012;   //删除监控列表应答
+    
+    Type_GetLastInfo = 1013;                //取最后位置、取最后行程、取最后故障
+    Type_GetLastInfo_ACK = 8013;            //取最后位置、取最后行程、取最后故障的应答
+    Type_GetHistoryInfo = 1014;             //取历史位置、历史行程、历史故障（如果换了一辆车，前一辆车的历史查询自动结束）
+    Type_GetHistoryInfoNextPage = 1015;     //取下一页历史位置、历史行程、历史故障
+    Type_GetHistoryInfo_ACK = 8014;         //取历史位置、历史行程、历史故障应答（1014, 1015共用一个应答）
+    Type_StopHistoryInfo = 1016;            //结束读历史位置、历史行程、历史故障（如果分页全部取完了，自动结束）
+    Type_StopHistoryInfo_ACK = 8016;        //结束读历史位置、历史行程、历史故障应答
+
+    Type_GetHistorySimpleGpsInfo_ACK = 8017;       //取历史位置主要信息应答
+    
+    Type_SendCommand = 1051;            //下发指令
+    Type_SendCommand_ACK = 8051;        //下发指令结果
+    Type_SendCommandSend_ACK = 8052;    //网关发送指令成功回应
+    
+    Type_TestDeliver = 2000;            //测试用，客户端请求模拟终端上传信息
+    Type_DeliverGPS = 2001;             //上传GPS（包括OBD数据）
+    Type_DeliverOperateData = 2002;     //上传运营数据
+    Type_DeliverSMS = 2003;             //上传短消息
+    Type_DeliverUnitLoginOut = 2004;    //上传终端登退录消息
+    Type_DeliverTravel = 2005;          //上传终端行程消息
+    Type_DeliverFault = 2006;           //上传终端故障消息
+    Type_DeliverAlarm = 2007;           //上传终端报警消息
+    Type_DeliverSimpleGPS = 2008;       //GPS主要信息(历史查询时用，减少传输字节)
+    Type_DeliverOBD = 2009;             //上传终端OBD数据
+    Type_DeliverAppNotice = 2010;       //APP通知类消息
+    Type_DeliverUnitVersion = 2011;     //终端升级成功上报版本号
+    Type_DeliverFaultLight = 2012;      //上传故障灯状态(放在GPS内，没有单独)
+    Type_DeliverECUConfig = 2013;       //上传ECU配置
+    Type_DeliverVehicleRegister = 2014; //上传车辆注册信息
+};
+*/
+
+/*************************************************************************************
+* 返回结果
+*************************************************************************************/
+/* 建议不用枚举类型，直接在代码中用常量定义, 不用protoc生成
+enum ResultCode {
+    OK_Error = 0;                   //成功
+    UserName_Error = 1;             //用户不存在
+    Password_Error = 2;             //密码错误
+    UserExist_Error = 3;            //用户已经存在
+    LoginNameExist_Error = 4;       //登录名已经存在
+    MobileExist_Error = 5;          //手机号已经存在
+    EmailExist_Error = 6;           //Email已经存在
+    UserNoExist_Error = 7;          //用户不存在
+    LoginNameEdit_Error = 8;        //登录名不能修改
+    VehicleNoExist_Error = 9;       //车辆不存在，车牌号错误
+    UnitNoExist_Error = 10;         //车台不存在, 呼号错误
+    UserNoVehicle_Error = 11;       //用户没有该车辆
+    VehicleNoUnit_Error = 12;       //车辆没有该车台
+    CallLetterExist_Error = 13;     //车载号码已经存在
+    UnitNoAck_Error = 14;           //指令发送成功但车台无反应
+    CommandID_Error = 15;           //命令ID错误
+    Parameters_Error = 16;          //参数错误 
+    Send_Error = 17;                //发送失败
+    Timeout_Error = 18;             //超时失败
+    CompanyNoExist_Error = 20;      //商户不存在
+    NoLogin_Error = 21;             //没有登录
+    DataBase_Error = 22;            //数据库错误
+    ConnectFail_Error = 23;         //连接不成功
+    Encode_Error = 24;              //编码（打包）错误
+    Decode_Error = 25;              //解码（解包）失败
+    Format_Error = 26;              //格式错误
+    Time_Error = 27;                //时间错误
+    NoRequest_Error = 28;           //没有申请错误
+    Shutdowm_Error = 29;            //终端已经关机错误
+
+    SeatNoLogin_Error = 40;         //坐席没有登录错误
+    AlarmNoExist_Error = 41;        //警单不存在错误
+    AlarmHandled_Error = 42;        //警单已经处理
+    SeatExist_Error = 43;           //坐席已经存在
+    SeatBusy_Error = 44;            //坐席忙碌
+    Seat_Error = 45;                //坐席错误
+    
+    Hbase_Error = 101;                  //Hbase存储错误
+    LastPosition_Error = 102;           //没有最后位置
+    HistoryPosition_Error = 103;        //没有历史位置
+    HistoryPositionNoStart_Error = 104; //没有开始历史位置（取下一页时）
+    
+    LastTravel_Error = 105;             //没有最后行程
+    HistoryTravel_Error = 106;          //没有历史行程
+    HistoryTravelNotStart_Error = 107;  //没有开始历史行程（取下一页时）
+
+    LastFault_Error = 108;             //没有最后故障
+    HistoryFault_Error = 109;          //没有历史故障
+    HistoryFaultNotStart_Error = 110;  //没有开始历史故障（取下一页时）
+
+    LastAlarm_Error = 111;              //没有最后警情
+    HistoryAlarm_Error = 112;           //没有历史警情
+    HistoryAlarmNoStart_Error = 113;    //没有开始历史警情（取下一页时）
+    
+    LastOperateData_Error = 114;           //没有最后运营数据
+    HistoryOperateData_Error = 115;        //没有历史运营数据
+    HistoryOperateDataNoStart_Error = 116; //没有开始历史运营数据（取下一页时）
+    
+    LastSm_Error = 117;             //没有最后短信
+    HistorySm_Error = 118;          //没有历史短信
+    HistorySmNoStart_Error = 119;   //没有开始历史短信（取下一页时）
+    
+    Other_Error = -1;               //其他错误
+};
+*/
+
+/*************************************************************************************
+* 一次可以发多个通信包
+*************************************************************************************/
+message ComCenterMessage {
+    message ComCenterBaseMessage {
+        required int32 id = 1;          //消息类型ID //MessageType
+        optional bytes content = 2;     //消息内容(消息内容根据类型不同，格式不同），这种方式要编码和解码二次，但是第一次都只有二个字段，很快
+    };
+    repeated ComCenterBaseMessage messages = 1;
+};
+
+/*************************************************************************************
+* 登录、登录应答内容
+*************************************************************************************/
+message Login {
+    required string username = 1;       //用户名
+    required string password = 2;       //密码
+    repeated string callLetters = 3;    //多个呼号
+    optional string seatid = 4;         //坐席编号
+    optional string usertype = 5;       //客户端类型，海马手机APP分别用IOS-HAIMA，ANDROID-HAIMA, 坐席用seatclient
+    optional string userversion = 6;    //客户端版本
+};
+message Login_ACK {
+    required int32 retcode = 1;         //登录结果(ResultCode)
+    optional string retmsg = 2;         //结果说明
+    optional string username = 3;       //用户名
+};
+
+/*************************************************************************************
+* 退录、退录应答没有内容, 只有消息ID
+*************************************************************************************/
+
+/*************************************************************************************
+* 链路检测（心跳）、链路检测（心跳）应答没有内容, 只有消息ID
+*************************************************************************************/
+
+/*************************************************************************************
+* 添加监控列表、添加监控列表应答内容
+*************************************************************************************/
+message AddMonitor {
+    repeated string callLetters = 1;    //多个呼号, ALLUNIT表示全部终端, 一般呼号默认是全部类型（后面的字段对一般呼号不起作用）
+    repeated int32  infotypes = 2;      //注册实时转发的内容类型（只对ALLUNIT起作用）, -1表示全部类型, 请参考MessageType中Type_DeliverGPS等
+    optional bool clearold = 3;         //是否清除原来的, 默认不清除
+};
+
+message AddMonitor_ACK {
+    required int32 retcode = 1;         //添加结果(ResultCode)
+    optional string retmsg = 2;         //结果说明
+    repeated string callLetters = 3;    //已经注册的全部呼号（包括以前注册的）
+};
+
+/*************************************************************************************
+* 删除监控列表、删除监控列表应答内容
+*************************************************************************************/
+message RemoveMonitor {
+    repeated string callLetters = 1;    //多个呼号, ALLUNIT表示全部终端, ALLUNIT只是删除ALLUNIT注册，并不删除指定呼号
+    repeated int32  infotypes = 2;      //注册实时转发的内容类型, -1表示全部类型, 请参考MessageType中Type_DeliverGPS等
+};
+
+message RemoveMonitor_ACK {
+    required int32 retcode = 1;         //删除结果(ResultCode)
+    optional string retmsg = 2;         //结果说明
+    repeated string callLetters = 3;    //剩下的注册的全部呼号
+};
+
+/*************************************************************************************
+* 上传终端登退录消息, 只有网络网关才有此项
+*************************************************************************************/
+message DeliverUnitLoginOut {
+    required string callLetter = 1;     //车辆呼号
+    required int32 inorout = 2;         //0:退录，1:登录
+    optional int32 gatewayid = 3;       //网关编号
+    optional int32 gatewaytype = 4;     //网关类型：0或无:表示NET网关，1:短信网关
+    optional int64 loginTime = 5;       //登录时间
+    optional int64 logoutTime = 6;      //退录时间
+    optional string unitversion = 7;    //终端版本号
+    optional bool upgradegateway = 8;   //升级网关（默认不是升级网关：FALSE）
+};
+
+/*************************************************************************************
+* 取最后信息（位置、行程、故障）及其应答
+*************************************************************************************/
+/*
+Type_DeliverGPS = 2001;             //上传GPS（包括OBD数据）
+Type_DeliverOperateData = 2002;     //上传运营数据
+Type_DeliverSMS = 2003;             //上传短消息
+Type_DeliverTravel = 2005;          //上传终端行程消息
+Type_DeliverFault = 2006;           //上传终端行程消息
+Type_DeliverAlarm = 2007;           //上传终端报警消息
+Type_DeliverSimpleGPS = 2008;       //GPS主要信息(历史查询时用，减少传输字节)
+Type_DeliverOBD = 2009;             //上传终端OBD数据
+Type_DeliverFaultLight = 2012;      //上传故障灯状态(放在GPS内，没有单独)
+Type_DeliverECUConfig = 2013;       //上传ECU配置
+*/
+
+message GetLastInfo {
+    required int32 infoType = 1;        //最后信息类型(MessageType), 直接对应上传消息类型
+    repeated string callLetters = 2;    //多个呼号
+    optional string sn = 3;             //序列号（唯一ID）,客户端对应用
+};
+message GetLastInfo_ACK {
+    required int32 retcode = 1;         //最后信息结果(ResultCode)
+    optional string retmsg = 2;         //结果说明
+    repeated GpsInfo gpses = 3;         //对应呼号的最后位置
+    repeated TravelInfo travels = 4;    //对应呼号的最后行程
+    repeated FaultInfo faults = 5;      //对应呼号的最后故障
+    optional string sn = 6;             //序列号（唯一ID）,客户端对应用
+    repeated OperateData operates = 7;  //对应呼号的最后运营数据
+    repeated ShortMessage sms = 8;      //对应呼号的最后短信
+    repeated AlarmInfo alarms = 9;      //对应呼号的最后警情
+    repeated OBDInfo obds = 10;         //对应呼号的最后OBD, 这个OBD也可能在gpses中
+    repeated DeliverUnitLoginOut unitloginout = 11; //对应呼号的最后登退录
+    repeated int64 timestamps = 12; 	//入库时间
+};
+
+/*************************************************************************************
+* 取历史信息、取历史信息应答内容
+*************************************************************************************/
+message GetHistoryInfo {
+    required string callLetter = 1;     //一个呼号
+    required int32 infoType = 2;        //历史信息类型(MessageType)
+    required int64 starttime = 3;       //开始时间(从1970-1-1 0:0:0开始的秒数，格林威治时间), 为了提高处理速度,不用字符串
+    required int64 endtime = 4;         //结束时间(从1970-1-1 0:0:0开始的秒数，格林威治时间), 为了提高处理速度,不用字符串
+    optional int32 pageNumber = 5;      //分页，每页最多条数（默认100条）
+    optional int32 totalNumber = 6;     //最多取总条数（默认5000条）
+    optional bool autonextpage = 7;     //不用客户端发下一面指令，自动发送下页, （默认true）
+    optional string sn = 8;             //序列号（唯一ID）,客户端对应用
+    optional bool reversed = 9;         //是否按时间先后顺序排序，还是逆序，默认顺序（false），
+    optional bool norepeat = 10;        //重复的点不返回（暂时只支持取GPS简单信息）
+};
+
+//取历史信息下一页
+//如果中心30分钟内，没有收到下一页指令，则自动结束
+message GetHistoryInfoNextPage {
+    required string callLetter = 1;     //一个呼号，如果呼号错误（不是开始取历史信息的呼号），返回失败
+    required int32 infoType = 2;        //历史信息类型(MessageType)
+    optional string sn = 3;             //序列号（唯一ID）,客户端对应用, sn必须和GetHistoryInfo相同
+};
+
+//历史信息应答
+message GetHistoryInfo_ACK {
+    required int32 retcode = 1;         //历史记录结果(ResultCode)
+    optional string retmsg = 2;         //结果说明
+    required bool lastPage = 3;         //是否是最后一页
+    repeated GpsInfo gpses = 4;         //GPS队列
+    repeated TravelInfo travels = 5;    //对应呼号的行程队列
+    repeated FaultInfo faults = 6;      //对应呼号的故障队列
+    optional string sn = 7;             //序列号（唯一ID）,客户端对应用
+    repeated OperateData operates = 8;  //对应呼号的运营数据队列
+    repeated ShortMessage sms = 9;      //对应呼号的短信队列
+    repeated AlarmInfo alarms = 10;     //警情队列
+    repeated OBDInfo obds = 11;         //对应呼号的OBD队列
+    repeated DeliverUnitLoginOut unitloginout = 12; //对应呼号的最后登退录
+    repeated int64 timestamps = 13; 	//入库时间
+};
+
+//取GPS简单信息应答
+message GetHistorySimpleGpsInfo_ACK {
+    required string callLetter = 1;     //呼号
+    required int32 retcode = 2;         //历史记录结果(ResultCode)
+    optional string retmsg = 3;         //结果说明
+    required bool lastPage = 4;         //是否是最后一页
+    optional string sn = 5;             //序列号（唯一ID）,客户端对应用
+    repeated GpsSimpleInfo gpses = 6;   //GPS简单信息队列
+    repeated int64 timestamps = 7; 	    //入库时间
+};
+
+//结束取历史信息, 如果中心已经读完历史记录（即lastPage = true），自动结束，不用发结束指令
+message StopHistoryInfo {
+    required string callLetter = 1;     //一个呼号如果呼号错误（不是开始取历史信息的呼号），返回失败，但是结束最近历史信息查询
+    required int32 infoType = 2;        //历史信息类型(MessageType)
+    optional string sn = 3;             //序列号（唯一ID）,客户端对应用, sn必须和GetHistoryInfo相同
+};
+
+//结束取历史信息应答
+message StopHistoryInfo_ACK {
+    required string callLetter = 1;     //一个呼号（原历史记录查询呼号）
+    required int32 infoType = 2;        //历史信息类型(MessageType)
+    required int32 retcode = 3;         //历史记录结果(ResultCode)
+    optional string retmsg = 4;         //结果说明
+    optional string sn = 5;             //序列号（唯一ID）,客户端对应用
+};
+
+/*************************************************************************************
+* 下发指令、指令应答内容
+*************************************************************************************/
+message SendCommand {
+    required string sn = 1;             //序列号（唯一ID）
+    repeated string callLetters = 2;    //车台呼号（多个）
+    required int32 cmdId = 3;           //命令编号
+    repeated string params = 4;         //命令参数（参数顺序及含义请参考）
+    optional string ackProxy = 5;       //接收代理方的登录名（车圣宝典提出的，如果手机发送指令后，断开连接，则把指令返回给车圣宝典WEB服务（第三方代理）
+    optional int32 channelId = 6;       //短信通道号，如果指定了通道号（网关编号），则走指定编号的网关，如果未指定，则按规则判断（车台一般都要指令）
+    optional bool addmonitor = 7;       //是否添加到监控列表, 默认不加入
+};
+
+/**
+ *  指令发送成功回应（网络网关，或短信网关）
+ */
+message SendCommandSend_ACK {
+    required string sn = 1;             //序列号
+    required string callLetter = 2;     //车台呼号
+    required int32 cmdId = 3;           //命令编号
+    required int32 retcode = 4;         //发送结果(ResultCode)
+    optional string retmsg = 5;         //结果说明
+    optional int32  unitsn = 6;         //网关发送给终端通信的流水号
+};
+
+/**
+ *  指令回应
+ */
+message SendCommand_ACK {
+    required string sn = 1;             //序列号
+    required string callLetter = 2;     //车台呼号
+    required int32 cmdId = 3;           //命令编号
+    required int32 retcode = 4;         //发送结果(ResultCode)
+    repeated string params = 5;         //回应参数
+    repeated GpsInfo gpsInfo = 6;       //GPS信息
+    optional string retmsg = 7;         //结果说明
+    optional int32  unitsn = 8;         //终端返回的(网关发送给终端通信的流水号)
+};
+
+/*************************************************************************************
+* 上传GPS
+*************************************************************************************/
+message DeliverGPS {
+    required GpsInfo gpsinfo = 1;       //请参考GBOSS.proto
+    optional int32 gatewayid = 2;       //网关编号
+    optional int32 gatewaytype = 3;     //网关类型：0或无:表示NET网关，1:短信网关
+    optional int32 alarmid = 4;         //警情ID(如果此车在警情队列中)
+    optional string alarmname = 5;      //警情名称
+};
+
+/*************************************************************************************
+* 上传终端报警信息
+*************************************************************************************/
+message DeliverAlarm {
+    required AlarmInfo alarminfo = 1;   //请参考GBOSS.proto
+    optional int32 gatewayid = 2;       //网关编号
+    optional int32 gatewaytype = 3;     //网关类型：0或无:表示NET网关，1:短信网关
+};
+
+/*************************************************************************************
+* 上传出租车运营数据
+*************************************************************************************/
+message DeliverOperateData {
+    required OperateData data = 1;      //请参考GBOSS.proto
+    optional int32 gatewayid = 2;       //网关编号
+    optional int32 gatewaytype = 3;     //网关类型：0或无:表示NET网关，1:短信网关
+};
+
+/*************************************************************************************
+* 上传短消息
+*************************************************************************************/
+message DeliverSMS {
+    required ShortMessage msg = 1;      //请参考GBOSS.proto
+    optional int32 gatewayid = 2;       //网关编号
+    optional int32 gatewaytype = 3;     //网关类型：0或无:表示NET网关，1:短信网关
+};
+
+/*************************************************************************************
+* 上传行程数据
+*************************************************************************************/
+message DeliverTravel {
+    required TravelInfo travelinfo = 1; //请参考GBOSS.proto
+    optional int32 gatewayid = 2;       //网关编号
+    optional int32 gatewaytype = 3;     //网关类型：0或无:表示NET网关，1:短信网关
+};
+
+/*************************************************************************************
+* 上传故障数据
+*************************************************************************************/
+message DeliverFault {
+    required FaultInfo faultinfo = 1;   //请参考GBOSS.proto
+    optional int32 gatewayid = 2;       //网关编号
+    optional int32 gatewaytype = 3;     //网关类型：0或无:表示NET网关，1:短信网关
+};
+
+/*************************************************************************************
+* 上传OBD数据
+*************************************************************************************/
+message DeliverOBD {
+    required OBDInfo obdinfo = 1;       //请参考GBOSS.proto
+    optional int32 gatewayid = 2;       //网关编号
+    optional int32 gatewaytype = 3;     //网关类型：0或无:表示NET网关，1:短信网关
+};
+
+/*************************************************************************************
+* App通知类消息
+*************************************************************************************/
+message DeliverAppNotice {
+    required AppNoticeInfo noticeinfo = 1;      //请参考GBOSS.proto
+    optional int32 gatewayid = 2;               //网关编号
+    optional int32 gatewaytype = 3;             //网关类型：0或无:表示NET网关，1:短信网关
+};
+
+/*************************************************************************************
+ * 上传终端软件版本
+*************************************************************************************/
+message DeliverUnitVersion {
+    required UnitVersion unitVersion = 1;   //请参考GBOSS.proto
+    optional int32 gatewayid = 2;       //网关编号
+    optional int32 gatewaytype = 3;     //网关类型：0或无:表示NET网关，1:短信网关
+};
+
+ /**
+ * 上传电控单元配置
+ */
+message DeliverECUConfig {
+    required ECUConfig ecuConfig = 1;   //请参考GBOSS.proto
+    optional int32 gatewayid = 2;       //网关编号
+    optional int32 gatewaytype = 3;     //网关类型：0或无:表示NET网关，1:短信网关
+};
+
+/*************************************************************************************
+ * 上传车辆注册信息
+*************************************************************************************/
+message Type_DeliverVehicleRegister {
+    required VehicleRegisterInfo vehicleinfo = 1;   //请参考GBOSS.proto
+    optional int32 gatewayid = 2;       //网关编号
+    optional int32 gatewaytype = 3;     //网关类型：0或无:表示NET网关，1:短信网关
+};
+
+/*************************************************************************************
+* 测试上传数据
+*************************************************************************************/
+/*
+message TestDeliver {
+    required int32 infoType = 1;        //终端递交类型
+    repeated string callLetters = 2;    //多个呼号
+};
+*/

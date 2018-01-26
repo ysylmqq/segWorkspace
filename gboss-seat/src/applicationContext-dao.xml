@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	default-lazy-init="true"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:ldap="http://www.springframework.org/schema/ldap"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="http://www.springframework.org/schema/ldap http://www.springframework.org/schema/ldap/spring-ldap-2.0.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+<!-- 
+    <bean class="org.springframework.orm.hibernate4.HibernateExceptionTranslator"/>
+    <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+ -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="locations">
+            <list>
+                <value>/config/jdbc.properties</value>
+                <value>/config/hibernate.properties</value>
+                <value>/config/misc.properties</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- JNDI DataSource for J2EE environments -->
+    <!--<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/appfuse"/>-->
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/testcityray?useUnicode=true&amp;characterEncoding=UTF-8"/>
+        <property name="user" value="root"/>
+        <property name="password" value="3306"/>
+        <property name="minPoolSize" value="${jdbc.minPoolSize}"/>
+        <property name="maxPoolSize" value="${jdbc.maxPoolSize}"/>
+        <property name="maxIdleTime" value="${jdbc.maxIdleTime}"/>
+        <property name="maxStatements" value="${jdbc.maxStatements}"/>
+        <property name="testConnectionOnCheckin" value="${jdbc.testConnectionOnCheckin}"/>
+        <property name="automaticTestTable" value="${jdbc.automaticTestTable}"/>
+        <property name="checkoutTimeout" value="${jdbc.checkoutTimeout}"/>
+    </bean>
+  <!--   <bean id="writeDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc.write.url}"/>
+        <property name="user" value="${jdbc.write.username}"/>
+        <property name="password" value="${jdbc.write.password}"/>
+        <property name="minPoolSize" value="${jdbc.minPoolSize}"/>
+        <property name="maxPoolSize" value="${jdbc.maxPoolSize}"/>
+        <property name="maxIdleTime" value="${jdbc.maxIdleTime}"/>
+        <property name="maxStatements" value="${jdbc.maxStatements}"/>
+        <property name="testConnectionOnCheckin" value="${jdbc.testConnectionOnCheckin}"/>
+        <property name="automaticTestTable" value="${jdbc.automaticTestTable}"/>
+        <property name="checkoutTimeout" value="${jdbc.checkoutTimeout}"/>
+    </bean> -->
+
+    <!-- Hibernate SessionFactory -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean" destroy-method="destroy">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:/hibernate.cfg.xml"/>
+    </bean>
+    <!-- <bean id="writeSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean" destroy-method="destroy">
+        <property name="dataSource" ref="writeDataSource"/>
+        <property name="configLocation" value="classpath:/hibernate.cfg.xml"/>
+    </bean> -->
+
+    <!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+   <!--  <bean id="writeTransactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="writeSessionFactory"/>
+    </bean> -->
+
+    <!-- Activates scanning of @Autowired -->
+    <context:annotation-config/>
+
+    <!-- Activates scanning of @Repository -->
+    <context:component-scan base-package="cc.chinagps.seat.dao"/>
+
+	<bean id="simpleTraceLogger" class="cc.chinagps.seat.util.SimpleTraceLogger"/>
+	<aop:config>
+ 		<aop:aspect id="daoAspect" ref="simpleTraceLogger">
+	 		<aop:around method="profile" pointcut="
+	 			execution(* cc.chinagps.seat.dao.*.*(..))"/>
+ 		</aop:aspect>
+ 	</aop:config>
+ 	
+ 	<aop:config>
+ 		<aop:advisor advice-ref="txAdvice" pointcut="execution(* cc.chinagps.seat.service.*.*(..))"/>
+ 		<!-- <aop:advisor advice-ref="writeTxAdvice" pointcut="execution(* cc.chinagps.seat.service.*.*(..))"/> -->
+ 	</aop:config>
+ 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+ 		<tx:attributes>
+ 			<tx:method name="get*" read-only="true" propagation="REQUIRED"/>
+ 			<tx:method name="*" propagation="REQUIRED"/>
+ 		</tx:attributes>
+ 	</tx:advice>
+ 	<!-- <tx:advice id="writeTxAdvice" transaction-manager="writeTransactionManager">
+ 		<tx:attributes>
+ 			<tx:method name="*" propagation="REQUIRED"/>
+ 		</tx:attributes>
+ 	</tx:advice> -->
+ 	
+ 	<bean id="hbaseConf" class="org.apache.hadoop.hbase.HBaseConfiguration" factory-method="create"/>
+ 	<bean id="hbaseConn" class="org.apache.hadoop.hbase.client.HConnectionManager" factory-method="createConnection" destroy-method="close">
+ 		<constructor-arg ref="hbaseConf"/>
+ 	</bean>
+ 	
+ 	<!-- cache enable -->
+ 	<cache:annotation-driven/>
+ 	<bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
+ 		<property name="caches">
+ 			<set>
+ 				<bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean">
+ 					<property name="name" value="alarmStatus"/>
+ 				</bean>
+ 				<bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean">
+ 					<property name="name" value="chinaCities"/>
+ 				</bean>
+ 			</set>
+ 		</property>
+ 	</bean>
+</beans>

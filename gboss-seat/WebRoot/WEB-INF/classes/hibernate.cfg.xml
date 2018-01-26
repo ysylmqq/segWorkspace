@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+    <session-factory>
+        <!-- c3p0 -->
+        <!-- 测试中发现在配置文件中配置c3p0参数无用，只能在配置datasource时指定-->
+        <!-- 
+        <property name="hibernate.c3p0.min_size">5</property>
+        <property name="hibernate.c3p0.max_size">20</property>
+        <property name="hibernate.c3p0.timeout">1800</property>
+        <property name="hibernate.c3p0.max_statements">50</property>
+		 -->
+        <!-- Enable Hibernate's automatic session context management -->
+        <!-- <property name="current_session_context_class">thread</property> -->
+
+        <!-- Disable the second-level cache  -->
+        <property name="cache.provider_class">org.hibernate.cache.internal.NoCacheProvider</property>
+
+        <!-- Echo all executed SQL to stdout -->
+        <property name="show_sql">false</property>
+        <property name="format_sql">true</property>
+        <property name="use_sql_comments">false</property>
+        
+        <!-- Drop and re-create the database schema on startup -->
+        <!-- <property name="hbm2ddl.auto">update</property> -->
+
+		<!-- mapping -->
+		<!--
+        <mapping resource="cc/chinagps/seat/hibernate/xxx.hbm.xml"/>
+        -->
+        
+        <mapping class="cc.chinagps.seat.bean.table.CustomerTable" />
+        <mapping class="cc.chinagps.seat.bean.table.DriverTable" />
+        <mapping class="cc.chinagps.seat.bean.table.InsuranceTable" />
+        <mapping class="cc.chinagps.seat.bean.table.LinkmanTable" />
+        <mapping class="cc.chinagps.seat.bean.table.S4ShopTable" />
+        <mapping class="cc.chinagps.seat.bean.table.SysValueTable" />
+        <mapping class="cc.chinagps.seat.bean.table.UnitTable" />
+        <mapping class="cc.chinagps.seat.bean.table.VehicleTable" />
+        <mapping class="cc.chinagps.seat.bean.table.FeeInfoTable" />
+        <mapping class="cc.chinagps.seat.bean.table.FeePaytxtTable" />
+        <mapping class="cc.chinagps.seat.bean.table.CollectionTable" />
+        <mapping class="cc.chinagps.seat.bean.table.CommandTable" />
+        <mapping class="cc.chinagps.seat.bean.table.UnitTypeTable" />
+        <mapping class="cc.chinagps.seat.bean.table.FeeBill" />
+        <mapping class="cc.chinagps.seat.bean.table.FeePaymentDt" />
+        <mapping class="cc.chinagps.seat.bean.table.MarkTable" />
+        <mapping class="cc.chinagps.seat.bean.table.NavTable" />
+        <mapping class="cc.chinagps.seat.bean.table.BriefTable" />
+        <mapping class="cc.chinagps.seat.bean.table.ChinaCityTable" />
+        <mapping class="cc.chinagps.seat.bean.table.AlarmStatusTable" />
+        <mapping class="cc.chinagps.seat.bean.table.AlarmTable" />
+        <mapping class="cc.chinagps.seat.bean.table.VehicleStatusTable" />
+        <mapping class="cc.chinagps.seat.bean.table.MarkCompanyTable" />
+        <mapping class="cc.chinagps.seat.bean.table.StolenVehicleTable" />
+        <mapping class="cc.chinagps.seat.bean.table.AppContact" />
+        <mapping class="cc.chinagps.seat.bean.table.LastPositionTable" />
+        <mapping class="cc.chinagps.seat.bean.table.SeatSegGroupTable" />
+        <mapping class="cc.chinagps.seat.bean.table.SeatSegPhonebookTable" />
+        <mapping class="cc.chinagps.seat.bean.table.ProductLibTable" />
+        <mapping class="cc.chinagps.seat.bean.table.SendCmdTable" />
+        <mapping class="cc.chinagps.seat.bean.table.CommandTypeTable" />
+        <mapping class="cc.chinagps.seat.bean.table.StatusTable" />
+        <mapping class="cc.chinagps.seat.bean.table.ComplaintTable" />
+        <mapping class="cc.chinagps.seat.bean.table.ServerTypeTable" />
+        <mapping class="cc.chinagps.seat.bean.table.ServerTypeCompanyTable" />
+        <mapping class="cc.chinagps.seat.bean.table.BriefDetailTable" />
+        <mapping class="cc.chinagps.seat.bean.table.AlarmLogTable" />
+        <mapping class="cc.chinagps.seat.bean.table.SmsTemplateTable" />
+        <mapping class="cc.chinagps.seat.bean.EventReport" />
+        <mapping class="cc.chinagps.seat.bean.EventSummary" />
+        <mapping class="cc.chinagps.seat.bean.AlarmResponse" />
+    </session-factory>
+</hibernate-configuration>

@@ -1,0 +1,15 @@
+.p-table{
+	border-collapse:collapse;
+	
+	margin:2px 0
+}
+
+.p-table td, .p-table th{
+	padding:5px;
+	text-align: center;
+}
+
+.p-table th{
+	/*background-color:#c3daf9;*/
+	background-color:#eee;
+}

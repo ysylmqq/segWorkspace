@@ -1,0 +1,319 @@
+2017-07-25 10:15:49 - ++++ exception thrown while writing bytes to server on stats
+2017-07-25 10:15:49 - 远程主机强迫关闭了一个现有的连接。
+java.io.IOException: 远程主机强迫关闭了一个现有的连接。
+	at sun.nio.ch.SocketDispatcher.read0(Native Method)
+	at sun.nio.ch.SocketDispatcher.read(SocketDispatcher.java:43)
+	at sun.nio.ch.IOUtil.readIntoNativeBuffer(IOUtil.java:223)
+	at sun.nio.ch.IOUtil.read(IOUtil.java:197)
+	at sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:379)
+	at sun.nio.ch.SocketAdaptor$SocketInputStream.read(SocketAdaptor.java:223)
+	at sun.nio.ch.ChannelInputStream.read(ChannelInputStream.java:103)
+	at java.io.BufferedInputStream.fill(BufferedInputStream.java:235)
+	at java.io.BufferedInputStream.read1(BufferedInputStream.java:275)
+	at java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	at java.io.DataInputStream.read(DataInputStream.java:149)
+	at com.meetup.memcached.SockIOPool$SockIO.readLine(SockIOPool.java:1760)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:2006)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1878)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1864)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.updateGatewayStatus(MemcacheUpdator.java:136)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.access$5(MemcacheUpdator.java:131)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator$UpdateGatewayStatusThread.run(MemcacheUpdator.java:123)
+2017-08-14 10:26:38 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 10:26:38 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 10:26:38 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.populateBuckets(SockIOPool.java:669)
+	at com.meetup.memcached.SockIOPool.initialize(SockIOPool.java:632)
+	at cc.chinagps.gateway.memcache.MemcacheManager.<clinit>(MemcacheManager.java:44)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.<init>(MemcacheUpdator.java:27)
+	at cc.chinagps.gateway.StartServer.start(StartServer.java:120)
+	at cc.chinagps.gateway.StartServer.main(StartServer.java:175)
+2017-08-14 10:26:38 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.populateBuckets(SockIOPool.java:669)
+	at com.meetup.memcached.SockIOPool.initialize(SockIOPool.java:632)
+	at cc.chinagps.gateway.memcache.MemcacheManager.<clinit>(MemcacheManager.java:44)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.<init>(MemcacheUpdator.java:27)
+	at cc.chinagps.gateway.StartServer.start(StartServer.java:120)
+	at cc.chinagps.gateway.StartServer.main(StartServer.java:175)
+2017-08-14 10:26:38 - ++++ failed to create connection to: 218.17.3.226:1211 -- only 0 created.
+2017-08-14 10:26:38 - ++++ failed to create connection to: 218.17.3.226:1211 -- only 0 created.
+2017-08-14 10:29:49 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 10:29:49 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.populateBuckets(SockIOPool.java:669)
+	at com.meetup.memcached.SockIOPool.initialize(SockIOPool.java:632)
+	at cc.chinagps.gateway.memcache.MemcacheManager.<clinit>(MemcacheManager.java:44)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.<init>(MemcacheUpdator.java:27)
+	at cc.chinagps.gateway.StartServer.start(StartServer.java:120)
+	at cc.chinagps.gateway.StartServer.main(StartServer.java:175)
+2017-08-14 10:29:49 - ++++ failed to create connection to: 218.17.3.226:1211 -- only 0 created.
+2017-08-14 10:30:52 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 10:30:52 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.getConnection(SockIOPool.java:1049)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1988)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1878)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1864)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.updateGatewayStatus(MemcacheUpdator.java:136)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.access$5(MemcacheUpdator.java:131)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator$UpdateGatewayStatusThread.run(MemcacheUpdator.java:123)
+2017-08-14 10:30:52 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 14:09:09 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 14:09:09 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.populateBuckets(SockIOPool.java:669)
+	at com.meetup.memcached.SockIOPool.initialize(SockIOPool.java:632)
+	at cc.chinagps.gateway.memcache.MemcacheManager.<clinit>(MemcacheManager.java:44)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.<init>(MemcacheUpdator.java:27)
+	at cc.chinagps.gateway.StartServer.start(StartServer.java:120)
+	at cc.chinagps.gateway.StartServer.main(StartServer.java:175)
+2017-08-14 14:09:09 - ++++ failed to create connection to: 218.17.3.226:1211 -- only 0 created.
+2017-08-14 14:10:12 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 14:10:12 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.getConnection(SockIOPool.java:1049)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1988)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1878)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1864)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.updateGatewayStatus(MemcacheUpdator.java:136)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.access$5(MemcacheUpdator.java:131)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator$UpdateGatewayStatusThread.run(MemcacheUpdator.java:123)
+2017-08-14 14:10:12 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 14:12:55 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 14:12:55 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.populateBuckets(SockIOPool.java:669)
+	at com.meetup.memcached.SockIOPool.initialize(SockIOPool.java:632)
+	at cc.chinagps.gateway.memcache.MemcacheManager.<clinit>(MemcacheManager.java:44)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.<init>(MemcacheUpdator.java:27)
+	at cc.chinagps.gateway.StartServer.start(StartServer.java:120)
+	at cc.chinagps.gateway.StartServer.main(StartServer.java:175)
+2017-08-14 14:12:55 - ++++ failed to create connection to: 218.17.3.226:1211 -- only 0 created.
+2017-08-14 14:14:25 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 14:14:25 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.populateBuckets(SockIOPool.java:669)
+	at com.meetup.memcached.SockIOPool.initialize(SockIOPool.java:632)
+	at cc.chinagps.gateway.memcache.MemcacheManager.<clinit>(MemcacheManager.java:44)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.<init>(MemcacheUpdator.java:27)
+	at cc.chinagps.gateway.StartServer.start(StartServer.java:120)
+	at cc.chinagps.gateway.StartServer.main(StartServer.java:175)
+2017-08-14 14:14:25 - ++++ failed to create connection to: 218.17.3.226:1211 -- only 0 created.
+2017-08-14 14:15:28 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 14:15:28 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.getConnection(SockIOPool.java:1049)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1988)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1878)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1864)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.updateGatewayStatus(MemcacheUpdator.java:136)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.access$5(MemcacheUpdator.java:131)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator$UpdateGatewayStatusThread.run(MemcacheUpdator.java:123)
+2017-08-14 14:15:28 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 14:35:33 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 14:35:33 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.populateBuckets(SockIOPool.java:669)
+	at com.meetup.memcached.SockIOPool.initialize(SockIOPool.java:632)
+	at cc.chinagps.gateway.memcache.MemcacheManager.<clinit>(MemcacheManager.java:44)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.<init>(MemcacheUpdator.java:27)
+	at cc.chinagps.gateway.StartServer.start(StartServer.java:120)
+	at cc.chinagps.gateway.StartServer.main(StartServer.java:175)
+2017-08-14 14:35:33 - ++++ failed to create connection to: 218.17.3.226:1211 -- only 0 created.
+2017-08-14 14:36:36 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 14:36:36 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.getConnection(SockIOPool.java:1049)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1988)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1878)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1864)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.updateGatewayStatus(MemcacheUpdator.java:136)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.access$5(MemcacheUpdator.java:131)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator$UpdateGatewayStatusThread.run(MemcacheUpdator.java:123)
+2017-08-14 14:36:36 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 14:53:42 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 14:53:42 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.populateBuckets(SockIOPool.java:669)
+	at com.meetup.memcached.SockIOPool.initialize(SockIOPool.java:632)
+	at cc.chinagps.gateway.memcache.MemcacheManager.<clinit>(MemcacheManager.java:44)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.<init>(MemcacheUpdator.java:27)
+	at cc.chinagps.gateway.StartServer.start(StartServer.java:120)
+	at cc.chinagps.gateway.StartServer.main(StartServer.java:175)
+2017-08-14 14:53:42 - ++++ failed to create connection to: 218.17.3.226:1211 -- only 0 created.
+2017-08-14 14:54:45 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 14:54:45 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.getConnection(SockIOPool.java:1049)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1988)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1878)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1864)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.updateGatewayStatus(MemcacheUpdator.java:136)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.access$5(MemcacheUpdator.java:131)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator$UpdateGatewayStatusThread.run(MemcacheUpdator.java:123)
+2017-08-14 14:54:45 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 14:55:48 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 14:55:48 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.getConnection(SockIOPool.java:1049)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1988)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1878)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1864)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.updateGatewayStatus(MemcacheUpdator.java:136)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.access$5(MemcacheUpdator.java:131)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator$UpdateGatewayStatusThread.run(MemcacheUpdator.java:123)
+2017-08-14 14:55:48 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 14:56:51 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 14:56:51 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.getConnection(SockIOPool.java:1049)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1988)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1878)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1864)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.updateGatewayStatus(MemcacheUpdator.java:136)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.access$5(MemcacheUpdator.java:131)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator$UpdateGatewayStatusThread.run(MemcacheUpdator.java:123)
+2017-08-14 14:56:51 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 14:57:54 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 14:57:54 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.getConnection(SockIOPool.java:1049)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1988)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1878)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1864)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.updateGatewayStatus(MemcacheUpdator.java:136)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.access$5(MemcacheUpdator.java:131)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator$UpdateGatewayStatusThread.run(MemcacheUpdator.java:123)
+2017-08-14 14:57:54 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 14:58:57 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 14:58:57 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.getConnection(SockIOPool.java:1049)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1988)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1878)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1864)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.updateGatewayStatus(MemcacheUpdator.java:136)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.access$5(MemcacheUpdator.java:131)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator$UpdateGatewayStatusThread.run(MemcacheUpdator.java:123)
+2017-08-14 14:58:57 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 15:00:00 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 15:00:00 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.getConnection(SockIOPool.java:1049)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1988)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1878)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1864)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.updateGatewayStatus(MemcacheUpdator.java:136)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.access$5(MemcacheUpdator.java:131)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator$UpdateGatewayStatusThread.run(MemcacheUpdator.java:123)
+2017-08-14 15:00:00 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 15:01:00 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 15:02:03 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 15:02:03 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.getConnection(SockIOPool.java:1049)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1988)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1878)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1864)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.updateGatewayStatus(MemcacheUpdator.java:136)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.access$5(MemcacheUpdator.java:131)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator$UpdateGatewayStatusThread.run(MemcacheUpdator.java:123)
+2017-08-14 15:02:03 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 15:03:03 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 15:04:03 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 15:05:06 - ++++ failed to get SockIO obj for: 218.17.3.226:1211
+2017-08-14 15:05:06 - 
+java.net.SocketTimeoutException
+	at sun.nio.ch.SocketAdaptor.connect(SocketAdaptor.java:126)
+	at com.meetup.memcached.SockIOPool$SockIO.getSocket(SockIOPool.java:1610)
+	at com.meetup.memcached.SockIOPool$SockIO.<init>(SockIOPool.java:1583)
+	at com.meetup.memcached.SockIOPool.createSocket(SockIOPool.java:780)
+	at com.meetup.memcached.SockIOPool.getConnection(SockIOPool.java:1049)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1988)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1878)
+	at com.meetup.memcached.MemcachedClient.stats(MemcachedClient.java:1864)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.updateGatewayStatus(MemcacheUpdator.java:136)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator.access$5(MemcacheUpdator.java:131)
+	at cc.chinagps.gateway.memcache.MemcacheUpdator$UpdateGatewayStatusThread.run(MemcacheUpdator.java:123)
+2017-08-14 15:05:06 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 15:06:06 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 15:07:06 - ++++ unable to get connection to : 218.17.3.226:1211
+2017-08-14 15:08:06 - ++++ unable to get connection to : 218.17.3.226:1211

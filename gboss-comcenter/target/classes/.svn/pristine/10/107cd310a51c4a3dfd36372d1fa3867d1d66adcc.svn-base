@@ -1,0 +1,14 @@
+##如有多个用,分隔
+servers=90.0.13.113\:17021
+
+##连接池设定
+failover=true
+initConn=5
+minConn=5
+maxConn=20
+nagle=false
+socketTO=30000
+aliveCheck=true
+
+##更新设定(车台呼号-网关编号 路由)
+routing_key_head=routing:

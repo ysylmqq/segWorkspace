@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.DicSupperierMapper"> 
+
+<!-- 用memcached做二级缓存 
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+-->
+    <resultMap type="DicSupperierPOJO" id="dicSupperierMap">  
+        <id property="supperierSn" column="supperier_sn" jdbcType="VARCHAR"/>
+        <result property="supperierName" column="supperier_name" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="INTEGER"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+    </resultMap>
+	
+	<select id="getList" parameterType="map" resultMap="dicSupperierMap">
+		select supperier_sn, supperier_name, is_valid, stamp from t_dic_supperier ds
+		<where>
+		  <if test="@Ognl@isNotBlank(isValid)">
+		    and ds.is_valid=#{isValid}
+		  </if>
+		  
+		   <if test="@Ognl@isNotBlank(supperierSn)">
+		      and ds.supperier_Sn=#{supperierSn}
+		   </if>
+		</where>
+	</select>
+	
+	<sql id="getByPageCondition">
+		<where>
+			<if test="@Ognl@isNotBlank(supperier)">
+				
+				<if test="@Ognl@isNotBlank(supperier.supperierSn)">
+					AND ds.supperier_sn LIKE '%'||#{supperier.supperierSn}||'%'
+				</if>
+				
+				<if test="@Ognl@isNotBlank(supperier.supperierName)">
+					AND ds.supperier_name LIKE '%'||#{supperier.supperierName}||'%'
+				</if>
+				
+			</if>
+		</where>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="getByPage" parameterType="map" resultMap="dicSupperierMap">
+		select ds.* from t_dic_supperier ds
+		<include refid="getByPageCondition"/>  
+		ORDER BY ds.stamp desc 
+	</select>
+	
+	<select id="countAll" parameterType="map" resultType="Integer">
+		select count(ds.supperier_sn) from t_dic_supperier ds
+			<include refid="getByPageCondition"/> 
+	</select> 
+	
+	<select id="get" parameterType="DicSupperierPOJO" resultMap="dicSupperierMap">
+		SELECT sp.* FROM t_dic_supperier sp WHERE sp.supperier_sn=#{supperierSn} 
+	</select>
+	
+	<delete id="remove" parameterType="DicSupperierPOJO" >
+			delete t_dic_supperier
+ 			where supperier_sn =#{supperierSn}
+	</delete>
+	
+	<insert id="add" parameterType="DicSupperierPOJO">
+		INSERT INTO t_dic_supperier
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+		 	<if test="@Ognl@isNotBlank(supperierSn)">supperier_sn,</if>
+		 	<if test="@Ognl@isNotBlank(supperierName)">supperier_name,</if>
+		 	<if test="@Ognl@isNotBlank(isValid)">is_Valid,</if>
+            stamp
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	<if test="@Ognl@isNotBlank(supperierSn)">#{supperierSn},</if>
+		 	<if test="@Ognl@isNotBlank(supperierName)">#{supperierName},</if>
+		 	<if test="@Ognl@isNotBlank(isValid)">#{isValid},</if>
+            sysdate
+		 </trim>
+ 	</insert>
+ 
+	<update id="edit" parameterType="DicSupperierPOJO">
+		UPDATE t_dic_supperier 
+		SET 
+    	<trim suffixOverrides=",">
+    		STAMP=sysdate, 
+		 	<if test="@Ognl@isNotBlank(supperierSn)">supperier_sn=#{supperierSn},</if>
+		 	<if test="@Ognl@isNotBlank(supperierName)">supperier_name=#{supperierName},</if>
+		 	<if test="@Ognl@isNotBlank(isValid)">is_Valid=#{isValid},</if>
+      	</trim>
+ 		WHERE supperier_sn=#{supperierSn,jdbcType=VARCHAR}
+	</update>
+</mapper>  

@@ -1,0 +1,62 @@
+package cc.chinagps.seat.controller;
+
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import cc.chinagps.seat.auth.User;
+import cc.chinagps.seat.bean.table.BriefTable;
+import cc.chinagps.seat.service.TelService;
+
+import com.googlecode.jsonplugin.JSONException;
+import com.googlecode.jsonplugin.JSONUtil;
+
+@Controller
+@RequestMapping("/tel")
+public class TelController extends BasicController {
+	
+	//@Autowired
+	private TelService telService;
+	
+	@RequestMapping("/briefs")
+	@ResponseBody
+	public String getBriefList(
+				@RequestParam("vehicleId") BigInteger vehicleId,
+				@RequestParam("phoneNo") String phoneNo,
+				@RequestParam("count") int count,
+				HttpServletRequest request) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		if(vehicleId==null){
+			vehicleId = new BigInteger("0");
+		}
+		List<BriefTable> briefList = telService.getBriefList(vehicleId,phoneNo,count);
+		resultMap.put("success", true);
+		resultMap.put("info", briefList);
+		return JSONUtil.serialize(resultMap);
+	}
+
+	@RequestMapping("/briefs/add")
+	@ResponseBody
+	public String saveBrief(BriefTable table,
+			HttpServletRequest request,
+			Locale locale) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		User user = getLoginUser(request);
+		table.setVehicle_id(new BigInteger(request.getParameter("vehicle_id")));
+		table.setOp_id(user.getOpId().intValue());
+		table.setOp_name(user.getOpName());
+		resultMap.put("success", true);
+		resultMap.put("id", telService.saveBrief(table));
+		return JSONUtil.serialize(resultMap);
+	}
+}

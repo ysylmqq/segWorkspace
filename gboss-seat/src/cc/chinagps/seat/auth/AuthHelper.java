@@ -1,0 +1,191 @@
+package cc.chinagps.seat.auth;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+
+
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+
+import cc.chinagps.seat.springutil.SpringContextHolder;
+import cc.chinagps.seat.util.CipherTool;
+import cc.chinagps.seat.util.Consts;
+import cc.chinagps.seat.util.HttpClientUtil;
+import cc.chinagps.seat.util.MyJSONPopulator;
+
+import com.googlecode.jsonplugin.JSONPopulator;
+import com.googlecode.jsonplugin.JSONUtil;
+
+public final class AuthHelper {
+	
+	private static final Logger LOGGER = Logger.getLogger(AuthHelper.class);
+	
+	private static final String HOST = Consts.AUTH_HOST;
+	
+	private static final String URL_COMPANYLIST = 
+			"http://" + HOST + "/ris/companyList";
+	private static final String URL_GETOPER = 
+			"http://" + HOST + "/ris/getOperator";
+	private static final String URL_VERIFYOPER = 
+			"http://" + HOST + "/ris/verifyOperator";
+	private static final String URL_GETORG = 
+			"http://" + HOST + "/ris/getOrgByid";
+	private static final String URL_GETOPERLIST = 
+			"http://" + HOST + "/ris/operatorList";
+	
+	/**
+	 * 获得有权限的公司ID列表
+	 * @param loginName
+	 * @return
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static List<CompanyInfo> getCompanyList(String loginName) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("loginname", loginName);
+        Map<String, Object> response = getResponseFromRequest(
+				URL_COMPANYLIST, params);
+		if (response != null && response.get("success") != null 
+				&& (Boolean)response.get("success")) {
+			List<Map> list = (List<Map>) response.get("datas");
+			List<CompanyInfo> companyList = 
+					new ArrayList<CompanyInfo>(list.size());
+			JSONPopulator pop = new MyJSONPopulator();
+			for (Map map : list) {
+				CompanyInfo company = new CompanyInfo();
+				try {
+					pop.populateObject(company, map);
+					companyList.add(company);
+				} catch (Exception e) {
+					LOGGER.error("", e);
+				}
+			}
+			return companyList;
+		}
+		return new ArrayList<CompanyInfo>();
+	}
+	
+	/**
+	 * 根据登录名获取用户
+	 * @param loginName
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public static User getUser(String loginName) throws NoSuchUserException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("loginname", loginName);
+		Map<String, Object> response = getResponseFromRequest(
+				URL_GETOPER, params);
+		if (response != null && response.get("success") != null 
+				&& (Boolean)response.get("success")) {
+			User user = new User();
+			JSONPopulator pop = new MyJSONPopulator();
+			try {
+				Map dataMap = (Map) response.get("datas");
+				pop.populateObject(user, dataMap);
+				return user;
+			} catch (Exception e) {
+				LOGGER.error("", e);
+				throw new NoSuchUserException(e);
+			}
+		} else if (response != null) {
+			throw new NoSuchUserException((String) response.get("errorMsg"));
+		} else {
+			throw new NoSuchUserException("Response is null!");
+		}
+	}
+	
+	/**
+	 * 验证登录名 密码是否正确
+	 * @param loginName
+	 * @param password
+	 * @return
+	 */
+	public static boolean isUserValid(String loginName, String password) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("loginname", loginName);
+		params.put("userPassword", password);
+		Map<String, Object> response = getResponseFromRequest(
+				URL_VERIFYOPER, params);
+		return response != null && (Boolean)response.get("success");
+	}
+	
+	private static Map<String, Object> getResponseFromRequest(String uri, 
+			Map<String, Object> params) {
+		HttpPost post = new HttpPost(uri); // "http://auth.host=192.110.10.218:1818/ris/verifyOperator";
+		
+		try {
+//			List<NameValuePair> params1 = new ArrayList<NameValuePair>();
+//			for (Entry<String, Object> entry : params.entrySet()) {
+//				params1.add(new BasicNameValuePair(entry.getKey(), entry.getValue().toString()));
+//			}
+//			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params1);
+			StringEntity entity = new StringEntity(
+					CipherTool.getCipherString(JSONUtil.serialize(params)),
+					ContentType.create("text/plain", "UTF-8"));
+			post.setEntity(entity);
+			return HttpClientUtil.execute(post);
+		} catch (Exception e) {
+			LOGGER.error("", e);
+		} 
+		
+		return new HashMap<String, Object>();
+	}
+	
+	public static Organization getOrg(BigInteger s4Id) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("companyno", s4Id);
+		Map<String, Object> response = getResponseFromRequest(URL_GETORG, params);
+		
+		Organization org = null;
+		if (response != null && response.get("success") != null 
+				&& (Boolean)response.get("success")) {
+			org = new Organization();
+			JSONPopulator pop = new MyJSONPopulator();
+			try {
+				@SuppressWarnings("rawtypes")
+				Map dataMap = (Map) response.get("datas");
+				pop.populateObject(org, dataMap);
+			} catch (Exception e) {
+				LOGGER.error("", e);
+			}
+		}
+		
+		return org;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static List<User> getOperatorList() {
+		List<User> userList = new ArrayList<User>();
+		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> response = getResponseFromRequest(
+				URL_GETOPERLIST, params);
+		if (response != null && response.get("success") != null 
+				&& (Boolean)response.get("success")) {
+			JSONPopulator pop = new MyJSONPopulator();
+			try {
+				List dataList = (List) response.get("datas");
+				for (Object data : dataList) {
+					User user = new User();
+					pop.populateObject(user, (Map) data);
+					userList.add(user);
+				}
+			} catch (Exception e) {
+				LOGGER.error("", e);
+			}
+		}
+		return userList;	
+	}
+}

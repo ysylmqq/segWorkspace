@@ -1,0 +1,1299 @@
+package cc.chinagps.gateway.mq.export;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.jms.BytesMessage;
+import javax.jms.Connection;
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.Topic;
+
+import org.apache.log4j.Logger;
+
+import cc.chinagps.gateway.StartServer;
+import cc.chinagps.gateway.buff.CommandBuff;
+import cc.chinagps.gateway.buff.CommandBuff.CommandResponse;
+import cc.chinagps.gateway.buff.CommandBuff.MultCommandResponse;
+import cc.chinagps.gateway.buff.CommandBuff.MultSendCommandResult;
+import cc.chinagps.gateway.buff.CommandBuff.SendCommandResult;
+import cc.chinagps.gateway.buff.DeliverBuff.DeliverAlarm;
+import cc.chinagps.gateway.buff.DeliverBuff.DeliverECUConfig;
+import cc.chinagps.gateway.buff.DeliverBuff.DeliverFault;
+import cc.chinagps.gateway.buff.DeliverBuff.DeliverGPS;
+import cc.chinagps.gateway.buff.DeliverBuff.DeliverOBD;
+import cc.chinagps.gateway.buff.DeliverBuff.DeliverOperateData;
+import cc.chinagps.gateway.buff.DeliverBuff.DeliverSMS;
+import cc.chinagps.gateway.buff.DeliverBuff.DeliverTravel;
+import cc.chinagps.gateway.buff.DeliverBuff.DeliverUnitLoginOut;
+import cc.chinagps.gateway.buff.DeliverBuff.DeliverUnitVersion;
+import cc.chinagps.gateway.buff.DeliverBuff.MultDeliverAlarm;
+import cc.chinagps.gateway.buff.DeliverBuff.MultDeliverECUConfig;
+import cc.chinagps.gateway.buff.DeliverBuff.MultDeliverFault;
+import cc.chinagps.gateway.buff.DeliverBuff.MultDeliverGPS;
+import cc.chinagps.gateway.buff.DeliverBuff.MultDeliverOBD;
+import cc.chinagps.gateway.buff.DeliverBuff.MultDeliverOperateData;
+import cc.chinagps.gateway.buff.DeliverBuff.MultDeliverSMS;
+import cc.chinagps.gateway.buff.DeliverBuff.MultDeliverTravel;
+import cc.chinagps.gateway.buff.DeliverBuff.MultDeliverUnitLoginOut;
+import cc.chinagps.gateway.buff.DeliverBuff.MultDeliverUnitVersion;
+import cc.chinagps.gateway.buff.GBossDataBuff;
+import cc.chinagps.gateway.buff.GBossDataBuff.AlarmInfo;
+import cc.chinagps.gateway.buff.GBossDataBuff.ECUConfig;
+import cc.chinagps.gateway.buff.GBossDataBuff.FaultInfo;
+import cc.chinagps.gateway.buff.GBossDataBuff.GpsInfo;
+import cc.chinagps.gateway.buff.GBossDataBuff.OBDInfo;
+import cc.chinagps.gateway.buff.GBossDataBuff.OperateData;
+import cc.chinagps.gateway.buff.GBossDataBuff.ShortMessage.Builder;
+import cc.chinagps.gateway.buff.GBossDataBuff.TravelInfo;
+import cc.chinagps.gateway.buff.GBossDataBuff.UnitVersion;
+import cc.chinagps.gateway.log.LogManager;
+import cc.chinagps.gateway.mq.MQManager;
+import cc.chinagps.gateway.unit.beans.Loginout;
+import cc.chinagps.gateway.util.Constants;
+import cc.chinagps.gateway.util.SystemConfig;
+
+public class ExportMQMult implements ExportMQInf{
+	private Logger logger_debug = Logger.getLogger(LogManager.LOGGER_NAME_DEBUG);
+	private boolean enabled = true;
+	
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+	
+	private Object dataLock = new Object();
+	
+	private List<DeliverGPS> listGPS = new ArrayList<DeliverGPS>();
+	private List<DeliverAlarm> listAlarm = new ArrayList<DeliverAlarm>();
+	private List<DeliverUnitLoginOut> listLoginout = new ArrayList<DeliverUnitLoginOut>();
+	
+	private List<SendCommandResult> listSendCommandResult = new ArrayList<SendCommandResult>();
+	private List<CommandResponse> listCommandResponse = new ArrayList<CommandResponse>();
+	
+	private List<DeliverOperateData> listOperateData = new ArrayList<DeliverOperateData>();
+	private List<DeliverSMS> listSMS = new ArrayList<DeliverSMS>();
+	private List<DeliverTravel> listTravel = new ArrayList<DeliverTravel>();
+	private List<DeliverFault> listFault = new ArrayList<DeliverFault>();
+	private List<DeliverOBD> listOBD = new ArrayList<DeliverOBD>();
+	private List<DeliverUnitVersion> listUnitVersion = new ArrayList<DeliverUnitVersion>();
+	
+	private List<DeliverECUConfig> listECUConfig = new ArrayList<DeliverECUConfig>();
+	
+	//写缓存最大长度
+	public static int MAX_CACHE_SIZE_WRITE = 50000;
+	
+	//压缩数据个数
+	public static int COMPRESS_SIZE = 50;
+	
+	private Session session;
+	private Map<String, Destination> queueMap = new HashMap<String, Destination>();
+	private Map<String, MessageProducer> producerMap = new HashMap<String, MessageProducer>();
+	
+	private long throwCount = 0;
+	
+	public long getThrowCount() {
+		return throwCount;
+	}
+	
+	public void init() throws JMSException{
+		
+		
+		MAX_CACHE_SIZE_WRITE = Integer.valueOf(SystemConfig.getMQProperty("max_cache_size_write"));
+		COMPRESS_SIZE = Integer.valueOf(SystemConfig.getMQProperty("compress_size"));
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		System.out.println("[" + sdf.format(new Date()) + "]init mq-export-mult start");
+		Connection connection = MQManager.openConnection();
+		connection.start();
+		
+		session = connection.createSession(true, Session.AUTO_ACKNOWLEDGE);
+		
+		addQueueOrTopic(MQManager.QUEUE_NAME_CMD, MQManager.QUEUE_TYPE_CMD, MQManager.QUEUE_MODE_CMD);
+		
+		addQueueOrTopic("cmd_sm", MQManager.QUEUE_TYPE_CMD, MQManager.QUEUE_MODE_CMD);
+		
+		addQueueOrTopic(MQManager.QUEUE_NAME_CMD_RESPONSE, MQManager.QUEUE_TYPE_CMD_RESPONSE, MQManager.QUEUE_MODE_CMD_RESPONSE);
+		addQueueOrTopic(MQManager.QUEUE_NAME_SEND_CMD_RESULT, MQManager.QUEUE_TYPE_SEND_CMD_RESULT, MQManager.QUEUE_MODE_SEND_CMD_RESULT);
+		addQueueOrTopic(MQManager.QUEUE_NAME_ALARM, MQManager.QUEUE_TYPE_ALARM, MQManager.QUEUE_MODE_ALARM);
+
+		addQueueOrTopic(MQManager.QUEUE_NAME_GPS, MQManager.QUEUE_TYPE_GPS, MQManager.QUEUE_MODE_GPS);
+		addQueueOrTopic(MQManager.QUEUE_NAME_SERVICE_DATA, MQManager.QUEUE_TYPE_SERVICE_DATA, MQManager.QUEUE_MODE_SERVICE_DATA);
+		addQueueOrTopic(MQManager.QUEUE_NAME_SHORT_MESSAGE, MQManager.QUEUE_TYPE_SHORT_MESSAGE, MQManager.QUEUE_MODE_SHORT_MESSAGE);
+		//OBD
+		addQueueOrTopic(MQManager.QUEUE_NAME_OBD, MQManager.QUEUE_TYPE_OBD, MQManager.QUEUE_MODE_OBD);		
+		addQueueOrTopic(MQManager.QUEUE_NAME_TRAVEL, MQManager.QUEUE_TYPE_TRAVEL, MQManager.QUEUE_MODE_TRAVEL);
+		addQueueOrTopic(MQManager.QUEUE_NAME_FAULT, MQManager.QUEUE_TYPE_FAULT, MQManager.QUEUE_MODE_FAULT);
+		//登录退录信息
+		addQueueOrTopic(MQManager.QUEUE_NAME_LOGINOUT, MQManager.QUEUE_TYPE_LOGINOUT, MQManager.QUEUE_MODE_LOGINOUT);
+		//车台软件版本
+		addQueueOrTopic(MQManager.QUEUE_NAME_UNIT_VERSION, MQManager.QUEUE_TYPE_UNIT_VERSION, MQManager.QUEUE_MODE_UNIT_VERSION);
+		//电控单元配置信息
+		addQueueOrTopic(MQManager.QUEUE_NAME_ECU_CONFIG, MQManager.QUEUE_TYPE_ECU_CONFIG, MQManager.QUEUE_MODE_ECU_CONFIG);
+		
+		System.out.println("[" + sdf.format(new Date()) + "]init mq-export-mult end");
+	}
+	
+	private void addQueueOrTopic(String name, int type, int mode) throws JMSException{
+		if(type == 1){
+			addQueue(name, mode);
+		}else{
+			addTopic(name, mode);
+		}
+	}
+	
+	private void addQueue(String queueName, int mode) throws JMSException{
+		Queue queue = session.createQueue(queueName);
+		addDestination(queue, queueName, mode);
+	}
+	
+	private void addTopic(String topicName, int mode) throws JMSException{
+		Topic topic = session.createTopic(topicName);
+		addDestination(topic, topicName, mode);
+	}
+	
+	private void addDestination(Destination destination, String queueName, int mode) throws JMSException{
+		MessageProducer producer = session.createProducer(destination);
+		if(mode == 1){
+			producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+		}else{
+			producer.setDeliveryMode(DeliveryMode.PERSISTENT);
+		}
+		
+		queueMap.put(queueName, destination);
+		producerMap.put(queueName, producer);
+	}
+	
+	public int getDataCount(){
+		return listGPS.size() + listAlarm.size() + listLoginout.size() 
+				+ listSendCommandResult.size() + listCommandResponse.size()
+				+ listOperateData.size() + listSMS.size() + listTravel.size()
+				+ listFault.size() + listOBD.size() + listUnitVersion.size()
+				+ listECUConfig.size();
+	}
+	
+	private boolean isFull(){
+		int total = getDataCount();
+		if(total > MAX_CACHE_SIZE_WRITE){
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public void addShortMessage(String callLetter, String message){
+		if(!enabled){
+			return;
+		}
+		
+		synchronized (dataLock) {
+			if(isFull()){
+				throwCount++;
+				return;
+			}
+			
+			Builder sm = GBossDataBuff.ShortMessage.newBuilder().setCallLetter(callLetter).setMsg(message);
+			sm.setRecvTime(System.currentTimeMillis());
+			cc.chinagps.gateway.buff.DeliverBuff.DeliverSMS.Builder builder = cc.chinagps.gateway.buff.DeliverBuff.DeliverSMS.newBuilder();
+			builder.setMsg(sm);
+			builder.setGatewayid(Constants.SYSTEM_ID_INT);
+			builder.setGatewaytype(0);
+			
+			listSMS.add(builder.build());
+			dataLock.notifyAll();
+		}
+	}
+	
+	public void addGPS(GpsInfo gpsInfo){
+		if(!enabled){
+			return;
+		}
+		
+		synchronized (dataLock) {
+			if(isFull()){
+				throwCount++;
+				return;
+			}
+			
+			cc.chinagps.gateway.buff.DeliverBuff.DeliverGPS.Builder builder = cc.chinagps.gateway.buff.DeliverBuff.DeliverGPS.newBuilder();
+			builder.setGpsinfo(gpsInfo);
+			builder.setGatewayid(Constants.SYSTEM_ID_INT);
+			builder.setGatewaytype(0);
+			
+			listGPS.add(builder.build());
+			dataLock.notifyAll();
+		}
+	}
+	
+//	public void addAlarm(AlarmInfo alarm){
+//		if(!enabled){
+//			return;
+//		}
+//		
+//		synchronized (dataLock) {
+//			if(isFull()){
+//				throwCount++;
+//				return;
+//			}
+//			
+//			cc.chinagps.gateway.buff.DeliverBuff.DeliverAlarm.Builder builder = cc.chinagps.gateway.buff.DeliverBuff.DeliverAlarm.newBuilder();
+//			builder.setAlarmInfo(alarm);
+//			builder.setGatewayid(Constants.SYSTEM_ID_INT);
+//			builder.setGatewaytype(0);
+//			
+//			listAlarm.add(builder.build());
+//			dataLock.notifyAll();
+//		}
+//	}
+	
+	public void addCommonAlarm(AlarmInfo alarm){
+		if(!enabled){
+			return;
+		}
+		
+		synchronized (dataLock) {
+			if(isFull()){
+				throwCount++;
+				return;
+			}
+			
+			cc.chinagps.gateway.buff.DeliverBuff.DeliverAlarm.Builder builder = cc.chinagps.gateway.buff.DeliverBuff.DeliverAlarm.newBuilder();
+			builder.setAlarmInfo(alarm);
+			builder.setGatewayid(Constants.SYSTEM_ID_INT);
+			builder.setGatewaytype(0);
+			
+			listAlarm.add(builder.build());
+			dataLock.notifyAll();
+		}
+	}
+	
+	public boolean addSpecialAlarm(AlarmInfo alarm){
+		if(!enabled){
+			return false;
+		}
+		
+		synchronized (dataLock) {
+			if(isFull()){
+				throwCount++;
+				return false;
+			}
+			
+			cc.chinagps.gateway.buff.DeliverBuff.DeliverAlarm.Builder builder = cc.chinagps.gateway.buff.DeliverBuff.DeliverAlarm.newBuilder();
+			builder.setAlarmInfo(alarm);
+			builder.setGatewayid(Constants.SYSTEM_ID_INT);
+			builder.setGatewaytype(0);
+			
+			listAlarm.add(builder.build());
+			dataLock.notifyAll();
+		}
+		
+		return true;
+	}
+	
+	public void addUnitLoginOut(Loginout loginout){
+		if(!enabled){
+			return;
+		}
+		
+		synchronized (dataLock) {
+			if(isFull()){
+				throwCount++;
+				return;
+			}
+			
+			cc.chinagps.gateway.buff.DeliverBuff.DeliverUnitLoginOut.Builder builder = cc.chinagps.gateway.buff.DeliverBuff.DeliverUnitLoginOut.newBuilder();
+			builder.setCallLetter(loginout.getCallLetter());
+			builder.setInorout(loginout.getIsLogin());
+			builder.setGatewayId(Constants.SYSTEM_ID_INT);
+			builder.setGatewayType(0);
+			if(loginout.getLoginTime() > 0){
+				builder.setLoginTime(loginout.getLoginTime());
+			}
+			
+			if(loginout.getLogoutTime() > 0){
+				builder.setLogoutTime(loginout.getLogoutTime());
+			}
+			
+			if(loginout.getUnitVersion() != null){
+				builder.setUnitVersion(loginout.getUnitVersion());
+			}
+			
+			builder.setUpdateGateway(Constants.IS_UPDATE_SERVER);
+			
+			listLoginout.add(builder.build());
+			dataLock.notifyAll();
+		}
+	}
+	
+	public void addSendCommandResult(SendCommandResult sendCommandResult){
+		if(!enabled){
+			return;
+		}
+		
+		synchronized (dataLock) {
+			if(isFull()){
+				throwCount++;
+				return;
+			}
+			
+			listSendCommandResult.add(sendCommandResult);
+			dataLock.notifyAll();
+		}
+	}
+	
+	public void addCommandResponse(CommandResponse commandResponse){
+		if(!enabled){
+			return;
+		}
+		
+		synchronized (dataLock) {
+			if(isFull()){
+				throwCount++;
+				return;
+			}
+			
+			listCommandResponse.add(commandResponse);
+			dataLock.notifyAll();
+		}
+	}
+	
+	public void addOperateData(OperateData operateData){
+		if(!enabled){
+			return;
+		}
+		
+		synchronized (dataLock) {
+			if(isFull()){
+				throwCount++;
+				return;
+			}
+			
+			cc.chinagps.gateway.buff.DeliverBuff.DeliverOperateData.Builder builder = cc.chinagps.gateway.buff.DeliverBuff.DeliverOperateData.newBuilder();
+			builder.setData(operateData);
+			builder.setGatewayid(Constants.SYSTEM_ID_INT);
+			builder.setGatewaytype(0);
+			listOperateData.add(builder.build());
+			dataLock.notifyAll();
+		}
+	}
+	
+	public void addOBDInfo(OBDInfo obdInfo){
+		if(!enabled){
+			return;
+		}
+		
+		synchronized (dataLock) {
+			if(isFull()){
+				throwCount++;
+				return;
+			}
+			
+			cc.chinagps.gateway.buff.DeliverBuff.DeliverOBD.Builder builder = cc.chinagps.gateway.buff.DeliverBuff.DeliverOBD.newBuilder();
+			builder.setObdinfo(obdInfo);
+			builder.setGatewayid(Constants.SYSTEM_ID_INT);
+			builder.setGatewaytype(0);
+			
+			listOBD.add(builder.build());
+			dataLock.notifyAll();
+		}
+	}
+	
+	public void addTravelInfo(TravelInfo value){
+		if(!enabled){
+			return;
+		}
+		
+		synchronized (dataLock) {
+			if(isFull()){
+				throwCount++;
+				return;
+			}
+			
+			cc.chinagps.gateway.buff.DeliverBuff.DeliverTravel.Builder builder = cc.chinagps.gateway.buff.DeliverBuff.DeliverTravel.newBuilder();
+			builder.setTravelinfo(value);
+			builder.setGatewayid(Constants.SYSTEM_ID_INT);
+			builder.setGatewaytype(0);
+			
+			listTravel.add(builder.build());
+			dataLock.notifyAll();
+		}
+	}
+	
+	public void addFaultInfo(FaultInfo value){
+		if(!enabled){
+			return;
+		}
+		
+		synchronized (dataLock) {
+			if(isFull()){
+				throwCount++;
+				return;
+			}
+			
+			cc.chinagps.gateway.buff.DeliverBuff.DeliverFault.Builder builder = cc.chinagps.gateway.buff.DeliverBuff.DeliverFault.newBuilder();
+			builder.setFaultinfo(value);
+			builder.setGatewayid(Constants.SYSTEM_ID_INT);
+			builder.setGatewaytype(0);
+			listFault.add(builder.build());
+			
+			dataLock.notifyAll();
+		}
+	}
+	
+	/**
+	 * 终端软件版本更新信息
+	 */
+	public void addUnitVersion(UnitVersion unitVersion){
+		if(!enabled){
+			return;
+		}
+		
+		synchronized (dataLock) {
+			if(isFull()){
+				throwCount++;
+				return;
+			}
+			
+			cc.chinagps.gateway.buff.DeliverBuff.DeliverUnitVersion.Builder builder = cc.chinagps.gateway.buff.DeliverBuff.DeliverUnitVersion.newBuilder();
+			builder.setUnitVersion(unitVersion);
+			builder.setGatewayid(Constants.SYSTEM_ID_INT);
+			builder.setGatewaytype(0);
+			
+			listUnitVersion.add(builder.build());
+			dataLock.notifyAll();
+		}
+	}
+	
+	/**
+	 * 上报电控单元配置
+	 */
+	public void addECUConfig(ECUConfig ecuConfig){
+		if(!enabled){
+			return;
+		}
+		
+		synchronized (dataLock) {
+			if(isFull()){
+				throwCount++;
+				return;
+			}
+			
+			cc.chinagps.gateway.buff.DeliverBuff.DeliverECUConfig.Builder builder = cc.chinagps.gateway.buff.DeliverBuff.DeliverECUConfig.newBuilder();
+			builder.setEcuConfig(ecuConfig);
+			builder.setGatewayid(Constants.SYSTEM_ID_INT);
+			builder.setGatewaytype(0);
+			
+			listECUConfig.add(builder.build());
+			dataLock.notifyAll();
+		}
+	}
+	
+	private boolean runflag = true;
+	
+	public class WriteWorker extends Thread{
+		//private List<MQItem> temp;
+		//private int writeIndex;
+		private int position;
+		
+		private long loop;
+
+		public long getLoop() {
+			return loop;
+		}
+
+		//public List<MQItem> getTemp() {
+		//	return temp;
+		//}
+
+		//public int getWriteIndex() {
+		//	return writeIndex;
+		//}
+		
+		public int getPosition() {
+			return position;
+		}
+		
+		@Override
+		public void run() {
+			while(runflag){
+				try{
+					//获取数据
+					List<DeliverGPS> tempGPS = null;
+					List<DeliverAlarm> tempAlarm = null;
+					List<DeliverUnitLoginOut> tempLoginout = null;
+					List<SendCommandResult> tempSendCommandResult = null;
+					List<CommandResponse> tempCommandResponse = null;
+					
+					List<DeliverOperateData> tempOperateData = null;
+					List<DeliverSMS> tempSMS = null;
+					List<DeliverTravel> tempTravel = null;
+					List<DeliverFault> tempFault = null;
+					List<DeliverOBD> tempOBD = null;
+					List<DeliverUnitVersion> tempUnitVersion = null;
+					
+					List<DeliverECUConfig> tempECUConfig = null;
+					
+					position = 1;
+					synchronized (dataLock) {
+						while(getDataCount() == 0){
+							try {
+								position = 2;
+								dataLock.wait();
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+						}
+						
+						loop ++;
+						
+						//1
+						if(listGPS.size() > 0){
+							tempGPS = listGPS;
+							listGPS = new ArrayList<DeliverGPS>();
+						}
+						
+						//2
+						if(listAlarm.size() > 0){
+							tempAlarm = listAlarm;
+							listAlarm = new ArrayList<DeliverAlarm>();
+						}
+						
+						//3
+						if(listLoginout.size() > 0){
+							tempLoginout = listLoginout;
+							listLoginout = new ArrayList<DeliverUnitLoginOut>();
+						}
+						
+						//4
+						if(listSendCommandResult.size() > 0){
+							tempSendCommandResult = listSendCommandResult;
+							listSendCommandResult = new ArrayList<SendCommandResult>();
+						}
+						
+						//5
+						if(listCommandResponse.size() > 0){
+							tempCommandResponse = listCommandResponse;
+							listCommandResponse = new ArrayList<CommandResponse>();
+						}
+						
+						//6					
+						if(listOperateData.size() > 0){
+							tempOperateData = listOperateData;
+							listOperateData = new ArrayList<DeliverOperateData>();
+						}
+						
+						//7
+						if(listSMS.size() > 0){
+							tempSMS = listSMS;
+							listSMS = new ArrayList<DeliverSMS>();
+						}
+						
+						//8
+						if(listTravel.size() > 0){
+							tempTravel = listTravel;
+							listTravel = new ArrayList<DeliverTravel>();
+						}
+						
+						//9
+						if(listFault.size() > 0){
+							tempFault = listFault;
+							listFault = new ArrayList<DeliverFault>();
+						}
+						
+						//10
+						if(listOBD.size() > 0){
+							tempOBD = listOBD;
+							listOBD = new ArrayList<DeliverOBD>();
+						}
+						
+						//11
+						if(listUnitVersion.size() > 0){
+							tempUnitVersion = listUnitVersion;
+							listUnitVersion = new ArrayList<DeliverUnitVersion>();
+						}
+						
+						//12
+						if(listECUConfig.size() > 0){
+							tempECUConfig = listECUConfig;
+							listECUConfig = new ArrayList<DeliverECUConfig>();
+						}
+						
+						dataLock.notifyAll();
+					}
+					
+					position = 3;
+					//发送数据
+					//1
+					if(tempGPS != null){
+						writeGPS(tempGPS);
+					}
+					
+					//2
+					if(tempAlarm != null){
+						writeAlarm(tempAlarm);
+					}
+					
+					//3
+					if(tempLoginout != null){
+						writeLoginout(tempLoginout);
+					}
+					
+					//4
+					if(tempSendCommandResult != null){
+						writeSendCommandResult(tempSendCommandResult);
+					}
+					
+					//5
+					if(tempCommandResponse != null){
+						writeCommandResponse(tempCommandResponse);
+					}
+					
+					//6
+					if(tempOperateData != null){
+						writeOperateData(tempOperateData);
+					}
+					
+					//7
+					if(tempSMS != null){
+						writeSMS(tempSMS);
+					}
+					
+					//8
+					if(tempTravel != null){
+						writeTravel(tempTravel);
+					}
+					
+					//9
+					if(tempFault != null){
+						writeFault(tempFault);
+					}
+					
+					//10
+					if(tempOBD != null){
+						writeOBD(tempOBD);
+					}
+					
+					//11
+					if(tempUnitVersion != null){
+						writeUnitVersion(tempUnitVersion);
+					}
+					
+					//12
+					if(tempECUConfig != null){
+						writeECUConfig(tempECUConfig);
+					}
+					
+					position = 4;
+				}catch (Throwable e) {
+					StartServer.instance.getUnitServer().exceptionCaught(e);
+				}
+			}
+		}
+	}
+	private long gpsCount = 0l;
+	//1
+	private void writeGPS(List<DeliverGPS> list) throws JMSException{
+		int compressCount = 0;
+		//new dgps
+		MultDeliverGPS.Builder last = MultDeliverGPS.newBuilder();
+		for(int i = 0; i < list.size(); i++){
+			//append
+			last.addMdeliverGPS(list.get(i));
+			compressCount++;
+			
+			if(compressCount >= COMPRESS_SIZE){
+				//commit
+				MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_GPS);
+				BytesMessage msg = session.createBytesMessage();
+				msg.writeBytes(last.build().toByteArray());
+				producer.send(msg);
+				session.commit();
+				gpsCount +=compressCount;
+				compressCount = 0;				
+				if(i != (list.size() - 1)){
+					//new dgps
+					last = MultDeliverGPS.newBuilder();
+				}
+			}
+		}
+		
+		if(compressCount > 0){
+			MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_GPS);
+			BytesMessage msg = session.createBytesMessage();
+			msg.writeBytes(last.build().toByteArray());
+			producer.send(msg);
+			session.commit();
+			gpsCount +=compressCount;
+			compressCount = 0;
+		}
+		
+	}
+	
+	private class PrintThread implements Runnable {
+		public void run() {
+			while (true) {
+				logger_others.info("[MQ]commit gps total count:"+gpsCount);
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	//2
+	private void writeAlarm(List<DeliverAlarm> list) throws JMSException{
+		int compressCount = 0;
+		//new dgps
+		MultDeliverAlarm.Builder last = MultDeliverAlarm.newBuilder();
+		for(int i = 0; i < list.size(); i++){
+			//append
+			last.addMdeliverAlarm(list.get(i));
+			compressCount++;
+			
+			if(compressCount >= COMPRESS_SIZE){
+				//commit
+				MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_ALARM);
+				BytesMessage msg = session.createBytesMessage();
+				msg.writeBytes(last.build().toByteArray());
+				producer.send(msg);
+				session.commit();
+				
+				compressCount = 0;
+				
+				if(i != (list.size() - 1)){
+					//new dgps
+					last = MultDeliverAlarm.newBuilder();
+				}
+			}
+		}
+		
+		if(compressCount > 0){
+			MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_ALARM);
+			BytesMessage msg = session.createBytesMessage();
+			msg.writeBytes(last.build().toByteArray());
+			producer.send(msg);
+			session.commit();
+			
+			compressCount = 0;
+		}
+	}
+	
+	//3
+	private void writeLoginout(List<DeliverUnitLoginOut> list) throws JMSException{
+		int compressCount = 0;
+		//new dgps
+		MultDeliverUnitLoginOut.Builder last = MultDeliverUnitLoginOut.newBuilder();
+		for(int i = 0; i < list.size(); i++){
+			//append
+			last.addMdeliverUnitLoginOut(list.get(i));
+			compressCount++;
+			
+			if(compressCount >= COMPRESS_SIZE){
+				//commit
+				MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_LOGINOUT);
+				BytesMessage msg = session.createBytesMessage();
+				msg.writeBytes(last.build().toByteArray());
+				producer.send(msg);
+				session.commit();
+				
+				compressCount = 0;
+				
+				if(i != (list.size() - 1)){
+					//new dgps
+					last = MultDeliverUnitLoginOut.newBuilder();
+				}
+			}
+		}
+		
+		if(compressCount > 0){
+			MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_LOGINOUT);
+			BytesMessage msg = session.createBytesMessage();
+			msg.writeBytes(last.build().toByteArray());
+			producer.send(msg);
+			session.commit();
+			
+			compressCount = 0;
+		}
+	}
+	
+	//4
+	private void writeSendCommandResult(List<SendCommandResult> list) throws JMSException{
+		int compressCount = 0;
+		//new dgps
+		MultSendCommandResult.Builder last = MultSendCommandResult.newBuilder();
+		for(int i = 0; i < list.size(); i++){
+			//append
+			last.addMsendCommandResult(list.get(i));
+			compressCount++;
+			
+			if(compressCount >= COMPRESS_SIZE){
+				//commit
+				MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_SEND_CMD_RESULT);
+				BytesMessage msg = session.createBytesMessage();
+				msg.writeBytes(last.build().toByteArray());
+				producer.send(msg);
+				session.commit();
+				
+				compressCount = 0;
+				
+				if(i != (list.size() - 1)){
+					//new dgps
+					last = MultSendCommandResult.newBuilder();
+				}
+			}
+		}
+		
+		if(compressCount > 0){
+			MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_SEND_CMD_RESULT);
+			BytesMessage msg = session.createBytesMessage();
+			msg.writeBytes(last.build().toByteArray());
+			producer.send(msg);
+			session.commit();
+			
+			compressCount = 0;
+		}
+	}
+	
+	//5
+	private void writeCommandResponse(List<CommandResponse> list) throws JMSException{
+		int compressCount = 0;
+		//new dgps
+		MultCommandResponse.Builder last = MultCommandResponse.newBuilder();
+		for(int i = 0; i < list.size(); i++){
+			//append
+			last.addMcommandResponse(list.get(i));
+			compressCount++;
+			
+			if(compressCount >= COMPRESS_SIZE){
+				//commit
+				MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_CMD_RESPONSE);
+				BytesMessage msg = session.createBytesMessage();
+				msg.writeBytes(last.build().toByteArray());
+				producer.send(msg);
+				session.commit();
+				
+				compressCount = 0;
+				
+				if(i != (list.size() - 1)){
+					//new dgps
+					last = MultCommandResponse.newBuilder();
+				}
+			}
+		}
+		
+		if(compressCount > 0){
+			MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_CMD_RESPONSE);
+			BytesMessage msg = session.createBytesMessage();
+			msg.writeBytes(last.build().toByteArray());
+			producer.send(msg);
+			session.commit();
+			
+			compressCount = 0;
+		}
+	}
+	
+	//6
+	private void writeOperateData(List<DeliverOperateData> list) throws JMSException{
+		int compressCount = 0;
+		//new dgps
+		MultDeliverOperateData.Builder last = MultDeliverOperateData.newBuilder();
+		for(int i = 0; i < list.size(); i++){
+			//append
+			last.addMdeliverOperateData(list.get(i));
+			compressCount++;
+			
+			if(compressCount >= COMPRESS_SIZE){
+				//commit
+				MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_SERVICE_DATA);
+				BytesMessage msg = session.createBytesMessage();
+				msg.writeBytes(last.build().toByteArray());
+				producer.send(msg);
+				session.commit();
+				
+				compressCount = 0;
+				
+				if(i != (list.size() - 1)){
+					//new dgps
+					last = MultDeliverOperateData.newBuilder();
+				}
+			}
+		}
+		
+		if(compressCount > 0){
+			MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_SERVICE_DATA);
+			BytesMessage msg = session.createBytesMessage();
+			msg.writeBytes(last.build().toByteArray());
+			producer.send(msg);
+			session.commit();
+			
+			compressCount = 0;
+		}
+	}
+	
+	//7
+	private void writeSMS(List<DeliverSMS> list) throws JMSException{
+		int compressCount = 0;
+		//new dgps
+		MultDeliverSMS.Builder last = MultDeliverSMS.newBuilder();
+		for(int i = 0; i < list.size(); i++){
+			//append
+			last.addMdeliverSMS(list.get(i));
+			compressCount++;
+			
+			if(compressCount >= COMPRESS_SIZE){
+				//commit
+				MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_SHORT_MESSAGE);
+				BytesMessage msg = session.createBytesMessage();
+				msg.writeBytes(last.build().toByteArray());
+				producer.send(msg);
+				session.commit();
+				
+				compressCount = 0;
+				
+				if(i != (list.size() - 1)){
+					//new dgps
+					last = MultDeliverSMS.newBuilder();
+				}
+			}
+		}
+		
+		if(compressCount > 0){
+			MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_SHORT_MESSAGE);
+			BytesMessage msg = session.createBytesMessage();
+			msg.writeBytes(last.build().toByteArray());
+			producer.send(msg);
+			session.commit();
+			
+			compressCount = 0;
+		}
+	}
+	
+	//8
+	private void writeTravel(List<DeliverTravel> list) throws JMSException{
+		int compressCount = 0;
+		//new dgps
+		MultDeliverTravel.Builder last = MultDeliverTravel.newBuilder();
+		for(int i = 0; i < list.size(); i++){
+			//append
+			last.addMdeliverTravel(list.get(i));
+			compressCount++;
+			
+			if(compressCount >= COMPRESS_SIZE){
+				//commit
+				MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_TRAVEL);
+				BytesMessage msg = session.createBytesMessage();
+				msg.writeBytes(last.build().toByteArray());
+				producer.send(msg);
+				session.commit();
+				
+				compressCount = 0;
+				
+				if(i != (list.size() - 1)){
+					//new dgps
+					last = MultDeliverTravel.newBuilder();
+				}
+			}
+		}
+		
+		if(compressCount > 0){
+			MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_TRAVEL);
+			BytesMessage msg = session.createBytesMessage();
+			msg.writeBytes(last.build().toByteArray());
+			producer.send(msg);
+			session.commit();
+			
+			compressCount = 0;
+		}
+	}
+	
+	//9
+	private void writeFault(List<DeliverFault> list) throws JMSException{
+		int compressCount = 0;
+		//new dgps
+		MultDeliverFault.Builder last = MultDeliverFault.newBuilder();
+		for(int i = 0; i < list.size(); i++){
+			//append
+			last.addMdeliverFault(list.get(i));
+			compressCount++;
+			
+			if(compressCount >= COMPRESS_SIZE){
+				//commit
+				MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_FAULT);
+				BytesMessage msg = session.createBytesMessage();
+				msg.writeBytes(last.build().toByteArray());
+				producer.send(msg);
+				session.commit();
+				
+				compressCount = 0;
+				
+				if(i != (list.size() - 1)){
+					//new dgps
+					last = MultDeliverFault.newBuilder();
+				}
+			}
+		}
+		
+		if(compressCount > 0){
+			MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_FAULT);
+			BytesMessage msg = session.createBytesMessage();
+			msg.writeBytes(last.build().toByteArray());
+			producer.send(msg);
+			session.commit();
+			
+			compressCount = 0;
+		}
+	}
+	
+	//10
+	private void writeOBD(List<DeliverOBD> list) throws JMSException{
+		int compressCount = 0;
+		//new dgps
+		MultDeliverOBD.Builder last = MultDeliverOBD.newBuilder();
+		for(int i = 0; i < list.size(); i++){
+			//append
+			last.addMdeliverOBD(list.get(i));
+			compressCount++;
+			
+			if(compressCount >= COMPRESS_SIZE){
+				//commit
+				MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_OBD);
+				BytesMessage msg = session.createBytesMessage();
+				msg.writeBytes(last.build().toByteArray());
+				producer.send(msg);
+				session.commit();
+				
+				compressCount = 0;
+				
+				if(i != (list.size() - 1)){
+					//new dgps
+					last = MultDeliverOBD.newBuilder();
+				}
+			}
+		}
+		
+		if(compressCount > 0){
+			MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_OBD);
+			BytesMessage msg = session.createBytesMessage();
+			msg.writeBytes(last.build().toByteArray());
+			producer.send(msg);
+			session.commit();
+			
+			compressCount = 0;
+		}
+	}
+	
+	//11
+	private void writeUnitVersion(List<DeliverUnitVersion> list) throws JMSException{
+		int compressCount = 0;
+		//new dgps
+		MultDeliverUnitVersion.Builder last = MultDeliverUnitVersion.newBuilder();
+		for(int i = 0; i < list.size(); i++){
+			//append
+			last.addMdeliverUnitVersion(list.get(i));
+			compressCount++;
+			
+			if(compressCount >= COMPRESS_SIZE){
+				//commit
+				MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_UNIT_VERSION);
+				BytesMessage msg = session.createBytesMessage();
+				msg.writeBytes(last.build().toByteArray());
+				producer.send(msg);
+				session.commit();
+				
+				compressCount = 0;
+				
+				if(i != (list.size() - 1)){
+					//new dgps
+					last = MultDeliverUnitVersion.newBuilder();
+				}
+			}
+		}
+		
+		if(compressCount > 0){
+			MessageProducer producer = producerMap.get(MQManager.QUEUE_NAME_UNIT_VERSION);
+			BytesMessage msg = session.createBytesMessage();
+			msg.writeBytes(last.build().toByteArray());
+			producer.send(msg);
+			session.commit();
+			
+			compressCount = 0;
+		}
+	}
+	
+	//12
+	private void writeECUConfig(List<DeliverECUConfig> list) throws JMSException{
+		String queueName = MQManager.QUEUE_NAME_ECU_CONFIG;
+		int compressCount = 0;
+		//new decuconfig
+		MultDeliverECUConfig.Builder last = MultDeliverECUConfig.newBuilder();
+		for(int i = 0; i < list.size(); i++){
+			//append
+			last.addMdeliverECUConfig(list.get(i));
+			compressCount++;
+			
+			if(compressCount >= COMPRESS_SIZE){
+				//commit
+				MessageProducer producer = producerMap.get(queueName);
+				BytesMessage msg = session.createBytesMessage();
+				msg.writeBytes(last.build().toByteArray());
+				producer.send(msg);
+				session.commit();
+				
+				compressCount = 0;
+				
+				if(i != (list.size() - 1)){
+					//new dgps
+					last = MultDeliverECUConfig.newBuilder();
+				}
+			}
+		}
+		
+		if(compressCount > 0){
+			MessageProducer producer = producerMap.get(queueName);
+			BytesMessage msg = session.createBytesMessage();
+			msg.writeBytes(last.build().toByteArray());
+			producer.send(msg);
+			session.commit();
+			
+			compressCount = 0;
+		}
+	}
+	
+	private Logger logger_others = Logger.getLogger(LogManager.LOGGER_NAME_OTHERS);
+	
+	private void exceptionCaught(Throwable e){
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		e.printStackTrace(new PrintStream(bos));
+		logger_others.info(bos.toString());
+	}
+
+	@Override
+	public Object getDataLock() {
+		return dataLock;
+	}
+
+	@Override
+	public int getPosition() {
+		if(worker == null){
+			return -1;
+		}
+		
+		return worker.getPosition();
+	}
+
+	@Override
+	public long getLoop() {
+		if(worker == null){
+			return -1;
+		}
+		
+		return worker.getLoop();
+	}
+
+	private WriteWorker worker;
+	
+	@Override
+	public void startWorker() {
+		worker = new WriteWorker();
+		worker.start();
+		//new Thread(new PrintThread()).start();
+	}
+	
+	public void addCommand(String callLetter,int cmdId,List<String> params) throws JMSException{
+		System.out.println("addCommand:"+cmdId);
+		CommandBuff.Command.Builder builder=CommandBuff.Command.newBuilder();
+		builder.addCallLetter(callLetter);
+		builder.setCmdId(cmdId);
+		
+		if(params!=null){
+			for (String param : params) {
+				builder.addParams(param);
+			}
+		}
+		
+		builder.setSn("00000000000");
+		
+		CommandBuff.MultCommand.Builder builder2=CommandBuff.MultCommand.newBuilder();
+		builder2.addMcommand(builder);
+		
+		MQItem item=new MQItem();
+		item.setData(builder2.build().toByteArray());
+		item.setQueueName(MQManager.QUEUE_NAME_CMD);
+		sendMessage(item);
+	}
+	
+	public void addCommand(String callLetter,int cmdId) throws JMSException{
+		System.out.println("addCommand:"+cmdId);
+		CommandBuff.Command.Builder builder=CommandBuff.Command.newBuilder();
+		builder.addCallLetter(callLetter);
+		builder.setCmdId(cmdId);
+		builder.setSn("00000000000");
+		
+		CommandBuff.MultCommand.Builder builder2=CommandBuff.MultCommand.newBuilder();
+		builder2.addMcommand(builder);
+		
+		MQItem item=new MQItem();
+		item.setData(builder2.build().toByteArray());
+		item.setQueueName(MQManager.QUEUE_NAME_CMD);
+		sendMessage(item);
+	}
+	
+	public void addSmCommand(String callLetter,int cmdId,int channelId,List<String> params) throws JMSException{
+		CommandBuff.Command.Builder builder=CommandBuff.Command.newBuilder();
+		builder.addCallLetter(callLetter);
+		builder.setCmdId(cmdId);
+		builder.setChannelId(channelId);
+		builder.setSn("00000000000");
+		if(params!=null){
+			for (String param : params) {
+				builder.addParams(param);
+			}
+		}
+		CommandBuff.MultCommand.Builder builder2=CommandBuff.MultCommand.newBuilder();
+		builder2.addMcommand(builder);
+		
+		MQItem item=new MQItem();
+		item.setData(builder2.build().toByteArray());
+		item.setQueueName("cmd_sm");
+		sendMessage(item);
+	}
+	
+	public void sendMessage(MQItem item) throws JMSException{
+		MessageProducer producer = producerMap.get(item.getQueueName());
+		if(producer == null){
+			return;
+		}
+		
+		Message msg = createMessage(item, session);
+		if(msg == null){
+			return;
+		}
+		producer.send(msg);
+		session.commit();
+	}
+	
+	private Message createMessage(MQItem item, Session session) throws JMSException{
+		Object obj_data = item.getData();
+		byte[] data = (byte[]) obj_data;
+		BytesMessage msg = session.createBytesMessage();
+		msg.writeBytes(data);
+		return msg;
+	}
+}

@@ -1,0 +1,170 @@
+#common
+wrong.param=The param is wrong.
+wrong.type=The type is wrong.
+wrong.vehicleid=The vehicle id is wrong.
+
+#basic data
+basicdata.no.info=There is no basic info for {0}.
+ModifyPrivatePwd_1=There is no corresponding vehicle.
+ModifyPrivatePwd_2=The old private password is error.
+ModifyVehicleRemark_1=There is no corresponding vehicle
+feeInfo.no.info=There is no fee info for {0}.
+NotNull.linkmanTable.customerId=Customer ID cannot be null.
+NotNull.linkmanTable.vehicleId=Vehicle ID cannot be null.
+NotNull.linkmanTable.name=Name cannot be null.
+Size.linkmanTable.name=The length of name should be between {2} and {1}.
+NotNull.linkmanTable.phone=Phone cannot be null.
+Size.linkmanTable.phone=The length of phone should be between {2} and {1}.
+SaveLinkman_1=First contact has been existed for customer id {0} and vehicle id {1}.
+
+#authenticate
+Authenticate_1=User name cannot be current login user name.
+Authenticate_2=User name or password is error.
+
+#map
+NotNull.markTable.name=Name cannot be null.
+Size.markTable.name=The length of name cannot be greater than {1}.
+NotNull.navTable.mapType=Map type cannot be null.
+Size.navTable.name=The length of map type cannot be greater than {1}.
+NotNull.navTable.fromLabel=From label cannot be null.
+Size.navTable.fromLabel=The length of from label cannot be greater than {1}.
+NotNull.navTable.fromTitle=From title cannot be null.
+Size.navTable.fromTitle=The length of from title cannot be greater than {1}.
+NotNull.navTable.toLabel=To label cannot be null.
+Size.navTable.toLabel=The length of to label cannot be greater than {1}.
+NotNull.navTable.toTitle=To title cannot be null.
+Size.navTable.toTitle=The length of to tile cannot be greater than {1}.
+
+#alarm
+NotNull.alarmTable.alarmSn=Alarm SN cannot be null.
+NotNull.alarmTable.content=Alarm content cannot be null.
+alarm_no_alarm=There is no alarm which serial number is {0}.
+alarm_finish_1=There is no alarm which serial number is {0}.
+alarm_finish_5=Verify alarm cannot be null.
+alarm_suspend_1=There is no alarm which serial number is {0}.
+alarm_resume_1=There is no alarm which serial number is {0}.
+alarm_transfer_1=There is no alarm which serial number is {0}.
+NotNull.vehicleStatusTable.unitId=The terminal ID cannot be null.
+alarm_vehicle_add_2=There is no vehicle which unit id is {0}.
+alarm_vehicle_add_3=There already has vehicle status which unit id is {0}.
+alarm_vehicle_add_4=The status id does not exist.
+alarm_vehicle_del_2=There is no vehicle status which unit id is {0}.
+alarm_vehicle_1=There is no vehicle which unit id is {0}.
+alarm_vehicle_2=There already has vehicle status which unit id is {0}.
+alarm_vehicle_3=The alarm status does not exist.
+alarm_vehicle_4=The end time should after the begin time.
+alarm_vehicle_5=The case has been finished.
+
+NotNull.briefTable.vehicleId=Vehicle ID cannot be null.
+NotNull.briefTable.serviceContent=Service content cannot be null.
+Size.briefTable.serviceContent=The length of service content cannot be greater than {1}.
+NotNull.briefTable.result=Result cannot be null.
+Size.briefTable.result=The length of result cannot be greater than {1}.
+
+#report
+report.historytrack.title=History Track
+report.historytrack.column0=No.
+report.historytrack.column1=Plate No.
+report.historytrack.column2=Unit No.
+report.historytrack.column3=Locate
+report.historytrack.column4=Status
+report.historytrack.column5=Reference Position
+report.historytrack.column6=Longitude,latitude
+report.historytrack.column7=Speed(KM/H)
+report.historytrack.column8=Locate Time
+report.historytrack.column9=Direction
+report.historytrack.loc.true=True
+report.historytrack.loc.false=False
+report.historytrack.dir.north=North
+report.historytrack.dir.east=Ease
+report.historytrack.dir.south=South
+report.historytrack.dir.west=West
+report.historytrack.dir.northeast=Northeast
+report.historytrack.dir.southeast=Southeast
+report.historytrack.dir.southwest=Southwest
+report.historytrack.dir.northwest=Northwest
+
+report.brief.title=\u7535\u8BDD\u547C\u5165\u67E5\u8BE2
+report.brief.column0=No.
+report.brief.column1=Plate No.
+report.brief.column2=Unit No.
+report.brief.column3=Time
+report.brief.column4=Call Letter
+report.brief.column5=Service Type
+report.brief.column6=User Name
+report.brief.column7=Operator Name
+
+report.stolenvehicle.title=\u6848\u53D1\u8F66\u8F86\u62A5\u8B66\u8BB0\u5F55
+report.stolenvehicle.column0=\u5E8F\u53F7
+report.stolenvehicle.column1=\u5BA2\u6237\u59D3\u540D
+report.stolenvehicle.column2=\u8F66\u724C\u53F7
+report.stolenvehicle.column3=\u8F66\u8F7D\u7535\u8BDD
+report.stolenvehicle.column4=\u8F66\u578B
+report.stolenvehicle.column5=\u4EA7\u54C1\u578B\u53F7
+report.stolenvehicle.column6=\u5B89\u88C5\u5730\u70B9
+report.stolenvehicle.column7=\u5165\u7F51\u65F6\u95F4
+report.stolenvehicle.column8=\u8B66\u60C5\u7C7B\u578B
+report.stolenvehicle.column9=\u6848\u53D1\u65F6\u95F4
+report.stolenvehicle.column10=\u662F\u5426\u62A5\u8B66
+report.stolenvehicle.column11=\u662F\u5426\u622A\u83B7
+report.stolenvehicle.column12=\u662F\u5426\u542B\u76D7\u62A2\u9669
+report.stolenvehicle.column13=\u7ED3\u6848\u65F6\u95F4
+report.stolenvehicle.column14=\u662F\u5426\u52A0\u88C5\u9632\u62C6\u76D2
+report.stolenvehicle.column15=\u591A\u70B9\u9632\u62C6
+report.stolenvehicle.column16=\u65E0\u7EBF\u9632\u62C6
+
+report.complanint.title=\u5BA2\u8BC9\u8BB0\u5F55
+report.complanint.column0=\u5E8F\u53F7
+report.complanint.column1=\u7F16\u53F7
+report.complanint.column2=\u53D7\u7406\u65E5\u671F
+report.complanint.column3=\u5BA2\u6237\u59D3\u540D
+report.complanint.column4=\u8F66\u724C\u53F7
+report.complanint.column5=\u8F66\u8F7D\u7535\u8BDD
+report.complanint.column6=\u5F52\u5C5E\u516C\u53F8
+report.complanint.column7=\u6295\u8BC9\u4EBA
+report.complanint.column8=\u8054\u7CFB\u7535\u8BDD
+report.complanint.column9=\u6295\u8BC9\u7C7B\u578B
+report.complanint.column10=\u6295\u8BC9\u5185\u5BB9
+report.complanint.column11=\u8DDF\u8FDB\u65E5\u671F
+report.complanint.column12=\u8DDF\u8FDB\u8BB0\u5F55
+
+
+
+casetype.1=Stolen
+casetype.2=Hijacked
+casetype.3=\u88AB\u64AC
+casetype.4=\u73BB\u7483\u88AB\u7838
+yesno.1=Yes
+yesno.0=No
+send.sms.info=\u8BF7\u6C42\u53D1\u9001\u77ED\u4FE1\u51FA\u9519
+
+report.marketing.title=\u5916\u547C\u670D\u52A1\u660E\u7EC6-\u8425\u9500
+report.marketing.column0=\u5E8F\u53F7
+report.marketing.column1=\u5BA2\u6237\u540D\u79F0
+report.marketing.column2=\u8F66\u724C\u53F7\u7801
+report.marketing.column3=\u8F66\u8F7D\u7535\u8BDD
+report.marketing.column4=\u8F66\u8F86\u989C\u8272
+report.marketing.column5=\u8EAB\u4EFD\u8BC1
+report.marketing.column6=\u5B89\u88C5\u65F6\u95F4
+report.marketing.column7=\u7528\u6237\u7535\u8BDD
+report.marketing.column8=\u8F66\u8F86\u578B\u53F7
+report.marketing.column9=\u5F15\u64CE\u53F7
+report.marketing.column10=\u8F66\u67B6\u53F7
+report.marketing.column11=\u516C\u53F8\u76D7\u62A2\u9669
+report.marketing.column12=\u516C\u53F8\u4FDD\u9669
+report.marketing.column13=\u8F66\u8F86\u521D\u6B21\u767B\u8BB0\u65E5\u671F
+report.marketing.column14=\u5F52\u5C5E\u516C\u53F8
+
+report.fee.title=\u5916\u547C\u670D\u52A1\u660E\u7EC6-\u670D\u52A1\u8D39\u50AC\u7F34
+report.fee.column0=\u5E8F\u53F7
+report.fee.column1=\u5BA2\u6237\u540D\u79F0
+report.fee.column2=\u8F66\u724C\u53F7\u7801
+report.fee.column3=\u8F66\u8F7D\u7535\u8BDD
+report.fee.column4=\u7EC8\u7AEF\u7C7B\u578B
+report.fee.column5=\u9500\u552E\u7ECF\u7406
+report.fee.column6=\u5F00\u901A\u65E5\u671F
+report.fee.column7=\u8D39\u7528\u603B\u989D
+report.fee.column8=\u670D\u52A1\u8D39(\u5143)
+report.fee.column9=\u6258\u6536\u6807\u8BB0
+report.fee.column10=\u670D\u52A1\u8D39\u622A\u6B62\u65F6\u95F4
+report.fee.column11=\u5F52\u5C5E\u516C\u53F8

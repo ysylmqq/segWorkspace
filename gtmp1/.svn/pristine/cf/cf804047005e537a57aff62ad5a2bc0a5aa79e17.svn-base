@@ -1,0 +1,320 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<script type="text/javascript" src="${basePath}js/unit.js"></script> 
+<script type="text/javascript" src="${basePath}easyui/easyui.datagrid.columnMoving.js"></script> 
+	
+<div id='loading2' style="position:absolute;z-index:1000;top:0px;left:0px;width:100%;height:100%;background:#DDDDDB;text-align:center;padding-top: 20%;">
+    <img src='images/loading.gif'/> 
+</div>
+<div  class="easyui-layout" data-options="fit:true,border:false" style="width:100%;height:100%;">
+   <div data-options="region:'center',border:false,onResize:unitMainResize"  style="overflow:hidden;">
+    <!-- 表格 begin -->
+    <table id="unit_datagrid" class="easyui-datagrid" style="width: auto; height: auto;"
+			data-options="url:'${basePath}unit/unit_search.action',queryParams:defQueryParams,toolbar:'#toolbar',
+            fitColumns:true,singleSelect:true,rownumbers:true,pagination:true,title:'终端注册'">
+             <thead>  
+            <tr>  
+                <th data-options="field:'unitSn',width:130,align:'center'">终端序列号</th>  
+                <th data-options="field:'unitType',width:100,align:'center'">终端类型</th>
+                <th data-options="field:'materialNo',width:100,align:'center'">物料条码</th>  
+                <th data-options="field:'simNo',width:150,align:'center'">SIM卡号</th>
+                <th data-options="field:'steelNo',width:150,align:'center'">钢号</th>
+                <th data-options="field:'hardwareVersion',width:100,align:'center'">硬件版本号</th>
+                <th data-options="field:'softwareVersion',width:100,align:'center'">软件版本号</th>  
+                <th data-options="field:'registedTime',width:160,align:'center'">注册时间</th>
+                <th data-options="field:'state',width:90,align:'center',formatter:function(val,row,index){if(val==1){ return '待安装';}else if(val==2){ return '已安装';}else if(val==3){ return '解绑定';}else if(val==9){ return '返修';}}">终端状态</th>
+                <!-- <th data-options="field:'isValid',width:90,align:'center',formatter:function(val,row,index){if(val==0){ return '有效';}else{ return '无效';}}">是否有效</th> -->
+                <th data-options="field:'unitId',width:150,align:'center',formatter:operate">操作</th>
+            </tr>  
+        </thead>
+		</table>
+		<!-- 表格 end -->
+		
+		<!-- 查询条件 begin -->
+		<div id="toolbar" style="padding: 5px; height: auto;">
+		
+		    <table style=" font-size: 12px;">
+		      <tr>
+		        <td align="right">物料条码:</td>
+		        <td><input id="materialNo_search" style="width: 150px;"></td>
+		        
+		        <td align="right">钢号:</td>
+		        <td><input id="steelNo_search" style="width: 150px;"></td>
+		        
+		        <td align="right">SIM卡号:</td>
+		        <td><input id="simNo_search" style="width: 150px;"></td>
+		      </tr>
+		      
+		       <tr>
+		        <td align="right"> 终端序列号:</td>
+		        <td><input id="unitSn_search" style="width: 150px;"></td>
+		        
+		        <td align="right">终端状态:</td>
+		        <td>
+					<select id="state_search" class="easyui-combobox" name="state_search" style="width:150px;" data-options="editable:false">  
+					<option value="">全部</option>
+					<option value="1" selected="selected">待安装</option>  
+					<option value="2">已安装</option>
+					<option value="3">解绑定</option>  
+					<option value="9">返修</option>   
+			    	</select> 
+                  </td>
+		        
+		        <!-- <td align="right">是否有效:</td>
+		        <td>
+			        <select id="isValid_search" class="easyui-combobox" name="isValid_search" style="width:150px;">  
+					<option value="">全部</option> 
+					<option value="0">有效</option>  
+					<option value="1">无效</option>  
+				    </select>
+			   </td> -->
+			    <td colspan="3"> <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="queryUnit()">查询</a>
+			    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" onclick="openDlg4UnitOperate()">新增</a>
+			    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-batch_import" onclick="javascript:$('#dlg_unit_impport').dialog('open')">批量导入</a>
+			    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-recycle" onclick="openRecycleWin()">回收站</a>
+			    </td>
+		      </tr>
+		    </table> 
+		    </div>
+		    <!-- 查询条件 end -->
+		    </div>
+		</div>
+		    <!-- 新增或者修改弹出框 begin-->
+		 <div id="dlg_unit_operate" class="easyui-dialog" title="终端注册" data-options="iconCls:'icon-save',modal: true"
+		style="padding: 5px; width: 600px; height: 420px;" closed="true" buttons="#dlg_unit_operate_btns">
+        <form id="unit_operate_form" metdod="post" theme="simple"
+			 action="${basePath}unit/unit_saveOrUpdate.action" >
+			 <input type="hidden" id="oldSimNo" name="oldSimNo"/>
+			 <input id="unitId" name="unitId" type="hidden" />
+ <table cellpadding="4" cellspacing="0" style="font-size:12px;width: 100%;">
+            <tr>
+	            <td align="right">终端类型:</td>
+                <td align="left">
+                <input id="unitTypeSn" class="easyui-combobox" name="unitTypeSn"  
+		                 data-options="valueField:'unitTypeSn',textField:'unitType',
+		                 url:'sys/dicUnitType_getList.action?isValid=0&supperierSn=${userInfo.departInfo.supperierSn}'
+		                 ,required:true"  style="width:150px"/> 
+		                 <span style="color:red">*</span>
+                </td>
+		        <td align="right">终端序列号:</td>
+                <td align="left">
+                	<input id="unitSn" name="unitSn" type="text"   class="easyui-validatebox" data-options="required:true" />
+                 	<span style="color:red">*</span>
+                 </td>
+            </tr>
+            <tr>
+                <td align="right">SIM卡号:</td>
+                <td align="left"><input id="simNo" name="simNo"  type="text" class="easyui-validatebox"data-options="required:true"   validType="checkSimNo['SIM卡号必须是11至20位的数字','simNo','unitId','unit/unit_checkSimNo.action']" />
+                <!--判断唯一性先去掉 validType="checkSimNo['SIM卡号必须是11位数字','simNo','unitId','unit/unit_checkSimNo.action']" -->
+                 <span style="color:red">*</span>
+                </td>
+           
+             <td align="right">物料条码:</td>
+                <td align="left">
+                <input id="materialNo" name="materialNo"  type="text" class="easyui-validatebox" data-options="required:true" validType="checkMaterialNo['物料条码最多50位!','materialNo','unitId','unit/unit_checkMaterialNo.action']"/>
+                <span style="color:red">*</span>
+             </tr>
+               
+            <tr>
+                 <td align="right">钢号:</td>
+                <td align="left"><input id="steelNo" name="steelNo"  type="text" class="easyui-validatebox"data-options="required:true"  validType="checkSteelNo['钢号最多50位!','steelNo','unitId','unit/unit_checkSteelNo.action']"/>
+                <span style="color:red">*</span>
+                </td>
+           
+                <td align="right">硬件版本号:</td>
+                <td align="left"><input id="hardwareVersion" name="hardwareVersion"  type="text" class="easyui-validatebox" /></td>
+            
+             </tr>
+            <tr>
+                <td align="right">软件版本号:</td>
+                <td align="left"><input id="softwareVersion" name="softwareVersion"  type="text" class="easyui-validatebox" /></td>
+           
+                 <td align="right">生产日期:</td>
+                <td align="left">
+                <input id="productionDate" name="productionDate" type="text" class="Wdate" onfocus="WdatePicker()" style="width:150px"></input>
+                </td>
+               </tr>
+            
+             <tr>
+                 <td align="right">登记时间:</td>
+                <td align="left">
+                <input id="registedTime"   name="registedTime" type="text" class="Wdate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"  style="width:150px"></input>
+                </td>
+            
+                <td align="right">登记人:</td>
+                <td align="left">
+                <input id="username" disabled="disabled" name="username" type="text"  style="width:150px"></input>
+                </td>
+            </tr>
+            
+             <tr>
+                <td align="right">SIM卡开始服务时间:</td>
+                <td align="left">
+                <input id="openTime" name="openTime" type="text" class="Wdate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})"  class="easyui-validatebox" data-options="required:true" style="width:150px"></input>
+                <span style="color:red">*</span>
+                </td>
+            
+                <td align="right">SIM卡结束服务时间:</td>
+                <td align="left">
+                <input id="endTime" name="endTime" type="text" class="Wdate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="easyui-validatebox" data-options="required:true"  style="width:150px"></input>
+                <span style="color:red">*</span>
+                </td>
+            </tr>
+            
+             <tr>     
+              <td align="right">SIM金额:</td>
+                <td align="left">
+                <input id="payAmount" name="payAmount" type="text" class="easyui-validatebox" data-options="required:true" style="width:150px"></input>
+                <span style="color:red">*</span>
+                </td>
+              
+                <td align="right">备注:</td>
+                <td align="left">
+                <textarea rows="3"id="remark" name="remark" ></textarea>
+                </td>
+             </tr>
+             <tr>
+             <td align="right" style="display: none" id="td_state_title">终端状态:</td>
+		        <td style="display: none" id="td_state">
+					<select id="state" class="easyui-combobox" name="state" style="width:150px;" data-options="editable:false">  
+					<option value="1">待安装</option>  
+					<option value="2">已安装</option>
+					<option value="3">解绑定</option>  
+					<option value="9">返修</option>    
+			    	</select> 
+                  </td>
+            </tr>
+        </table>
+		</form>
+       </div>  
+		<div id="dlg_unit_operate_btns">  
+	    <a href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="saveUnit()">保存</a>  
+	    <a href="#" class="easyui-linkbutton" iconCls="icon-no"
+			onclick="javascript:$('#unit_operate_form').form('clear')">重置</a>
+	    <a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg_unit_operate').dialog('close')">取消</a>  
+	</div>  
+		    <!-- 新增或者修改弹出框 end-->
+		    
+		    <!-- 批量导入弹出框 begin-->
+		    <div id="dlg_unit_impport" class="easyui-dialog" title="批量导入" data-options="iconCls:'icon-save',modal:true"
+		style="padding: 5px; width: 450px; height: 180px;" closed="true" buttons="#dlg_unit_impport_btns">
+       
+        <form id="unit_impport_Form" method="post" theme="simple"
+			enctype="multipart/form-data" action="${basePath}unit/unit_impFromExcel.action" >
+			 <table style="font-size:12px;width: 100%;">
+		        <tr>
+						<td>选择文件：</td>
+						<td>
+						<input width="100px" type="file" id="upload"  name="upload"/>
+						<input type="button" value="模板下载" onclick="document.getElementById('ifm_down').src='${basePath}doc/template/unit_registe_templates.xls';">
+					   </td>
+					</tr>
+					</table>
+		</form>
+		     
+		</div>
+      <div id="dlg_unit_impport_btns">  
+	    <a href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="batchImpUnit()">上传</a>  
+	    <a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg_unit_impport').dialog('close')">取消</a>  
+	   </div> 
+		    <!-- 批量导入弹出框 end-->
+	   
+	   
+	   <!-- 回收站弹出框 begin-->
+	<div id="dlg_unit_recycle" class="easyui-dialog" title="回收站" style="width:800px; height:500px;"
+		data-options="iconCls:'icon-recycle',modal:true,maximizable:true,closed:true,buttons:'#dlg_unit_recycle_btns',onResize:dlgResize">
+       		 <!-- 表格 begin -->
+    <table id="unit_recycle_datagrid" class="easyui-datagrid" style="padding-top:0px;margin-top:0px;height:430px;"
+			data-options="url:'${basePath}unit/unit_search.action?isValid=1',
+            fitColumns:true,singleSelect:false,rownumbers:true,pagination:true,toolbar:'#toolbar_recycle',fit:true">
+             <thead>  
+            <tr> 
+            	<th data-options="field:'ck',checkbox : true,align:'center'">全选</th> 
+                <th data-options="field:'unitSn',width:130,align:'center'">终端序列号</th>  
+                <th data-options="field:'unitType',width:100,align:'center'">终端类型</th>
+                <th data-options="field:'materialNo',width:100,align:'center'">物料条码</th>  
+                <th data-options="field:'simNo',width:150,align:'center'">SIM卡号</th>
+                <th data-options="field:'steelNo',width:150,align:'center'">钢号</th>
+                <th data-options="field:'hardwareVersion',width:100,align:'center'">硬件版本号</th>
+                <th data-options="field:'softwareVersion',width:100,align:'center'">软件版本号</th>  
+                <th data-options="field:'registedTime',width:160,align:'center'">注册时间</th>
+                <th data-options="field:'state',width:90,align:'center',formatter:function(val,row,index){if(val==1){ return '待安装';}else if(val==2){ return '已安装';}else if(val==3){ return '解绑定';}else if(val==9){ return '返修';}}">终端状态</th>
+                <th data-options="field:'unitId',width:150,align:'center',formatter:operate">操作</th>
+            </tr>  
+        </thead>
+		</table>
+		<!-- 表格 end -->
+		
+		<!-- 查询条件 begin -->
+		<div id="toolbar_recycle" style="padding: 5px; height: auto;">
+		
+		    <table style=" font-size: 12px;">
+		      <tr>
+		        <td align="right">物料条码:</td>
+		        <td><input id="materialNo_search_recycle" style="width: 150px;"></td>
+		        
+		        <td align="right">钢号:</td>
+		        <td><input id="steelNo_search_recycle" style="width: 150px;"></td>
+		        
+		        <td align="right">SIM卡号:</td>
+		        <td><input id="simNo_search_recycle" style="width: 150px;"></td>
+		      </tr>
+		      
+		       <tr>
+		        <td align="right"> 终端序列号:</td>
+		        <td><input id="unitSn_search_recycle" style="width: 150px;"></td>
+		        
+			    <td colspan="5"> <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="queryUnitRecycle()">查询</a>
+			    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" onclick="deleteInRecycle()">删除</a>
+			    <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-restore" onclick="updateUnitsIsValid()">还原</a>
+			    </td>
+		      </tr>
+		    </table> 
+		    </div>
+		    <!-- 查询条件 end -->
+		     
+		</div>
+      <div id="dlg_unit_recycle_btns">  
+	    <a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg_unit_recycle').dialog('close')">关闭</a>  
+	   </div>  
+		    <!-- 回收站弹出框 end-->
+<iframe style="display: none" id="ifm_down"></iframe>
+	<script type="text/javascript"  >
+    function show(){
+        $("#loading2").fadeOut("normal", function(){
+            $(this).remove();
+            //修改表格的宽度
+            var wid =$(document.body).width();
+            var hei =$('#main').height();
+             $('#unit_datagrid').datagrid('resize', {width:wid-2,height:hei}); 
+        });
+    }    
+    var delayTime;
+    $.parser.onComplete = function(obj){
+    	$('#unit_datagrid').datagrid('columnMoving');
+    	$('#unit_recycle_datagrid').datagrid('columnMoving');
+    	
+        if(delayTime) 
+            clearTimeout(delayTime);
+        delayTime = setTimeout(show,1);
+    };
+    Date.prototype.format = function(fmt) { 
+     var o = { 
+        "M+" : this.getMonth()+1,                 //月份 
+        "d+" : this.getDate(),                    //日 
+        "h+" : this.getHours(),                   //小时 
+        "m+" : this.getMinutes(),                 //分 
+        "s+" : this.getSeconds(),                 //秒 
+        "q+" : Math.floor((this.getMonth()+3)/3), //季度 
+        "S"  : this.getMilliseconds()             //毫秒 
+    }; 
+    if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length)); 
+    }
+     for(var k in o) {
+        if(new RegExp("("+ k +")").test(fmt)){
+             fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+         }
+     }
+    return fmt; 
+} 
+</script> 

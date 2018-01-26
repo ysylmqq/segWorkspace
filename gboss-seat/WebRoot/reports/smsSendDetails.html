@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="短信明细">
+<meta name="description" content="短信明细">
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/jquery.dataTables.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/data_style.css" rel="stylesheet" />
+<link href="../dist/plugins/css/datepicker.css" rel="stylesheet">
+<link href="../css/base.css" rel="stylesheet" />
+<title>短信明细</title>
+
+</head>
+<body style="background-color:white;">
+	<div class="container-fluid Reports_page">
+		<h1>短信明细</h1>
+		<div class="row c_area">
+            <div class="filter_box">
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">发送时间：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control form_datetime starTime">
+                            <span class="input-group-addon" style="padding:0;width:12px;">至</span>
+                            <input type="text" class="form-control form_datetime endTime" >
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">搜索：</h6>
+                    <div class="filter_content">
+                        <span class="reports_search_1">
+                            <input type="text" class="form-control reports_search_1_engine" placeholder="车牌号码或车载电话" style="width:200px;" id="smsSendDetailsCar_partNo">
+                            <input type="hidden" class="search_plate_no">
+                            <input type="hidden" class="search_call_letter">
+                            <input type="hidden" class="search_vehicle_id" id="smsSendDetailsVehicleID">
+                            <ul class="reports_search_1_list" style="display:none;"></ul>
+                        </span>
+                        <span>
+                            <input type="text" class="form-control" style="width:120px;" placeholder="联系电话" id="smsSendDetailsPhone">
+                        </span>
+                        <span>
+                            <input type="text" class="form-control" style="width:180px;" placeholder="发送内容" id="smsSendDetailsContent">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix btns">
+                    <a href="#" class="exportExcel" id="smsSendDetailsSearch"><i class="glyphicon glyphicon-search"></i>查询</a>
+                    <a href="#" class="exportExcel" id="smsSendDetailsExport"><i class="glyphicon glyphicon-export"></i>导出Excel</a>
+                </div>
+            </div>            
+        </div>
+        <div class="row r_scroll">
+            <div class="Reports_box" style="width:1000px;">
+                <table id="smsSendDetails-table" class="display compact table_borders dataTable" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th style="width:10px;"></th>
+                            <th style="width:120px;">发送时间</th>
+                            <th style="width:80px;">发送人</th>
+                            <th style="width:80px;">联系电话</th>
+                            <th style="width:500px;">发送内容</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+	</div>
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/fnReloadAjax.js"></script>
+<script type="text/javascript" src="../dist/plugins/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/reports.js"></script>
+<script type="text/javascript">
+    //呼入业务明细查询
+    $("#smsSendDetailsSearch").click(function(){    
+        if(checkTimeBox()==0){//判断时间是否为空
+            return;
+        }else if($('.starTime').val() >= $('.endTime').val()){
+            alert("起始时间不能大于结束时间");
+            return;
+        }else{
+            if ( typeof(add_table) != "undefined") {
+                smsSendDetailsReport();
+                add_table.fnReloadAjax("../app/sms/sms_detail?" + paras);
+            }
+            else{
+                smsSendDetailsReport();
+            };
+        };
+     });
+
+    //呼入业务明细导出
+
+    $("#smsSendDetailsExport").click(function(){
+        $(this).attr("href","../app/sms/sms_detail/export?"+callparas);
+    });
+
+    //呼入业务明细查询
+    function smsSendDetailsReport(){
+        var ValvehicleId = $("#smsSendDetailsVehicleID").val();//车辆id（隐藏）
+        var ValpartNo =  $("#smsSendDetailsCar_partNo").val();//部分车牌或车载
+        var Valphone =  $("#smsSendDetailsPhone").val();//联系电话
+        var Valcontent =  encodeURI($("#smsSendDetailsContent").val());//发送内容
+        var ValbeginTime = $(".starTime").val();//开始时间
+        var ValendTime = $(".endTime").val();//结束时间
+        
+        if (ValvehicleId == ''){//车辆id或部分车牌车载拼接
+            smsSendDetailsvehicleId = '';
+            if (ValpartNo==''){
+                smsSendDetailspartNo='';
+            }else{
+                smsSendDetailspartNo = 'partNo='+ValpartNo+'&';
+            };
+        }else{
+            smsSendDetailsvehicleId = 'vehicleId='+ValvehicleId+'&';
+            smsSendDetailspartNo='';
+        };
+
+        if (Valphone==''){//联系电话拼接
+            smsSendDetailsphone = '';
+        }else{
+            smsSendDetailsphone = 'mobile='+Valphone+'&';
+        };
+
+        if (Valcontent==''){//发送内容拼接
+            smsSendDetailscontent = '';
+        }else{
+            smsSendDetailscontent = 'content='+Valcontent+'&';
+        };
+
+        if (ValbeginTime==''){//开始时间
+            smsSendDetailsbeginTime='';
+        }else{
+            smsSendDetailsbeginTime = 'beginTime='+ValbeginTime+'&';
+        };
+
+        if (ValendTime==''){//结束时间
+            smsSendDetailsendTime='';
+        }else{
+            smsSendDetailsendTime = 'endTime='+ValendTime;
+        };
+
+        callparas = smsSendDetailsvehicleId+smsSendDetailspartNo+smsSendDetailsphone+smsSendDetailscontent+smsSendDetailsbeginTime+smsSendDetailsendTime;//车辆id、部分车牌、联系电话、发送内容、开始时间、结束时间
+        paras = callparas;//参数;
+        add_table = $("#smsSendDetails-table").dataTable({
+            "bSort": false,//不排序
+            "filter": false,//去掉搜索框
+            "pagingType": "full_numbers",
+            "processing" : true,
+            "serverSide" : true,//后端处理
+            "bRetrieve": true,
+            "bDestroy": true,
+            "oLanguage": {
+                "sUrl":"../assets/data-tables/js/dataTable.cn.txt"
+            },
+            "ajax" : {
+                "type":"POST",
+                "url":"../app/sms/sms_detail?" + paras //获取数据的API
+            },             
+            "columns":[
+                {"data":"sn"},//序号
+                {"data":"send_time"},//发送时间
+                {"data":"op_name"},//发送人
+                {"data":"mobile"},//联系电话
+                {"data":"content"}//发送内容
+            ]
+        });
+        return add_table;
+    }
+</script>
+</body>
+</html>

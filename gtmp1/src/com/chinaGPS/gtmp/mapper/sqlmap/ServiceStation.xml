@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.ServiceStationMapper">
+	<!-- 用memcached做二级缓存 -->
+	<cache type="org.mybatis.caches.memcached.MemcachedCache" />
+
+	<sql id="getByPageCondition">
+		<where>
+			<if test="@Ognl@isNotBlank(serviceStation.stationName)">
+				AND mss.station_name LIKE '%${serviceStation.stationName}%'
+			</if>
+			<if test="@Ognl@isNotBlank(serviceStation.isValid)">
+				AND mss.is_valid = #{serviceStation.isValid}
+			</if>
+			<if test="@Ognl@isNotBlank(serviceStation.departId)">
+				AND EXISTS(SELECT 'X' FROM t_p_user u WHERE mss.create_man = u.user_id AND u.depart_id = #{serviceStation.departId})
+			</if>
+			<if test="@Ognl@isBlank(serviceStation.isValid)">
+				AND mss.is_valid = '1'
+			</if>
+		</where>
+	</sql>
+
+	<select id="countAll" parameterType="map" resultType="integer" useCache="true">
+		SELECT COUNT(1) FROM t_mp_service_station mss
+		<include refid="getByPageCondition"/>
+	</select>
+	
+	<select id="getByPage" parameterType="map" resultType="com.chinaGPS.gtmp.entity.ServiceStationPOJO" useCache="true">
+		SELECT
+			mss.id, mss.station_name AS stationName,mss.address,mss.contact,
+			mss.phone_number AS phoneNumber,mss.longitude,mss.latitude,
+			mss.create_man AS createMan,mss.create_time AS createTime 
+		FROM t_mp_service_station mss
+		<include refid="getByPageCondition"/>
+	</select>
+	
+	<select id="getById" parameterType="string" resultType="com.chinaGPS.gtmp.entity.ServiceStationPOJO" useCache="true">
+		SELECT
+			mss.id, mss.station_name AS stationName,mss.address,mss.contact,
+			mss.phone_number AS phoneNumber,mss.longitude,mss.latitude,
+			mss.create_man AS createMan,mss.create_time AS createTime 
+		FROM t_mp_service_station mss
+		WHERE id = #{id}
+	</select>
+	
+	<insert id="add" parameterType="com.chinaGPS.gtmp.entity.ServiceStationPOJO" flushCache="true">
+		INSERT INTO t_mp_service_station
+			(id, station_name, address, contact, phone_number, longitude, latitude, is_valid, create_man, create_time)
+    	VALUES
+			(SEQ_SERVICE_STATION.NEXTVAL, #{stationName}, #{address}, #{contact}, #{phoneNumber}, ${longitude}, ${latitude}, '1', ${createMan}, sysdate)
+	</insert>
+	
+	<update id="edit" parameterType="com.chinaGPS.gtmp.entity.ServiceStationPOJO" flushCache="true">
+		UPDATE
+			t_mp_service_station
+		SET
+			<trim suffixOverrides=",">
+				<if test="@Ognl@isNotBlank(stationName)">
+					station_name = #{stationName},
+				</if>
+				<if test="@Ognl@isNotBlank(address)">
+					address = #{address},
+				</if>
+				<if test="@Ognl@isNotBlank(contact)">
+					contact = #{contact},
+				</if>
+				<if test="@Ognl@isNotBlank(phoneNumber)">
+					phone_number = #{phoneNumber},
+				</if>
+				<if test="@Ognl@isNotBlank(longitude)">
+					longitude = #{longitude},
+				</if>
+				<if test="@Ognl@isNotBlank(latitude)">
+					latitude = #{latitude},
+				</if>
+				<if test="@Ognl@isNotBlank(isValid)">
+					is_valid = #{isValid},
+				</if>
+			</trim>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="removeById" parameterType="string" flushCache="true">
+		DELETE FROM t_mp_service_station WHERE id = #{id}
+	</delete>
+	
+</mapper>  

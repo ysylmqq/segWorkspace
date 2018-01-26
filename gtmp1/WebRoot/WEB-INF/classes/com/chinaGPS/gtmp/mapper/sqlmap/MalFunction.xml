@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.MalfunctionMapper">
+
+	<!-- 用memcached做二级缓存 -->
+	<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper" />
+
+	<resultMap type="MalfunctionPOJO" id="malFunctionMap">
+		<id property="malfunctionId" column="malfunction_Id" jdbcType="BIGINT" />
+		<result property="unitId" column="UNIT_ID" jdbcType="VARCHAR" />
+		<result property="malfunctionCode" column="malfunction_Code"
+			jdbcType="VARCHAR" />
+		<result property="stamp" column="STAMP" jdbcType="TIMESTAMP" />
+
+		<result property="lon" column="lon" jdbcType="FLOAT" />
+		<result property="lat" column="lat" jdbcType="FLOAT" />
+		<result property="direction" column="direction" jdbcType="INTEGER" />
+		<result property="speed" column="speed" jdbcType="FLOAT" />
+		<result property="locationState" column="location_state"
+			jdbcType="INTEGER" />
+		<result property="vehicleState" column="vehicle_state"
+			jdbcType="VARCHAR" />
+		<result property="gpsTime" column="gps_time" jdbcType="TIMESTAMP" />
+		<result property="referencePosition" column="reference_position"
+			jdbcType="VARCHAR" />
+
+		<result property="vehicleDef" column="VEHICLE_DEF" jdbcType="VARCHAR" />
+		<result property="typeName" column="TYPE_NAME" jdbcType="VARCHAR" />
+		<result property="modelName" column="MODEl_NAME" jdbcType="VARCHAR" />
+		<result property="vehicleCode" column="VEHICLE_CODE" jdbcType="VARCHAR" />
+		<result property="vehicleArg" column="VEHICLE_ARG" jdbcType="VARCHAR" />
+
+		<result property="ownerName" column="owner_name" jdbcType="VARCHAR" />
+		<result property="ownerPhoneNumber" column="owner_phone_number"
+			jdbcType="VARCHAR" />
+
+		<result property="malfunction" column="malfunction" />
+	</resultMap>
+
+	<resultMap type="DicMalfunctionCode" id="dicMalfunctionCodeMap">
+		<result property="malfunctionCode" column="malfunction_code"></result>
+		<result property="malfunction" column="malfunction" />
+		<result property="solution" column="solution" />
+	</resultMap>
+
+	<resultMap type="java.util.HashMap" id="statisticMalfunctonMap"></resultMap>
+	<sql id="getByPageCondition">
+		<where>
+			and v.vehicle_def is not null
+			<if test="@Ognl@isNotBlank(malfunction)">
+				<if test="@Ognl@isNotBlank(malfunction.vehicleDef)">
+					AND lower(V.VEHICLE_DEF) LIKE
+					'%'||lower(#{malfunction.vehicleDef})||'%' 
+	  			</if>
+				<if test="@Ognl@isNotBlank(malfunction.typeName)">
+					AND V.vehicle_type=#{malfunction.typeName}
+	  			</if>
+				<if test="@Ognl@isNotBlank(malfunction.dealerIds)">
+					AND dv.dealer_id IN
+					<foreach collection="malfunction.dealerIds" item="dealerId" open="(" separator="," close=")">
+						#{dealerId}
+					</foreach>
+				</if>
+				<if test="@Ognl@isNotBlank(malfunction.modelName)">
+					AND V.vehicle_model=#{malfunction.modelName}
+	  			</if>
+				<if test="@Ognl@isNotBlank(malfunction.vehicleCode)">
+					AND V.vehicle_code=#{malfunction.vehicleCode}
+	  			</if>
+				<if test="@Ognl@isNotBlank(malfunction.vehicleArg)">
+					AND V.vehicle_arg=#{malfunction.vehicleArg}
+	  			</if>
+				<if test="@Ognl@isNotBlank(malfunction.ownerName)">
+					AND o.owner_name LIKE '%${malfunction.ownerName}%'
+				</if>
+
+				<if test="@Ognl@isNotBlank(malfunction.malfunctionCode)">
+					AND m.malfunction_code=#{malfunction.malfunctionCode}
+				</if>
+
+				<if test="@Ognl@isNotBlank(malfunction.startTime)">
+					AND m.stamp &gt;=#{malfunction.startTime}
+				</if>
+				<if test="@Ognl@isNotBlank(malfunction.endTime)">
+					AND m.stamp &lt;=#{malfunction.endTime}
+				</if>
+			</if>
+		</where>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="getByPage" parameterType="map" resultMap="malFunctionMap">
+		select m.malfunction_id, m.unit_id, m.malfunction_code,dmc.malfunction,
+		m.stamp,da.name AS dealerName,
+		v.vehicle_def,dvt.type_name,dvm.model_name,v.vehicle_code,v.vehicle_arg,
+		lp.lon,lp.lat,lp.direction,lp.speed,lp.location_state,lp.vehicle_state,lp.gps_time,
+		lp.reference_position,o.owner_name,o.owner_phone_number
+		from
+		t_malfunction m
+		left join t_vehicle_unit vu on vu.unit_id=m.unit_id
+		left join t_vehicle v on vu.vehicle_id=v.vehicle_id
+		left join
+		t_last_position lp on lp.unit_id=m.unit_id
+		left join t_dic_vehicle_type
+		dvt on dvt.type_id=v.vehicle_type
+		left join t_dic_vehicle_model dvm on
+		dvm.model_id=v.vehicle_model
+		left join t_dealer_vehicle dv on
+		dv.vehicle_def=v.vehicle_def
+		left join T_OWNER o on
+		o.owner_id=dv.owner_id
+		left join t_dealer_area da 
+    	on dv.dealer_id=da.id
+		left join t_dic_malfunction_code dmc on
+		dmc.malfunction_code=m.malfunction_code
+		<include refid="getByPageCondition" />
+		ORDER BY m.stamp desc
+	</select>
+
+	<select id="countAll" parameterType="map" resultType="Integer">
+		select count(malfunction_id)
+		from t_malfunction m
+		left join
+		t_vehicle_unit vu on vu.unit_id=m.unit_id
+		left join t_vehicle v on
+		vu.vehicle_id=v.vehicle_id
+		left join t_last_position lp on
+		lp.unit_id=m.unit_id
+		left join t_dic_vehicle_type dvt on
+		dvt.type_id=v.vehicle_type
+		left join t_dic_vehicle_model dvm on
+		dvm.model_id=v.vehicle_model
+		left join t_dealer_vehicle dv on
+		dv.vehicle_def=v.vehicle_def
+		left join T_OWNER o on
+		o.owner_id=dv.owner_id
+		left join t_dealer_area da 
+    	on dv.dealer_id=da.id
+		left join t_dic_malfunction_code dmc on
+		dmc.malfunction_code=m.malfunction_code
+		<include refid="getByPageCondition" />
+		ORDER BY m.stamp desc
+	</select>
+
+	<select id="getDicMalfunctionCode" parameterType="DicMalfunctionCode"
+		resultMap="dicMalfunctionCodeMap" resultType="List" useCache="false">
+		select malfunction_code, malfunction, solution from
+		t_dic_malfunction_code d
+		<where>
+			<if test="@Ognl@isNotBlank(malfunctionCode)">
+				AND d.malfunction_Code=#{malfunctionCode}
+				</if>
+		</where>
+	</select>
+
+
+	<select id="statisticMalfunction" parameterType="map" resultType="map">
+		SELECT
+		<choose>
+			<when test="reportType==1">
+				<choose>
+					<when test="@Ognl@isNotBlank(vehicleCode) and @Ognl@isNotBlank(vehicleArg)">
+						sm.vehicle_code || sm.vehicle_arg AS type_id,sm.vehicle_code,sm.vehicle_arg
+					</when>
+					<when test="@Ognl@isNotBlank(vehicleCode) and @Ognl@isBlank(vehicleArg)">
+						sm.vehicle_code AS type_id,sm.vehicle_code
+					</when>
+					<otherwise>
+						sm.model_type_id AS type_id, dvm.model_name					
+					</otherwise>
+				</choose>
+			</when>
+			<when test="reportType==2">
+				sm.malfunction_code AS type_id, dmc.malfunction
+			</when>
+			<otherwise>
+				sm.dealer_id AS type_id, da.name AS dealer_name
+			</otherwise>
+		</choose>
+		<foreach collection="columns" item="id">
+			, <![CDATA[
+				SUM(DECODE(TO_CHAR(sm.date_ymd, 'yyyymm'), REPLACE('${id}','m',''), sm.mcount, 0)) AS ${id}
+		      ]]>
+		</foreach>
+		FROM t_stat_malfunction sm
+		left join t_dic_vehicle_model dvm on
+		
+		dvm.model_id=sm.model_type_id
+		left join t_dic_malfunction_code dmc on
+		dmc.malfunction_code=sm.malfunction_code
+		left join t_dealer_area da ON sm.dealer_id=da.id
+		<where>
+			<if test="@Ognl@isNotBlank(modelName)">
+				AND sm.model_type_id=#{modelName}
+		   	</if>
+			<if test="@Ognl@isNotBlank(malfunctionCode)">
+				AND sm.malfunction_code=#{malfunctionCode}
+		   	</if>
+			<if test="@Ognl@isNotBlank(vehicleCode)">
+				AND sm.vehicle_code = #{vehicleCode}
+			</if>
+			<if test="@Ognl@isNotBlank(vehicleArg)">
+				AND sm.vehicle_arg = #{vehicleArg}
+			</if>
+			<if test="@Ognl@isNotBlank(startTime)">
+				AND sm.date_ymd &gt;=#{startTime}
+			</if>
+			<if test="@Ognl@isNotBlank(endTime)">
+				AND sm.date_ymd &lt;=#{endTime}
+			</if>
+			<if test="@Ognl@isNotBlank(dealerIds)">
+				AND sm.dealer_id IN
+				<foreach collection="dealerIds" item="dealerId" open="(" separator="," close=")">
+					#{dealerId}
+				</foreach>
+			</if>
+		</where>
+		GROUP BY to_char(sm.date_ymd, 'yyyy'),
+		<choose>
+			<when test='reportType==1'>
+				<choose>
+					<when test="@Ognl@isNotBlank(vehicleCode) and @Ognl@isNotBlank(vehicleArg)">
+						sm.vehicle_code, sm.vehicle_arg
+					</when>
+					<when test="@Ognl@isNotBlank(vehicleCode) and @Ognl@isBlank(vehicleArg)">
+						sm.vehicle_code
+					</when>
+					<otherwise>
+						sm.model_type_id, dvm.model_name
+					</otherwise>
+				</choose>
+			</when>
+			<when test='reportType==2'>
+				sm.malfunction_code, dmc.malfunction
+			</when>
+			<otherwise>
+				sm.dealer_id, da.name
+			</otherwise>
+		</choose>
+	</select>
+</mapper>  

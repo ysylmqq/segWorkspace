@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="短信业务统计">
+<meta name="description" content="短信业务统计">
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/jquery.dataTables.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/data_style.css" rel="stylesheet" />
+<link href="../dist/plugins/css/datepicker.css" rel="stylesheet">
+<link href="../css/base.css" rel="stylesheet" />
+<title>短信业务统计</title>
+
+</head>
+<body style="background-color:white;">
+    <div class="container-fluid Reports_page">
+        <h1>短信业务统计</h1>
+        <div class="row c_area">
+            <div class="filter_box">
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">发送时间：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control form_datetime starTime">
+                            <span class="input-group-addon" style="padding:0;width:12px;">至</span>
+                            <input type="text" class="form-control form_datetime endTime" >
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">短信类型：</h6>
+                    <div class="filter_content">
+                        <select id="smsType" class="form-control">
+                            <!-- <option value="99">全部</option>
+                            <option value="2000">公司资料</option>
+                            <option value="3000">祝福短信</option>
+                            <option value="4000">业务短信</option>
+                            <option value="5000">营销短信</option>
+                            <option value="1000">其他</option> -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix btns">
+                    <a href="#" class="exportExcel" id="smsSendStatisticsSearch"><i class="glyphicon glyphicon-search"></i>查询</a>
+                    <a href="#" class="exportExcel" id="smsSendStatisticsExport"><i class="glyphicon glyphicon-export"></i>导出Excel</a>
+                </div>
+            </div>            
+        </div>
+        <div class="row r_scroll">
+            <div class="Reports_box" style="width:500px">
+                <table id="smsSendStatistics-table" class="display compact table_borders dataTable" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th style="width:30px"></th>
+                            <th style="width:90px">发送时间</th>
+                            <th style="width:90px">短信类型</th>
+                            <th style="width:140px">数量</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/fnReloadAjax.js"></script>
+<script type="text/javascript" src="../dist/plugins/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/reports.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $.getJSON('../app/sms_temp/codes', function(result){
+            if(result && result.success==true){
+                $("#smsType").append('<option value="99">全部</option>');
+                if(result.data.length > 0){
+                    var json_obj = result.data[0];
+                    for (var porp in json_obj ) {
+                        var val = json_obj[porp];
+                        $("#smsType").append('<option value="'+ porp +'">'+ val +'</option>');
+                    };    
+                };
+            };
+        });
+    });
+
+    //短信业务统计查询
+    $("#smsSendStatisticsSearch").click(function(){    
+        if(checkTimeBox()==0){//判断时间是否为空
+            return;
+        }else if($('.starTime').val() >= $('.endTime').val()){
+            alert("起始时间不能大于结束时间");
+            return;
+        }else{
+            if ( typeof(add_table) != "undefined") {
+                smsSendStatisticsReport();
+                add_table.fnReloadAjax("../app/sms/sms_statistics?" + paras);
+            }
+            else{
+                smsSendStatisticsReport();
+            };
+        };
+     });
+
+    //短信业务统计导出
+    $("#smsSendStatisticsExport").click(function(){
+        $(this).attr("href","../app/sms/sms_statistics/export?"+callparas);
+    });
+
+    //短信业务统计查询
+    function smsSendStatisticsReport(){
+        var ValsmsType = $("#smsType").val();//短信类型
+        var ValbeginTime = $(".starTime").val();//开始时间
+        var ValendTime = $(".endTime").val();//结束时间
+
+        if(ValsmsType == 99){//短信类型(0：全部 ) 如果选择全部，则不传此参数
+            smsSendStatisticssmsType = '';
+        }else{
+            smsSendStatisticssmsType = 'st_code=' + ValsmsType + '&';
+        };
+
+        if(ValbeginTime==''){//开始时间
+            smsSendStatisticsbeginTime='';
+        }else{
+            smsSendStatisticsbeginTime = 'beginTime='+ValbeginTime+'&';
+        };
+
+        if (ValendTime==''){//结束时间
+            smsSendStatisticsendTime='';
+        }else{
+            smsSendStatisticsendTime = 'endTime='+ValendTime;
+        };
+
+        callparas = smsSendStatisticssmsType+smsSendStatisticsbeginTime+smsSendStatisticsendTime;//短信类型、开始时间、结束时间
+        paras = callparas;//参数;
+        add_table = $("#smsSendStatistics-table").dataTable({
+            "bSort": false,//不排序
+            "filter": false,//去掉搜索框
+            "pagingType": "full_numbers",
+            "processing" : true,
+            "serverSide" : true,//后端处理
+            "bRetrieve": true,
+            "bDestroy": true,
+            "oLanguage": {
+                "sUrl":"../assets/data-tables/js/dataTable.cn.txt"
+            },
+            "ajax" : {
+                "type":"POST",
+                "url":"../app/sms/sms_statistics?" + paras //获取数据的API
+            },             
+            "columns":[
+                {"data":"sn"},//序号
+                {"data":"send_time"},//发送时间
+                {"data":"st_name"},//短信类型
+                {"data":"send_num"}//数量
+            ]
+        });
+        return add_table;
+    }
+</script>
+</body>
+</html>

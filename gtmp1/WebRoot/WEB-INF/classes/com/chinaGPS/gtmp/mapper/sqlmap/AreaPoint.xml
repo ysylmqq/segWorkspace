@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.AreaPointMapper"> 
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+    <resultMap type="AreaPointPOJO" id="areaPointMap"> 
+        <id property="areapointId" column="areapoint_Id" jdbcType="BIGINT" />  
+       <result property="areapointName" column="areapoint_Name" jdbcType="VARCHAR"/>
+       <result property="shapetype" column="shapetype" jdbcType="INTEGER"/>
+       <result property="lon" column="lon" jdbcType="FLOAT"/>
+        <result property="lat" column="lat" jdbcType="FLOAT"/>
+        <result property="lon2" column="lon2" jdbcType="FLOAT"/>
+        <result property="lat2" column="lat2" jdbcType="FLOAT"/>
+        <result property="radius" column="radius" jdbcType="FLOAT"/>
+        <result property="pointstr" column="pointstr" jdbcType="VARCHAR"/>
+        <result property="mlevel" column="mlevel" jdbcType="INTEGER"/>
+        <result property="departId" column="depart_Id" jdbcType="BIGINT"/>
+        <result property="userId" column="user_Id" jdbcType="BIGINT"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+        <result property="areapointType" column="areapoint_type" jdbcType="INTEGER"/>
+    </resultMap>
+
+<resultMap type="AreaPointVehiclePOJO" id="areaPointVehicleMap"> 
+       <result property="area_id" column="area_id" jdbcType="BIGINT"/>
+       <result property="user_id" column="user_id" jdbcType="BIGINT"/>
+       <result property="vehicle_id" column="vehicle_id" jdbcType="BIGINT"/>
+        <result property="call_letter" column="call_letter" jdbcType="VARCHAR"/>
+        <result property="rule" column="rule" jdbcType="VARCHAR"/>
+        <result property="vehicle_def" column="vehicle_def" jdbcType="VARCHAR"/>
+        <result property="area_name" column="areapoint_name" jdbcType="VARCHAR"/>      
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+    </resultMap>
+	<select id="getList" parameterType="AreaPointPOJO" resultMap="areaPointMap">
+		select areapoint_id, areapoint_name, shapetype, lon, lat, lon2, lat2, radius, pointstr, mlevel, user_id, remark, stamp from t_area_point ap
+		<where>
+			<if test="@Ognl@isNotBlank(areapointName)"> AND ap.areapoint_name LIKE '%'||#{areapointName}||'%'</if>
+	    	<if test="@Ognl@isNotBlank(remark)"> AND ap.remark LIKE '%'||#{remark}||'%'</if>
+		   <if test="@Ognl@isNotBlank(departId)">
+		      and ap.depart_Id=#{departId}
+		   </if>
+		   <if test="@Ognl@isNotBlank(areapointType)">and ap.areapoint_type = #{areapointType}</if>
+		</where>
+		order by stamp desc
+	</select>
+	
+	<sql id="getByPageCondition">
+		<where>
+			<if test="@Ognl@isNotBlank(areaPoint)">
+				<if test="@Ognl@isNotBlank(areaPoint.areapointName)"> AND ap.areapoint_name LIKE '%'||#{areaPoint.areapointName}||'%'</if>
+	    		<if test="@Ognl@isNotBlank(areaPoint.remark)"> AND ap.remark LIKE '%'||#{areaPoint.remark}||'%'</if>
+	    		<if test="@Ognl@isNotBlank(areapointType)">and ap.areapoint_type = #{areapointType}</if>
+    		</if>
+		</where>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="getByPage" parameterType="map" resultMap="areaPointMap" >
+		select areapoint_id, areapoint_name, shapetype, lon, lat, lon2, lat2, radius, pointstr,
+		mlevel, user_id, remark, stamp
+		from t_area_point ap
+		<include refid="getByPageCondition"/> 
+		order by ap.stamp desc  
+	</select>
+	<select id="countAll" parameterType="map" resultType="Integer" >
+		SELECT COUNT(ap.areapoint_id) FROM t_area_point ap
+		<include refid="getByPageCondition"/>   
+	</select> 
+	<delete id="removeById" parameterType="Long" >
+			delete t_area_point
+ 			where areapoint_id =#{areapointId}
+	</delete>
+	
+	<select id="getById" parameterType="Long" resultMap="areaPointMap" >
+		select areapoint_id, areapoint_name, shapetype, lon, lat, lon2, lat2, radius, pointstr,
+		mlevel, user_id, remark, stamp
+		from t_area_point ap
+		<where>
+			   ap.areapoint_Id=#{id}
+		</where>
+	</select>
+	<insert id="add" parameterType="AreaPointPOJO">
+		INSERT INTO t_area_point
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+		 	areapoint_Id,
+		 	<if test="@Ognl@isNotBlank(areapointName)">areapoint_Name,</if>
+		 	<if test="@Ognl@isNotBlank(lon)">lon,</if>
+		 	<if test="@Ognl@isNotBlank(lat)">lat,</if>
+		 	<if test="@Ognl@isNotBlank(lon2)">lon2,</if>
+		 	<if test="@Ognl@isNotBlank(lat2)">lat2,</if>
+		 	<if test="@Ognl@isNotBlank(radius)">radius,</if>
+		 	<if test="@Ognl@isNotBlank(pointstr)">pointstr,</if>
+            <if test="@Ognl@isNotBlank(mlevel)">mlevel,</if>
+            <if test="@Ognl@isNotBlank(remark)">remark,</if>
+		 	<if test="@Ognl@isNotBlank(departId)">depart_id,</if>
+		 	<if test="@Ognl@isNotBlank(userId)">user_id,</if>
+		 	<if test="@Ognl@isNotBlank(areapointType)">areapoint_type,</if>
+            stamp
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	SEQ_AREA_POINT.nextval,
+		 	<if test="@Ognl@isNotBlank(areapointName)">#{areapointName},</if>
+		 	<if test="@Ognl@isNotBlank(lon)">#{lon},</if>
+		 	<if test="@Ognl@isNotBlank(lat)">#{lat},</if>
+		 	<if test="@Ognl@isNotBlank(lon2)">#{lon2},</if>
+		 	<if test="@Ognl@isNotBlank(lat2)">#{lat2},</if>
+		 	<if test="@Ognl@isNotBlank(radius)">#{radius},</if>
+		 	<if test="@Ognl@isNotBlank(pointstr)">#{pointstr},</if>
+            <if test="@Ognl@isNotBlank(mlevel)">#{mlevel},</if>
+            <if test="@Ognl@isNotBlank(remark)">#{remark},</if>
+		 	<if test="@Ognl@isNotBlank(departId)">#{departId},</if>
+		 	<if test="@Ognl@isNotBlank(userId)">#{userId},</if>
+		 	<if test="@Ognl@isNotBlank(areapointType)">#{areapointType},</if>
+            sysdate
+		 </trim>
+ 	</insert>
+ 
+	<update id="edit" parameterType="AreaPointPOJO">
+		UPDATE t_area_point 
+		SET 
+    	<trim suffixOverrides=",">
+    		STAMP=sysdate, 
+		 	<if test="@Ognl@isNotBlank(areapointName)">areapoint_Name=#{areapointName},</if>
+		 	<if test="@Ognl@isNotBlank(lon)">lon=#{lon},</if>
+		 	<if test="@Ognl@isNotBlank(lat)">lat=#{lat},</if>
+		 	<if test="@Ognl@isNotBlank(lon2)">lon2=#{lon2},</if>
+		 	<if test="@Ognl@isNotBlank(lat2)">lat2=#{lat2},</if>
+		 	<if test="@Ognl@isNotBlank(radius)">radius=#{radius},</if>
+		 	<if test="@Ognl@isNotBlank(pointstr)">pointstr=#{pointstr},</if>
+            <if test="@Ognl@isNotBlank(mlevel)">mlevel=#{mlevel},</if>
+            <if test="@Ognl@isNotBlank(remark)">remark=#{remark},</if>
+		 	<if test="@Ognl@isNotBlank(departId)">depart_id=#{departId},</if>
+		 	<if test="@Ognl@isNotBlank(userId)">user_id=#{userId},</if>
+      	</trim>
+ 		WHERE areapoint_Id=#{areapointId,jdbcType=BIGINT}
+	</update>
+	
+	<select id="checkAreaPointName" parameterType="AreaPointPOJO" resultType="Integer" >
+		select count(areapoint_id)
+		from t_area_point ap
+		<where>
+		   <if test="@Ognl@isNotBlank(areapointName)"> AND ap.areapoint_name=#{areapointName}</if>
+		   <if test="@Ognl@isNotBlank(departId)">
+		      and ap.depart_Id=#{departId}
+		   </if>
+		      <!-- 防重复 -->
+				<if test="@Ognl@isNotBlank(areapointId)">
+				 AND ap.areapoint_Id&lt;&gt;#{areapointId}
+				</if>
+		</where>
+	</select>
+	<select id="getSimNo" parameterType="String" resultType="String">
+	    select vu.unit_id from t_vehicle_unit vu where vu.vehicle_id = #{vid}
+	</select>
+	<insert id="saveAreaVehicles" parameterType="AreaPointVehiclePOJO">
+	    INSERT INTO t_area_vehicle
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+		 	<if test="@Ognl@isNotBlank(area_id)">area_id,</if>
+		 	<if test="@Ognl@isNotBlank(user_id)">user_id,</if>
+		 	<if test="@Ognl@isNotBlank(vehicle_id)">vehicle_id,</if>
+		 	<if test="@Ognl@isNotBlank(unit_id)">unit_id,</if>
+		 	<if test="@Ognl@isNotBlank(rule)">rule,</if>
+            stamp
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	<if test="@Ognl@isNotBlank(area_id)">#{area_id},</if>
+		 	<if test="@Ognl@isNotBlank(user_id)">#{user_id},</if>
+		 	<if test="@Ognl@isNotBlank(vehicle_id)">#{vehicle_id},</if>
+		 	<if test="@Ognl@isNotBlank(unit_id)">#{unit_id},</if>
+		 	<if test="@Ognl@isNotBlank(rule)">#{rule},</if>
+            sysdate
+		 </trim>
+	</insert>
+	<delete id="relieveAreaVehicle" parameterType="AreaPointVehiclePOJO">
+	    delete t_area_vehicle
+	    <where>
+		 	<if test="@Ognl@isNotBlank(area_id)">and area_id=#{area_id}</if>
+		 	<if test="@Ognl@isNotBlank(vehicle_id)">and vehicle_id=#{vehicle_id}</if>
+		</where>
+	</delete>
+	<sql id="getAreaVehiclesCondition">
+		<where>
+			<if test="@Ognl@isNotBlank(areaPointVehicles)">
+				<if test="@Ognl@isNotBlank(areaPointVehicles.area_id)"> AND av.area_id = #{areaPointVehicles.area_id}</if>
+	    		<if test="@Ognl@isNotBlank(areaPointVehicles.vehicle_id)"> AND av.vehicle_id = #{areaPointVehicles.vehicle_id}</if>
+    		</if>
+		</where>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="getAreaVehicles" parameterType="map" resultMap="areaPointVehicleMap" >
+		select av.*,v.vehicle_def,p.areapoint_name from t_area_vehicle av 
+	    left join t_vehicle v on av.vehicle_id=v.vehicle_id
+	    left join t_area_point p on av.area_id = p.areapoint_id
+		<include refid="getAreaVehiclesCondition"/> 
+		order by v.vehicle_def 
+	</select>
+	<select id="getAreaVehiclesCountAll" parameterType="map" resultType="Integer" >
+		select count(*) from t_area_vehicle av 
+		<include refid="getAreaVehiclesCondition"/>   
+	</select> 	
+</mapper>  

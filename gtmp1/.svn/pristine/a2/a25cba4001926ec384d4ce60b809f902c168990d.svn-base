@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.MapChinaAreaMapper">
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+    <resultMap type="MapChinaAreaPOJO" id="mapChinaAreaMap">
+        <id property="mapId" column="mapid" jdbcType="VARCHAR" /> 
+        <result property="name" column="name" jdbcType="VARCHAR" />  
+        <result property="provinceName" column="provincename" jdbcType="VARCHAR"/>
+       <result property="lon" column="lon" jdbcType="FLOAT"/>
+        <result property="lat" column="lat" jdbcType="FLOAT" />
+        <result property="tableName" column="tablename" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+		
+	<select id="getProvinceList" parameterType="MapChinaAreaPOJO" resultMap="mapChinaAreaMap">
+		select * from t_map_china_province t
+	</select>
+	
+	
+	<select id="getCityList" parameterType="MapChinaAreaPOJO" resultMap="mapChinaAreaMap">
+		select * from t_map_china_city  t
+		<where>
+		  <if test="@Ognl@isNotBlank(provinceName)">
+						AND t.provincename=#{provinceName}
+				</if>
+					
+		</where>
+	</select>
+	
+	<select id="getProvinceListForPoint" resultType="map">
+		SELECT lon/1000000 || ',' || lat/1000000 AS id, name FROM t_map_china_province ORDER BY mapid
+	</select>
+	
+	<select id="getCityListForPoint" parameterType="map" resultType="map">
+		SELECT
+			lon/1000000 || ',' || lat/1000000 AS id, name 
+		FROM
+			t_map_china_city
+		WHERE
+			provincename = #{provinceName} 
+		ORDER BY mapid 
+	</select>
+	
+</mapper>  

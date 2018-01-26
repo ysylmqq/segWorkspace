@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="案发车辆报警记录">
+<meta name="description" content="案发车辆报警记录">
+
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/jquery.dataTables.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/data_style.css" rel="stylesheet" />
+<link href="../dist/plugins/css/datepicker.css" rel="stylesheet">
+<link href="../css/base.css" rel="stylesheet" />
+<style type="text/css">
+    input[type='radio']{
+        vertical-align: sub;
+    }
+    #importantEventDialog table td{
+        padding: 5px;
+    }
+    .labelText{
+        text-align: right;
+    }
+    #alarmDialog .labelText{
+        padding-left: 0;
+        padding-right: 0;
+        line-height: 24px;
+    }
+    #alarmDialog label{
+        margin: 0;
+        margin-left: 5px;
+        float: left;
+        line-height: 24px;
+    }
+    #alarmDialog input[type="radio"]{
+        vertical-align: sub;
+    }
+    #trueAlarmDialog td{
+        padding: 5px;
+    }
+    #trueAlarmDialog td.labelText{
+        width: 120px;
+    }
+    #alarmDynamicDialog input{
+        display: inline-block;
+        font-size: 13px;
+    }
+    #alarmDynamicDialog input.date{
+        width: 160px;
+    }
+    #alarmDynamicDialog input.address{
+        width: 250px;
+    }
+    #alarmDynamicDialog input.simpleinfo{
+        width: 65px;
+    }
+    #alarmDynamicDialog input.stolen,#alarmDynamicDialog input.pla{
+        width: 105px;
+    }
+    .btns a.yellow{background-color: #ec971f;}
+</style>
+<title>案发车辆报警记录</title>
+
+</head>
+<body style="background-color:white;">
+	<div class="container-fluid Reports_page">
+		<h1>案发车辆报警记录</h1>
+		<div class="row c_area">
+            <div class="filter_box">
+                <!--<span class="control-label filter_term">查询条件:</span>-->
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">归属公司:</h6>
+                    <div class="filter_content">
+                        <span class="filiale">
+                            <input type="text" class="form-control reports_search_4_engine" id="stolenR_Com_search" value="全部"/>
+                            <i class="glyphicon glyphicon-chevron-down filialeDown"></i>
+                            <input type="hidden" class="search_filiale_id" id="stolenR_ID_search" value="0">
+                            <ul class="reports_search_4_list" style="display:none;"></ul>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">搜索:</h6>
+                    <div class="filter_content">
+                        <span class="reports_search_1">
+                            <input type="text" id="stolenCarNum" class="form-control reports_search_1_engine" placeholder="车牌号码或车载电话" style="width:251px;">
+                            <input type="hidden" class="search_plate_no">
+                            <input type="hidden" class="search_call_letter">
+                            <input type="hidden" class="search_vehicle_id" id="stolenRCarID">
+                            <ul class="reports_search_1_list" style="display:none;">
+                                <!--
+                            	<li><span class="p_plate_no">粤B.123456</span> <span class="p_call_letter">13698521459</span></li>
+                            	-->
+                            </ul>
+                        </span>
+                        <span>
+                            <input type="text" class="form-control" placeholder="客户名称" id="stolenRCosName">
+                        </span>
+                        <span>
+                            <input type="text" class="form-control" placeholder="联系电话" id="stolenRPhone">
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">案发时间段:</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control form_datetime starTime" id="stolenRStartTime">
+                            <span class="input-group-addon">至</span>
+                            <input type="text" class="form-control form_datetime endTime" id="stolenREndTime">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">案件类型:</h6>
+                    <div class="filter_content">
+                        <select id="stolenCaseType">
+                            <option value="0">全部</option>
+                            <option value="1">被盗</option>
+                            <option value="2">被劫</option>
+                            <option value="3">被撬</option>
+                            <option value="4">玻璃被砸</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">防拆类型:</h6>
+                    <div class="filter_content">
+                        <select id="tamperType">
+                            <option value="0">全部</option>
+                            <option value="1">防拆盒</option>
+                            <option value="2">智能防拆</option>
+                            <option value="3">无线防拆</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h6 class="control-label control_title">附加选项:</h6>
+                    <div class="filter_content">
+                        <span>
+                            <label><input type="checkbox" id="iscallPolice" value="1">报警</label>
+                            <label><input type="checkbox" id="containTP" value="1">含盗抢险</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix btns" style="width:860px;">
+                    <a href="#" class="exportExcel" id="stolenSearch"><i class="glyphicon glyphicon-search"></i>查询</a>
+                    <a href="#" class="exportExcel" id="stolenExport"><i class="glyphicon glyphicon-export"></i>导出Excel</a>
+                    <a href="#" class="exportExcel" id="stolenRevise"><i class="glyphicon glyphicon-pencil"></i>修改</a>
+                    <a href="#" class="exportExcel" id="stolendelete"><i class="glyphicon glyphicon-trash"></i>删除</a>
+                    <span style="float:right;">
+                        <a class="exportExcel yellow" id="importantEventBtn">查看《重大事件报告》</a>
+                        <a class="exportExcel yellow" id="alarmDialogBtn">查看《处警响应表》</a>
+                        <a class="exportExcel yellow" id="#trueAlarmDialogBtn">查看《真实警情处理表》</a>
+                        <a class="exportExcel yellow" id="#alarmDynamicDialogBtn">查看《警情动态》</a>
+                    </span>
+                </div>
+            </div>            
+        </div>
+        <div class="row r_scroll">
+            <div class="Reports_box stolenRecords">
+                <table id="stolenRecords-example" class="display compact table_borders dataTable" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th style="width:30px;"></th>
+                            <th style="width:60px;">客户姓名</th>
+                            <th style="width:90px;">车牌号</th>
+                            <th style="width:100px;">车载电话</th>
+                            <th style="width:80px;">车型</th>
+                            <th style="width:180px;">产品型号</th>
+                            <th style="width:110px;">安装地点</th>
+                            <th style="width:140px;">入网时间</th>
+                            <th style="width:70px;">案件类型</th>
+                            <th style="width:140px;">案发时间</th>
+                            <th style="width:60px;">是否报警</th>
+                            <th style="width:60px;">是否截获</th>
+                            <th style="width:80px;">是否含盗抢险</th>
+                            <th style="width:140px;">结案时间</th>
+                            <th style="width:90px;">是否加装防拆盒</th>
+                            <th style="width:60px;">智能防拆</th>
+                            <th style="width:60px;">无线防拆</th>
+                            <th style="display:none">车辆id</th>
+                            <th style="display:none">案件编号</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="display:none;">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+	</div>
+<!-- 弹窗 案发车辆报警记录修改 START -->
+<div class="modal fade Casereg" id="p_Caseregistration" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">案发车辆报警记录修改</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="p_Caseregistration_caseid" >
+                <input type="hidden" id="p_Caseregistration_vehicleid" >
+                <div class="row">
+                    <p class="col-xs-6">用户姓名:<b id="p_Casereg_name"></b></p>
+                    <p class="col-xs-6">车牌号:<span id="p_Casereg_pla"></span></p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-6">车载电话:<span id="p_Casereg_callletter"></span></p>
+                    <p class="col-xs-6">车型:<span id="p_Casereg_vehtype"></span></p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-6">产品型号:<span id="p_Casereg_gpstype"></span></p>
+                    <p class="col-xs-6">安装地点:<span id="p_Casereg_filiale"></span></p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-6">入网时间:<span id="p_Casereg_Jtime"></span></p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-12" id="p_caseType">案件类型:
+                        <label><input type="radio" name="pCasereg_option1" value="1" />被盗</label>
+                        <label><input type="radio" name="pCasereg_option1" value="2" />被劫</label>
+                        <label><input type="radio" name="pCasereg_option1" value="3" />被撬</label>
+                        <label><input type="radio" name="pCasereg_option1" value="4" />玻璃被砸</label>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-6">案发时间:<input type="text" id="p_caseTime" class="form-control form_datetime" style="width:152px;display:inline-block;"></p>
+                    <p class="col-xs-6">
+                        <label><input type="checkbox" id="p_isCallPolice" />报警</label>
+                        <label><input type="checkbox" id="p_isCatchIt" />截获</label>
+                        <label><input type="checkbox" id="p_isInsurance" />含盗抢险</label>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-6">结案时间:<input type="text" id="p_closingTime" class="form-control form_datetime" style="width:152px;display:inline-block;"></p>
+                    <p class="col-xs-6">
+                        <label><input type="checkbox" id="p_isTamperBox" />加装防拆盒</label>
+                        <label><input type="checkbox" id="p_isSpot" />智能防拆</label>
+                        <label><input type="checkbox" id="p_isWireless" />无线防拆</label>
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" id="p_CaseSubmit">修改提交</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 案发车辆报警记录 END -->
+<!-- 弹窗 案发车辆报警记录删除 START -->
+<div class="modal fade Casereg" id="d_Caseregistration" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">案发车辆报警记录删除</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="d_Caseregistration_caseid" >
+                <input type="hidden" id="d_Caseregistration_vehicleid" >
+                <div class="row">
+                    <p class="col-xs-6">用户姓名:<b id="d_Casereg_name"></b></p>
+                    <p class="col-xs-6">车牌号:<span id="d_Casereg_pla"></span></p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-6">车载电话:<span id="d_Casereg_callletter"></span></p>
+                    <p class="col-xs-6">案件类型:<span id="d_Casereg_type"></span></p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-6">案发时间:<span id="d_caseTime"></span></p>
+                    <p class="col-xs-6">结案时间:<span id="d_closingTime"></span></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="d_CaseSubmit">确认删除</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 案发车辆报警记录删除 END -->
+<!-- 弹窗 重大事件报告 START -->
+<div class="modal fade Casereg" id="importantEventDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:850px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">重大事件报告</h4>
+            </div>
+            <div class="modal-body" style="height:500px;overflow-y:auto;">
+                <input type="hidden" id="importantEvent_vehicle_id">
+                <input type="hidden" id="importantEvent_e_id">
+                <input type="hidden" id="importantEvent_stolen_id">
+                <table id="" class="display compact table_borders" cellspacing="0" border="1" width="100%">
+                    <tbody>
+                        <tr>
+                            <td class="labelText">用户姓名/车牌号</td>
+                            <td colspan="2" id="impEve_h_name_pla"></td>
+                            <td class="labelText">事件简要:</td>
+                            <td colspan="2"><input type="text" class="form-control" id="impEve_v_even"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">车型</td>
+                            <td colspan="2" id="impEve_h_type"></td>
+                            <td class="labelText">来电号码</td>
+                            <td colspan="2" id="impEve_h_phone"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">案发地点</td>
+                            <td><input type="text" class="form-control" id="impEve_v_site"></td>
+                            <td class="labelText">是否正规停车场</td>
+                            <td>
+                                <label><input type="radio" name="isstandard_park" value="1">是</label>
+                                <label><input type="radio" name="isstandard_park" value="0">否</label>
+                            </td>
+                            <td class="labelText">案发状态</td>
+                            <td><input type="text" class="form-control" id="impEve_v_police"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">安装时间</td>
+                            <td colspan="2" id="impEve_h_fixTime"></td>
+                            <td class="labelText">产品类型</td>
+                            <td colspan="2" id="impEve_h_proType"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">第一接听时间及接听人</td>
+                            <td colspan="2"><input type="text" class="form-control"  id="impEve_v_man"></td>
+                            <td class="labelText">当班班长</td>
+                            <td colspan="2"><input type="text" class="form-control" id="impEve_v_monitor"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">高速行驶状态下起动不了</td>
+                            <td colspan="5">
+                                <span style="display:inline-block;line-height:24px;float:left;">行驶状态描述：行驶速度</span>
+                                <span style="width:50px;display:inline-block;float:left;"><input type="text" class="form-control" id="impEve_v_speed"></span>
+                                <span style="display:inline-block;line-height:24px;float:left;">，持续行驶时间</span>
+                                <span style="width:50px;display:inline-block;float:left;"><input type="text" class="form-control" id="impEve_v_runtime"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">车台是否已升级</td>
+                            <td id="impEve_h_upgrade"></td>
+                            <td class="labelText">升级日期</td>
+                            <td id="impEve_h_upgradeT"></td>
+                            <td class="labelText">升级方式</td>
+                            <td id="impEve_h_upgradeType"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">是否已加无线防拆</td>
+                            <td colspan="2" id="impEve_h_tamperWireless"></td>
+                            <td class="labelText">是否已加防拆盒</td>
+                            <td colspan="2" id="impEve_h_tamperBox"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">是否享受我司盗抢险服务</td>
+                            <td id="impEve_h_insurance"></td>
+                            <td class="labelText">我司盗抢险公司名称</td>
+                            <td id="impEve_h_insuranceName"></td>
+                            <td class="labelText">另行购买商业盗抢险</td>
+                            <td><input type="text" class="form-control" id="impEve_v_else_insuranceName"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">现场处警电工及司机</td>
+                            <td colspan="2"><input type="text" class="form-control" id="impEve_v_alarmMan"></td>
+                            <td class="labelText">通知时间</td>
+                            <td colspan="2"><input type="text" class="form-control" id="impEve_v_inform_time" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">出发时间</td>
+                            <td colspan="2"><input type="text" class="form-control" id="impEve_v_start_time" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"></td>
+                            <td class="labelText">出发地点</td>
+                            <td colspan="2"><input type="text" class="form-control" id="impEve_v_start_site"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">处警车牌</td>
+                            <td><input type="text" class="form-control" id="impEve_v_alarm_pla"></td>
+                            <td class="labelText">到达时间</td>
+                            <td><input type="text" class="form-control" id="impEve_v_arrive_time" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"></td>
+                            <td class="labelText">返回时间</td>
+                            <td><input type="text" class="form-control" id="impEve_v_back_time" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">电工检查结果</td>
+                            <td colspan="5"><textarea type="text" class="form-control" id="impEve_v_check_result" style="height:58px;padding:5px;" placeholder="500字内"></textarea></td>
+                                <!-- <input type="text" class="form-control" id="impEve_v_check_result"></td> -->
+                        </tr>
+                        <tr>
+                            <td class="labelText">事件内容</td>
+                            <td colspan="5"><textarea type="text" class="form-control" id="impEve_v_content" style="height:58px;padding:5px;" placeholder="1000字内"></textarea></td>
+                            <!-- <td colspan="5"><input type="text" class="form-control" id="impEve_v_content"></td> -->
+                        </tr>
+                        <tr>
+                            <td class="labelText">客户要求</td>
+                            <td colspan="5"><textarea type="text" class="form-control" id="impEve_v_req" style="height:58px;padding:5px;" placeholder="500字内"></textarea></td>
+                            <!-- <td colspan="5"><input type="text" class="form-control" id="impEve_v_req"></td> -->
+                        </tr>
+                        <tr>
+                            <td class="labelText">当班班长受理情况</td>
+                            <td colspan="5"><input type="text" class="form-control" id="impEve_v_monitor_accepted"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">协作部门</td>
+                            <td><input type="text" class="form-control" id="impEve_v_consociation"></td>
+                            <td class="labelText">受理人</td>
+                            <td><input type="text" class="form-control" id="impEve_v_consociation_man"></td>
+                            <td class="labelText">转发日期</td>
+                            <td id="impEve_h_forward_date"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">处理结果</td>
+                            <td colspan="5"><input type="text" class="form-control" id="impEve_v_deal_result"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">回访情况</td>
+                            <td colspan="5"><input type="text" class="form-control" id="impEve_v_callback"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">客户满意度</td>
+                            <td colspan="2"><input type="text" class="form-control" id="impEve_v_satisfaction"></td>
+                            <td class="labelText">回访日期</td>
+                            <td colspan="2" id="impEve_h_callback_date"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">备注</td>
+                            <td colspan="5"><input type="text" class="form-control" id="impEve_v_remark"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-primary pull-left" id="impEve_export">导出word</a>
+                <button type="button" class="btn btn-warning" id="impEve_submit">修改提交</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 重大事件报告 END -->
+<!-- 弹窗 处警响应表 START -->
+<div class="modal fade Casereg" id="alarmDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">处警响应表</h4>
+            </div>
+            <div class="modal-body" style="height:500px;overflow-y:auto;">
+                <input type="hidden" id="alarmDialog_vehicle_id">
+                <input type="hidden" id="alarmDialog_res_id">
+                <input type="hidden" id="alarmDialog_stolen_id">
+                <div class="row">
+                    <p class="col-xs-12">一、处警人员资料：</p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">处警人员</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_man_name"></span>
+                    </p>
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">处警车牌</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_man_pla"></span>
+                    </p>
+                    <p class="col-xs-3">
+                        <span class="col-xs-4 labelText">所属公司</span>
+                        <span class="col-xs-8"><input type="text" class="form-control" id="alarm_man_sub"></span>
+                    </p>
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">处警日期</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_man_alarmdate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"></span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">通知时间</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_man_informdate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"></span>
+                    </p>
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">出发时间</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_man_leavedate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"></span>
+                    </p>
+                    <p class="col-xs-6">
+                        <span class="col-xs-2 labelText">出发地点</span>
+                        <span class="col-xs-10"><input type="text" class="form-control" id="alarm_man_leavesite"></span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">到达时间</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_man_arrivedate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"></span>
+                    </p>
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">返程时间</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_man_backdate" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"></span>
+                    </p>
+                    <p class="col-xs-6">
+                        <span class="col-xs-2 labelText">处警地点</span>
+                        <span class="col-xs-10"><input type="text" class="form-control" id="alarm_man_address"></span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-12">二、客户资料：</p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">客户车牌</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_cust_pla"></span>
+                    </p>
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">用户名</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_cust_name"></span>
+                    </p>
+                    <p class="col-xs-6">
+                        <span class="col-xs-2 labelText">所属公司</span>
+                        <span class="col-xs-10"><input type="text" class="form-control" id="alarm_cust_sub"></span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">车型</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_cust_cartype"></span>
+                    </p>
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">颜色</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_cust_color"></span>
+                    </p>
+                    <p class="col-xs-6">
+                        <span class="col-xs-2 labelText">发动机/车架号</span>
+                        <span class="col-xs-10"><input type="text" class="form-control"  id="alarm_cust_engineno"></span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">客户1</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_cust_1"></span>
+                    </p>
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">联系电话</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_cust_1_phone"></span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">客户2</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_cust_2"></span>
+                    </p>
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">联系电话</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="alarm_cust_2_phone"></span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-12">三、现场环境：</p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">手机信号:</span>
+                        <span class="col-xs-9">
+                            <label><input type="radio" name="phoneSignal" value="2">强</label>
+                            <label><input type="radio" name="phoneSignal" value="1">弱</label>
+                            <label><input type="radio" name="phoneSignal" value="0">无</label>
+                        </span>
+                    </p>
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">GPS信号:</span>
+                        <span class="col-xs-9">
+                            <label><input type="radio" name="GPSSignal" value="2">强</label>
+                            <label><input type="radio" name="GPSSignal" value="1">弱</label>
+                            <label><input type="radio" name="GPSSignal" value="0">无</label>
+                        </span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-5">
+                        <span class="col-xs-9 labelText" style="width:240px;">案发车辆是否停放于正规保安发卡的停车场:</span>
+                        <span class="col-xs-3">
+                            <label><input type="radio" name="parkStatus" value="1">是</label>
+                            <label><input type="radio" name="parkStatus" value="0">否</label>
+                        </span>
+                    </p>
+                    <p class="col-xs-3">
+                        <span class="col-xs-8 labelText">案发地点是否有录像监控:</span>
+                        <span class="col-xs-4">
+                            <label><input type="radio" name="videoRecord" value="1">是</label>
+                            <label><input type="radio" name="videoRecord" value="0">否</label>
+                        </span>
+                    </p>
+                    <p class="col-xs-3">
+                        <span class="col-xs-8 labelText">案发地点是否有碎玻璃:</span>
+                        <span class="col-xs-4">
+                            <label><input type="radio" name="isGlass" value="1">是</label>
+                            <label><input type="radio" name="isGlass" value="0">否</label>
+                        </span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-9">
+                        <span class="col-xs-1 labelText">搜索范围:</span>
+                        <span class="col-xs-11"><input type="text" class="form-control" id="searchRange"></span>
+                    </p>
+                    <p class="col-xs-3">
+                        <span class="col-xs-3 labelText">搜索结果:</span>
+                        <span class="col-xs-9">
+                            <label><input type="radio" name="searchResult" value="1">已寻获</label>
+                            <label><input type="radio" name="searchResult" value="0">未寻获</label>
+                        </span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-10">
+                        <span class="col-xs-2 labelText">现场有无警方工作人员:</span>
+                        <span class="col-xs-7">
+                            <label><input type="radio" name="isAlarmMan" value="1">有</label>
+                            <span style="float:left;line-height:24px;">，属</span>
+                            <em style="float:left;width:120px;line-height:24px;"><input type="text" class="form-control" id="localPolice"></em>
+                            <span style="float:left;line-height:24px;">派出所</span>
+                            <label><input type="radio" name="isAlarmMan" value="0">无</label>
+                        </span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-6">
+                        <span class="col-xs-2 labelText">其他环境描述:</span>
+                        <span class="col-xs-10"><input type="text" class="form-control" id="conditionDescribe"></span>
+                    </p>
+                    <p class="col-xs-6">
+                        <span class="col-xs-6 labelText">如成功搜获车辆，需填写车辆外形描述:</span>
+                        <span class="col-xs-6"><input type="text" class="form-control" id="appearDescribe"></span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-6">
+                        <span class="col-xs-2 labelText">门锁情况描述:</span>
+                        <span class="col-xs-10"><input type="text" class="form-control" id="doorDescribe"></span>
+                    </p>
+                    <p class="col-xs-6">
+                        <span class="col-xs-3 labelText">车辆内部情况描述:</span>
+                        <span class="col-xs-9"><input type="text" class="form-control" id="innerDescribe"></span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-12">
+                        <span class="col-xs-1 labelText">车载设备检测:</span>
+                        <span class="col-xs-11">
+                            <label><input type="radio" name="deviceCheck" value="0">产品无损</label>
+                            <label><input type="radio" name="deviceCheck" value="1">有缺损，缺损的部件是</label>
+                            <span style="width:100px;display:inline-block;float:left;"><input type="text" class="form-control" id="defectPart"></span>
+                            <label><input type="radio" name="deviceCheck" value="2">线路被破坏</label>
+                        </span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-4">
+                        <span class="col-xs-3 labelText">定位功能:</span>
+                        <span class="col-xs-9">
+                            <label><input type="radio" name="positionFun" value="0">正常</label>
+                            <label><input type="radio" name="positionFun" value="1">不正常，需要检修</label>
+                        </span>
+                    </p>
+                    <p class="col-xs-4">
+                        <span class="col-xs-3 labelText">报警功能:</span>
+                        <span class="col-xs-9">
+                            <label><input type="radio" name="alarmFun" value="0">正常</label>
+                            <label><input type="radio" name="alarmFun" value="1">不正常，需要检修</label>
+                        </span>
+                    </p>
+                    <p class="col-xs-4">
+                        <span class="col-xs-4 labelText">车载电话功能:</span>
+                        <span class="col-xs-8">
+                            <label><input type="radio" name="callphoneFun" value="0">正常</label>
+                            <label><input type="radio" name="callphoneFun" value="1">不正常，需要检修</label>
+                        </span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-4">
+                        <span class="col-xs-3 labelText">锁油电功能:</span>
+                        <span class="col-xs-9">
+                            <label><input type="radio" name="lockFun" value="0">正常</label>
+                            <label><input type="radio" name="lockFun" value="1">不正常，需要检修</label>
+                        </span>
+                    </p>
+                    <p class="col-xs-4">
+                        <span class="col-xs-3 labelText">设/撤防功能:</span>
+                        <span class="col-xs-9">
+                            <label><input type="radio" name="defencesFun" value="0">正常</label>
+                            <label><input type="radio" name="defencesFun" value="1">不正常，需要检修</label>
+                        </span>
+                    </p>
+                    <p class="col-xs-4">
+                        <span class="col-xs-4 labelText">导航功能:</span>
+                        <span class="col-xs-8">
+                            <label><input type="radio" name="navFun" value="0">正常</label>
+                            <label><input type="radio" name="navFun" value="1">不正常，需要检修</label>
+                        </span>
+                    </p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-12">四、客户要求：</p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-12">
+                        <textarea type="text" class="form-control" style="padding:5px;line-height:20px;height:50px;" id="alarm_cust_req"></textarea>
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-primary pull-left" id="alarm_export">导出word</a>
+                <button type="button" class="btn btn-warning" id="alarm_submit">修改提交</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 处警响应表 END -->
+<!-- 弹窗 真实警情处理表 START -->
+<div class="modal fade Casereg" id="trueAlarmDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">真实警情处理表</h4>
+            </div>
+            <div class="modal-body" style="height:500px;overflow-y:auto;">
+                <table id="" class="display compact table_borders" cellspacing="0" border="1" width="100%">
+                    <tbody>
+                        <tr>
+                            <td class="labelText">受理日期</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">车台报警时间</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">报警内容</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">是否截获</td>
+                            <td><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">车牌号</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">车载电话</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">归属公司</td>
+                            <td><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">系统用户名</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">联系人姓名</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">二者关系（本人、家人、朋友、同事）</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">车型</td>
+                            <td><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">联系电话</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">安装时间</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">安装地点</td>
+                            <td colspan="3"><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">产品类型</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">月服务费金额（元）</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">销售人员</td>
+                            <td colspan="3"><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">车台报警地点</td>
+                            <td colspan="3"><input type="text" class="form-control"></td>
+                            <td class="labelText">经度</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">纬度</td>
+                            <td><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">报警时产品状态</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">报警时车辆状态</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td colspan="4"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">全套GPS遥控器及全套车钥匙保管情况</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">是否停在正规停车场</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td colspan="4"></td>
+                        </tr>
+
+                        <tr>
+                            <td class="labelText">客户核实车辆丢失后工作状况</td>
+                            <td class="labelText">客户来电核实车辆丢失时间</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">来电人姓名</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td colspan="3"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">是否下发监听指令</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">下发标准</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">是否回传监听内容</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">车载电话使用状况</td>
+                            <td><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">是否下发跟踪指令</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">下发标准</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">是否有信息回传</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">是否停止</td>
+                            <td><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">是否下发断油</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">下发标准</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">是否控停车辆</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">定位状态</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">接收时间</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">GPS时间</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">车辆定位地点</td>
+                            <td colspan="7"><input type="text" class="form-control" placeholder="（注：无信息回传，则此项填“无”）"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">经纬度</td>
+                            <td colspan="7"><input type="text" class="form-control" placeholder="（注：无信息回传，则此项填“无”）"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">产品状况</td>
+                            <td colspan="7"><input type="text" class="form-control" placeholder="（注：无信息回传，则此项填“无”）"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">车辆状况</td>
+                            <td colspan="7"><input type="text" class="form-control" placeholder="（注：无信息回传，则此项填“无”）"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">最近一次故障通知维修日期及时间</td>
+                            <td colspan="2"><input type="text" class="form-control"></td>
+                            <td class="labelText">故障现象</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">维修日期</td>
+                            <td colspan="2"><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">是否欠GPS服务费用</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">最后一次成功托收费用的月份</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">催缴日期及时间</td>
+                            <td colspan="3"><input type="text" class="form-control"></td>
+                        </tr>
+
+                        <tr>
+                            <td class="labelText">车台是否已升级</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">升级日期</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">升级方式</td>
+                            <td colspan="3"><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">是否享受我司全车盗抢险综合服务</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">是否另行购买商业盗抢险</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">商业盗抢险保险公司名称</td>
+                            <td colspan="3"><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">是否已加防拆盒</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">是否已加无线防拆</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td colspan="4"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">最近升级通知日期</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">是否已调通知升级录音</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td colspan="4"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">处警班长</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">调度员</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">监控员</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">监听员</td>
+                            <td><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">值班领导</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">通知时间</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">通知人</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">现场处警电工及司机</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">通知时间</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td colspan="4"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">出发时间</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">出发地点</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td colspan="4"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">处警车牌</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td class="labelText">到达时间</td>
+                            <td colspan="2"><input type="text" class="form-control"></td>
+                            <td class="labelText">返回时间</td>
+                            <td colspan="2"><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="7" class="labelText">处理过程</td>
+                            <td colspan="2">发生时间</td>
+                            <td colspan="5">详细内容</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="text" class="form-control"></td>
+                            <td colspan="5"><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="text" class="form-control"></td>
+                            <td colspan="5"><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="text" class="form-control"></td>
+                            <td colspan="5"><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="text" class="form-control"></td>
+                            <td colspan="5"><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="text" class="form-control"></td>
+                            <td colspan="5"><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="text" class="form-control"></td>
+                            <td colspan="5"><input type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">事后评估警情状况</td>
+                            <td>
+                                <label><input type="radio" name="jqzt">正常</label>
+                                <label><input type="radio" name="jqzt">异常</label>
+                            </td>
+                            <td colspan="6"><input type="text" class="form-control" placeholder="异常，另需简单说明"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">技术分析</td>
+                            <td class="labelText">分析人：</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td colspan="5"></td>
+                        </tr>
+                        <tr>
+                            <td class="labelText">其它信息</td>
+                            <td colspan="7"><textarea type="text" class="form-control" style="height:40px;"></textarea></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" id="">修改提交</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 真实警情处理表 END -->
+<!-- 弹窗 警情动态 START -->
+<div class="modal fade Casereg" id="alarmDynamicDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:780px;line-height:30px;font-size:14px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">警情动态</h4>
+            </div>
+            <div class="modal-body">
+                <div id="jqdt_1">
+                    <div style="text-indent:3em">
+                        <input type="text" class="form-control date" placeholder="接警时间">，服务中心接客户来电称车辆<b style="color:red;">粤B.EY254E</b>在<input type="text" class="form-control address" placeholder="案发详细地址">附近<input type="text" class="form-control stolen" placeholder="被抢\被盗\被劫">，我司立即安排处警人员赶往现场搜索，通过GPS定位系统，我司配合<input type="text" class="form-control stolen" placeholder="出警单位">警方成功在<input type="text" class="form-control address" placeholder="车辆截获地点">附近，截获(控停)一辆疑似<input type="text" class="form-control stolen" placeholder="被抢\被盗\被劫">的<input type="text" class="form-control simpleinfo" placeholder="车辆颜色">色<input type="text" class="form-control simpleinfo" placeholder="车辆类型">车。
+                    </div>
+                    <div style="text-indent:3em">
+                        此车车载定位系统：<input type="text" class="form-control stolen" placeholder="正常\不正常">；安装地点：<input type="text" class="form-control date" placeholder="安装地点">；销售经理：<input type="text" class="form-control simpleinfo" placeholder="销售经理">；该车于<input type="text" class="form-control date" placeholder="安装时间">安装我公司<input type="text" class="form-control stolen" placeholder="产品类型">产品，<input type="text" class="form-control date" placeholder="升级时间">升级产品。
+                    </div>
+                </div>
+                <div id="jqdt_2" style="display:none">
+                    <div style="text-indent:3em">
+                        <input type="text" class="form-control date" placeholder="接警时间">，服务中心收到<b style="color:red;">粤B.EY254E</b>的<input type="text" class="form-control simpleinfo" placeholder="车辆类型">车辆开门报警通知客户，客户查看车辆情况后来电中心称车辆停在<input type="text" class="form-control address" placeholder="案发详细地址">附近，发现车门被撬。服务中心通知到位，实现车辆监控服务行为，及时阻止车辆被盗。
+                    </div>
+                    <div style="text-indent:3em">
+                        此车车载定位系统：<input type="text" class="form-control stolen" placeholder="正常\不正常">；报警系统：<input type="text" class="form-control stolen" placeholder="正常\不正常">；安装地点：<input type="text" class="form-control date" placeholder="安装地点">；销售经理：<input type="text" class="form-control simpleinfo" placeholder="销售经理">；该车于<input type="text" class="form-control date" placeholder="安装时间">安装我公司<input type="text" class="form-control stolen" placeholder="产品类型">产品，<input type="text" class="form-control date" placeholder="升级时间">升级产品。
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" id="">修改提交</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 真实警情处理表 END -->
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/fnReloadAjax.js"></script>
+<script type="text/javascript" src="../dist/plugins/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="../js/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/reports.js"></script>
+<script type="text/javascript">
+    $("#importantEventBtn").click(function(){//查看《重大事件报告》
+        if($(".row_selected_bc").length>0){
+            $("#importantEventDialog modal-body input").val("");//清空所有填空处
+            // $("#importantEvent_vehicle_id,#importantEvent_e_id").val("");//vehicle_id,e_id
+            $("input[name='isstandard_park']:checked").removeAttr("checked");//去掉单选（是否正规停车场）
+
+            var itemIm = getEachline();
+            api_url = '../app/event/report'; //搜索API
+            var v_id=itemIm.vehicle_id;//车辆id
+            var st_id=itemIm.stolen_id;//案件id
+            params = {vehicle_id: v_id,stolen_id: st_id};//车辆id、案件id
+            $.getJSON(api_url, params, function(result){//查询
+                if(result && result.success==true){
+                    $("#importantEventDialog").modal("show");//弹窗显示
+                    // 固定数据 st
+                    $("#importantEvent_vehicle_id").val(result.data.vehicle_id);//vehicle_id
+                    $("#importantEvent_e_id").val(result.data.e_id);//e_id
+                    $("#importantEvent_stolen_id").val(result.data.stolen_id)//stolen_id
+                    $("#impEve_h_name_pla").empty().html(result.data.customer_name+"/"+result.data.plate_no);//姓名/车牌
+                    $("#impEve_h_type").empty().html(result.data.model_name);//车型
+                    $("#impEve_h_phone").empty().html(result.data.call_in_phone);//来电号码
+                    $("#impEve_h_fixTime").empty().html(result.data.fix_time);//安装时间（服务时间）
+                    $("#impEve_h_proType").empty().html(result.data.unittype);//产品类型
+                    
+                    $("#impEve_h_upgrade").empty().html(result.data.up_flag);//是否升级
+                    $("#impEve_h_upgradeT").empty().html(result.data.up_time);//升级时间
+                    $("#impEve_h_upgradeType").empty().html(result.data.up_way);//升级方式
+                    $("#impEve_h_tamperWireless").empty().html(result.data.tamper_wireless);//无线防拆
+                    $("#impEve_h_tamperBox").empty().html(result.data.tamper_box);//防拆盒
+                    $("#impEve_h_insurance").empty().html(result.data.is_pilfer);//是否享受我司盗抢险服务
+                    $("#impEve_h_insuranceName").empty().html(result.data.is_pilfer);//我司盗抢险公司名称
+                    $("#impEve_h_forward_date").empty().html(result.data.forward_date);//转发日期
+                    $("#impEve_h_callback_date").empty().html(result.data.ret_date);//回访日期
+                    // 固定数据 nd
+                    //填写数据 st
+                    $("#impEve_v_even").val(result.data.e_brief);//事件简要
+                    $("#impEve_v_site").val(result.data.place);//案发地点
+
+                    if(result.data.is_std_depot !== null){//是否正规停车场
+                        $.each($("input[name='isstandard_park']"), function(i,item){
+                            if($(item).val() == result.data.is_std_depot){
+                                $(item).attr("checked","checked");
+                            };
+                        });
+                    };
+
+                    $("#impEve_v_police").val(result.data.vehicle_state);//案发状态
+                    $("#impEve_v_man").val(result.data.callin_brief);//第一接听时间及接听人
+                    $("#impEve_v_monitor").val(result.data.monitor);//当班班长
+                    $("#impEve_v_speed").val(result.data.speed);//行驶速度
+                    $("#impEve_v_runtime").val(result.data.driver_time);//行驶时间
+                    $("#impEve_v_else_insuranceName").val(result.data.ic_name);//另行购买商业盗抢险
+                    $("#impEve_v_alarmMan").val(result.data.alarm_work);//现场处理电工及司机*******************
+                    $("#impEve_v_inform_time").val(result.data.alarm_notice_time);//通知时间
+                    $("#impEve_v_start_time").val(result.data.departure_time);//出发时间
+                    $("#impEve_v_start_site").val(result.data.departure);//出发地点
+                    $("#impEve_v_alarm_pla").val(result.data.alarm_plate);//处警车牌
+                    $("#impEve_v_arrive_time").val(result.data.arrival_time);//到达时间
+                    $("#impEve_v_back_time").val(result.data.back_time);//返回时间
+                    $("#impEve_v_check_result").val(result.data.work_result);//电工检查结果
+                    $("#impEve_v_content").val(result.data.event_content);//事件内容
+                    $("#impEve_v_req").val(result.data.cstm_request);//客户要求
+                    $("#impEve_v_monitor_accepted").val(result.data.ac_remark);//当班班长受理情况
+                    $("#impEve_v_consociation").val(result.data.collabora_dept);//协作部门
+                    $("#impEve_v_consociation_man").val(result.data.ac_op_name);//受理人
+                    $("#impEve_v_deal_result").val(result.data.handle_result);//处理结果
+                    $("#impEve_v_callback").val(result.data.ret_remark);//回访情况
+                    $("#impEve_v_satisfaction").val(result.data.cs);//客户满意度
+                    $("#impEve_v_remark").val(result.data.remark);//备注
+                    //填写数据 nd
+                } else{
+                    alert("重大事件报告表获取失败");
+                };
+            });
+        } else{
+            alert("请选择一条记录");
+        };
+    });
+
+    $("#impEve_submit").click(function(){//查看《重大事件报告》提交
+        var vehicle_id = $("#importantEvent_vehicle_id").val();//vehicle_id
+        var e_id = $("#importantEvent_e_id").val();//重大事件报告id
+        var stolen_id = $("#importantEvent_stolen_id").val();//stolen_id
+
+        //填写的数据 st
+        var e_brief = $("#impEve_v_even").val();//事件简要
+        var place = $("#impEve_v_site").val();//案发地点
+        var is_std_depot = $("input[name='isstandard_park']:checked").val();//是否正规停车场
+        var vehicle_state = $("#impEve_v_police").val();//案发状态
+        var callin_brief = $("#impEve_v_man").val();//第一接听时间及接听人
+        var monitor = $("#impEve_v_monitor").val();//当班班长
+        var speed = $("#impEve_v_speed").val();//行驶速度
+        var driver_time = $("#impEve_v_runtime").val();//行驶时间
+        var ic_name = $("#impEve_v_else_insuranceName").val();//另行购买商业盗抢险
+        var alarm_work = $("#impEve_v_alarmMan").val();//现场处理电工及司机***************
+        var alarm_notice_time = $("#impEve_v_inform_time").val();//通知时间
+        var departure_time = $("#impEve_v_start_time").val();//出发时间
+        var departure = $("#impEve_v_start_site").val();//出发地点
+        var alarm_plate = $("#impEve_v_alarm_pla").val();//处警车牌
+        var arrival_time = $("#impEve_v_arrive_time").val();//到达时间
+        var back_time = $("#impEve_v_back_time").val();//返回时间
+        var work_result = $("#impEve_v_check_result").val();//电工检查结果
+        var event_content = $("#impEve_v_content").val();//事件内容
+        var cstm_request = $("#impEve_v_req").val();//客户要求
+        var ac_remark = $("#impEve_v_monitor_accepted").val();//当班班长受理情况
+        var collabora_dept = $("#impEve_v_consociation").val();//协作部门
+        var ac_op_name = $("#impEve_v_consociation_man").val();//受理人
+        var handle_result = $("#impEve_v_deal_result").val();//处理结果
+        var ret_remark = $("#impEve_v_callback").val();//回访情况
+        var cs = $("#impEve_v_satisfaction").val();//客户满意度
+        var remark = $("#impEve_v_remark").val();//备注
+        //填写的数据 nd
+        var api_url = '../app/event/edit'; //搜索API
+        var params = {
+            vehicle_id: vehicle_id,
+            e_id: e_id,
+            stolen_id: stolen_id,
+            e_brief: e_brief,
+            place: place,
+            is_std_depot: is_std_depot,
+
+            vehicle_state: vehicle_state,
+            callin_brief: callin_brief,
+            monitor: monitor,
+            speed: speed,
+            driver_time: driver_time,
+            ic_name: ic_name,
+            alarm_work: alarm_work,
+
+            alarm_notice_time: alarm_notice_time,
+            departure_time: departure_time,
+            departure: departure,
+            alarm_plate: alarm_plate,
+            arrival_time: arrival_time,
+            back_time: back_time,
+
+            work_result: work_result,
+            event_content: event_content,
+            cstm_request: cstm_request,
+            ac_remark: ac_remark,
+            collabora_dept: collabora_dept,
+            ac_op_name: ac_op_name,
+
+            handle_result: handle_result,
+            ret_remark: ret_remark,
+            cs: cs,
+            remark: remark
+        };//参数
+        // console.log(params);
+        $.post(api_url, params, function(result){
+            result = eval('(' + result + ')');
+            if(result && result.success==true){
+                
+            }else{
+                alert("《重大事件报告》提交失败："+result.message);
+            };
+        });
+    });
+
+    $("#impEve_export").click(function(){//重大事件报告导出
+        var param = "vehicle_id="+$("#importantEvent_vehicle_id").val()+"&stolen_id="+$("#importantEvent_stolen_id").val();
+        $(this).attr("href","../app/event/report/export?"+param);
+    });
+
+    $("#alarmDialogBtn").click(function(){//查看《处警响应表》
+        if($(".row_selected_bc").length>0){
+            $("#alarmDialog modal-body input").val("");//清空所有填空处
+            $("#alarmDialog modal-body textarea").val("");//输入框清空
+            $("#alarmDialog input[type='radio']").removeAttr("checked");//去掉单选
+
+            var itemIm = getEachline();
+            var api_url = '../app/alarm/response/report'; //搜索API
+            var v_id = itemIm.vehicle_id;//车辆id
+            var st_id = itemIm.stolen_id;//案件id
+            var params = {vehicle_id: v_id,stolen_id: st_id};//车辆id、案件id
+            $.getJSON(api_url, params, function(result){//查询
+                if(result && result.success==true){
+                    $("#alarmDialog").modal("show");//弹窗显示
+                    $("#alarmDialog_vehicle_id").val(result.data.vehicle_id);//vehicle_id
+                    $("#alarmDialog_res_id").val(result.data.res_id);//res_id
+                    $("#alarmDialog_stolen_id").val(result.data.stolen_id)//stolen_id
+
+                    // 一、处警人员资料：
+                    $("#alarm_man_name").val(result.data.alarm_mans);//处警人员
+                    $("#alarm_man_pla").val(result.data.alarm_plate);//处警车牌
+                    $("#alarm_man_sub").val(result.data.alarm_subco_name);//所属公司
+                    $("#alarm_man_alarmdate").val(result.data.alarm_date);//处警日期
+                    $("#alarm_man_informdate").val(result.data.notice_time);//通知时间
+                    
+                    $("#alarm_man_leavedate").val(result.data.departure_time);//出发时间
+                    $("#alarm_man_leavesite").val(result.data.departure);//出发地点
+                    $("#alarm_man_arrivedate").val(result.data.arrival_time);//到达时间
+                    $("#alarm_man_backdate").val(result.data.back_time);//返程时间
+                    $("#alarm_man_address").val(result.data.res_place);//处警地点
+                    
+                    //二、客户资料：
+                    $("#alarm_cust_pla").val(result.data.plate_no);//客户车牌
+                    $("#alarm_cust_name").val(result.data.customer_name);//用户名
+                    $("#alarm_cust_sub").val(result.data.cstm_subco_name);//所属公司
+                    $("#alarm_cust_cartype").val(result.data.model_name);//车型
+                    $("#alarm_cust_color").val(result.data.color);//颜色
+                    
+                    $("#alarm_cust_engineno").val(result.data.engine_no);//发动机/车架号
+                    $("#alarm_cust_1").val();//客户1
+                    $("#alarm_cust_1_phone").val();//联系电话1
+                    $("#alarm_cust_2").val();//客户2
+                    $("#alarm_cust_2_phone").val();//联系电话2
+
+                    //三、现场环境：
+                    if(result.data.phone_signal !== null){//手机信号
+                        $.each($("input[name='phoneSignal']"), function(i,item){
+                            if($(item).val() == result.data.phone_signal){
+                                $(item).attr("checked","checked");
+                            };
+                        });
+                    };
+                    if(result.data.gps_signal !== null){//GPS信号
+                        $.each($("input[name='GPSSignal']"), function(i,item){
+                            if($(item).val() == result.data.gps_signal){
+                                $(item).attr("checked","checked");
+                            };
+                        });
+                    };
+                    if(result.data.is_std_depot !== null){//案发车辆是否停放于正规保安发卡的停车场
+                        $.each($("input[name='parkStatus']"), function(i,item){
+                            if($(item).val() == result.data.is_std_depot){
+                                $(item).attr("checked","checked");
+                            };
+                        });
+                    };
+                    if(result.data.is_monitor !== null){//案发地点是否有录像监控
+                        $.each($("input[name='videoRecord']"), function(i,item){
+                            if($(item).val() == result.data.is_monitor){
+                                $(item).attr("checked","checked");
+                            };
+                        });
+                    };
+                    if(result.data.has_cullet !== null){//案发地点是否有碎玻璃
+                        $.each($("input[name='isGlass']"), function(i,item){
+                            if($(item).val() == result.data.has_cullet){
+                                $(item).attr("checked","checked");
+                            };
+                        });
+                    };
+
+                    $("#searchRange").val(result.data.search_scope);//搜索范围
+
+                    if(result.data.search_result !== null){//搜索结果
+                        $.each($("input[name='searchResult']"), function(i,item){
+                            if($(item).val() == result.data.search_result){
+                                $(item).attr("checked","checked");
+                            };
+                        });
+                    };
+                    if(result.data.has_police !== null){//现场有无警方工作人员
+                        $.each($("input[name='isAlarmMan']"), function(i,item){
+                            if($(item).val() == result.data.has_police){
+                                $(item).attr("checked","checked");
+                            };
+                        });
+                    };
+                    $("#localPolice").val(result.data.police_station);//派出所
+
+                    $("#conditionDescribe").val(result.data.env_remark);//其他环境描述
+                    $("#appearDescribe").val(result.data.vehicle_outside);//如成功搜获车辆，需填写车辆外形描述
+                    $("#doorDescribe").val(result.data.doorlock_remark);//门锁情况描述
+                    $("#innerDescribe").val(result.data.vehicle_inside);//车辆内部情况描述
+
+                    if(result.data.line_damage !== null){//先判断是否有线路损坏，再判断是否车载设备
+                        if(result.data.line_damage == 1){//线路损坏 0无损 1有损
+                            $.each($("input[name='deviceCheck']"), function(i,item){
+                                if($(item).val() == 2){//线路被破坏选项被选中
+                                    $(item).attr("checked","checked");
+                                };
+                            });
+                        } else{
+                            if(result.data.unit_chk !== null){//车载设备检测 0无损 1有损
+                                $.each($("input[name='deviceCheck']"), function(i,item){
+                                    if($(item).val() == result.data.unit_chk){
+                                        $(item).attr("checked","checked");
+                                    };
+                                });
+                            };
+                        };
+                                
+                    };
+
+                    $("#defectPart").val(result.data.damage_part);//损坏部件
+
+                    if(result.data.locate_func !== null){//定位功能
+                        $.each($("input[name='positionFun']"), function(i,item){
+                            if($(item).val() == result.data.locate_func){
+                                $(item).attr("checked","checked");
+                            };
+                        });
+                    };
+                    if(result.data.alarm_func !== null){//报警功能
+                        $.each($("input[name='alarmFun']"), function(i,item){
+                            if($(item).val() == result.data.alarm_func){
+                                $(item).attr("checked","checked");
+                            };
+                        });
+                    };
+                    if(result.data.call_func !== null){//车载电话功能
+                        $.each($("input[name='callphoneFun']"), function(i,item){
+                            if($(item).val() == result.data.call_func){
+                                $(item).attr("checked","checked");
+                            };
+                        });
+                    };
+                    if(result.data.lock_oil_func !== null){//锁油电功能
+                        $.each($("input[name='lockFun']"), function(i,item){
+                            if($(item).val() == result.data.lock_oil_func){
+                                $(item).attr("checked","checked");
+                            };
+                        });
+                    };
+                    if(result.data.defences_func !== null){//设/撤防功能
+                        $.each($("input[name='defencesFun']"), function(i,item){
+                            if($(item).val() == result.data.defences_func){
+                                $(item).attr("checked","checked");
+                            };
+                        });
+                    };
+                    if(result.data.nav_func !== null){//导航功能
+                        $.each($("input[name='navFun']"), function(i,item){
+                            if($(item).val() == result.data.nav_func){
+                                $(item).attr("checked","checked");
+                            };
+                        });
+                    };
+
+                    $("#alarm_cust_req").val(result.data.cstm_request);//四、客户要求
+                } else{
+                    alert("处警响应表获取失败");
+                };
+            });
+        } else{
+            alert("请选择一条记录");
+        };
+    });
+
+    $("#alarm_submit").click(function(){//《处警响应表》提交
+        var vehicle_id = $("#alarmDialog_vehicle_id").val();//vehicle_id
+        var res_id = $("#alarmDialog_res_id").val();//处警响应id
+        var stolen_id = $("#alarmDialog_stolen_id").val();//stolen_id
+
+        //一、处警人员资料
+        var alarm_mans = $("#alarm_man_name").val();//处警人员
+        var alarm_plate = $("#alarm_man_pla").val();//处警车牌
+        var alarm_subco_name = $("#alarm_man_sub").val();//所属公司
+        var alarm_date = $("#alarm_man_alarmdate").val();//处警日期
+        var notice_time = $("#alarm_man_informdate").val();//通知时间
+        var departure_time = $("#alarm_man_leavedate").val();//出发时间
+        var departure = $("#alarm_man_leavesite").val();//出发地点
+        var arrival_time = $("#alarm_man_arrivedate").val();//到达时间
+        var back_time = $("#alarm_man_backdate").val();//返程时间
+        var res_place = $("#alarm_man_address").val();//处警地点
+        //二、客户资料
+        var plate_no = $("#alarm_cust_pla").val();//客户车牌
+        var customer_name = $("#alarm_cust_name").val();//用户名
+        var cstm_subco_name = $("#alarm_cust_sub").val();//所属公司
+        var model_name = $("#alarm_cust_cartype").val();//车型
+        var color = $("#alarm_cust_color").val();//颜色
+        var engine_no = $("#alarm_cust_engineno").val();//发动机车架号
+        // var work_result = $("#alarm_cust_1").val();//客户1
+        // var event_content = $("#alarm_cust_1_phone").val();//联系电话1
+        // var cstm_request = $("#alarm_cust_2").val();//客户2
+        // var ac_remark = $("#alarm_cust_2_phone").val();//联系电话2
+        //三、现场环境
+        var phone_signal = $("input[name='phoneSignal']:checked").val();//手机信号
+        var gps_signal = $("input[name='GPSSignal']:checked").val();//GPS信号
+        var is_std_depot = $("input[name='parkStatus']:checked").val();//案发车辆是否停放于正规保安发卡的停车场
+        var is_monitor = $("input[name='videoRecord']:checked").val();//案发地点是否有录像监控
+        var has_cullet = $("input[name='isGlass']:checked").val();//案发地点是否有碎玻璃
+        var search_scope = $("#searchRange").val();//搜索范围
+        var search_result = $("input[name='searchResult']:checked").val();//搜索结果
+        var has_police = $("input[name='isAlarmMan']:checked").val();//现场有无警方工作人员
+        var police_station = $("#localPolice").val();//所属派出所
+        var env_remark = $("#conditionDescribe").val();//其他环境描述
+        var vehicle_outside = $("#appearDescribe").val();//如成功搜获车辆，需填写车辆外形描述
+        var doorlock_remark = $("#doorDescribe").val();//门锁情况描述
+        var vehicle_inside = $("#innerDescribe").val();//车辆内部情况描述
+
+        var unit_chk = "";//车载设备检测
+        var line_damage = "";//线路破坏
+        if($("input[name='deviceCheck']:checked").val()==0){//无损
+            unit_chk = 0;
+            line_damage = 0;
+        } else if($("input[name='deviceCheck']:checked").val()==1){//有损+损坏部件
+            unit_chk = 1;
+            line_damage = 0;
+        } else if($("input[name='deviceCheck']:checked").val()==2){//线路被破坏
+            unit_chk = 1;
+            line_damage = 1;
+        };
+        var damage_part = $("#impEve_v_remark").val();//损坏的部件是
+
+        var locate_func = $("input[name='positionFun']:checked").val();//定位功能
+        var alarm_func = $("input[name='alarmFun']:checked").val();//报警功能
+        var call_func = $("input[name='callphoneFun']:checked").val();//车载电话功能
+        var lock_oil_func = $("input[name='lockFun']:checked").val();//锁油电功能
+        var defences_func = $("input[name='defencesFun']:checked").val();//设/撤防功能
+        var nav_func = $("input[name='navFun']:checked").val();//导航功能
+        //四、客户要求
+        var cstm_request = $("#alarm_cust_req").val();//客户要求
+
+        //填写的数据 nd
+        var api_url = '../app/alarm/response/edit'; //搜索API
+        var params = {
+            res_id: res_id,
+            vehicle_id: vehicle_id,
+            stolen_id: stolen_id,
+
+            alarm_mans: alarm_mans,
+            alarm_plate: alarm_plate,
+            alarm_subco_name: alarm_subco_name,
+            alarm_date: alarm_date,
+            notice_time: notice_time,
+            departure_time: departure_time,
+            departure: departure,
+            arrival_time: arrival_time,
+            back_time: back_time,
+            res_place: res_place,
+
+            // plate_no: plate_no,
+            // customer_name: customer_name,
+            // cstm_subco_name: cstm_subco_name,
+            // model_name: model_name,
+            // color: color,
+            // engine_no: engine_no,
+            // departure: departure,
+            // arrival_time: arrival_time,
+            // back_time: back_time,
+            // res_place: res_place,
+
+            phone_signal: phone_signal,
+            gps_signal: gps_signal,
+            is_std_depot: is_std_depot,
+            is_monitor: is_monitor,
+            has_cullet: has_cullet,
+            search_scope: search_scope,
+            search_result: search_result,
+            has_police: has_police,
+            police_station: police_station,
+            env_remark: env_remark,//其他环境描述
+
+            vehicle_outside: vehicle_outside,
+            doorlock_remark: doorlock_remark,
+            vehicle_inside: vehicle_inside,
+            unit_chk: unit_chk,
+            line_damage: line_damage,
+            damage_part: damage_part,
+
+            locate_func: locate_func,
+            alarm_func: alarm_func,
+            call_func: call_func,
+            lock_oil_func: lock_oil_func,
+            defences_func: defences_func,
+            nav_func: nav_func,
+
+            cstm_request:cstm_request
+        };//参数
+        // console.log(params);
+        $.post(api_url, params, function(result){
+            result = eval('(' + result + ')');
+            if(result && result.success==true){
+                
+            }else{
+                alert("《处警响应表》提交失败："+result.message);
+            };
+        });
+    });
+
+    $("#alarm_export").click(function(){//处警响应表导出
+        var param = "vehicle_id="+$("#alarmDialog_vehicle_id").val()+"&stolen_id="+$("#alarmDialog_stolen_id").val();
+        $(this).attr("href","../app/alarm/response/report/export?"+param);
+    });
+
+var getEachline = function(){
+    var $tr = $(".row_selected_bc");
+    var name = $tr.children("td").eq(1).html();//姓名
+    var plate_no = $tr.children("td").eq(2).html();//车牌
+    var modelName = $tr.children("td").eq(4).html();//车型
+    var unitType = $tr.children("td").eq(5).html();//产品型号
+    var createDate = $tr.children("td").eq(7).html();//入网时间
+    var endTime = $tr.children("td").eq(13).html();//结案时间
+    var tamperBox = $tr.children("td").eq(14).html();//是否已加放拆盒
+    var tamperWireless = $tr.children("td").eq(16).html();//无线防拆
+    var vehicle_id = $tr.children("td").eq(17).html();//车辆id
+    var stolen_id = $tr.children("td").eq(18).html();//案发记录编号id
+
+    var details = {
+        "name":name,
+        "plate_no":plate_no,
+        "modelName":modelName,
+        "unitType":unitType,
+        "createDate":createDate,
+        "endTime":endTime,
+        "tamperBox":tamperBox,
+        "tamperWireless":tamperWireless,
+        "vehicle_id":vehicle_id,
+        "stolen_id":stolen_id
+    }
+    return details;
+}
+
+</script>
+</body>
+</html>

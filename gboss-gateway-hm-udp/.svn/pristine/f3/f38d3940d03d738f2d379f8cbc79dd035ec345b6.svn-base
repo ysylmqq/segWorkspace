@@ -1,0 +1,549 @@
+package cc.chinagps.gateway.unit.leopaard.download;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.seg.lib.util.Util;
+
+import cc.chinagps.gateway.buff.CommandBuff;
+import cc.chinagps.gateway.buff.CommandBuff.Command;
+import cc.chinagps.gateway.exceptions.WrongFormatException;
+import cc.chinagps.gateway.log.LogManager;
+import cc.chinagps.gateway.seat.cmd.CmdUtil;
+import cc.chinagps.gateway.seat.cmd.ServerToUnitCommand;
+import cc.chinagps.gateway.stream.OutputPackageEncoder;
+import cc.chinagps.gateway.unit.UnitSocketSession;
+import cc.chinagps.gateway.unit.leopaard.define.LeopaardDefines;
+import cc.chinagps.gateway.unit.leopaard.pkg.LeopaardHead;
+import cc.chinagps.gateway.unit.leopaard.pkg.LeopaardPackage;
+import cc.chinagps.gateway.unit.leopaard.util.LeopaardPkgUtil;
+import cc.chinagps.gateway.unit.leopaard.util.LeopaardTimeFormatUtil;
+import cc.chinagps.gateway.unit.seg.download.SegServerToUnitCommand;
+import cc.chinagps.gateway.util.HexUtil;
+
+public class LeopaardDownloadCmdEncoder implements OutputPackageEncoder {
+	private Logger logger_debug = Logger.getLogger(LogManager.LOGGER_NAME_DEBUG);
+
+	@Override
+	public ServerToUnitCommand encode(CommandBuff.Command userCmd, UnitSocketSession unitSession) throws Exception {
+		int cmdIdx = userCmd.getCmdId();
+		byte[] body = new byte[0];
+		List<String> params = new ArrayList<String>();
+		int paramNum = 0;
+		int bodyLen = 0;
+		int pos = 0;
+		switch (cmdIdx) {
+		/** =========长丰控制指令======== */
+		case CmdUtil.CMD_ID_OPEN_DOOR:
+			return getCenterCTRLLockCmd(userCmd, unitSession, true);
+		case CmdUtil.CMD_ID_LOCK_DOOR:
+			return getCenterCTRLLockCmd(userCmd, unitSession, false);
+		case CmdUtil.CMD_ID_LEOPAARD_OPEN_WINDOW:
+			return getWindowControlCmd(userCmd, unitSession, true);
+		case CmdUtil.CMD_ID_LEOPAARD_CLOSE_WINDOW:
+			return getWindowControlCmd(userCmd, unitSession, false);
+		/** =========长丰查询指令======== */
+		case CmdUtil.CMD_ID_LEOPAARD_QUERY_CMD:
+			params = userCmd.getParamsList();
+			paramNum = params.size();
+			if (paramNum == 0) {
+				throw new WrongFormatException("(leopaard)no param");
+			}
+			bodyLen = 7 + paramNum;
+			pos = 0;
+			body = new byte[bodyLen];
+			addTime(body);
+			pos += 6;
+			body[pos++] = (byte) paramNum;
+
+			for (int i = 0; i < paramNum; i++) {
+				body[pos++] = Byte.valueOf(params.get(i));
+			}
+
+			return getCommonQueryCmd(userCmd, unitSession, body);
+		case CmdUtil.CMD_ID_LEOPAARD_SET_CMD:
+			return getSetCmd(userCmd, unitSession);
+		case CmdUtil.CMD_ID_UNIT_UPDATE_FTP:
+			return getUnitFtpUpgradeCmd(userCmd, unitSession);
+		case CmdUtil.CMD_ID_LEOPAARD_COLD_AIRCONDITION:
+			return getAirconditionCmd(userCmd, unitSession, 2);
+		case CmdUtil.CMD_ID_LEOPAARD_HOT_AIRCONDITION:
+			return getAirconditionCmd(userCmd, unitSession, 1);
+		case CmdUtil.CMD_ID_LEOPAARD_CLOSE_AIRCONDITION:
+			return getAirconditionCmd(userCmd, unitSession, 3);
+		case CmdUtil.CMD_ID_SEARCH_VEHICLE:
+			return getSearchVehicleCmd(userCmd, unitSession);
+		case CmdUtil.CMD_ID_BOX_START_ENGINE:// 远程启动
+			return getEngineStartCmd(userCmd, unitSession);
+		case CmdUtil.CMD_ID_BOX_STOP_ENGINE:// 远程熄火
+			return getEngineStopCmd(userCmd, unitSession);
+		case CmdUtil.CMD_ID_POSITION:// 查车
+			byte[] cmdParam = new byte[3];
+			cmdParam[0] = 0x09;
+			cmdParam[1] = 0x1;
+			return getCommonControlCmd(userCmd, unitSession, (byte) 0x80, cmdParam);
+		default:
+			throw new WrongFormatException("(leopaard)no encoder, cmdId:" + cmdIdx);
+		}
+	}
+
+	private ServerToUnitCommand getSetCmd(Command userCmd, UnitSocketSession unitSession) throws Exception {
+		List<String> params = new ArrayList<String>();
+		int paramNum = 0;
+		int pos = 0;
+		params = userCmd.getParamsList();
+		paramNum = params.size();
+		if (paramNum == 0) {
+			throw new WrongFormatException("(leopaard)no param");
+		}
+		List<byte[]> paramBytes = new ArrayList<byte[]>();
+		byte[] time8 = LeopaardTimeFormatUtil.getCurrentTime8();
+		paramBytes.add(time8);
+		paramBytes.add(new byte[] { (byte) paramNum });
+		byte[] temp = new byte[0];
+		for (int i = 0; i < paramNum; i++) {
+			String param = params.get(i);
+			String paramId = param.split("@")[0];
+			String paramValue = param.split("@")[1];
+			String values[] = paramValue.split(",");
+			int id = Integer.valueOf(paramId);
+			paramBytes.add(new byte[] { (byte) id });
+			switch (id) {
+			case 0x0B:// 服务中心号码
+				byte[] serviceCenterCallByte = values[0].getBytes(LeopaardDefines.CHARSET);
+				temp = new byte[16];
+				System.arraycopy(serviceCenterCallByte, 0, temp, 0, Math.min(serviceCenterCallByte.length, 16));
+				break;
+			case 0x0C:// 短信业务中心号码、上行号码
+				byte[] smCallUpByte = values[0].getBytes(LeopaardDefines.CHARSET);
+				temp = new byte[25];
+				System.arraycopy(smCallUpByte, 0, temp, 0, Math.min(smCallUpByte.length, 25));
+				break;
+			case 0x0D:// 短信业务中心号码、下行号码
+				byte[] smCallDownByte = values[0].getBytes(LeopaardDefines.CHARSET);
+				temp = new byte[25];
+				System.arraycopy(smCallDownByte, 0, temp, 0, Math.min(smCallDownByte.length, 25));
+				break;
+			case 0x0E:// E-call 服务电话
+				byte[] eCallByte = values[0].getBytes(LeopaardDefines.CHARSET);
+				temp = new byte[16];
+				System.arraycopy(eCallByte, 0, temp, 0, Math.min(eCallByte.length, 16));
+				break;
+			case 0x0F:// I-call 服务电话
+				byte[] iCallByte = values[0].getBytes(LeopaardDefines.CHARSET);
+				temp = new byte[16];
+				System.arraycopy(iCallByte, 0, temp, 0, Math.min(iCallByte.length, 16));
+				break;
+			case 0x10:// acc是否上报
+				byte isAccDeliver = Byte.valueOf(values[0]);
+				temp = new byte[1];
+				temp[0] = isAccDeliver;
+				break;
+			case 0x11:// 休眠是否上报
+				byte isSleepDeliver = Byte.valueOf(values[0]);
+				temp = new byte[1];
+				temp[0] = isSleepDeliver;
+				break;
+			case 0x12:// 关机是否上报
+				byte isPowerOffDeliver = Byte.valueOf(values[0]);
+				temp = new byte[1];
+				temp[0] = isPowerOffDeliver;
+				break;
+			case 0x13:// 车身变化是否上报
+				byte isVehicleChangeDeliver = Byte.valueOf(values[0]);
+				temp = new byte[1];
+				temp[0] = isVehicleChangeDeliver;
+				break;
+			case 0x14:// 故障是否上报
+				byte isFaultDeliver = Byte.valueOf(values[0]);
+				temp = new byte[1];
+				temp[0] = isFaultDeliver;
+				break;
+			case 0x16:// 体检配置信息
+				temp = new byte[] { 0, 0, 0, 0, 0 };
+				break;
+			case 0x17:// 数据采集信息
+				pos = 0;
+				byte collectParamsNum = Byte.valueOf(values[0]);
+				temp = new byte[1 + 2 + collectParamsNum * 2];
+				temp[pos++] = collectParamsNum;
+				byte[] timeByte = Util.getShortByte(Short.valueOf(values[1]));
+				System.arraycopy(timeByte, 0, temp, pos, timeByte.length);
+				pos += 2;
+				for (int j = 0; j < collectParamsNum; j++) {
+					byte[] paramByte = Util.getShortByte(Short.valueOf(values[j + 2]));
+					System.arraycopy(paramByte, 0, temp, pos, paramByte.length);
+					pos += 2;
+				}
+				break;
+			case 0x18:// 音响主机连接状态
+				byte isSoundDeviceConnected = Byte.valueOf(values[0]);
+				temp = new byte[1];
+				temp[0] = isSoundDeviceConnected;
+				break;
+			case 0x19:// 定时上报信息
+				byte intervalByte[] = Util.getShortByte(Short.valueOf(values[0]));
+				temp = new byte[2];
+				System.arraycopy(intervalByte, 0, temp, 0, intervalByte.length);
+				pos += 2;
+				break;
+			case 0x1B:// 主服务器网络参数
+				temp = new byte[6];
+				pos = 0;
+				byte[] masterIpByte = new byte[4];
+				masterIpByte = cc.chinagps.gateway.util.Util.getIPBytes(values[0]);
+				System.arraycopy(masterIpByte, 0, temp, pos, masterIpByte.length);
+				pos += 4;
+				byte[] masterPort = Util.getShortByte(Short.valueOf(values[1]));
+				System.arraycopy(masterPort, 0, temp, pos, masterPort.length);
+				pos += 2;
+				break;
+			case 0x1C:// 从服务器网络参数
+				temp = new byte[6];
+				pos = 0;
+				byte[] slaveIpByte = cc.chinagps.gateway.util.Util.getIPBytes(values[0]);
+				System.arraycopy(slaveIpByte, 0, temp, pos, slaveIpByte.length);
+				pos += 4;
+				byte[] slavePort = Util.getShortByte(Short.valueOf(values[1]));
+				System.arraycopy(slavePort, 0, temp, pos, slavePort.length);
+				pos += 2;
+				break;
+			case 0x1D:// 一键导航目的地下发参数
+				if (values.length < 4) {
+					throw new WrongFormatException("(leoparrd)not enough params, min: 4, current:" + values.length);
+				}
+				temp = new byte[1 + (32 + 4 + 4) * 4];
+				pos = 0;
+				int index = 0;
+				byte searchType = Byte.valueOf(values[index++]);
+				temp[pos++] = searchType;
+				// 目的地poi名称、经纬度
+				byte destPoiName[] = values[index++].getBytes("GBK");
+				System.arraycopy(destPoiName, 0, temp, pos, Math.min(destPoiName.length, 32));
+				pos += 32;
+				byte[] destLon = Util.getIntByte((int) (Double.valueOf(values[index++]) * 10000000));
+				System.arraycopy(destLon, 0, temp, pos, 4);
+				pos += 4;
+				byte[] destLat = Util.getIntByte((int) (Double.valueOf(values[index++]) * 10000000));
+				System.arraycopy(destLat, 0, temp, pos, 4);
+				pos += 4;
+
+				// 必经点1、2、3 poi名称、经纬度
+				byte[] necessaryPoint1PoiName = values[index++].getBytes("GBK");
+				System.arraycopy(necessaryPoint1PoiName, 0, temp, pos, Math.min(necessaryPoint1PoiName.length, 32));
+				pos += 32;
+				byte[] necessaryPoint1Lon = Util.getIntByte((int) (Double.valueOf(values[index++]) * 10000000));
+				System.arraycopy(necessaryPoint1Lon, 0, temp, pos, 4);
+				pos += 4;
+				byte[] necessaryPoint1Lat = Util.getIntByte((int) (Double.valueOf(values[index++]) * 10000000));
+				System.arraycopy(necessaryPoint1Lat, 0, temp, pos, 4);
+				pos += 4;
+
+				byte[] necessaryPoint2PoiName = values[index++].getBytes("GBK");
+				System.arraycopy(necessaryPoint2PoiName, 0, temp, pos, Math.min(necessaryPoint1PoiName.length, 32));
+				pos += 32;
+				byte[] necessaryPoint2Lon = Util.getIntByte((int) (Double.valueOf(values[index++]) * 10000000));
+				System.arraycopy(necessaryPoint2Lon, 0, temp, pos, 4);
+				pos += 4;
+				byte[] necessaryPoint2Lat = Util.getIntByte((int) (Double.valueOf(values[index++]) * 10000000));
+				System.arraycopy(necessaryPoint2Lat, 0, temp, pos, 4);
+				pos += 4;
+
+				byte[] necessaryPoint3PoiName = values[index++].getBytes("GBK");
+				System.arraycopy(necessaryPoint3PoiName, 0, temp, pos, Math.min(necessaryPoint1PoiName.length, 32));
+				pos += 32;
+				byte[] necessaryPoint3Lon = Util.getIntByte((int) (Double.valueOf(values[index++]) * 10000000));
+				System.arraycopy(necessaryPoint3Lon, 0, temp, pos, 4);
+				pos += 4;
+				byte[] necessaryPoint3Lat = Util.getIntByte((int) (Double.valueOf(values[index++]) * 10000000));
+				System.arraycopy(necessaryPoint3Lat, 0, temp, pos, 4);
+				pos += 4;
+				break;
+			case 0x1E:// 更新推送信息参数（需传送给MP5）
+				byte isUpdatePushInfo = Byte.valueOf(values[0]);
+				temp = new byte[1];
+				temp[0] = isUpdatePushInfo;
+				break;
+			case 0x1F:// URL数据信息
+				temp = new byte[1 + 1 + 256];
+				pos = 0;
+				byte isTextOrPic = Byte.valueOf(values[0]);
+				temp[pos++] = isTextOrPic;
+				byte isPopWin = Byte.valueOf(values[1]);
+				temp[pos++] = isPopWin;
+				byte[] dataByte = values[1].getBytes(LeopaardDefines.CHARSET);
+				System.arraycopy(dataByte, 0, temp, pos, Math.min(dataByte.length, 256));
+				pos += 256;
+				break;
+			case 0x20:
+				byte deliverContent = Byte.valueOf(values[0]);
+				temp = new byte[1];
+				temp[0] = deliverContent;
+				break;
+			case 0x21:
+				byte[] apn_tbox = values[0].getBytes(LeopaardDefines.CHARSET);
+				temp = new byte[32];
+				System.arraycopy(apn_tbox, 0, temp, 0, Math.min(apn_tbox.length, 32));
+				break;
+			case 0x22:
+				byte[] apn_hu = values[0].getBytes(LeopaardDefines.CHARSET);
+				temp = new byte[32];
+				System.arraycopy(apn_hu, 0, temp, 0, Math.min(apn_hu.length, 32));
+				break;
+			case 0x23:
+				byte peps_enable = Byte.valueOf(values[0]);
+				temp = new byte[1];
+				temp[0] = peps_enable;
+				break;
+			case 0x24:
+				byte peps_auth_enable = Byte.valueOf(values[0]);
+				temp = new byte[1];
+				temp[0] = peps_auth_enable;
+				break;
+			case 0x25:
+				byte tbox_3G_reset = Byte.valueOf(values[0]);
+				temp = new byte[1];
+				temp[0] = tbox_3G_reset;
+				break;
+			case 0x26:
+				byte tbox_reset = Byte.valueOf(values[0]);
+				temp = new byte[1];
+				temp[0] = tbox_reset;
+				break;
+			case 0x27:
+				byte auto_binding = Byte.valueOf(values[0]);
+				temp = new byte[1];
+				temp[0] = auto_binding;
+				break;
+			default:
+				break;
+			}
+			paramBytes.add(temp);
+		}
+		int bodyLen = 0;
+		for (byte[] b : paramBytes) {
+			bodyLen += b.length;
+		}
+		byte[] body = new byte[bodyLen];
+		pos = 0;
+		for (byte[] b : paramBytes) {
+			System.arraycopy(b, 0, body, pos, b.length);
+			pos += b.length;
+		}
+		return makeCmd(userCmd, unitSession, (byte) 0x81, body);
+	}
+
+	private ServerToUnitCommand getEngineStartCmd(Command userCmd, UnitSocketSession unitSession) throws Exception {
+		List<String> params = userCmd.getParamsList();
+		if (params.size() < 1) {
+			throw new WrongFormatException("(leopaard)not enough params, need: 1, current:" + params.size());
+		}
+		String mins = params.get(0);
+		byte min = Byte.valueOf(mins);
+
+		byte[] cmdParam = new byte[3];
+		cmdParam[0] = 0x7;
+		cmdParam[1] = 0x1;
+		cmdParam[2] = min;
+		return getCommonControlCmd(userCmd, unitSession, (byte) 0x80, cmdParam);
+	}
+
+	private ServerToUnitCommand getEngineStopCmd(Command userCmd, UnitSocketSession unitSession) throws Exception {
+		byte[] cmdParam = new byte[3];
+		cmdParam[0] = 0x08;
+		cmdParam[1] = 0x1;
+		return getCommonControlCmd(userCmd, unitSession, (byte) 0x80, cmdParam);
+	}
+
+	private ServerToUnitCommand getUnitFtpUpgradeCmd(Command userCmd, UnitSocketSession unitSession) throws Exception {
+
+		List<String> params = userCmd.getParamsList();
+		if (params.size() < 6) {
+			throw new WrongFormatException("(leopaard)not enough params, need: 6, current:" + params.size());
+		}
+
+		int paramsLen = 4 + 2 + 32 + 16 + 20 + 4;
+		int pos = 0;
+		byte[] paramsBytes = new byte[paramsLen];
+
+		String ftpIp = params.get(0);
+		byte[] ftpIpBytes = cc.chinagps.gateway.util.Util.getIPBytes(ftpIp);
+		System.arraycopy(ftpIpBytes, 0, paramsBytes, pos, 4);
+		pos += 4;
+
+		String ftpPort = params.get(1);
+		short port = Short.valueOf(ftpPort);
+		byte[] portBytes = Util.getShortByte(port);
+		System.arraycopy(portBytes, 0, paramsBytes, pos, 2);
+		pos += 2;
+
+		String loginName = params.get(2);
+		byte[] loginNameBytes = loginName.getBytes(LeopaardDefines.CHARSET);
+		System.arraycopy(loginNameBytes, 0, paramsBytes, pos, Math.min(loginNameBytes.length, 32));
+		pos += 32;
+
+		String loginPwd = params.get(3);
+		byte[] loginPwdBytes = loginPwd.getBytes(LeopaardDefines.CHARSET);
+		System.arraycopy(loginPwdBytes, 0, paramsBytes, pos, Math.min(loginPwdBytes.length, 16));
+		pos += 16;
+
+		String fileName = params.get(4);
+		byte[] fileNameBytes = fileName.getBytes(LeopaardDefines.CHARSET);
+		System.arraycopy(fileNameBytes, 0, paramsBytes, pos, Math.min(fileNameBytes.length, 20));
+		pos += 20;
+
+		String fileLen = params.get(5);
+		int len = Integer.valueOf(fileLen);
+		byte[] fileLenBytes = Util.getIntByte(len);
+		System.arraycopy(fileLenBytes, 0, paramsBytes, pos, 4);
+		pos += 4;
+
+		return getCommonControlCmd(userCmd, unitSession, (byte) 0x01, (byte) 0x08, paramsBytes);
+	}
+
+	private ServerToUnitCommand getWindowControlCmd(Command userCmd, UnitSocketSession unitSession, boolean isOpen)
+			throws Exception {
+		List<String> params = userCmd.getParamsList();
+		if (params.size() < 1) {
+			throw new WrongFormatException("(leopaard)not enough params, need: 1, current:" + params.size());
+		}
+		// 1:左前窗，2：右前窗,3:左后窗，4：右后窗
+		Byte param1 = Byte.valueOf(params.get(0));
+		byte param2 = (byte) (isOpen ? 0x1 : 0x2);
+		byte[] cmdParam = new byte[3];
+		cmdParam[0] = 0x2;
+		cmdParam[1] = param1;
+		cmdParam[2] = param2;
+		return getCommonControlCmd(userCmd, unitSession, (byte) 0x80, cmdParam);
+	}
+
+	private ServerToUnitCommand getCenterCTRLLockCmd(Command userCmd, UnitSocketSession unitSession, boolean isOpen)
+			throws Exception {
+		byte param = (byte) (isOpen ? 1 : 2);
+		byte[] cmdParam = new byte[2];
+		cmdParam[0] = 0x01;
+		cmdParam[1] = param;
+		return getCommonControlCmd(userCmd, unitSession, (byte) 0x80, cmdParam);
+	}
+
+	private ServerToUnitCommand getAirconditionCmd(Command userCmd, UnitSocketSession unitSession, int action)
+			throws Exception {
+		byte param = (byte) (action);
+		byte[] cmdParam = new byte[2];
+		cmdParam[0] = 0x03;
+		cmdParam[1] = param;
+		return getCommonControlCmd(userCmd, unitSession, (byte) 0x80, cmdParam);
+	}
+
+	private ServerToUnitCommand getSearchVehicleCmd(Command userCmd, UnitSocketSession unitSession) throws Exception {
+		byte param = (byte) (1);
+		byte[] cmdParam = new byte[2];
+		cmdParam[0] = 0x05;
+		cmdParam[1] = param;
+		return getCommonControlCmd(userCmd, unitSession, (byte) 0x80, cmdParam);
+	}
+
+	private ServerToUnitCommand getCommonControlCmd(Command userCmd, UnitSocketSession unitSession, byte subCmdId,
+			byte cmdId, byte[] cmdParam) throws Exception {
+		int pos = 0;
+		byte[] body = new byte[7 + cmdParam.length];
+		addTime(body);
+		pos += 6;
+		body[pos++] = subCmdId;
+		System.arraycopy(cmdParam, 0, body, pos, cmdParam.length);
+		return makeCmd(userCmd, unitSession, cmdId, body);
+	}
+
+	private ServerToUnitCommand getCommonControlCmd(Command userCmd, UnitSocketSession unitSession, byte subCmdId,
+			byte[] cmdParam) throws Exception {
+		int pos = 0;
+		byte[] body = new byte[7 + cmdParam.length];
+		addTime(body);
+		pos += 6;
+		body[pos++] = subCmdId;
+		System.arraycopy(cmdParam, 0, body, pos, cmdParam.length);
+		return makeCmd(userCmd, unitSession, (byte) 0x82, body);
+	}
+
+	/**
+	 * [0x3] 通用查询指令
+	 * 
+	 * @throws Exception
+	 */
+	private ServerToUnitCommand getCommonQueryCmd(Command userCmd, UnitSocketSession unitSession, byte body[])
+			throws Exception {
+
+		return makeCmd(userCmd, unitSession, (byte) 0x80, body);
+	}
+
+	public static void main(String[] args) {
+		// String s = "00000000";
+		// System.out.println(HexUtil.isOneByteBinaryString(s));
+		//
+		// int v = Integer.valueOf(s, 2);
+		// System.out.println(v);
+		//
+		// System.out.println(7 & 1);
+
+		for (int i = 0; i <= 255; i++) {
+			String str = HexUtil.byteToString((byte) i);
+			if (!HexUtil.isOneByteBinaryString(str)) {
+				System.err.println("xxxxxxxxx:" + i);
+				break;
+			}
+
+			int v = Integer.valueOf(str, 2);
+			if (v != i) {
+				System.err.println("yyyyyyy:" + i);
+				break;
+			}
+
+			System.out.println("[" + i + "]:" + str);
+		}
+
+		System.out.println("end");
+	}
+
+	/**
+	 * cmd公共部分
+	 * 
+	 * @throws ParseException
+	 */
+	private void addTime(byte[] data) throws ParseException {
+		addTime(data, 0);
+	}
+
+	private void addTime(byte[] data, int offset) throws ParseException {
+		byte[] bcd = LeopaardTimeFormatUtil.getCurrentTime8();
+		System.arraycopy(bcd, 0, data, offset, 6);
+	}
+
+	private ServerToUnitCommand makeCmd(Command userCmd, UnitSocketSession unitSession, byte msgType, byte[] body)
+			throws Exception {
+		LeopaardPackage pkg = new LeopaardPackage();
+		LeopaardHead head = new LeopaardHead();
+		head.setCmdId(msgType);
+		head.setEncryptFlag((byte) 0x00);
+		head.setIc(unitSession.getUnitInfo().getIMEI());
+		head.setResponseFlag((byte) 0xFE);
+		head.setSerialNo(LeopaardPkgUtil.getSn(unitSession));
+		head.setStartFlag(LeopaardDefines.HEAD_STX);
+		head.setDataUnitLen(body.length);
+
+		pkg.setHead(head);
+		pkg.setDataUnit(body);
+		byte[] source = pkg.encode();
+
+		SegServerToUnitCommand serverToUnitCommand = new SegServerToUnitCommand();
+		serverToUnitCommand.setUserCommand(userCmd);
+		String cachedSn = LeopaardPkgUtil.getCmdCacheSn(unitSession.getUnitInfo().getCallLetter(), head.getSerialNo());
+		serverToUnitCommand.setCachedSn(cachedSn);
+
+		serverToUnitCommand.setData(source);
+		serverToUnitCommand.setResponseType(OutputPackageEncoder.SUCCESS_AFTER_RESPONSE);
+		logger_debug.debug("[leopaard]  cmd encoder makeCmd data:" + HexUtil.byteToHexStr(source) + ";cmd:" + userCmd);
+		return serverToUnitCommand;
+	}
+}

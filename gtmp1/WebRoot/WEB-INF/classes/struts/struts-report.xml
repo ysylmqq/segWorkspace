@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+
+<struts>
+	<package name="report" namespace="/report" extends="global">
+        <result-types>
+            <result-type name="chart" class="org.apache.struts2.dispatcher.ChartResult"></result-type>
+        </result-types> 
+		<!-- 统计查询 -->
+		<action name="statistic_*" class="statisticQueryAction" method="{1}">
+		      <result  name="success" type="chart">
+				<param name="width">700</param>
+				<param name="height">400</param>
+			</result>
+		</action>
+		
+		<!-- 工作时间统计 -->
+		<action name="workhour_*" class="workhourReportAction" method="{1}">
+		</action>
+	</package>
+</struts>

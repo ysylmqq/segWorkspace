@@ -1,0 +1,1115 @@
+package com.chinaGPS.gtmp.action.vehicle;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.liteframework.core.web.util.JsonExtUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+import com.chinaGPS.gtmp.action.common.BaseAction;
+import com.chinaGPS.gtmp.business.command.SendCommandMessage;
+import com.chinaGPS.gtmp.business.memcache.GatewayBack;
+import com.chinaGPS.gtmp.business.memcache.MemCache;
+import com.chinaGPS.gtmp.business.memcache.Position;
+import com.chinaGPS.gtmp.business.memcache.UnitBack;
+import com.chinaGPS.gtmp.entity.CompositeQueryConditionPOJO;
+import com.chinaGPS.gtmp.entity.ConditionsPOJO;
+import com.chinaGPS.gtmp.entity.DealerAreaPOJO;
+import com.chinaGPS.gtmp.entity.DepartPOJO;
+import com.chinaGPS.gtmp.entity.DicCommandType;
+import com.chinaGPS.gtmp.entity.RemoteUpgradePOJO;
+import com.chinaGPS.gtmp.entity.RolePOJO;
+import com.chinaGPS.gtmp.entity.TLastPositionPOJO;
+import com.chinaGPS.gtmp.entity.TestCommandPOJO;
+import com.chinaGPS.gtmp.entity.TreeNode;
+import com.chinaGPS.gtmp.entity.UserPOJO;
+import com.chinaGPS.gtmp.entity.VehiclePOJO;
+import com.chinaGPS.gtmp.entity.VehicleUnitPOJO;
+import com.chinaGPS.gtmp.mapper.CommandMapper;
+import com.chinaGPS.gtmp.service.IDealerAreaService;
+import com.chinaGPS.gtmp.service.ISendCommandService;
+import com.chinaGPS.gtmp.service.IVehicleService;
+import com.chinaGPS.gtmp.util.Constants;
+import com.chinaGPS.gtmp.util.DateUtil;
+import com.chinaGPS.gtmp.util.HttpURLConnectionUtil;
+import com.opensymphony.xwork2.ModelDriven;
+
+/**
+ * @Package:com.chinaGPS.gtmp.action.run
+ * @ClassName:VehiclePollingAction
+ * @Description:机械巡检
+ * @author:zfy
+ * @date:2013-7-1 下午04:45:33
+ */
+@Scope("prototype")
+@Controller
+public class VehiclePollingAction extends BaseAction implements ModelDriven<VehicleUnitPOJO> {
+	private static final long serialVersionUID = -2710498485897859330L;
+	private static Logger logger = LoggerFactory.getLogger(VehiclePollingAction.class);
+	
+	@Resource
+	private VehicleUnitPOJO vehicleUnitPOJO;
+	@Resource
+	private IDealerAreaService dealerAreaService;
+	@Resource
+	private ISendCommandService sendCommandService;
+	private String id;
+
+	private List<String> vehicleUnitPOJOs;// 监控列表中的vehicleunitpojo
+	@Resource
+	private CommandMapper commandMapper;
+	@Resource
+	private MemCache memCache;
+	@Resource
+	private SendCommandMessage sendCommandMessage;
+	@Resource
+	private IVehicleService vehicleService;
+	@Resource
+	private CompositeQueryConditionPOJO condition;
+
+	/**
+	 * 机械巡检树
+	 */
+	public void getVehicle4Tree() {
+		List<Map> mapList = new ArrayList<Map>();
+
+		try {
+			Map childMap = null;
+			Map attrMap = null;
+			if (StringUtils.isNotEmpty(id)) {
+
+				HashMap map = new HashMap();
+				// 查询出测试组
+				map.put("isValid", Constants.IS_VALID_YES);
+				List<VehicleUnitPOJO> vehicleUnitList = null;
+				// 测试组
+				if (Constants.VEHICLE_STATE1.intValue() == Integer.parseInt(id)) {
+					map.put("vehicleStatus", Constants.VEHICLE_STATE1);
+					vehicleUnitList = dealerAreaService
+							.getVehilclesInDealer(map);
+
+				} else {
+					map.put("vehicleStatus", Constants.VEHICLE_STATE2);
+					vehicleUnitList = dealerAreaService
+							.getVehilclesInDealer(map);
+				}
+
+				if (vehicleUnitList != null && !vehicleUnitList.isEmpty()) {
+					for (VehicleUnitPOJO vehicleUnitPOJO : vehicleUnitList) {
+						childMap = new HashMap();
+						childMap.put("id", Constants.NODE_VEHICLE_PREFIX
+								+ vehicleUnitPOJO.getVehicleId());
+						childMap.put("text", vehicleUnitPOJO.getVehicleDef());
+						childMap.put("type", 4);
+						if (vehicleUnitPOJO.getIsLogin() != null
+								&& vehicleUnitPOJO.getIsLogin().intValue() == 0) {// 在线
+							childMap.put("iconCls", Constants.NODE_ONLINE_ICON);
+						} else {// 离线
+							childMap
+									.put("iconCls", Constants.NODE_OFFLINE_ICON);
+						}
+						if(vehicleUnitPOJO.getLat()!=null && vehicleUnitPOJO.getLon()!=null&&!vehicleUnitPOJO.getLat().equals("0")&&!vehicleUnitPOJO.getLon().equals("0")){
+							String ret = HttpURLConnectionUtil.getAddress(HttpURLConnectionUtil.getBaiduLonlat(""+vehicleUnitPOJO.getLon()+","+vehicleUnitPOJO.getLat()));
+							if(ret!=null && !ret.equals("")){
+								vehicleUnitPOJO.setReferencePosition(ret);
+							}
+						}		
+						childMap.put("attributes", vehicleUnitPOJO);
+						mapList.add(childMap);
+					}
+				}
+
+			} else {
+				List<Map> vehicleStatusChildList = new ArrayList<Map>();
+
+				Map mapRoot = new HashMap();
+				mapRoot.put("id", Constants.ROOT_ID);
+				mapRoot.put("text", Constants.ROOT_TEXT);
+				mapRoot.put("state", Constants.NODE_STATE_OPEN);
+
+				// 测试组
+				childMap = new HashMap();
+				DealerAreaPOJO dealerAreaPOJO = new DealerAreaPOJO();
+				dealerAreaPOJO.setDtype(2);// 分组
+				childMap.put("id", Constants.VEHICLE_STATE1);
+				childMap.put("text", Constants.VEHICLE_STATE1_TEXT);
+				childMap.put("state", Constants.NODE_STATE_CLOSE);
+				childMap.put("attributes", dealerAreaPOJO);
+				vehicleStatusChildList.add(childMap);
+
+				// 已测组
+				childMap = new HashMap();
+				childMap.put("id", Constants.VEHICLE_STATE2);
+				childMap.put("text", Constants.VEHICLE_STATE2_TEXT);
+				childMap.put("state", Constants.NODE_STATE_CLOSE);
+				childMap.put("attributes", dealerAreaPOJO);
+				vehicleStatusChildList.add(childMap);
+
+				mapRoot.put("children", vehicleStatusChildList);
+				mapList.add(mapRoot);// 添加父节点
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+		}
+		renderObject(mapList);
+	}
+
+	/**
+	 * @Title:getVehilces
+	 * @Description:搜索(更多条件),并构成一棵树
+	 * @throws
+	 */
+	public void getVehilces() {
+		HashMap mapSelect = new HashMap();
+		List<TreeNode> vehicleStatusChildList = new ArrayList<TreeNode>();
+
+		try {
+			// 测试组
+			TreeNode pMap = new TreeNode();
+			pMap.setId(Constants.VEHICLE_STATE1 + "");
+			pMap.setText(Constants.VEHICLE_STATE1_TEXT);
+
+			// 已测组
+			TreeNode pMap2 = new TreeNode();
+			pMap2.setId(Constants.VEHICLE_STATE2 + "");
+			pMap2.setText(Constants.VEHICLE_STATE2_TEXT);
+
+			if (vehicleUnitPOJO != null) {
+				if (StringUtils.isNotEmpty(vehicleUnitPOJO.getVehicleDef())) {
+					mapSelect
+							.put("vehicleDef", vehicleUnitPOJO.getVehicleDef());
+				}
+				if (vehicleUnitPOJO.getTypeId() != null) {
+					mapSelect.put("typeId", vehicleUnitPOJO.getTypeId());
+				}
+				if (vehicleUnitPOJO.getModelId() != null) {
+					mapSelect.put("modelId", vehicleUnitPOJO.getModelId());
+				}
+				if (StringUtils.isNotEmpty(vehicleUnitPOJO.getMaterialNo())) {
+					mapSelect
+							.put("materialNo", vehicleUnitPOJO.getMaterialNo());
+				}
+				if (StringUtils.isNotEmpty(vehicleUnitPOJO.getSteelNo())) {
+					mapSelect.put("steelNo", vehicleUnitPOJO.getSteelNo());
+				}
+				if (StringUtils.isNotEmpty(vehicleUnitPOJO.getUnitSn())) {
+					mapSelect.put("unitSn", vehicleUnitPOJO.getUnitSn());
+				}
+				if (vehicleUnitPOJO.getStatus() != null) {
+					mapSelect.put("vehicleStatus", vehicleUnitPOJO.getStatus());
+				}
+				mapSelect.put("vehicleStatusList", "1,2");
+				mapSelect.put("isValid", Constants.IS_VALID_YES);
+			}
+			// 查询机械
+			List<VehicleUnitPOJO> vehicleUnitList = dealerAreaService
+					.getVehilclesInDealer(mapSelect);
+			TreeNode node = null;
+			Map vehicleMap = new HashMap();
+			for (VehicleUnitPOJO vehicleUnitPOJO2 : vehicleUnitList) {
+				node = new TreeNode();
+				node.setId(Constants.NODE_VEHICLE_PREFIX
+						+ vehicleUnitPOJO2.getVehicleId());
+				node.setText(vehicleUnitPOJO2.getVehicleDef());
+				if (vehicleUnitPOJO2.getIsLogin() != null
+						&& vehicleUnitPOJO2.getIsLogin().intValue() == 0) {// 在线
+					node.setIconCls(Constants.NODE_ONLINE_ICON);
+				} else {// 离线
+					node.setIconCls(Constants.NODE_OFFLINE_ICON);
+				}
+				node.setAttributes(vehicleUnitPOJO2);
+				if (vehicleUnitPOJO2.getStatus().intValue() == Constants.VEHICLE_STATE1) {
+					pMap.addChild(node);
+				} else {
+					pMap2.addChild(node);
+				}
+				if(vehicleUnitPOJO2.getLat()!=null && vehicleUnitPOJO2.getLon()!=null&&!vehicleUnitPOJO2.getLat().equals("0")&&!vehicleUnitPOJO2.getLon().equals("0")){
+					String ret = HttpURLConnectionUtil.getAddress(HttpURLConnectionUtil.getBaiduLonlat(""+vehicleUnitPOJO2.getLon()+","+vehicleUnitPOJO2.getLat()));
+					if(ret!=null && !ret.equals("")){
+						vehicleUnitPOJO2.setReferencePosition(ret);
+					}
+				}
+			}
+			if (pMap.getChildren() != null && !pMap.getChildren().isEmpty()) {
+				vehicleStatusChildList.add(pMap);
+			}
+			if (pMap2.getChildren() != null && !pMap2.getChildren().isEmpty()) {
+				vehicleStatusChildList.add(pMap2);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		renderObject(vehicleStatusChildList);
+	}
+
+	/**
+	 * @Title:addMonitorList
+	 * @Description:加入到监控列表
+	 * @throws
+	 */
+	public void addMonitorList() {
+		try {
+			if (vehicleUnitPOJOs != null) {
+				List<VehicleUnitPOJO> vehicleUnitPOJOList = new ArrayList<VehicleUnitPOJO>();
+				JsonExtUtils jeu = JsonExtUtils.create(Inclusion.ALWAYS);
+				Map<String, Object> map = null;
+				VehicleUnitPOJO vehicleUnitPOJO2 = null;
+				for (int i = 0; i < vehicleUnitPOJOs.size(); i++) {
+					map = (Map<String, Object>) jeu.fromJson(vehicleUnitPOJOs
+							.get(i), Map.class);
+					vehicleUnitPOJO2 = new VehicleUnitPOJO();
+					try {
+						BeanUtils.populate(vehicleUnitPOJO2, map);
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					} catch (InvocationTargetException e) {
+						e.printStackTrace();
+					}
+					vehicleUnitPOJOList.add(vehicleUnitPOJO2);
+				}
+				getSession().put(Constants.WATCH_VEHICLE_POLLING,
+						vehicleUnitPOJOList);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * 删除监控车辆（车台呼号）
+	 * 
+	 * @return
+	 */
+	public void delWatchUnitIds() {
+		try {
+			List<VehicleUnitPOJO> removeList = new ArrayList<VehicleUnitPOJO>();
+			if (vehicleUnitPOJOs != null) {
+				Map<String, Object> map = null;
+				VehicleUnitPOJO vehicleUnitPOJO2 = null;
+				JsonExtUtils jeu = JsonExtUtils.create(Inclusion.ALWAYS);
+				List<VehicleUnitPOJO> gpsMonitorList = (List<VehicleUnitPOJO>) getSession()
+						.get(Constants.WATCH_VEHICLE_POLLING);
+				for (int i = 0; i < vehicleUnitPOJOs.size(); i++) {
+					map = (Map<String, Object>) jeu.fromJson(vehicleUnitPOJOs
+							.get(i), Map.class);
+					vehicleUnitPOJO2 = new VehicleUnitPOJO();
+					try {
+						BeanUtils.populate(vehicleUnitPOJO2, map);
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					} catch (InvocationTargetException e) {
+						e.printStackTrace();
+					}
+					for (VehicleUnitPOJO vehicleUnitPOJO : gpsMonitorList) {
+						if (vehicleUnitPOJO != null && vehicleUnitPOJO2 != null) {
+							if (vehicleUnitPOJO.getUnitId() != null
+									&& vehicleUnitPOJO.getUnitId().equals(
+											vehicleUnitPOJO2.getUnitId())) {
+								removeList.add(vehicleUnitPOJO);
+							}
+						}
+					}
+				}
+				gpsMonitorList.removeAll(removeList);
+				getSession().put(Constants.WATCH_VEHICLE_POLLING, gpsMonitorList);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * 清空监控车辆（车台呼号）
+	 * 
+	 * @return
+	 */
+	public String cleanWatchVehicle() {
+		try {
+			getSession().remove(Constants.WATCH_VEHICLE_POLLING);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return NONE;
+	}
+
+	/**
+	 * 获取监控车辆（unitId)
+	 * 
+	 * @return
+	 */
+	public String getWatchVehicle() {
+		try {
+			HashMap<String, Object> result = new HashMap<String, Object>();
+			int total = 0;
+			List<VehicleUnitPOJO> vehicleList = new ArrayList<VehicleUnitPOJO>();
+			if (getSession().get(Constants.WATCH_VEHICLE_POLLING) != null) {
+				vehicleList = (List<VehicleUnitPOJO>) getSession().get(
+						Constants.WATCH_VEHICLE_POLLING);
+				total = vehicleList.size();
+			}
+
+			result.put("total", total);
+			result.put("rows", vehicleList);
+			renderObject(result);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return NONE;
+	}
+
+	/**
+	 * 获取最后位置（unitId)
+	 * 
+	 * @return
+	 */
+	public String getLastGPS() {
+		TLastPositionPOJO datalist = new TLastPositionPOJO();
+		try {
+			// 先从memcached中取，取不到再从最后位置表中取
+			Position position = memCache.getPosition(vehicleUnitPOJO
+					.getUnitId());
+			if (position != null) {
+				if(position.getLat()!=null && position.getLon()!=null&&!position.getLat().equals("0")&&!position.getLon().equals("0")){
+					String ret = HttpURLConnectionUtil.getAddress(HttpURLConnectionUtil.getBaiduLonlat(""+position.getLon()+","+position.getLat()));
+					if(ret!=null && !ret.equals("")){
+						position.setReferencePosition(ret);
+					}
+				}
+				renderObject(position);
+			} else {
+				VehiclePOJO vehiclePOJO = new VehiclePOJO();
+				vehiclePOJO.setUnitId(vehicleUnitPOJO.getUnitId());
+				datalist = vehicleService.selectLastPosition(vehiclePOJO);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		renderObject(datalist);
+		return NONE;
+	}
+
+	/**
+	 * @throws Exception
+	 * @Title:getMemcacheData
+	 * @Description:得到Memcached中的gps信息，工况信息，指令回应信息
+	 * @throws
+	 */
+	public void getMemcacheData() throws Exception {
+		try {
+			// 一般指令发送的commandSN信息,用于取得指令回应
+			Map<Integer, String> commandSNList = null;
+			if (getSession().get(Constants.COMMAND_SN_POLLING) != null) {
+				commandSNList = (Map<Integer, String>) getSession().get(
+						Constants.COMMAND_SN_POLLING);
+			}
+			// 空中升级指令发送的commandSN信息,用于取得指令回应
+			Map<Integer, String> commandSNUpgradeList = null;
+			if (getSession().get(Constants.COMMAND_SN_UPGRADE_POLLING) != null) {
+				commandSNUpgradeList = (Map<Integer, String>) getSession().get(
+						Constants.COMMAND_SN_UPGRADE_POLLING);
+			}
+
+			// 指令回应的GPS信息
+			Map<String, GatewayBack> commandSNGpsList = null;
+			if (getSession().get(Constants.GPSINFO_SN_POLLING) != null) {
+				commandSNGpsList = (Map<String, GatewayBack>) getSession().get(
+						Constants.GPSINFO_SN_POLLING);
+			}
+			// 指令回应的工况信息
+			Map<String, GatewayBack> commandSNWorkInfoList = null;
+			if (getSession().get(Constants.WORKINFO_SN_POLLING) != null) {
+				commandSNWorkInfoList = (Map<String, GatewayBack>) getSession()
+						.get(Constants.WORKINFO_SN_POLLING);
+			}
+			// 一般指令回应，如参数查询
+			Map<String, GatewayBack> commandSNUnitBackList = null;
+			if (getSession().get(Constants.UNITBACK_SN_POLLING) != null) {
+				commandSNUnitBackList = (Map<String, GatewayBack>) getSession()
+						.get(Constants.UNITBACK_SN_POLLING);
+			}
+			// 指令回应的 :GPS信息,工况信息
+			List<Position> positionList = new ArrayList<Position>();
+			List<ConditionsPOJO> conditionList = new ArrayList<ConditionsPOJO>();
+			Position position = null;
+			ConditionsPOJO conditions = null;
+			// 一般指令回应,如果GPRS无回应，则走GSM重新发送
+			List<GatewayBack> backList = new ArrayList<GatewayBack>();
+			GatewayBack back = null;
+			HashMap map = new HashMap();
+
+			List<VehicleUnitPOJO> dealerAreaList = null;
+			DicCommandType dicCommandType = new DicCommandType();
+
+			// 存放需要走GSM的指令信息
+			Map<Integer, String> commandSNMsgList = new HashMap<Integer, String>();// 要走短信的
+			TestCommandPOJO command = null;
+			if (commandSNList != null) {
+				Set<Integer> keySet = commandSNList.keySet();
+				// 要删除的key
+				List<Integer> removedKeys = new ArrayList<Integer>();
+				for (Integer sn : keySet) {
+					back = memCache.getGatewayBack(sn);// 走GPRS
+					// 从数据库T_TEST_COMMAND表中获得指令是走哪个通道
+					command = sendCommandService.getById4Test(Long.valueOf(sn
+							.longValue()));
+
+					if (back != null) {
+						/*
+						 * if("00".equals(back.getIsSuccess())){ //指令发送记录表更新
+						 * commandMapper.updateTestCommand(back); }
+						 */
+						if (command != null && command.getPathFlag() != null) {
+							back.setPathFlag(command.getPathFlag());
+						}
+						map.put("unitId", back.getUnitId());
+						dealerAreaList = dealerAreaService
+								.getVehilclesInDealer(map);
+						if (dealerAreaList != null && !dealerAreaList.isEmpty()) {
+							// 整机编号
+							back.setVehicleDef(dealerAreaList.get(0)
+									.getVehicleDef());
+						}
+						dicCommandType.setCommandTypeName(back.getCommandSn());
+						dicCommandType.setCommandParam("t_test_command");
+						dicCommandType = sendCommandService
+								.getCommandType(dicCommandType);
+						if (dicCommandType != null) {// 指令类型
+							// 如果是定位和工况采集，则需获得指令回应的gps和工况
+							if (dicCommandType.getCommandTypeId().intValue() == Constants.COMMAND_TYPE_GPS
+									.intValue()
+									||dicCommandType.getCommandTypeId()
+											.intValue() == Constants.COMMAND_TYPE_CONDITIONS
+											.intValue()) {
+								if (dicCommandType.getCommandTypeId()
+										.intValue() == Constants.COMMAND_TYPE_GPS
+										.intValue()
+										) {// 定位
+									if (commandSNGpsList == null) {
+										commandSNGpsList = new HashMap<String, GatewayBack>();
+									}
+
+									commandSNGpsList.put(back.getCommandSn(),
+											back);
+									getSession().put(
+											Constants.GPSINFO_SN_POLLING,
+											commandSNGpsList);
+								} else if (dicCommandType.getCommandTypeId()
+										.intValue() == Constants.COMMAND_TYPE_CONDITIONS
+										.intValue()) {// 工况数据采集
+									if (commandSNWorkInfoList == null) {
+										commandSNWorkInfoList = new HashMap<String, GatewayBack>();
+									}
+
+									commandSNWorkInfoList.put(back
+											.getCommandSn(), back);
+									getSession().put(
+											Constants.WORKINFO_SN_POLLING,
+											commandSNWorkInfoList);
+
+								}
+							} else {// 其他一般指令终端回应
+								back.setCommandType(dicCommandType
+										.getCommandTypeName());
+								if (commandSNUnitBackList == null) {
+									commandSNUnitBackList = new HashMap<String, GatewayBack>();
+								}
+								commandSNUnitBackList.put(back.getCommandSn(),
+										back);
+								getSession().put(Constants.UNITBACK_SN_POLLING,
+										commandSNWorkInfoList);
+							}
+							back.setCommandType(dicCommandType
+									.getCommandTypeName());
+						}
+						// 拼接指令回应数据,显示在指令回应信息中
+						StringBuffer remarkSb = new StringBuffer();
+						remarkSb.append(back.getVehicleDef());
+						remarkSb.append(" ").append(
+								DateUtil.format(back.getStamp(),
+										DateUtil.YMD_DASH_WITH_FULLTIME24));
+						remarkSb.append(" ").append(back.getCommandType());
+						if ("00".equals(back.getIsSuccess())) {
+							remarkSb.append(" 成功");
+						} else {
+							remarkSb.append(" 失败");
+						}
+						if (back.getPathFlag().intValue() == 0) {
+							remarkSb.append(" GPRS");
+						} else {
+							remarkSb.append(" GSM");
+						}
+						back.setResponseType(Constants.RESPONSE_GATEWAY);
+						back.setRemark(remarkSb.toString());
+						backList.add(back);
+
+						// 网关指令回应取出后就移除
+						if (dicCommandType != null) {
+							// if(!(dicCommandType.getCommandTypeId().intValue()==Constants.COMMAND_TYPE_TRACK.intValue()||dicCommandType.getCommandTypeId().intValue()==Constants.COMMAND_TYPE_CONDITIONS.intValue())){
+							// 从memcached中移除
+							memCache.remove(back.getCommandSn() + "gback");
+							// 把要移除的key加入到集合中
+							removedKeys.add(Integer
+									.valueOf(back.getCommandSn()));
+							// }
+						}
+					} else {// 走短信流程gsm
+						if (logger.isDebugEnabled()) {
+							logger.debug("指令id[" + sn + "]取不到网关回应,走GSM");
+						}
+						// 工况采集不走GSM
+						String[] rawdatas = commandSNList.get(sn)
+						.split("-");
+						long step = System.currentTimeMillis()
+						- Long.valueOf(rawdatas[1]);
+						if (command != null
+								&& command.getPathFlag() != null
+								&& command.getPathFlag().intValue() != 1
+								&& command.getCommandTypeId().intValue() != Constants.COMMAND_TYPE_CONDITIONS
+										.intValue()) {// 如果已经走GSM发过了，就不再发送
+							commandSNMsgList.put(sn, commandSNList.get(sn));
+						}
+						if (step > 30000) {// 如果30秒无回应
+							if (command.getCommandResult() == null) {
+								map.put("unitId", command.getUnitId());
+								dealerAreaList = dealerAreaService
+										.getVehilclesInDealer(map);
+								if (dealerAreaList != null && !dealerAreaList.isEmpty()) {
+								back = new GatewayBack();
+								back.setResponseType(Constants.RESPONSE_GATEWAY);
+								back.setRemark(dealerAreaList.get(0).getVehicleDef()+"  无回应！");
+								backList.add(back);
+								}
+								if(null != back.getCommandSn()){
+								    memCache.remove(back.getCommandSn() + "gback");
+								}
+								removedKeys.add(Integer.valueOf(command
+										.getCommandSn().toString()));
+							}
+						}
+					}
+				}
+				// 从session中移除
+				if (removedKeys != null && !removedKeys.isEmpty()) {
+					for (Integer removedKey : removedKeys) {
+						commandSNList.remove(removedKey);
+					}
+					getSession().put(Constants.COMMAND_SN_POLLING,
+							commandSNList);// result主要用于得到指令回应
+				}
+			}
+
+			// 指令回应：GPS位置
+			if (commandSNGpsList != null) {
+				// 要删除的key
+				List<String> removedKeys = new ArrayList<String>();
+
+				for (Map.Entry<String, GatewayBack> obj : commandSNGpsList
+						.entrySet()) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("机械巡检开始取终端回应,commandSn=" + obj.getKey());
+					}
+					position = memCache.getPositionOrder(obj.getKey());
+					if (position != null) {
+						position.setVehicleDef(obj.getValue().getVehicleDef());
+						if (position.getNowTime() == null) {
+							position.setNowTime(DateUtil.format(new Date(),
+									DateUtil.YMD_DASH_WITH_FULLTIME24));
+						}
+						if (logger.isDebugEnabled()) {
+							logger
+									.debug("机械巡检已取终端回应,commandSn="
+											+ obj.getKey());
+						}
+						if(position.getLat()!=null && position.getLon()!=null&&!position.getLat().equals("0")&&!position.getLon().equals("0")){
+							String ret = HttpURLConnectionUtil.getAddress(HttpURLConnectionUtil.getBaiduLonlat(""+position.getLon()+","+position.getLat()));
+							if(ret!=null && !ret.equals("")){
+								position.setReferencePosition(ret);
+							}
+						}
+						positionList.add(position);
+						// 从memcached中移除
+						memCache.remove(obj.getKey() + "uback");
+						// 把要移除的key加入到集合中
+						if (logger.isDebugEnabled()) {
+							logger.debug("指令id[" + obj.getKey()
+									+ "]已取到终端回应(查车)");
+						}
+					}
+
+				}
+				// 从session中移除
+				if (removedKeys != null && !removedKeys.isEmpty()) {
+					for (String removedKey : removedKeys) {
+						commandSNGpsList.remove(removedKey);
+					}
+					getSession().put(Constants.GPSINFO_SN_POLLING,
+							commandSNGpsList);
+				}
+			}
+
+			// 指令回应：工况采集
+			if (commandSNWorkInfoList != null) {
+				// 要删除的key
+				List<String> removedKeys = new ArrayList<String>();
+
+				for (Map.Entry<String, GatewayBack> obj : commandSNWorkInfoList
+						.entrySet()) {
+					conditions = memCache.getConditionOrder(obj.getKey());
+					if (conditions != null) {
+						conditions
+								.setVehicleDef(obj.getValue().getVehicleDef());
+						conditionList.add(conditions);
+						// 从memcached中移除
+						memCache.remove(obj.getKey() + "uback");
+						// 把要移除的key加入到集合中
+						removedKeys.add(obj.getKey());
+
+					} else {
+						if (logger.isDebugEnabled()) {
+							logger.debug("指令id[" + obj.getKey()
+									+ "]未取到终端回应(工况)");
+						}
+					}
+				}
+
+				// 从session中移除
+				if (removedKeys != null && !removedKeys.isEmpty()) {
+					for (String removedKey : removedKeys) {
+						commandSNWorkInfoList.remove(removedKey);
+					}
+					getSession().put(Constants.WORKINFO_SN_POLLING,
+							commandSNWorkInfoList);
+				}
+
+			}
+			// 空中升级指令回应
+			RemoteUpgradePOJO remoteUpgrade = null;
+			if (commandSNUpgradeList != null) {
+				Set<Integer> keySetUpgrade = commandSNUpgradeList.keySet();
+				// 要删除的key
+				List<Integer> removedKeys = new ArrayList<Integer>();
+				for (Integer sn : keySetUpgrade) {
+					back = memCache.getGatewayBack(sn);// 走GPRS
+					// 从数据库t_send_command表中获得指令是走哪个通道
+					remoteUpgrade = sendCommandService.getByIdUpgrade(Long
+							.valueOf(sn.longValue()));
+					if (back != null) {
+
+						if (remoteUpgrade != null
+								&& remoteUpgrade.getPathFlag() != null) {
+							back.setPathFlag(remoteUpgrade.getPathFlag());
+						}
+						map.clear();
+						map.put("unitId", back.getUnitId());
+						dealerAreaList = dealerAreaService
+								.getVehilclesInDealer(map);
+						if (dealerAreaList != null && !dealerAreaList.isEmpty()) {
+							// 整机编号
+							back.setVehicleDef(dealerAreaList.get(0)
+									.getVehicleDef());
+						}
+						back.setCommandType(Constants.COMMAND_TYPE16_NAME);
+						backList.add(back);
+
+						// 从memcached中移除
+						memCache.remove(back.getCommandSn() + "gback");
+						// 把要移除的key加入到集合中
+						removedKeys.add(Integer.valueOf(back.getCommandSn()));
+
+						// 加入到终端回应监控中
+						if (commandSNUnitBackList == null) {
+							commandSNUnitBackList = new HashMap<String, GatewayBack>();
+						}
+						commandSNUnitBackList.put(back.getCommandSn(), back);
+						getSession().put(Constants.UNITBACK_SN_POLLING,
+								commandSNUnitBackList);
+					} else {// 走短信流程gsm
+						if (logger.isDebugEnabled()) {
+							logger.debug("指令id[" + back.getCommandSn()
+									+ "]未取到网关回应(空中升级),走gsm");
+						}
+						if (remoteUpgrade != null
+								&& remoteUpgrade.getPathFlag() != null
+								&& remoteUpgrade.getPathFlag().intValue() != 1) {// 如果已经走GSM发过了，就不在发送
+							commandSNMsgList.put(sn, commandSNUpgradeList
+									.get(sn));
+						}
+					}
+				}
+
+				// 从session中移除
+				if (removedKeys != null && !removedKeys.isEmpty()) {
+					for (Integer removedKey : removedKeys) {
+						commandSNUpgradeList.remove(removedKey);
+					}
+					getSession().put(Constants.COMMAND_SN_UPGRADE_POLLING,
+							commandSNUpgradeList);// result主要用于得到指令回应
+				}
+			}
+			// 一般指令终端回应
+			// List<UnitBack> unitBackList = new ArrayList<UnitBack>();
+			UnitBack unitBack = null;
+			if (commandSNUnitBackList != null) {
+				// 要删除的key
+				List<String> removedKeys = new ArrayList<String>();
+				GatewayBack gatewayback = null;
+				for (Map.Entry<String, GatewayBack> obj : commandSNUnitBackList
+						.entrySet()) {
+					unitBack = memCache.getUnitBack(Integer.parseInt(obj
+							.getKey()));
+					if (unitBack != null) {
+						gatewayback = obj.getValue();
+						unitBack.setVehicleDef(gatewayback.getVehicleDef());
+						unitBack.setStamp(new Date());
+						// unitBackList.add(unitBack);
+
+						// 拼接指令回应数据,显示在指令回应信息中
+						StringBuffer remarkSb = new StringBuffer();
+						remarkSb.append(gatewayback.getVehicleDef());
+						remarkSb.append(" ").append(
+								gatewayback.getCommandType());
+						// 如果是空中升级，终端回应单独解析
+						if (Constants.COMMAND_TYPE16_NAME.equals(gatewayback
+								.getCommandType())) {
+							// 00-文件格式正确；01-不存在任何文件；02-供应商标识不对；03-终端型号不对；04-程序版本不对；05-升级类型不对；06-GPS终端升级成功；07-控制器升级成功；08-显示器升级成功；09-未知类型错误
+							if ("00".equals(unitBack.getUnitback())) {
+								remarkSb.append(" 文件格式正确");
+							} else if ("01".equals(unitBack.getUnitback())) {
+								remarkSb.append(" 不存在任何文件");
+							} else if ("02".equals(unitBack.getUnitback())) {
+								remarkSb.append(" 供应商标识不对");
+							} else if ("03".equals(unitBack.getUnitback())) {
+								remarkSb.append(" 终端型号不对");
+							} else if ("04".equals(unitBack.getUnitback())) {
+								remarkSb.append(" 程序版本不对");
+							} else if ("05".equals(unitBack.getUnitback())) {
+								remarkSb.append(" 升级类型不对");
+							} else if ("06".equals(unitBack.getUnitback())) {
+								remarkSb.append(" GPS终端升级成功");
+							} else if ("07".equals(unitBack.getUnitback())) {
+								remarkSb.append(" 控制器升级成功");
+							} else if ("08".equals(unitBack.getUnitback())) {
+								remarkSb.append(" 显示器升级成功");
+							} else if ("09".equals(unitBack.getUnitback())) {
+								remarkSb.append(" 未知类型错误");
+							}
+							remarkSb.append(" ").append(
+									DateUtil.format(unitBack.getStamp(),
+											DateUtil.YMD_DASH_WITH_FULLTIME24));
+						} else {
+							// 00-接收成功；01-校验错；02-控制器未上电；03-总线故障；04-未知传输失败类型
+							if ("00".equals(unitBack.getUnitback())) {
+								remarkSb.append(" 接收成功");
+							} else if ("01".equals(unitBack.getUnitback())) {
+								remarkSb.append(" 校验错");
+							} else if ("02".equals(unitBack.getUnitback())) {
+								remarkSb.append(" 控制器未上电");
+							} else if ("03".equals(unitBack.getUnitback())) {
+								remarkSb.append(" 总线故障");
+							} else if ("04".equals(unitBack.getUnitback())) {
+								remarkSb.append(" 未知传输失败类型");
+							}
+							remarkSb.append(" ").append(
+									DateUtil.format(unitBack.getStamp(),
+											DateUtil.YMD_DASH_WITH_FULLTIME24));
+							if (StringUtils.isNotEmpty(unitBack.getIp())) {
+								remarkSb.append(" IP:")
+										.append(unitBack.getIp());
+							}
+							if (StringUtils.isNotEmpty(unitBack.getPort())) {
+								remarkSb.append(" 端口:").append(
+										unitBack.getPort());
+							}
+							if (StringUtils.isNotEmpty(unitBack.getApn())) {
+								remarkSb.append(" APN:").append(
+										unitBack.getApn());
+							}
+							if (StringUtils.isNotEmpty(unitBack.getIp())) {
+								remarkSb.append(" 短信号码:").append(
+										unitBack.getNumber());
+							}
+							if (StringUtils.isNotEmpty(unitBack
+									.getVersionCanId())) {
+								remarkSb.append(" 控制器版本及ID信息:").append(
+										unitBack.getVersionCanId());
+							}
+						}
+						back = new GatewayBack();
+						back.setResponseType(Constants.RESPONSE_GATEWAY);
+						back.setRemark(remarkSb.toString());
+						backList.add(back);
+						// 从memcached中移除
+						memCache.remove(obj.getKey() + "uback");
+						// 把要移除的key加入到集合中
+						removedKeys.add(obj.getKey());
+
+					} else {
+						if (logger.isDebugEnabled()) {
+							logger.debug("指令id[" + obj.getKey()
+									+ "]未取到终端回应(一般指令),可能终端没回应");
+						}
+					}
+				}
+
+				// 从session中移除
+				if (removedKeys != null && !removedKeys.isEmpty()) {
+					for (String removedKey : removedKeys) {
+						commandSNUnitBackList.remove(removedKey);
+					}
+					getSession().put(Constants.UNITBACK_SN_POLLING,
+							commandSNUnitBackList);
+				}
+			}
+			/*
+			 * //暂时注释 待测试 调用发短信的方法
+			 * if(commandSNMsgList!=null&&commandSNMsgList.keySet().size()>0){
+			 * try { sendCommandMessage.sendCommand(commandSNMsgList);
+			 * commandSNMsgList.clear(); } catch (JMSException e) {
+			 * e.printStackTrace(); } }
+			 */
+			HashMap resultMap = new HashMap();
+			resultMap.put("gpsInfo", positionList);
+			resultMap.put("workInfo", conditionList);
+			resultMap.put("response", backList);
+			renderObject(resultMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage(),e);
+			renderMsgJson(false, "获取指令回应信息失败");
+		}
+	}
+
+	/**
+	 * 函 数 名 :getGpsWorkOnLineData 功能描述：获得定时上报的GPS位置、工况、在线、不在线的数据条数 输入参数:
+	 * 
+	 * @param
+	 * @return void
+	 * @throws 无异常处理
+	 *             创 建 人:周峰炎 日 期:2013-7-4 修 改 人: 修 改 日 期: 修 改 原 因:
+	 */
+	public void getGpsWorkOnLineData() {
+		try {
+			// 监控列表中的信息
+			List<VehicleUnitPOJO> monitorGPSs = null;
+			if (getSession().get(Constants.WATCH_VEHICLE_POLLING) != null) {
+				monitorGPSs = (List<VehicleUnitPOJO>) getSession().get(
+						Constants.WATCH_VEHICLE_POLLING);
+			}
+
+			// 定时上报: GPS信息,工况信息
+			List<Position> positionList = new ArrayList<Position>();
+			List<ConditionsPOJO> conditionList = new ArrayList<ConditionsPOJO>();
+			Position position = null;
+			ConditionsPOJO conditions = null;
+			if (monitorGPSs != null) {
+				for (VehicleUnitPOJO vehicleUnitPOJO : monitorGPSs) {
+					// gps
+					position = memCache
+							.getPosition(vehicleUnitPOJO.getUnitId());
+					if (position != null) {
+						position.setVehicleDef(vehicleUnitPOJO.getVehicleDef());
+						if (position.getNowTime() == null) {
+							position.setNowTime(DateUtil.format(new Date(),
+									DateUtil.YMD_DASH_WITH_FULLTIME24));
+						}
+						if(position.getLat()!=null && position.getLon()!=null&&!position.getLat().equals("0")&&!position.getLon().equals("0")){
+							String ret = HttpURLConnectionUtil.getAddress(HttpURLConnectionUtil.getBaiduLonlat(""+position.getLon()+","+position.getLat()));
+							if(ret!=null && !ret.equals("")){
+								position.setReferencePosition(ret);
+							}
+						}
+						positionList.add(position);
+						// 取出后就移除
+						// memCache.remove(vehicleUnitPOJO.getUnitId()+"gps");
+					}
+					// 工况
+					conditions = memCache.getCondition(vehicleUnitPOJO
+							.getUnitId());
+					if (conditions != null) {
+						conditions.setVehicleDef(vehicleUnitPOJO
+								.getVehicleDef());
+						conditionList.add(conditions);
+						// 取出后就移除
+						// memCache.remove(vehicleUnitPOJO.getUnitId()+"con");
+					}
+				}
+			}
+
+			/*
+			 * //在线、离线数量 int onLineCount=0; int offLineCount=0; UserPOJO
+			 * userPOJO = (UserPOJO) getSession().get(Constants.USER_INFO); List<RolePOJO>
+			 * roles=userPOJO.getRoles(); boolean isDealer=false;//是否是经销商
+			 * DepartPOJO departPOJO=null; if(!roles.isEmpty()){
+			 * if(roles.size()==1){ RolePOJO role=roles.get(0);
+			 * if(role.getRoleId()==Constants.DEALER_ROLE_ID){//如果是经销商的话
+			 * isDealer=true; } } } //查询条件 HashMap map = new HashMap();
+			 * if(isDealer){//经销商 departPOJO=userPOJO.getDepartInfo();
+			 * if(departPOJO!=null){ map.put("dealerId",
+			 * departPOJO.getDealerId()); } }
+			 * 
+			 * //只查询出已销售、有效的机械 map.put("vehicleStatus",
+			 * Constants.VEHICLE_STATE3); map.put("isValid",
+			 * Constants.IS_VALID_YES); //在线 map.put("isLogin",
+			 * Constants.IS_LOGIN_YES); onLineCount=
+			 * dealerAreaService.getVehilclesCount(map); //离线
+			 * map.remove("isLogin"); map.put("isLogin", Constants.IS_LOGIN_NO);
+			 * offLineCount= dealerAreaService.getVehilclesCount(map);
+			 */
+			HashMap resultMap = new HashMap();
+			resultMap.put("gpsInfo", positionList);
+			resultMap.put("workInfo", conditionList);
+			// resultMap.put("onLineCount", onLineCount);
+			// resultMap.put("offLineCount", offLineCount);
+			renderObject(resultMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage(),e);
+			renderMsgJson(false, "获取定时上报回应信息失败");
+		}
+	}
+
+	/**
+	 * 函 数 名 :getVechilesInArea 功能描述：用于拉框搜索 输入参数:
+	 * 
+	 * @param
+	 * @return void
+	 * @throws 无异常处理
+	 *             创 建 人:周峰炎 日 期:2013-7-12 修 改 人: 修 改 日 期: 修 改 原 因:
+	 */
+	public void getVechilesInArea() throws Exception {
+		try {
+			// List<VehicleUnitPOJO> vehicleUnitList=null;
+			UserPOJO userPOJO = (UserPOJO) getSession().get(Constants.USER_INFO);
+			List<RolePOJO> roles = userPOJO.getRoles();
+			boolean isDealer = false;// 是否是经销商
+			DepartPOJO departPOJO = null;
+			if (!roles.isEmpty()) {
+				if (roles.size() == 1) {
+					RolePOJO role = roles.get(0);
+					if (role.getRoleId() == Constants.DEALER_ROLE_ID) {// 如果是经销商的话
+						isDealer = true;
+					}
+				}
+			}
+			// 查询条件
+			HashMap map = new HashMap();
+			if (isDealer) {// 经销商
+				departPOJO = userPOJO.getDepartInfo();
+				if (departPOJO != null) {
+					map.put("dealerId", departPOJO.getDealerId());
+				}
+			}
+
+			// 只查询出测试组、已测组、有效的机械
+			map.put("vehicleStatusList", "1,2");
+			map.put("isValid", Constants.IS_VALID_YES);
+			// 左上角的经纬度
+			if (condition.getLon() != null) {
+				map.put("lon", condition.getLon());
+			}
+			if (condition.getLat() != null) {
+				map.put("lat", condition.getLat());
+			}
+			// 右下角的经纬度
+			if (condition.getLon2() != null) {
+				map.put("lon2", condition.getLon2());
+			}
+			if (condition.getLat2() != null) {
+				map.put("lat2", condition.getLat2());
+			}
+			// vehicleUnitList=dealerAreaService.getVehilclesInDealer(map);
+			renderObject(dealerAreaService.getVehilclesInDealer(map));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+	@Override
+	public VehicleUnitPOJO getModel() {
+		return vehicleUnitPOJO;
+	}
+
+	public IDealerAreaService getDealerAreaService() {
+		return dealerAreaService;
+	}
+
+	public void setDealerAreaService(IDealerAreaService dealerAreaService) {
+		this.dealerAreaService = dealerAreaService;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public List<String> getVehicleUnitPOJOs() {
+		return vehicleUnitPOJOs;
+	}
+
+	public void setVehicleUnitPOJOs(List<String> vehicleUnitPOJOs) {
+		this.vehicleUnitPOJOs = vehicleUnitPOJOs;
+	}
+
+	public CommandMapper getCommandMapper() {
+		return commandMapper;
+	}
+
+	public void setCommandMapper(CommandMapper commandMapper) {
+		this.commandMapper = commandMapper;
+	}
+
+	public MemCache getMemCache() {
+		return memCache;
+	}
+
+	public void setMemCache(MemCache memCache) {
+		this.memCache = memCache;
+	}
+
+	public ISendCommandService getSendCommandService() {
+		return sendCommandService;
+	}
+
+	public void setSendCommandService(ISendCommandService sendCommandService) {
+		this.sendCommandService = sendCommandService;
+	}
+
+	public SendCommandMessage getSendCommandMessage() {
+		return sendCommandMessage;
+	}
+
+	public void setSendCommandMessage(SendCommandMessage sendCommandMessage) {
+		this.sendCommandMessage = sendCommandMessage;
+	}
+
+	public IVehicleService getVehicleService() {
+		return vehicleService;
+	}
+
+	public void setVehicleService(IVehicleService vehicleService) {
+		this.vehicleService = vehicleService;
+	}
+
+	public CompositeQueryConditionPOJO getCondition() {
+		return condition;
+	}
+
+	public void setCondition(CompositeQueryConditionPOJO condition) {
+		this.condition = condition;
+	}
+}

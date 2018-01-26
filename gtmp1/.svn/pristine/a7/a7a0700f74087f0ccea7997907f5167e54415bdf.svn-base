@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">  
+<generatorConfiguration>  
+    <!-- 数据库驱动包位置 -->  
+    <classPathEntry location="E:\workspace8.5\gtmp1\WebRoot\WEB-INF\lib\ojdbc14.jar" />   
+    <!-- <classPathEntry location="C:\oracle\product\10.2.0\db_1\jdbc\lib\ojdbc14.jar" />-->  
+    <context id="DB2Tables" targetRuntime="MyBatis3">  
+        <commentGenerator>  
+            <property name="suppressAllComments" value="true" />  
+        </commentGenerator>  
+        <!-- 数据库链接URL、用户名、密码 -->  
+         <jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver" connectionURL="jdbc:oracle:thin:@192.168.16.82:1521:gps" userId="gisap" password="1">   
+        <!--<jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver" connectionURL="jdbc:oracle:thin:@localhost:1521:orcl" userId="msa" password="msa">-->  
+        </jdbcConnection>  
+        <javaTypeResolver>  
+            <property name="forceBigDecimals" value="false" />  
+        </javaTypeResolver>  
+        <!-- 生成模型的包名和位置  targetProject="src\main\java" -->  
+        <javaModelGenerator targetPackage="com.chinaGPS.gtmp.entity" targetProject="E:\workspace8.5\gtmp1\src">  
+            <property name="enableSubPackages" value="true" />  
+            <property name="trimStrings" value="true" />  
+        </javaModelGenerator>  
+        <!-- 生成的映射文件包名和位置   targetProject="src\main\java" -->  
+        <sqlMapGenerator targetPackage="com.chinaGPS.gtmp.mapper.sqlmap" targetProject="E:\workspace8.5\gtmp1\src">  
+            <property name="enableSubPackages" value="true" />  
+        </sqlMapGenerator>  
+        <!-- 生成DAO的包名和位置 -->  
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.chinaGPS.gtmp.mapper" targetProject="E:\workspace8.5\gtmp1\src">  
+            <property name="enableSubPackages" value="true" />  
+        </javaClientGenerator>  
+        <!-- 要生成那些表(更改tableName和domainObjectName就可以) -->  
+       <!--  <table tableName="student" domainObjectName="Student" enableCountByExample="true" enableUpdateByExample="true" enableDeleteByExample="true" enableSelectByExample="true" selectByExampleQueryId="true" />  
+        <table tableName="score" domainObjectName="Score" enableCountByExample="true" enableUpdateByExample="true" enableDeleteByExample="true" enableSelectByExample="true" selectByExampleQueryId="true" />  
+         -->
+        <table tableName="t_sim_server" domainObjectName="SimServerPOJO" />  
+    	<table tableName="t_sim_pay" domainObjectName="SimPayPOJO" />  
+    	<table tableName="t_customer_sim" domainObjectName="CustomerSimPOJO" />  
+    	<table tableName="t_customer_pay" domainObjectName="CustomerPayPOJO" />  
+    	
+    </context>  
+</generatorConfiguration>  

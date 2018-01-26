@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="短信模板管理">
+<meta name="description" content="短信模板管理">
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../css/base.css" rel="stylesheet" />
+<title>短信模板管理</title>
+</head>
+<body style="background-color:#fff;">
+	<div style="margin:0 auto;width:1000px;">
+		<h3>短信模板管理</h3>
+        <div class="panel-group" id="accordion" >
+            
+            <div class="panel panel-default SmsSort" smsTypeId="2000">
+                <div class="panel-heading" role="tab">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#collapseOne" smsTypeId="2000">公司资料</a>
+                    </h4>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" >
+                    <div class="panel-body" id="stType_2000">
+                        <!-- <div class="smsItem">
+                            <textarea type="text" class="form-control" disabled="disabled" smsContentId="11">【早餐吃鸡蛋到底好在哪里】1、补充优质蛋白质。2、增加饱腹感：为机体提供充足的蛋白质，延缓胃的排空速度。3、有助减肥：早餐吃鸡蛋，能降低午餐以及一整天的热量摄入，起到控制体重的作用。4、提高记忆力。5、提高警觉性。</textarea>
+                            <span class="btn_box">
+                                <a href="#" class="edit_sms_btn"><i class="glyphicon glyphicon-edit"></i></a>
+                                <a href="#" class="store_sms_btn" style="display:none;"><i class="glyphicon glyphicon-floppy-disk"></i></a>
+                            </span>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default SmsSort" smsTypeId="3000">
+                <div class="panel-heading" role="tab" >
+                    <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" href="#collapseTwo" smsTypeId="3000">祝福短信</a>
+                    </h4>
+                </div>
+                <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" >
+                    <div class="panel-body" id="stType_3000"></div>
+                </div>
+            </div>
+            <div class="panel panel-default SmsSort" smsTypeId="4000">
+                <div class="panel-heading" role="tab">
+                    <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" href="#collapseThree" smsTypeId="4000">业务短信</a>
+                    </h4>
+                </div>
+                <div id="collapseThree" class="panel-collapse collapse in" role="tabpanel">
+                    <div class="panel-body" id="stType_4000"></div> 
+                </div>
+            </div>
+            <div class="panel panel-default SmsSort" smsTypeId="5000">
+                <div class="panel-heading" role="tab">
+                    <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" href="#collapseFour" smsTypeId="5000">营销短信</a>
+                    </h4>
+                </div>
+                <div id="collapseFour" class="panel-collapse collapse in" role="tabpanel">
+                    <div class="panel-body" id="stType_5000"></div> 
+                </div>
+            </div>
+            <div class="panel panel-default SmsSort" smsTypeId="1000">
+                <div class="panel-heading" role="tab">
+                    <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" href="#collapseFive" smsTypeId="1000">其他</a>
+                    </h4>
+                </div>
+                <div id="collapseFive" class="panel-collapse collapse in" role="tabpanel">
+                    <div class="panel-body" id="stType_6000"></div> 
+                </div>
+            </div>
+            <!-- <div class="panel panel-default SmsSort" smsTypeId="2000">
+                <div class="panel-heading" role="tab">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#collapseOne" smsTypeId="2000">公司资料</a>
+                        <input type="text" class="form-control edit_area">
+                        <span class="title_btn_box">
+                            <a href="#" class="edit_title_btn"><i class="glyphicon glyphicon-edit"></i></a>
+                            <a href="#" class="store_title_btn" style="display:none;"><i class="glyphicon glyphicon-floppy-disk"></i></a>
+                            <a href="#" class="delete_title_btn"><i class="glyphicon glyphicon-remove"></i></a>
+                        </span>
+                    </h4>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" >
+                    <div class="panel-body">
+                        <div class="smsItem">
+                            <input type="checkbox" class="selectItem" name="selectSms" value="11">
+                            <textarea type="text" class="form-control" disabled="disabled" smsContentId="11">【早餐吃鸡蛋到底好在哪里】1、补充优质蛋白质。2、增加饱腹感：为机体提供充足的蛋白质，延缓胃的排空速度。3、有助减肥：早餐吃鸡蛋，能降低午餐以及一整天的热量摄入，起到控制体重的作用。4、提高记忆力。5、提高警觉性。</textarea>
+                            <span class="btn_box">
+                                <a href="#" class="edit_sms_btn"><i class="glyphicon glyphicon-edit"></i></a>
+                                <a href="#" class="store_sms_btn" style="display:none;"><i class="glyphicon glyphicon-floppy-disk"></i></a>
+                                <a href="#" class="delete_sms_btn"><i class="glyphicon glyphicon-remove"></i></a>
+                            </span>
+                        </div>
+                        <div class="addbtn">
+                            <a href="#" class="add_newSms">添加短信</a>
+                            <a href="#" class="delete_all">批量删除</a>
+                            <label class="selectAll"><input type="checkbox">全选</label>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+           
+        </div>
+
+	</div>
+<!-- 弹窗 单条删除 START -->
+<div class="modal fade Casereg" id="d_smsContent" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:400px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">单条短信删除</h4>
+            </div>
+            <div class="modal-body">
+                <!-- <input type="text" id="d_content_id" > -->
+                <div class="row">
+                    <p class="col-xs-12">是否删除<b id="d_sms_content"></b>？（不可恢复）</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger d_smsSubmit">确认删除</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 单条删除 END -->
+<!-- 弹窗 批量删除 START -->
+<div class="modal fade Casereg" id="d_smsContentAll" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:400px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">短信模板批量删除</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <p class="col-xs-12">是否删除选中的所有短信模板？（不可恢复）</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger d_smsSubmit">确认删除</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 批量删除 END -->
+
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript">
+    var tit;//标题
+    var checkedArray = [];//选中条目（单条 批量）
+    function store_title(title){//保存短信标题
+        alert("ajax提交:"+title);
+    }
+
+    function store_Content(area){//保存短信内容（新增或修改）
+        var con = area.val();
+        var sc = area.attr("stcode");
+        var api_url = '../app/sms_temp/edit';//http://localhost:8080/seat/app/sms_temp/edit
+        var params = {stCode:sc,sms:con};
+        $.post(api_url, params, function(result){
+            result = eval('(' + result + ')');
+            if(result.success==true){
+                updateDatas();//更新
+            } else{
+                alert(result.message);
+            }
+        });
+    }
+
+    $(".d_smsSubmit").click(function(){//确认删除按钮
+        delete_sms();
+    });
+
+    function delete_sms(){//删除保存
+        console.log(checkedArray);//这里是数据
+        var api_url = '../app/sms_temp/del';//http://localhost:8088/seat/app/sms_temp/del
+        var params = {stIds:checkedArray};
+        var params_t = decodeURIComponent($.param(params,true));
+        // alert(params_t);
+        $.getJSON(api_url+"?"+params_t,function(result){
+            if(result.success==true){
+                updateDatas();//更新
+            } else{
+                alert(result.message);
+            }
+        });
+    }
+
+    function submitAll_Newsms(){//提交所有短信
+        var sort = $("#accordion").find(".addNewSms_Area");//取所有选到的大类（正文外框）
+        if(sort.length>0){
+            var smsData = [];//要提交的数据 json数组
+            $.each(sort,function(i,item){
+                var id = $(item).attr("smsTypeId");
+                var t = $(item).find("textarea");
+
+                var smsArray = [];//内部的正文
+                $.each(t,function(k,v){
+                    var va = $(v).val();
+                    // console.log(va);
+                    smsArray.push(va);
+                });
+
+                var smsTypeId_s = {smsType_id:id,smsItems:smsArray};
+                smsData.push(smsTypeId_s);
+
+            });
+        }
+
+        console.log(smsData);
+
+        var api_url = '../app/sms_temp/save';
+        var params = {datas:smsData};
+        params_t = decodeURIComponent($.param(params,true));
+        $.post(api_url+"?"+params_t, function(result){
+            result = eval('(' + result + ')');
+            if(result.success==false){
+                alert(result.message);    
+            }else{
+                updateDatas();//更新短信
+            }
+        });
+    }
+
+    function updateDatas(){//更新短信
+        $("#stType_1000,#stType_2000,#stType_3000,#stType_4000,#stType_5000").html("");//清空
+        var api_url = '../app/sms_temp/list';
+        $.getJSON(api_url,function(result){
+            if(result.success==true){
+                var htmls = "";
+                // var smsTypeName = "";//大类name
+                var smsstType = "";//大类stType
+                if(result.data.length>0){//不为空，则循环取值
+                    $.each(result.data,function(i,item){
+                        htmls = "";//清空
+                        // smsTypeName = item.stName;//大类name
+                        smsstType = item.stType;//大类stType
+                        if(item.sms.length>0){
+                            $.each(item.sms,function(k,v){
+                                htmls += '<div class="smsItem"><textarea type="text" class="form-control" disabled="disabled" stCode="'+ v.stCode +'">'+ v.sms +'</textarea><span class="btn_box"><a href="#" class="edit_sms_btn"><i class="glyphicon glyphicon-edit"></i></a><a href="#" class="store_sms_btn" style="display:none;"><i class="glyphicon glyphicon-floppy-disk"></i></a></span>';
+                            });
+                        }
+                        $("#stType_"+smsstType).append(htmls);//id="stType_2000"
+                    });
+
+                    /* 绑定事件 st*/
+                    $(".edit_sms_btn").click(function(){//短信编辑
+                        $(this).parent().siblings("textarea").removeAttr("disabled").focus();
+                        $(this).css("display","none").siblings(".store_sms_btn").css("display","inline-block");
+                    });
+                    $(".store_sms_btn").click(function(){//短信保存
+                        store_Content($(this).parent().siblings("textarea"));//store
+                    });
+
+                    $(".smsItem textarea").blur(function(){//正文失去焦点保存
+                        store_Content($(this));//store
+                    });
+
+
+                    // $(".delete_sms_btn").click(function(){//删除单条
+                    //     checkedArray = [];//清空
+                    //     var delete_content = $(this).parent().siblings("textarea").val();
+                    //     var delete_content_id = $(this).parent().siblings("textarea").attr("smsContentId");
+                    //     $("#d_sms_content").html(delete_content);
+                    //     $("#d_smsContent").modal("show");
+                    //     checkedArray.push(parseInt(delete_content_id));//parseInt()
+                    // });
+
+                    // $(".delete_all").click(function(){//批量删除
+                    //     if($("input:checkbox[name='selectSms']:checked").length==0){
+                    //         alert("请选择短信条目");
+                    //         return;
+                    //     }
+                    //     checkedArray = [];//清空
+                    //     $.each($("input:checkbox[name='selectSms']:checked"), function(i,item){
+                    //         checkedArray.push(parseInt(item.value));
+                    //     })
+                    //     $("#d_smsContentAll").modal("show");
+                    // });
+
+                    $(".selectAll").click(function(){//全选按钮
+                        if ($(this).children("input").attr("checked")=="checked") {
+                            $(this).parent().siblings(".smsItem").find("input").attr("checked","checked");
+                            // $(".TOS_opt input").attr("checked","checked");            
+                        }else{
+                            $(this).parent().siblings(".smsItem").find("input").removeAttr("checked");
+                            // $(".TOS_opt input").removeAttr("checked");            
+                        };
+                    });
+
+                    $(".add_newSms").click(function(){//新增短信
+                        var panelbody = $(this).parent().parent();//全组
+                        var panelsmsTypeId = panelbody.parent().parent().attr("smsTypeId");
+
+                        if(panelbody.find(".addNewSms_Area").length==0){//本组不存在该组
+                            var hDiv = $('<div></div>').addClass("addNewSms_Area").attr("smsTypeId",panelsmsTypeId);
+                            var hButton = $('<button></button>').addClass("btn btn-default btn-xs").html("提交全部").click(function(){
+                                submitAll_Newsms();//提交所有短信
+                            });
+                            hDiv.append(hButton);
+                            $(this).parent().before(hDiv);
+                        };
+
+                        /*新建对象及事件 st*/
+
+                        var bDiv = $('<div></div>').addClass('smsItem');
+                        var bTextarea = $('<textarea></textarea>').addClass('form-control').attr("type","text");
+                        var bSpan = $('<span></span>').addClass('btn_box');
+                        var bA = $('<a></a>').attr("href","javascript:void(0)").addClass('delete_sms_n').html("<i class='glyphicon glyphicon-remove'></i>").click(function(){
+                            if($(bDiv).siblings(".smsItem").length==0){
+                                bDiv.parent().remove();
+                            } else{
+                                $(bDiv).remove();//删除事件
+                            };
+                        });
+                        bSpan.append(bA);
+                        bDiv.append(bTextarea).append(bSpan);
+                        /*新建对象及事件 nd*/
+                        $(".btn",panelbody).before(bDiv);
+                    });
+
+                    /* 绑定事件 nd*/
+                }
+            };
+        });
+    }
+
+    $(document).ready(function(){
+        updateDatas();//更新
+    });
+</script>
+</body>
+</html>

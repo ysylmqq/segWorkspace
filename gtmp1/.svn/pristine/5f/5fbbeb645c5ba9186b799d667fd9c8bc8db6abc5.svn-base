@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chinaGPS.gtmp.mapper.CustomerSimPOJOMapper" >
+  <resultMap id="BaseResultMap" type="com.chinaGPS.gtmp.entity.CustomerSimPOJO" >
+    <id column="SIM_NO" property="simNo" jdbcType="VARCHAR" />
+    <result column="START_TIME" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="END_TIME" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="FREE_PERIOD" property="freePeriod" jdbcType="DECIMAL" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="STOP_START_TIME" property="stopStartTime" jdbcType="TIMESTAMP" />
+    <result column="STOP_END_TIME" property="stopEndTime" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="stop_reason" property="stopReason" jdbcType="VARCHAR" />
+    <result column="OPER_ID" property="operId" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="all_fee" property="allFee" jdbcType="DECIMAL" />
+    <result column="stop_fee_month" property="stopFeeMonth" jdbcType="DECIMAL" />
+    
+    <result column="is_server" property="isServer" jdbcType="VARCHAR" />
+    
+    <result column="vehicle_def" property="vehicleDef" jdbcType="VARCHAR" />
+    <result column="vehicle_code" property="vehicleCode" jdbcType="VARCHAR" />
+    <result column="vehicle_arg" property="vehicleArg" jdbcType="VARCHAR" />
+    <result column="unit_sn" property="unitSn" jdbcType="VARCHAR" />
+    
+    <result column="distributor" property="distributor" jdbcType="VARCHAR" />
+    <result column="model_name" property="modelName" jdbcType="VARCHAR" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    
+    <result column="stop_save_fee" property="stopSaveFee" jdbcType="DECIMAL" />
+    
+  </resultMap>
+  
+  <sql id="getByPageCondition">
+		<where>
+			<if test="customerSimPOJO!=null">
+			 	<if test="@Ognl@isNotBlank(customerSimPOJO.simNo)"> 
+	       			AND un.sim_no like  concat( concat('%',#{customerSimPOJO.simNo}),'%')
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(customerSimPOJO.startTime)">   
+	       			AND cs.start_time &gt;= #{customerSimPOJO.startTime}
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(customerSimPOJO.endTime)">   
+	       			AND cs.end_time &lt; = #{customerSimPOJO.endTime}
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(customerSimPOJO.status)">   
+	       			<if test="customerSimPOJO.status == 1 or customerSimPOJO.status == 0 ">  
+	       				AND cs.status  = #{customerSimPOJO.status}
+	       			</if>
+	       			<if test="customerSimPOJO.status == 2 ">  
+	       				AND cs.status  is null
+	       			</if>
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(customerSimPOJO.freePeriod)">   
+	       			AND cs.free_period = #{customerSimPOJO.freePeriod}
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(customerSimPOJO.stopStartTime)">   
+	       			AND cs.stop_start_time &gt;= #{customerSimPOJO.stopStartTime}
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(customerSimPOJO.stopEndTime)">   
+	       			AND cs.stop_end_time &lt; = #{customerSimPOJO.stopEndTime}
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(customerSimPOJO.vehicleDef)">
+	       			AND veh.vehicle_def  like concat( concat('%',#{customerSimPOJO.vehicleDef}),'%')
+	  			</if>
+	  			<if test="@Ognl@isNotBlank(customerSimPOJO.dealerIds)">
+		  	     	and dv.dealer_id in 
+			  	    <foreach collection="customerSimPOJO.dealerIds" item="id" open="(" separator="," close=")">
+					      <if test="@Ognl@isNotBlank(id)">
+						   #{id} 
+						 </if>
+					</foreach>
+			    </if>
+	 		</if>
+	 	</where>
+	</sql>
+  
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    SIM_NO, START_TIME, END_TIME, FREE_PERIOD, STATUS, STOP_START_TIME, STOP_END_TIME, 
+    REMARK, OPER_ID, CREATE_TIME,all_fee,stop_fee_month
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.chinaGPS.gtmp.entity.CustomerSimPOJOExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from T_CUSTOMER_SIM
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+    <select id="getCustomerSimPOJOById" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select *
+    from T_CUSTOMER_SIM
+    where SIM_NO = #{simNo,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from T_CUSTOMER_SIM
+    where SIM_NO = #{simNo,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from T_CUSTOMER_SIM
+    where SIM_NO = #{simNo,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.chinaGPS.gtmp.entity.CustomerSimPOJOExample" >
+    delete from T_CUSTOMER_SIM
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.chinaGPS.gtmp.entity.CustomerSimPOJO" >
+    insert into T_CUSTOMER_SIM (SIM_NO, START_TIME, END_TIME, 
+      FREE_PERIOD, STATUS, STOP_START_TIME, 
+      STOP_END_TIME, REMARK, OPER_ID, 
+      CREATE_TIME,all_fee)
+    values (#{simNo,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, 
+      #{freePeriod,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, #{stopStartTime,jdbcType=TIMESTAMP}, 
+      #{stopEndTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{operId,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{allFee,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.chinaGPS.gtmp.entity.CustomerSimPOJO" >
+    insert into T_CUSTOMER_SIM
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="simNo != null" >
+        SIM_NO,
+      </if>
+      <if test="startTime != null" >
+        START_TIME,
+      </if>
+      <if test="endTime != null" >
+        END_TIME,
+      </if>
+      <if test="freePeriod != null" >
+        FREE_PERIOD,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="stopStartTime != null" >
+        STOP_START_TIME,
+      </if>
+      <if test="stopEndTime != null" >
+        STOP_END_TIME,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="operId != null" >
+        OPER_ID,
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME,
+      </if>
+      <if test="allFee != null" >
+        all_fee,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="simNo != null" >
+        #{simNo,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="freePeriod != null" >
+        #{freePeriod,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="stopStartTime != null" >
+        #{stopStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="stopEndTime != null" >
+        #{stopEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="operId != null" >
+        #{operId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+       <if test="allFee != null" >
+        #{allFee,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.chinaGPS.gtmp.entity.CustomerSimPOJOExample" resultType="java.lang.Integer" >
+    select count(*) from T_CUSTOMER_SIM
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update T_CUSTOMER_SIM
+    <set >
+      <if test="record.simNo != null" >
+        SIM_NO = #{record.simNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.startTime != null" >
+        START_TIME = #{record.startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.endTime != null" >
+        END_TIME = #{record.endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.freePeriod != null" >
+        FREE_PERIOD = #{record.freePeriod,jdbcType=DECIMAL},
+      </if>
+      <if test="record.status != null" >
+        STATUS = #{record.status,jdbcType=DECIMAL},
+      </if>
+      <if test="record.stopStartTime != null" >
+        STOP_START_TIME = #{record.stopStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.stopEndTime != null" >
+        STOP_END_TIME = #{record.stopEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.remark != null" >
+        REMARK = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.operId != null" >
+        OPER_ID = #{record.operId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        CREATE_TIME = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update T_CUSTOMER_SIM
+    set SIM_NO = #{record.simNo,jdbcType=VARCHAR},
+      START_TIME = #{record.startTime,jdbcType=TIMESTAMP},
+      END_TIME = #{record.endTime,jdbcType=TIMESTAMP},
+      FREE_PERIOD = #{record.freePeriod,jdbcType=DECIMAL},
+      STATUS = #{record.status,jdbcType=DECIMAL},
+      STOP_START_TIME = #{record.stopStartTime,jdbcType=TIMESTAMP},
+      STOP_END_TIME = #{record.stopEndTime,jdbcType=TIMESTAMP},
+      REMARK = #{record.remark,jdbcType=VARCHAR},
+      OPER_ID = #{record.operId,jdbcType=VARCHAR},
+      CREATE_TIME = #{record.createTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.chinaGPS.gtmp.entity.CustomerSimPOJO" >
+    update T_CUSTOMER_SIM
+    <set >
+      <if test="startTime != null" >
+        START_TIME = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        END_TIME = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="freePeriod != null" >
+        FREE_PERIOD = #{freePeriod,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="stopStartTime != null" >
+        STOP_START_TIME = #{stopStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="stopEndTime != null" >
+        STOP_END_TIME = #{stopEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="operId != null" >
+        OPER_ID = #{operId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+        <if test="allFee != null" >
+        all_fee = #{allFee,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where SIM_NO = #{simNo,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.chinaGPS.gtmp.entity.CustomerSimPOJO" >
+    update T_CUSTOMER_SIM
+    set START_TIME = #{startTime,jdbcType=TIMESTAMP},
+      END_TIME = #{endTime,jdbcType=TIMESTAMP},
+      FREE_PERIOD = #{freePeriod,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=DECIMAL},
+      STOP_START_TIME = #{stopStartTime,jdbcType=TIMESTAMP},
+      STOP_END_TIME = #{stopEndTime,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      OPER_ID = #{operId,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      all_fee = #{allFee,jdbcType=DECIMAL}
+    where SIM_NO = #{simNo,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateStatus" parameterType="com.chinaGPS.gtmp.entity.CustomerSimPOJO" >
+    update t_customer_sim
+    set
+	    status = #{status,jdbcType=DECIMAL},
+	    stop_fee_month = #{stopFeeMonth,jdbcType=DECIMAL},
+	    STOP_START_TIME = #{stopStartTime,jdbcType=TIMESTAMP},
+	    STOP_END_TIME = #{stopEndTime,jdbcType=TIMESTAMP},
+	    stop_reason = #{stopReason,jdbcType=VARCHAR},
+	    oper_Id  = #{operId,jdbcType=VARCHAR}
+    where sim_no = #{simNo,jdbcType=DECIMAL}
+  </update>
+  
+  
+  	<select id="countAll" parameterType="map" resultType="Integer">
+         select count(veh.vehicle_code) from t_vehicle veh 
+         left join t_vehicle_unit tvn on veh.vehicle_id = tvn.vehicle_id 
+         left join t_unit un on  un.unit_id = tvn.unit_id 
+         left join t_customer_sim  cs on un.sim_no = cs.sim_no
+          left join t_dealer_vehicle dv on veh.vehicle_def = dv.vehicle_def 
+  		 left join t_dealer_area da on da.id = dv.dealer_id
+   		LEFT JOIN T_DIC_VEHICLE_MODEL VM ON veh.VEHICLE_MODEL = VM.MODEL_ID 
+		   <include refid="getByPageCondition"/>
+	</select> 
+
+  <!-- 分页查询 -->
+	<select id="getByPage" parameterType="map" resultMap="BaseResultMap" useCache="false">
+	 <!--  round(ceil(To_date(cs.stop_end_time) - to_date(cs.stop_start_time))/30,2)*cs.stop_fee_month  -->
+	  select pu.user_name,da.name as distributor, VM.MODEL_NAME,veh.vehicle_code,veh.vehicle_def,veh.vehicle_arg,un.unit_sn,
+               un.sim_no, cs.start_time,cs.end_time,cs.free_period,cs.status,cs.stop_start_time,
+               cs.remark,cs.create_time,cs.stop_reason,cs.stop_end_time,
+        		  ceil(To_date(cs.end_time) - to_date(sysdate)) as is_server,
+        		  case
+                  when cs.status = 1 then        
+                    nvl(cs.stop_fee_month,0) 
+                  else 0
+               end as stop_save_fee 
+         from t_vehicle veh 
+         left join t_vehicle_unit tvn on veh.vehicle_id = tvn.vehicle_id 
+         left join t_unit un on  un.unit_id = tvn.unit_id 
+         left join t_customer_sim  cs on un.sim_no = cs.sim_no
+         
+          left join t_dealer_vehicle dv on veh.vehicle_def = dv.vehicle_def 
+  		 left join t_dealer_area da on da.id = dv.dealer_id
+   		LEFT JOIN T_DIC_VEHICLE_MODEL VM ON veh.VEHICLE_MODEL = VM.MODEL_ID 
+               left join  t_p_user pu  on  cs.oper_id = pu.user_id
+           
+           <include refid="getByPageCondition"/>
+           order by veh.stamp desc 
+	</select>
+  
+	 <select id="customerSimList" resultMap="BaseResultMap" useCache="false">
+		select * from t_customer_sim order by create_time desc
+	</select>
+	
+	<select id="allCustomerSim"  parameterType="map"  resultMap="BaseResultMap" useCache="false">
+		select * from t_customer_sim cs
+		<include refid="getByPageCondition"/>  
+		 order by cs.create_time desc
+	</select>
+	
+	
+	<select id="exportCustomerSim"  parameterType="map"  resultMap="BaseResultMap" useCache="false">
+		<!--  停机保号时一共收费 round(ceil(To_date(cs.stop_end_time) - to_date(cs.stop_start_time))/30,2)*cs.stop_fee_month  -->
+		
+		select pu.user_name,da.name as distributor, VM.MODEL_NAME,veh.vehicle_code,veh.vehicle_def,veh.vehicle_arg,un.unit_sn,
+               un.sim_no, cs.start_time,cs.end_time,cs.free_period,cs.status,cs.stop_start_time,
+               cs.remark,cs.create_time,cs.stop_reason,cs.stop_end_time,
+        		  ceil(To_date(cs.end_time) - to_date(sysdate)) as is_server,
+        		  case
+                  when cs.status = 1 then        
+                     nvl(cs.stop_fee_month,0)
+                  else 0
+               end as stop_save_fee 
+         from t_vehicle veh 
+         left join t_vehicle_unit tvn on veh.vehicle_id = tvn.vehicle_id 
+         left join t_unit un on  un.unit_id = tvn.unit_id 
+         left join t_customer_sim  cs on un.sim_no = cs.sim_no
+         
+          left join t_dealer_vehicle dv on veh.vehicle_def = dv.vehicle_def 
+  		 left join t_dealer_area da on da.id = dv.dealer_id
+   		LEFT JOIN T_DIC_VEHICLE_MODEL VM ON veh.VEHICLE_MODEL = VM.MODEL_ID 
+               left join  t_p_user pu  on  cs.oper_id = pu.user_id
+           <include refid="getByPageCondition"/>
+           order by veh.stamp desc 
+	</select>
+	
+	 <select id="getAllPay" resultType="java.lang.Integer" useCache="false">
+		select sum(pay_amount)　from t_customer_pay  where sim_no =  #{simNo,jdbcType=VARCHAR}
+	</select>
+</mapper>

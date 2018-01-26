@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+
+<struts>
+	<package name="permi" namespace="/permi" extends="global">
+		<!-- 用户 -->
+		<action name="user_*" class="userAction" method="{1}">
+		</action>
+		
+		<!-- 机主用户 -->
+		<action name="ownerUser_*" class="ownerUserAction" method="{1}"></action>
+		
+		<!-- 角色 -->
+		<action name="role_*" class="roleAction" method="{1}">
+		</action>
+		
+		<!-- 模块 -->
+		<action name="module_*" class="moduleAction" method="{1}">
+		</action>
+		
+		<!-- 机构 -->
+		<action name="depart_*" class="departAction" method="{1}">
+		</action>
+	</package>
+</struts>

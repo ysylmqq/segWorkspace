@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="cacheEnabled" value="true" />
+	</settings>
+<!--
+	<plugins> 指定数据库分页方言Dialect, 其它方言:OracleDialect,SQLServerDialect,SybaseDialect,DB2Dialect,PostgreSQLDialect,MySQLDialect,DerbyDialect 
+		<plugin interceptor="com.luo.util.page.OffsetLimitInterceptor">
+			<property name="dialectClass" value="com.luo.util.page.MySQLDialect"/>
+		</plugin>
+	</plugins>
+-->
+	<typeAliases>
+		<typeAlias alias="PageSelect" type="com.chinaGPS.gtmp.util.page.PageSelect" />
+	</typeAliases>
+	<typeHandlers>
+		<typeHandler javaType="oracle.sql.ARRAY" jdbcType="ARRAY" handler="com.chinaGPS.gtmp.util.typeHandler.ARRAYTypeHandler" />
+	</typeHandlers>
+</configuration>		
+			

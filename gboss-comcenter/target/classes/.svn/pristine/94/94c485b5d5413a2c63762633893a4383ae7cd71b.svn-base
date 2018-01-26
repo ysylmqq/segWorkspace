@@ -1,0 +1,15 @@
+#base
+#DriverClass=com.mysql.jdbc.Driver
+#JdbcUrl=jdbc:mysql://127.0.0.1/member
+#User=root
+#Password=123456
+
+DriverClass=com.mysql.jdbc.Driver
+JdbcUrl=jdbc\:mysql\://90.0.13.111/gboss
+User=gboss
+Password=123456
+
+#for c3p0
+InitialPoolSize=5
+MaxPoolSize=100
+TestConnectionOnCheckout=true

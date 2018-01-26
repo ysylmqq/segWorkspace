@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd   
+           http://www.springframework.org/schema/aop 
+           http://www.springframework.org/schema/aop/spring-aop-3.0.xsd   
+           http://www.springframework.org/schema/tx 
+           http://www.springframework.org/schema/tx/spring-tx-3.0.xsd" default-autowire="byName">
+
+	<!-- 该 BeanPostProcessor 将自动对标注 @Autowired 的 Bean 进行注入 -->
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+
+	<context:component-scan base-package="com.chinaGPS.gtmp.action" />
+	<context:component-scan base-package="com.chinaGPS.gtmp.service" />
+	<context:component-scan base-package="com.chinaGPS.gtmp.entity" />
+	<context:component-scan base-package="com.chinaGPS.gtmp.servlet" />
+	<context:component-scan base-package="com.chinaGPS.gtmp.business" />
+
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory" />
+	</bean>
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.chinaGPS.gtmp.mapper" />
+		<property name="markerInterface" value="com.chinaGPS.gtmp.mapper.BaseSqlMapper" />
+	</bean>
+	<bean id="springContext" class="com.chinaGPS.gtmp.util.SpringContext" />
+	<bean id="pageSelect" class="com.chinaGPS.gtmp.util.page.PageSelect" />
+</beans>  

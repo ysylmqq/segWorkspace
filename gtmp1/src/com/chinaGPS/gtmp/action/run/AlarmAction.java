@@ -1,0 +1,1341 @@
+package com.chinaGPS.gtmp.action.run;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Resource;
+import javax.mail.Flags.Flag;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.ibatis.executor.ReuseExecutor;
+import org.apache.ibatis.session.RowBounds;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.StandardChartTheme;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+import com.chinaGPS.gtmp.action.common.BaseAction;
+import com.chinaGPS.gtmp.entity.AlarmPOJO;
+import com.chinaGPS.gtmp.entity.AlarmTypePOJO;
+import com.chinaGPS.gtmp.entity.DepartPOJO;
+import com.chinaGPS.gtmp.entity.DynamicColumn;
+import com.chinaGPS.gtmp.entity.DynamicMalfunctionPOJO;
+import com.chinaGPS.gtmp.entity.RolePOJO;
+import com.chinaGPS.gtmp.entity.UserAlarmTypesPOJO;
+import com.chinaGPS.gtmp.entity.UserPOJO;
+import com.chinaGPS.gtmp.service.IAlarmService;
+import com.chinaGPS.gtmp.util.Constants;
+import com.chinaGPS.gtmp.util.DateUtil;
+import com.chinaGPS.gtmp.util.FormatUtil;
+import com.chinaGPS.gtmp.util.HttpURLConnectionUtil;
+import com.chinaGPS.gtmp.util.OperationLog;
+import com.chinaGPS.gtmp.util.StringUtils;
+import com.chinaGPS.gtmp.util.page.PageSelect;
+import com.opensymphony.xwork2.ModelDriven;
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
+/**
+ * @Package:com.chinaGPS.gtmp.action.run
+ * @ClassName:AlarmAction
+ * @Description:警情Action
+ * @author:zfy
+ * @date:2013-4-26 下午03:18:01
+ */
+@Scope("prototype")
+@Controller
+public class AlarmAction extends BaseAction implements ModelDriven<AlarmPOJO> {
+	private static final long serialVersionUID = -8378357994805356934L;
+	private static Logger logger = LoggerFactory.getLogger(AlarmAction.class);
+
+	@Resource
+	private AlarmPOJO alarmPOJO;
+	@Resource
+	private IAlarmService alarmService;
+	private int page;
+	private int rows;
+	private List<AlarmPOJO> resultList = new ArrayList<AlarmPOJO>();
+	@Resource
+	private PageSelect pageSelect;
+
+	// 设置已读集合
+	private List<String> idList;
+	private JFreeChart chart;
+	private String startDateStr;
+	private String endDateStr;
+
+	@Resource
+	private UserAlarmTypesPOJO userAlarmTypesPOJO;
+
+	public void getList() {
+		try {
+			resultList = alarmService.getList(alarmPOJO);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		renderObject(resultList);
+	}
+
+	public void getAlarmInfo() throws Exception {
+		pageSelect.setPage(page);
+		pageSelect.setRows(rows);
+		HashMap map = new HashMap();
+		if(alarmPOJO.getDealerId() != null){
+			String temp = alarmPOJO.getDealerId();
+			if(temp.equals("")){
+				
+			}else{				
+				String[] dealerIds=FormatUtil.strToFormat(temp).split(",");
+				alarmPOJO.setDealerIds(dealerIds);
+				alarmPOJO.setDealerId(null);
+			}
+			}
+		map.put("alarm", alarmPOJO);
+		
+		if(alarmPOJO.getAlarmTypeIds() != null){
+		if(alarmPOJO.getAlarmTypeIds().length>0){
+			String temp = alarmPOJO.getAlarmTypeIds()[0];
+			if(temp.equals("")){
+				alarmPOJO.setAlarmTypeIds(null);
+			}else{				
+				String[] alarmTypeIds=FormatUtil.strToFormat(temp).split(",");
+				alarmPOJO.setAlarmTypeIds(alarmTypeIds);
+			}
+		}
+		}
+		
+		// 判断是否是经销商
+		UserPOJO userPOJO = (UserPOJO) getSession().get(Constants.USER_INFO);
+		List<RolePOJO> roles = userPOJO.getRoles();
+		boolean isDealer = false;// 是否是经销商
+		boolean isLeaseHold = false; // 是否是融资租赁
+		DepartPOJO departPOJO = null;
+		if (!roles.isEmpty()) {
+			if (roles.size() == 1) {
+				RolePOJO role = roles.get(0);
+				if (role.getRoleId() == Constants.DEALER_ROLE_ID) {// 如果是经销商的话
+					isDealer = true;
+				} else if (role.getRoleId() == Constants.LEASEHOLD_ROLE_ID) { // 如果是融资租赁
+					isLeaseHold = true;
+				}
+			}
+		}
+
+		if (isDealer) {// 经销商
+			String[] dealerIds = new String[1];// 查询更多条件中的经销商数组
+			departPOJO = userPOJO.getDepartInfo();
+			dealerIds[0] = String.valueOf(departPOJO.getDealerId());
+			map.put("dealerIds", dealerIds);
+
+		} else if (isLeaseHold) {
+			map.put("leaseFlag", 1);
+		}
+		
+		// 获得用户自己设置的需要查询的警情类型，作为查询条件
+		Long userId = null;
+		if (getSession().get(Constants.USER_ID) != null) {
+			userId = (Long) getSession().get(Constants.USER_ID);
+		}
+		List<UserAlarmTypesPOJO> useralAlarmTypesPOJOs = alarmService
+				.getUserAlarmTypes(userId);
+		if (!useralAlarmTypesPOJOs.isEmpty()) {
+			map.put("alarmTypes",
+					useralAlarmTypesPOJOs.get(0) != null ? useralAlarmTypesPOJOs
+							.get(0).getAlarmTypes() : null);
+		}
+
+		// 机械分组
+		if (getSession().get(Constants.VEHICLE_STATUS) != null) {
+			List<Integer> vehicleStatus = (List<Integer>) getSession().get(
+					Constants.VEHICLE_STATUS);
+			if (vehicleStatus != null && !vehicleStatus.isEmpty()) {
+				map.put("vehicleStatus", vehicleStatus);
+			} else {
+				if (isDealer) {// 经销商
+					vehicleStatus.add(Constants.VEHICLE_STATE3);
+				} else {
+					// 如果没有设置数据权限，则默认查一个组为0，实际上没这个组，即不查询出来
+					vehicleStatus.add(0);
+				}
+				map.put("vehicleStatus", vehicleStatus);
+			}
+		}
+		int total = alarmService.countAll(map);
+		List<AlarmPOJO> resultList = alarmService.getByPage(map, new RowBounds(
+				pageSelect.getOffset(), pageSelect.getRows()));
+		for(AlarmPOJO alarm : resultList){
+			if(alarm.getLat()!=null && alarm.getLon()!=null){
+				String re = HttpURLConnectionUtil.getAddress(HttpURLConnectionUtil.getBaiduLonlat(""+alarm.getLon()+","+alarm.getLat()));
+				if(re!=null && !re.equals("")){
+					alarm.setReferencePosition(re);
+				}
+			}			
+		}
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		result.put("total", total);
+		result.put("rows", resultList);
+		renderObject(result);
+	}
+
+	public void getNonReadAlarmCount() throws Exception {
+		HashMap map = new HashMap();
+		map.put("alarm", alarmPOJO);
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		// 判断是否是经销商
+		UserPOJO userPOJO = (UserPOJO) getSession().get(Constants.USER_INFO);
+		if (userPOJO == null) {
+			renderObject(result);
+			return;
+		}
+		
+		
+		List<RolePOJO> roles = userPOJO.getRoles();
+		boolean isDealer = false;// 是否是经销商
+		boolean isLeaseHold = false; // 是否是融资租赁
+		DepartPOJO departPOJO = null;
+		if (!roles.isEmpty()) {
+			if (roles.size() == 1) {
+				RolePOJO role = roles.get(0);
+				if (role.getRoleId() == Constants.DEALER_ROLE_ID) {// 如果是经销商的话
+					isDealer = true;
+				} else if (role.getRoleId() == Constants.LEASEHOLD_ROLE_ID) { // 如果是融资租赁
+					isLeaseHold = true;
+				}
+			}
+		}
+
+		if (isDealer) {// 经销商
+			String[] dealerIds = new String[1];// 查询更多条件中的经销商数组
+			departPOJO = userPOJO.getDepartInfo();
+			if (departPOJO.getDealerId() != null) {
+				dealerIds[0] = String.valueOf(departPOJO.getDealerId());
+				map.put("dealerIds", dealerIds);
+			}
+
+		} else if (isLeaseHold) { // 融资租赁
+			map.put("leaseFlag", 1);
+
+		}
+
+		// 获得用户自己设置的需要查询的警情类型，作为查询条件
+		Long userId = null;
+		if (getSession().get(Constants.USER_ID) != null) {
+			userId = (Long) getSession().get(Constants.USER_ID);
+		}
+		List<UserAlarmTypesPOJO> useralAlarmTypesPOJOs = alarmService
+				.getUserAlarmTypes(userId);
+		boolean flag = true;
+		if ( useralAlarmTypesPOJOs.size() > 0 && !useralAlarmTypesPOJOs.isEmpty()) {
+			map.put("alarm","");
+			map.put("alarmTypes",
+					useralAlarmTypesPOJOs.get(0) != null ? useralAlarmTypesPOJOs
+							.get(0).getAlarmTypes() : null);
+			
+			int start  = useralAlarmTypesPOJOs.get(0).getStartTime();
+			int end = useralAlarmTypesPOJOs.get(0).getEndTime();
+			if (start + end >0){
+				SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
+				int now = Integer.parseInt(sdf.format(new Date()));
+				if(start<now && now<end){
+					flag = false;
+				}
+			}
+		}
+		int total = 0;
+		if(flag){
+			// 机械分组
+			if (getSession().get(Constants.VEHICLE_STATUS) != null) {
+				List<Integer> vehicleStatus = (List<Integer>) getSession().get(
+						Constants.VEHICLE_STATUS);
+				if (vehicleStatus != null && !vehicleStatus.isEmpty()) {
+					map.put("vehicleStatus", vehicleStatus);
+				} else {
+					if (isDealer) {// 经销商
+						vehicleStatus.add(Constants.VEHICLE_STATE3);
+					} else {
+						// 如果没有设置数据权限，则默认查一个组为0，实际上没这个组，即不查询出来
+						vehicleStatus.add(0);
+					}
+					map.put("vehicleStatus", vehicleStatus);
+				}
+			}
+			total = alarmService.countAll(map);
+			List<AlarmPOJO> resultList = alarmService.getByPage(map, new RowBounds(
+					0, 1));
+			if (resultList != null && resultList.size() > 0) {
+				alarmPOJO = resultList.get(0);
+			}
+		}
+		if(alarmPOJO.getLat()!=null && alarmPOJO.getLon()!=null){
+			String re = HttpURLConnectionUtil.getAddress(HttpURLConnectionUtil.getBaiduLonlat(""+alarmPOJO.getLon()+","+alarmPOJO.getLat()));
+			if(re!=null && !re.equals("")){
+				alarmPOJO.setReferencePosition(re);
+			}
+		}			
+		result.put("total", total);
+		result.put("result", alarmPOJO);
+		renderObject(result);
+	}
+
+
+	/*public void getNonReadAlarmCountNew() throws Exception {
+		HashMap map = new HashMap();
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		// 判断是否是经销商
+		UserPOJO userPOJO = (UserPOJO) getSession().get(Constants.USER_INFO);
+		if (userPOJO == null) {
+			renderObject(result);
+			return;
+		}
+		
+		List<RolePOJO> roles = userPOJO.getRoles();
+		boolean isDealer = false;// 是否是经销商
+		boolean isLeaseHold = false; // 是否是融资租赁
+		DepartPOJO departPOJO = null;
+		if (!roles.isEmpty()) {
+			if (roles.size() == 1) {
+				RolePOJO role = roles.get(0);
+				if (role.getRoleId() == Constants.DEALER_ROLE_ID) {// 如果是经销商的话
+					isDealer = true;
+				} else if (role.getRoleId() == Constants.LEASEHOLD_ROLE_ID) { // 如果是融资租赁
+					isLeaseHold = true;
+				}
+			}
+		}
+
+		if (isDealer) {// 经销商
+			String[] dealerIds = new String[1];// 查询更多条件中的经销商数组
+			departPOJO = userPOJO.getDepartInfo();
+			if (departPOJO.getDealerId() != null) {
+				dealerIds[0] = String.valueOf(departPOJO.getDealerId());
+				map.put("dealerIds", dealerIds);
+			}
+
+		} else if (isLeaseHold) { // 融资租赁
+			map.put("leaseFlag", 1);
+
+		}
+
+		// 获得用户自己设置的需要查询的警情类型，作为查询条件
+		Long userId = null;
+		if (getSession().get(Constants.USER_ID) != null) {
+			userId = (Long) getSession().get(Constants.USER_ID);
+		}
+		List<UserAlarmTypesPOJO> useralAlarmTypesPOJOs = alarmService
+				.getUserAlarmTypes(userId);
+		boolean flag = true;
+		String alarmTypes = "";
+		if ( useralAlarmTypesPOJOs.size() > 0 && !useralAlarmTypesPOJOs.isEmpty()) {
+			map.put("alarmTypes",
+					useralAlarmTypesPOJOs.get(0) != null ? useralAlarmTypesPOJOs
+							.get(0).getAlarmTypes() : null);
+			alarmTypes = useralAlarmTypesPOJOs.get(0) != null ? useralAlarmTypesPOJOs
+					.get(0).getAlarmTypes() : null;
+			int start  = useralAlarmTypesPOJOs.get(0).getStartTime();
+			int end = useralAlarmTypesPOJOs.get(0).getEndTime();
+			if (start + end >0){
+				SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
+				int now = Integer.parseInt(sdf.format(new Date()));
+				if(start<now && now<end){
+					flag = false;
+				}
+			}
+		}
+		//flag = false 标示要拦截警情，用户设置了
+		int total = 0;
+		if (getSession().get(Constants.VEHICLE_STATUS) != null) {
+			List<Integer> vehicleStatus = (List<Integer>) getSession().get(
+					Constants.VEHICLE_STATUS);
+			if (vehicleStatus != null && !vehicleStatus.isEmpty()) {
+				map.put("vehicleStatus", vehicleStatus);
+			} else {
+				if (isDealer) {// 经销商
+					vehicleStatus.add(Constants.VEHICLE_STATE3);
+				} else {
+					// 如果没有设置数据权限，则默认查一个组为0，实际上没这个组，即不查询出来
+					vehicleStatus.add(0);
+				}
+				map.put("vehicleStatus", vehicleStatus);
+			}
+		}
+		
+		if(flag){ //没有设置拦截时间或设置了拦截时间不在当前时间段内
+			map.put("alarm", alarmPOJO);
+			total = alarmService.countAll(map);
+			List<AlarmPOJO> resultList = alarmService.getByPage(map, new RowBounds(
+					0, 1));
+			if (resultList != null && resultList.size() > 0) {
+				alarmPOJO = resultList.get(0);
+			}
+		}else{
+			//用户设置了拦截时间并且拦截时间还在当前时间段内
+			//alarm  not in ()
+			if( !"".equals(alarmTypes) ){
+				map.put("alarmTypes", alarmTypes);
+				alarmPOJO.setAlarmTypeIds(alarmTypes.split(","));
+				map.put("alarm", alarmPOJO);
+			}
+			total = alarmService.countAll(map);
+			List<AlarmPOJO> resultList = alarmService.getByPage(map, new RowBounds(
+					0, 1));
+			if (resultList != null && resultList.size() > 0) {
+				alarmPOJO = resultList.get(0);
+			}
+		}
+		result.put("total", total);
+		result.put("result", alarmPOJO);
+		renderObject(result);
+	}*/
+
+
+	public void getNonReadAlarmCountNew() throws Exception {
+		HashMap map = new HashMap();
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		// 判断是否是经销商
+		UserPOJO userPOJO = (UserPOJO) getSession().get(Constants.USER_INFO);
+		if (userPOJO == null) {
+			renderObject(result);
+			return;
+		}
+		
+		List<RolePOJO> roles = userPOJO.getRoles();
+		boolean isDealer = false;// 是否是经销商
+		boolean isLeaseHold = false; // 是否是融资租赁
+		DepartPOJO departPOJO = null;
+		if (!roles.isEmpty()) {
+			if (roles.size() == 1) {
+				RolePOJO role = roles.get(0);
+				if (role.getRoleId() == Constants.DEALER_ROLE_ID) {// 如果是经销商的话
+					isDealer = true;
+				} else if (role.getRoleId() == Constants.LEASEHOLD_ROLE_ID) { // 如果是融资租赁
+					isLeaseHold = true;
+				}
+			}
+		}
+
+		if (isDealer) {// 经销商
+			String[] dealerIds = new String[1];// 查询更多条件中的经销商数组
+			departPOJO = userPOJO.getDepartInfo();
+			if (departPOJO.getDealerId() != null) {
+				dealerIds[0] = String.valueOf(departPOJO.getDealerId());
+				map.put("dealerIds", dealerIds);
+			}
+
+		} else if (isLeaseHold) { // 融资租赁
+			map.put("leaseFlag", 1);
+
+		}
+
+		// 获得用户自己设置的需要查询的警情类型，作为查询条件
+		Long userId = null;
+		if (getSession().get(Constants.USER_ID) != null) {
+			userId = (Long) getSession().get(Constants.USER_ID);
+		}
+		List<UserAlarmTypesPOJO> useralAlarmTypesPOJOs = alarmService
+				.getUserAlarmTypes(userId);
+		boolean flag = true;
+		String alarmTypes = "";
+		if ( useralAlarmTypesPOJOs.size() > 0 && !useralAlarmTypesPOJOs.isEmpty()) {
+			/*map.put("alarmTypes",
+					useralAlarmTypesPOJOs.get(0) != null ? useralAlarmTypesPOJOs
+							.get(0).getAlarmTypes() : null);*/
+			alarmTypes = useralAlarmTypesPOJOs.get(0) != null ? useralAlarmTypesPOJOs
+					.get(0).getAlarmTypes() : null;
+			int start  = useralAlarmTypesPOJOs.get(0).getStartTime();
+			int end = useralAlarmTypesPOJOs.get(0).getEndTime();
+			if (start + end >0){
+				SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
+				int now = Integer.parseInt(sdf.format(new Date()));
+				if(start<now && now<end){
+					flag = false;
+				}
+			}
+		}
+		//flag = false 标示要拦截警情，用户设置了
+		int total = 0;
+		if (getSession().get(Constants.VEHICLE_STATUS) != null) {
+			List<Integer> vehicleStatus = (List<Integer>) getSession().get(
+					Constants.VEHICLE_STATUS);
+			if (vehicleStatus != null && !vehicleStatus.isEmpty()) {
+				map.put("vehicleStatus", vehicleStatus);
+			} else {
+				if (isDealer) {// 经销商
+					vehicleStatus.add(Constants.VEHICLE_STATE3);
+				} else {
+					// 如果没有设置数据权限，则默认查一个组为0，实际上没这个组，即不查询出来
+					vehicleStatus.add(0);
+				}
+				map.put("vehicleStatus", vehicleStatus);
+			}
+		}
+		
+		if(flag){ //没有设置拦截时间或设置了拦截时间不在当前时间段内
+			map.put("alarm", alarmPOJO);
+			total = alarmService.countAll(map);
+			List<AlarmPOJO> resultList = alarmService.getByPage(map, new RowBounds(
+					0, 1));
+			if (resultList != null && resultList.size() > 0) {
+				alarmPOJO = resultList.get(0);
+			}
+		}else{
+			//用户设置了拦截时间并且拦截时间还在当前时间段内
+			//alarm  not in ()
+			if( !"".equals(alarmTypes) ){
+				/*map.put("alarmTypes", alarmTypes);*/
+				alarmPOJO.setAlarmTypeIds(alarmTypes.split(","));
+				map.put("alarm", alarmPOJO);
+			}
+			total = alarmService.countAll(map);
+			List<AlarmPOJO> resultList = alarmService.getByPage(map, new RowBounds(
+					0, 1));
+			if (resultList != null && resultList.size() > 0) {
+				alarmPOJO = resultList.get(0);
+			}
+		}
+		if(alarmPOJO.getLat()!=null && alarmPOJO.getLon()!=null){
+			String re = HttpURLConnectionUtil.getAddress(HttpURLConnectionUtil.getBaiduLonlat(""+alarmPOJO.getLon()+","+alarmPOJO.getLat()));
+			if(re!=null && !re.equals("")){
+				alarmPOJO.setReferencePosition(re);
+			}
+		}
+		result.put("total", total);
+		result.put("result", alarmPOJO);
+		renderObject(result);
+	}
+	
+	/**
+	 * @Title:getAlarmType
+	 * @Description:警情类型
+	 * @throws Exception
+	 * @throws
+	 */
+	public void getAlarmType() throws Exception {
+		AlarmTypePOJO alarmTypePOJO = new AlarmTypePOJO();
+		alarmTypePOJO.setAlarmTypeName("全部");
+		alarmTypePOJO.setAlarmTypeId("");
+ 
+		List<AlarmTypePOJO> result = new ArrayList<AlarmTypePOJO>();
+		result.add(alarmTypePOJO);
+		Long userId = null;
+		if (getSession().get(Constants.USER_ID) != null) {
+			userId = (Long) getSession().get(Constants.USER_ID);
+		}
+		// 获得用户自己设置的警情类型
+		HashMap map = new HashMap();
+		List<UserAlarmTypesPOJO> useralAlarmTypesPOJOs = alarmService
+				.getUserAlarmTypes(userId);
+		if (!useralAlarmTypesPOJOs.isEmpty()) {
+			map.put("alarmTypes",
+					useralAlarmTypesPOJOs.get(0) != null ? useralAlarmTypesPOJOs
+							.get(0).getAlarmTypes() : null);
+		}
+		result.addAll(alarmService.getAllAlarmType(map));
+		renderObject(result);
+	}
+
+	/**
+	 * 　　* 函 数 名 :getUserAlarmTypes 　　* 功能描述：获得用户自己设置要查看的警情类型和所有的警情，用于显示过滤警情类型
+	 * 　　* 输入参数: 　　* @param 　　* @return void 　　* @throws 无异常处理　　 　　* 创 建 人:周峰炎
+	 * 　　* 日 期:2013-7-19 　　* 修 改 人: 　　* 修 改 日 期: 　　* 修 改 原 因:
+	 */
+	public void getUserAlarmTypes() {
+		try {
+			Long userId = null;
+			if (getSession().get(Constants.USER_ID) != null) {
+				userId = (Long) getSession().get(Constants.USER_ID);
+			}
+			// 获得用户自己设置的警情类型
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			List<UserAlarmTypesPOJO> useralAlarmTypesPOJOs = alarmService
+					.getUserAlarmTypes(userId);
+			if (!useralAlarmTypesPOJOs.isEmpty()) {
+				map.put("alarmTypes",
+						useralAlarmTypesPOJOs.get(0) != null ? useralAlarmTypesPOJOs
+								.get(0).getAlarmTypes() : null);
+				map.put("showColumns",
+						useralAlarmTypesPOJOs.get(0) != null ? useralAlarmTypesPOJOs
+								.get(0).getShowColumns() : null);
+			}
+			map.put("allAlarmTypes", alarmService.getAllAlarmType(null));
+			map.put("startTime", useralAlarmTypesPOJOs.get(0) != null ? useralAlarmTypesPOJOs
+					.get(0).getStartTime() : null);
+			map.put("endTime", useralAlarmTypesPOJOs.get(0) != null ? useralAlarmTypesPOJOs
+					.get(0).getEndTime() : null);
+			
+			renderObject(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 　　* 函 数 名 :setUserAlarmTypes 　　* 功能描述：设置用户要查看的警情类型 　　* 输入参数: 　　* @param
+	 * 　　* @return void 　　* @throws 无异常处理　　 　　* 创 建 人:周峰炎 　　* 日 期:2013-7-19 　　*
+	 * 修 改 人: 　　* 修 改 日 期: 　　* 修 改 原 因:
+	 */
+	public void setUserAlarmTypes() {
+		boolean result = false;
+		String msg = OP_FAIL;
+		try {
+			Long userId = null;
+			if (getSession().get(Constants.USER_ID) != null) {
+				userId = (Long) getSession().get(Constants.USER_ID);
+			}
+			userAlarmTypesPOJO.setUserId(userId);
+			result = alarmService.setUserAlarmTypes(userAlarmTypesPOJO);
+			msg = OP_SUCCESS;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		renderMsgJson(result, msg);
+	}
+
+	/**
+	 * 修改警情表的阅读状态
+	 * @throws Exception
+	 */
+	@OperationLog(description = "警情阅读状态修改")
+	public void updateAlarm() throws Exception {
+		boolean result = true;
+		String msg = OP_SUCCESS;
+		try {
+			if (idList != null && idList.size() > 0) {
+				alarmService.editAlarms(idList);
+			}
+		} catch (Exception e) {
+			result = false;
+			msg = OP_FAIL;
+		}
+		renderMsgJson(result, msg);
+	}
+
+    public String indexToExcel() throws Exception{
+    	if(page == 0){
+    		pageSelect.setPage(1);
+    	}else{
+    		pageSelect.setPage(page);
+    		}
+    	if(rows == 0){
+    		pageSelect.setRows(20);
+    	}else{
+    		pageSelect.setRows(rows);
+    	}
+
+		HashMap map = new HashMap();
+		alarmPOJO.setVehicleDef(URLDecoder.decode(alarmPOJO.getVehicleDef()));
+		alarmPOJO.setIsRead(1);
+		alarmPOJO.setAlarmStatus("01");
+		if (StringUtils.isNotBlank(alarmPOJO.getReferencePosition())) {
+			alarmPOJO.setAlarmTypeIds(alarmPOJO.getReferencePosition()
+					.split(","));
+		}
+		map.put("alarm", alarmPOJO);
+		if(alarmPOJO.getAlarmTypeIds() != null){
+		if(alarmPOJO.getAlarmTypeIds().length>0){
+			String temp = alarmPOJO.getAlarmTypeIds()[0];
+			if(temp.equals("")){
+				alarmPOJO.setAlarmTypeIds(null);
+			}else{				
+				String[] alarmTypeIds=FormatUtil.strToFormat(temp).split(",");
+				alarmPOJO.setAlarmTypeIds(alarmTypeIds);
+			}
+		}
+		}
+		
+		// 判断是否是经销商
+		UserPOJO userPOJO = (UserPOJO) getSession().get(Constants.USER_INFO);
+		List<RolePOJO> roles = userPOJO.getRoles();
+		boolean isDealer = false;// 是否是经销商
+		boolean isLeaseHold = false; // 是否是融资租赁
+		DepartPOJO departPOJO = null;
+		if (!roles.isEmpty()) {
+			if (roles.size() == 1) {
+				RolePOJO role = roles.get(0);
+				if (role.getRoleId() == Constants.DEALER_ROLE_ID) {// 如果是经销商的话
+					isDealer = true;
+				} else if (role.getRoleId() == Constants.LEASEHOLD_ROLE_ID) { // 如果是融资租赁
+					isLeaseHold = true;
+				}
+			}
+		}
+
+		if (isDealer) {// 经销商
+			String[] dealerIds = new String[1];// 查询更多条件中的经销商数组
+			departPOJO = userPOJO.getDepartInfo();
+			dealerIds[0] = String.valueOf(departPOJO.getDealerId());
+			map.put("dealerIds", dealerIds);
+
+		} else if (isLeaseHold) {
+			map.put("leaseFlag", 1);
+		}
+
+		// 获得用户自己设置的需要查询的警情类型，作为查询条件
+		Long userId = null;
+		if (getSession().get(Constants.USER_ID) != null) {
+			userId = (Long) getSession().get(Constants.USER_ID);
+		}
+		List<UserAlarmTypesPOJO> useralAlarmTypesPOJOs = alarmService
+				.getUserAlarmTypes(userId);
+		if (!useralAlarmTypesPOJOs.isEmpty()) {
+			map.put("alarmTypes",
+					useralAlarmTypesPOJOs.get(0) != null ? useralAlarmTypesPOJOs
+							.get(0).getAlarmTypes() : null);
+		}
+
+		// 机械分组
+		if (getSession().get(Constants.VEHICLE_STATUS) != null) {
+			List<Integer> vehicleStatus = (List<Integer>) getSession().get(
+					Constants.VEHICLE_STATUS);
+			if (vehicleStatus != null && !vehicleStatus.isEmpty()) {
+				map.put("vehicleStatus", vehicleStatus);
+			} else {
+				if (isDealer) {// 经销商
+					vehicleStatus.add(Constants.VEHICLE_STATE3);
+				} else {
+					// 如果没有设置数据权限，则默认查一个组为0，实际上没这个组，即不查询出来
+					vehicleStatus.add(0);
+				}
+				map.put("vehicleStatus", vehicleStatus);
+			}
+		}
+		int total = alarmService.countAll(map);
+		List<AlarmPOJO> resultList = alarmService.getByPage(map, new RowBounds(
+				pageSelect.getOffset(), pageSelect.getRows()));
+		List<Object[]> values = new ArrayList<Object[]>();
+		for (AlarmPOJO alarm1 : resultList) {
+			if (org.apache.commons.lang.StringUtils.isNotEmpty(alarm1
+					.getAlarmStatus())) {
+				if ("00".equals(alarm1.getAlarmStatus())) {
+					alarm1.setAlarmStatus("警情消除");
+				} else {
+					alarm1.setAlarmStatus("警情发生");
+				}
+			}
+			if (org.apache.commons.lang.StringUtils.isNotEmpty(alarm1
+					.getAlarmTypeGenre())) {
+				if ("1".equals(alarm1.getAlarmTypeGenre())) {
+					alarm1.setAlarmTypeGenre("GPS警情");
+				} else {
+					alarm1.setAlarmTypeGenre("挖机警情");
+				}
+			}
+			if(alarm1.getLat()!=null && alarmPOJO.getLon()!=null){
+				String re = HttpURLConnectionUtil.getAddress(HttpURLConnectionUtil.getBaiduLonlat(""+alarm1.getLon()+","+alarm1.getLat()));
+				if(re!=null && !re.equals("")){
+					alarm1.setReferencePosition(re);
+				}
+			}
+			values.add(new Object[] { alarm1.getVehicleDef(),
+					alarm1.getDealerId(),
+					alarm1.getVehicleModelName(), alarm1.getVehicleCode(),
+					alarm1.getVehicleArg(), alarm1.getAlarmTypeGenre(),alarm1.getAlarmTypeName(),
+					alarm1.getStamp(), alarm1.getAlarmStatus(),
+					alarm1.getLon(), alarm1.getLat(), alarm1.getSpeed(),
+					alarm1.getReferencePosition() });
+		}
+		String[] headers = new String[] { "整机编号", "经销商","机型", "机器代号", "配置号","警情大类",
+				"警情类型", "报警时间", "警情是否消除", "经度", "纬度", "速度", "参考位置" };
+		super.renderExcel("报警信息查询" + ".xls", headers, values);
+		
+		
+    	return null;
+    }
+	public String exportToExcel() throws UnsupportedEncodingException {
+		try {
+			List<Object[]> values = new ArrayList<Object[]>();
+//			String dealerId = getParameter("dealerId");
+			alarmPOJO.setVehicleDef(URLDecoder.decode(alarmPOJO.getVehicleDef()));
+//			alarmPOJO.setDealerId(URLDecoder.decode(alarmPOJO.getDealerId()));
+			
+			// 开始时间
+			if(alarmPOJO.getStartTime()!=null && alarmPOJO.getEndTime() !=null){
+			    alarmPOJO.setStartTime(DateUtil.parse(URLDecoder.decode(alarmPOJO.getRawData()),DateUtil.YMD_DASH_WITH_FULLTIME));
+			    alarmPOJO.setEndTime(DateUtil.parse(URLDecoder.decode(alarmPOJO.getUnitId()), DateUtil.YMD_DASH_WITH_FULLTIME));
+			}
+			/* List<AlarmPOJO> list=alarmService.getList(alarmPOJO); */
+			Map map = new HashMap();
+			if(pageSelect.getPage() == 0)
+			pageSelect.setPage(1);
+			if(pageSelect.getRows() ==0)
+			pageSelect.setRows(Integer.MAX_VALUE);
+			if (StringUtils.isNotBlank(alarmPOJO.getReferencePosition())) {
+				alarmPOJO.setAlarmTypeIds(alarmPOJO.getReferencePosition()
+						.split(","));
+			}
+			if(alarmPOJO.getDealerId() != null){
+	            String temp = alarmPOJO.getDealerId();
+	            if(temp.equals("")){
+	                
+	            }else{              
+	                String[] dealerIds=FormatUtil.strToFormat(temp).split(",");
+	                alarmPOJO.setDealerIds(dealerIds);
+	                alarmPOJO.setDealerId(null);
+	            }
+	            }
+			map.put("alarm", alarmPOJO);
+			// 判断是否是经销商
+			UserPOJO userPOJO = (UserPOJO) getSession()
+					.get(Constants.USER_INFO);
+			List<RolePOJO> roles = userPOJO.getRoles();
+			boolean isDealer = false;// 是否是 经销商
+			DepartPOJO departPOJO = null;
+			if (!roles.isEmpty()) {
+				if (roles.size() == 1) {
+					RolePOJO role = roles.get(0);
+					if (role.getRoleId() == Constants.DEALER_ROLE_ID) {// 如果是经销商的话
+						isDealer = true;
+					}
+				}
+			}
+
+			if (isDealer) {// 经销商
+				String[] dealerIds = new String[1];// 查询更多条件中的经销商数组
+				departPOJO = userPOJO.getDepartInfo();
+				dealerIds[0] = String.valueOf(departPOJO.getDealerId());
+				map.put("dealerIds", dealerIds);
+			}
+
+			// 获得用户自己设置的需要查询的警情类型，作为查询条件
+			Long userId = null;
+			if (getSession().get(Constants.USER_ID) != null) {
+				userId = (Long) getSession().get(Constants.USER_ID);
+			}
+			List<UserAlarmTypesPOJO> useralAlarmTypesPOJOs = alarmService
+					.getUserAlarmTypes(userId);
+			if (!useralAlarmTypesPOJOs.isEmpty()) {
+				map.put("alarmTypes",
+						useralAlarmTypesPOJOs.get(0) != null ? useralAlarmTypesPOJOs
+								.get(0).getAlarmTypes() : null);
+			}
+			// 机械分组
+			if (getSession().get(Constants.VEHICLE_STATUS) != null) {
+				List<Integer> vehicleStatus = (List<Integer>) getSession().get(
+						Constants.VEHICLE_STATUS);
+				if (vehicleStatus != null && !vehicleStatus.isEmpty()) {
+					map.put("vehicleStatus", vehicleStatus);
+				} else {
+					if (isDealer) {// 经销商
+						vehicleStatus.add(Constants.VEHICLE_STATE3);
+					} else {
+						// 如果没有设置数据权限，则默认查一个组为0，实际上没这个组，即不查询出来
+						vehicleStatus.add(0);
+					}
+					map.put("vehicleStatus", vehicleStatus);
+				}
+			}
+		
+			List<AlarmPOJO> resultList;
+
+			resultList = alarmService
+					.getByPage(map, new RowBounds(0,Integer.MAX_VALUE));
+			for (AlarmPOJO alarm1 : resultList) {
+				if (org.apache.commons.lang.StringUtils.isNotEmpty(alarm1
+						.getAlarmStatus())) {
+					if ("00".equals(alarm1.getAlarmStatus())) {
+						alarm1.setAlarmStatus("警情消除");
+					} else {
+						alarm1.setAlarmStatus("警情发生");
+					}
+				}
+				if (org.apache.commons.lang.StringUtils.isNotEmpty(alarm1
+						.getAlarmTypeGenre())) {
+					if ("1".equals(alarm1.getAlarmTypeGenre())) {
+						alarm1.setAlarmTypeGenre("GPS警情");
+					} else {
+						alarm1.setAlarmTypeGenre("挖机警情");
+					}
+				}
+				if(alarm1.getLat()!=null && alarmPOJO.getLon()!=null){
+					String re = HttpURLConnectionUtil.getAddress(HttpURLConnectionUtil.getBaiduLonlat(""+alarm1.getLon()+","+alarm1.getLat()));
+					if(re!=null && !re.equals("")){
+						alarm1.setReferencePosition(re);
+					}
+				}
+				values.add(new Object[] { alarm1.getVehicleDef(),
+						alarm1.getDealerId(),
+						alarm1.getVehicleModelName(), alarm1.getVehicleCode(),
+						alarm1.getVehicleArg(),alarm1.getAlarmTypeGenre(), alarm1.getAlarmTypeName(),
+						alarm1.getStamp(), alarm1.getAlarmStatus(),
+						alarm1.getLon(), alarm1.getLat(), alarm1.getSpeed(),
+						alarm1.getReferencePosition() });
+			}
+			String[] headers = new String[] { "整机编号","经销商", "机型", "机器代号", "配置号","警情大类",
+					"警情类型", "报警时间", "警情是否消除", "经度", "纬度", "速度", "参考位置" };
+			super.renderExcel("报警信息查询" + ".xls", headers, values);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+			
+		
+	
+
+	/**
+	 * @Title:statistic_search
+	 * @Description:警情统计
+	 * @throws Exception
+	 * @throws
+	 */
+	public void statistic_search() {
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		try {
+			// 查询条件
+			HashMap<String, Object> conditionMap = new HashMap<String, Object>();
+			conditionMap.put("reportType", alarmPOJO.getReportType());
+			conditionMap.put("vehicleModel", alarmPOJO.getVehicleModel());
+			conditionMap.put("vehicleCode", alarmPOJO.getVehicleCode());
+			conditionMap.put("vehicleArg", alarmPOJO.getVehicleArg());
+			conditionMap.put("alarmTypeId", alarmPOJO.getAlarmTypeId());
+			conditionMap.put("alarmTypeGenre", alarmPOJO.getAlarmTypeGenre());
+			// Grid表头
+			LinkedHashMap<String, Object> propertyMap = new LinkedHashMap<String, Object>();
+			propertyMap.put("typeId", Class.forName("java.lang.String"));
+			String[] columnsNameArray = null;
+			int count = 0;
+			String columnName = null;
+			
+			if (StringUtils.isNotBlank(endDateStr) && StringUtils.isNotBlank(startDateStr)) {// 只出现这几个月的信息
+				conditionMap.put("startTime", DateUtil.parse(startDateStr + "-01", DateUtil.YMD_DASH));
+				Calendar cal = Calendar.getInstance();
+				int year = Integer.parseInt(endDateStr.split("-")[0]);
+				int month = Integer.parseInt(endDateStr.split("-")[1]) - 1;
+				cal.set(year, month, cal.getActualMaximum(Calendar.DAY_OF_MONTH), 23, 59, 59);
+				conditionMap.put("endTime", cal.getTime());
+				// 计算表头数量及名称
+				HashSet<String> monthSet = DateUtil.getAllYearMonthList(startDateStr, endDateStr);
+				count = monthSet.size();
+				columnsNameArray = new String[count];
+				int i = 1;
+				for (String item : monthSet) {
+					columnName = "m" + item;
+					columnsNameArray[i - 1] = columnName;
+					i++;
+					propertyMap.put(columnName, Class.forName("java.lang.String"));
+				}
+			} else {
+				count = 12;
+				int year = Calendar.getInstance().get(Calendar.YEAR);
+				columnsNameArray = new String[count];
+				for (int i = 1; i <= count; i++) {
+					columnName = "m" + year + String.format("%02d", i);
+					columnsNameArray[i - 1] = columnName;
+					propertyMap.put(columnName, Class.forName("java.lang.String"));
+				}
+			}
+
+			Set<String> set = propertyMap.keySet();
+			Iterator<String> it = set.iterator();
+			List<DynamicColumn> fieldsList = new ArrayList<DynamicColumn>();
+			DynamicColumn dynamicCcolumn = null;
+			String column = null;
+			while (it.hasNext()) {
+				column = it.next();
+				dynamicCcolumn = new DynamicColumn();
+				dynamicCcolumn.setField(column);
+				dynamicCcolumn.setWidth(100);
+				if(column.startsWith("m2")) {
+					dynamicCcolumn.setTitle(column.replace("m", "").substring(0, 4)+ "年" + column.replace("m", "").substring(4) + "月");
+				} else {
+					dynamicCcolumn.setHidden(true);
+					dynamicCcolumn.setTitle("typeId");
+				}
+				fieldsList.add(dynamicCcolumn);
+			}
+			
+			conditionMap.put("columns", columnsNameArray);
+			
+			DynamicColumn dc = new DynamicColumn();
+			if(alarmPOJO.getReportType() == 1) { // 如果是机型
+				if(alarmPOJO.getVehicleCode() != null && !"".equals(alarmPOJO.getVehicleCode())) { // 如果机械代号不为空
+					dc.setTitle("机械代号");
+					dc.setField("vehicleCode");
+					fieldsList.add(0, dc);
+					propertyMap.put("vehicleCode", Class.forName("java.lang.String"));
+					if(alarmPOJO.getVehicleArg() != null && !"".equals(alarmPOJO.getVehicleArg())) { // 如果配置号不为空
+						dc = new DynamicColumn();
+						dc.setTitle("配置号");
+						dc.setField("vehicleArg");
+						fieldsList.add(1, dc);
+						propertyMap.put("vehicleArg", Class.forName("java.lang.String"));
+					}
+				} else {
+					dc.setTitle("机械型号");
+					dc.setField("modelName");
+					fieldsList.add(0, dc);
+					propertyMap.put("modelName", Class.forName("java.lang.String"));
+				}
+			} else if (alarmPOJO.getReportType() == 2) { // 如果是故障类型
+				dc.setTitle("警情类型");
+				dc.setField("alarmTypeName");
+				fieldsList.add(0, dc);
+				propertyMap.put("alarmTypeName", Class.forName("java.lang.String"));
+			}
+			
+			List<Object> list = alarmService.statisticAlarm(conditionMap, propertyMap);
+			result.put("rows", list);
+			result.put("total", 0);
+			List<Object> columnsListWrap = new ArrayList<Object>();
+			columnsListWrap.add(fieldsList);
+			result.put("columns", columnsListWrap);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		renderObject(result);
+
+	}
+
+	public void exportToExcelStatistic() {
+		List<String> fieldsList2 = new ArrayList<String>();
+		List<Object[]> values = new ArrayList<Object[]>();
+		try {
+			// 查询条件
+			HashMap<String, Object> conditionMap = new HashMap<String, Object>();
+			conditionMap.put("reportType", alarmPOJO.getReportType());
+			conditionMap.put("vehicleModel", alarmPOJO.getVehicleModel());
+			conditionMap.put("vehicleCode", alarmPOJO.getVehicleCode());
+			conditionMap.put("vehicleArg", alarmPOJO.getVehicleArg());
+			conditionMap.put("alarmTypeId", alarmPOJO.getAlarmTypeId());
+			conditionMap.put("alarmTypeGenre", alarmPOJO.getAlarmTypeGenre());
+			
+			LinkedHashMap<String, Object> propertyMap = new LinkedHashMap<String, Object>();
+			if(alarmPOJO.getReportType() == 1) { // 如果是机型
+				if(alarmPOJO.getVehicleCode() != null && !"".equals(alarmPOJO.getVehicleCode())) { // 如果机械代号不为空
+					fieldsList2.add(0, "机械代号");
+					propertyMap.put("vehicleCode", Class.forName("java.lang.String"));
+					if(alarmPOJO.getVehicleArg() != null && !"".equals(alarmPOJO.getVehicleArg())) { // 如果配置号不为空
+						fieldsList2.add(1, "配置号");
+						propertyMap.put("vehicleArg", Class.forName("java.lang.String"));
+					}
+				} else {
+					fieldsList2.add(0, "机械型号");
+					propertyMap.put("modelName", Class.forName("java.lang.String"));
+				}
+			} else if (alarmPOJO.getReportType() == 2) { // 如果是故障类型
+				fieldsList2.add(0, "警情类型");
+				propertyMap.put("alarmTypeName", Class.forName("java.lang.String"));
+			}
+			
+			String[] columnsNameArray = null;
+			int count = 0;
+			String columnName = null;
+			if (StringUtils.isNotBlank(endDateStr) && StringUtils.isNotBlank(startDateStr)) {// 只出现这几个月的信息
+				HashSet<String> monthSet = DateUtil.getAllYearMonthList(startDateStr, endDateStr);
+				conditionMap.put("startTime", DateUtil.parse(startDateStr + "-01", DateUtil.YMD_DASH));
+				Calendar cal = Calendar.getInstance();
+				int year = Integer.parseInt(endDateStr.split("-")[0]);
+				int month = Integer.parseInt(endDateStr.split("-")[1]) - 1;
+				cal.set(year, month, cal.getActualMaximum(Calendar.DAY_OF_MONTH), 23, 59, 59);
+				conditionMap.put("endTime", cal.getTime());
+				
+				count = monthSet.size();
+				columnsNameArray = new String[count];
+				int i = 1;
+				for (String item : monthSet) {
+					columnName = "m" + item;
+					columnsNameArray[i - 1] = columnName;
+					i++;
+					propertyMap.put(columnName, Class.forName("java.lang.String"));
+				}
+			} else {
+				count = 12;
+				int year = Calendar.getInstance().get(Calendar.YEAR);
+				columnsNameArray = new String[count];
+				for (int i = 1; i <= count; i++) {
+					columnName = "m" + year + String.format("%02d", i);
+					columnsNameArray[i - 1] = columnName;
+					propertyMap.put(columnName, Class.forName("java.lang.String"));
+				}
+			}
+			
+			Set<String> set = propertyMap.keySet();
+			Iterator<String> it = set.iterator();
+			String[] columnSqlArray = new String[set.size()];
+			
+			String column = null;
+			int columnIndex = 0;
+			String title = "";
+			while (it.hasNext()) {
+				column = String.valueOf(it.next());
+				columnSqlArray[columnIndex] = column;
+				columnIndex++;
+				if(column.startsWith("m2")) {
+					title = column.replace("m", "").substring(0, 4)+ "年" + column.replace("m", "").substring(4) + "月";
+					fieldsList2.add(title);
+				}
+			}
+			conditionMap.put("columns", columnsNameArray);
+			
+			List<DynamicMalfunctionPOJO> list = alarmService.statisticAlarmToPOJO(conditionMap, propertyMap);
+			for (DynamicMalfunctionPOJO object : list) {
+				String[] row = new String[columnSqlArray.length];
+				for (int j = 0; j < columnSqlArray.length; j++) {
+					row[j] = String.valueOf(object.getValue(columnSqlArray[j]));
+				}
+				values.add(row);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		super.renderExcel("警情统计" + ".xls", fieldsList2.toArray(), values);
+
+	}
+
+	/**
+	 * @Title:drawChart
+	 * @Description:图表
+	 * @return
+	 * @throws
+	 */
+	public String drawChart() {
+		try {
+			chart = createAlarmChart(createDataSet4alarm());
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return SUCCESS;
+	}
+	
+	public void downloadChart() {
+		try {
+			chart = createAlarmChart(createDataSet4alarm());
+			HttpServletResponse resp = BaseAction.getResponse();
+			resp.setContentType("application/octet-stream");
+			resp.setHeader("Content-disposition", "attachment; filename=alarm_chart.png");
+			ChartUtilities.writeChartAsPNG(resp.getOutputStream(), chart, 1024, 768);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+
+	public CategoryDataset createDataSet4alarm() throws Exception {
+		// 条件
+		HashMap<String, Object> conditionMap = new HashMap<String, Object>();
+		conditionMap.put("reportType", alarmPOJO.getReportType());
+		conditionMap.put("vehicleModel", alarmPOJO.getVehicleModel());
+		conditionMap.put("vehicleCode", alarmPOJO.getVehicleCode());
+		conditionMap.put("vehicleArg", alarmPOJO.getVehicleArg());
+		conditionMap.put("alarmTypeId", alarmPOJO.getAlarmTypeId());
+
+		LinkedHashMap<String, Object> propertyMap = new LinkedHashMap<String, Object>();
+		if(alarmPOJO.getReportType() == 1) { // 如果是机型
+			if(alarmPOJO.getVehicleCode() != null && !"".equals(alarmPOJO.getVehicleCode())) { // 如果机械代号不为空
+				propertyMap.put("vehicleCode", Class.forName("java.lang.String"));
+				if(alarmPOJO.getVehicleArg() != null && !"".equals(alarmPOJO.getVehicleArg())) { // 如果配置号不为空
+					propertyMap.put("vehicleArg", Class.forName("java.lang.String"));
+				}
+			} else {
+				propertyMap.put("modelName", Class.forName("java.lang.String"));
+			}
+		} else if (alarmPOJO.getReportType() == 2) { // 如果是故障类型
+			propertyMap.put("alarmTypeName", Class.forName("java.lang.String"));
+		}
+		
+		String[] columnsNameArray = null;
+		int count = 0;
+		String columnName = null;
+		if (StringUtils.isNotBlank(endDateStr) && StringUtils.isNotBlank(startDateStr)) {// 只出现这几个月的信息
+			HashSet<String> monthSet = DateUtil.getAllYearMonthList(startDateStr, endDateStr);
+			conditionMap.put("startTime", DateUtil.parse(startDateStr + "-01", DateUtil.YMD_DASH));
+			Calendar cal = Calendar.getInstance();
+			int year = Integer.parseInt(endDateStr.split("-")[0]);
+			int month = Integer.parseInt(endDateStr.split("-")[1]) - 1;
+			cal.set(year, month, cal.getActualMaximum(Calendar.DAY_OF_MONTH), 23, 59, 59);
+			conditionMap.put("endTime", cal.getTime());
+			
+			count = monthSet.size();
+			columnsNameArray = new String[count];
+			int i = 1;
+			for (String item : monthSet) {
+				columnName = "m" + item;
+				columnsNameArray[i - 1] = columnName;
+				i++;
+				propertyMap.put(columnName, Class.forName("java.lang.String"));
+			}
+		} else {
+			count = 12;
+			int year = Calendar.getInstance().get(Calendar.YEAR);
+			columnsNameArray = new String[count];
+			for (int i = 1; i <= count; i++) {
+				columnName = "m" + year + String.format("%02d", i);
+				columnsNameArray[i - 1] = columnName;
+				propertyMap.put(columnName, Class.forName("java.lang.String"));
+			}
+		}
+		conditionMap.put("columns", columnsNameArray);
+		
+		List<DynamicMalfunctionPOJO> list = alarmService.statisticAlarmToPOJO(conditionMap, propertyMap);
+		String typeName = null;// 类型
+		String ccount = null;// 数量
+		String yyyymm = null;// 年月
+		
+		DefaultCategoryDataset defaultcategorydataset = new DefaultCategoryDataset();
+		for (DynamicMalfunctionPOJO object : list) {
+			for (int j = 0; j < columnsNameArray.length; j++) {
+				ccount = String.valueOf(object.getValue(columnsNameArray[j]));
+				yyyymm = columnsNameArray[j].replace("m", "").substring(0, 4) + "-" + columnsNameArray[j].replace("m", "").substring(4);
+				typeName = String.valueOf(object.getValue("alarmTypeName"));
+				if("null".equals(typeName)) {
+					if(object.getValue("vehicleCode") != null) {
+						if (object.getValue("vehicleArg") != null) {
+							typeName = String.valueOf(object.getValue("vehicleCode")) + String.valueOf(object.getValue("vehicleArg"));
+						} else {
+							typeName = String.valueOf(object.getValue("vehicleCode"));
+						}
+					} else {
+						typeName = String.valueOf(object.getValue("modelName"));
+					}
+				}
+				defaultcategorydataset.addValue(Integer.parseInt(ccount), typeName, yyyymm);
+			}
+		}
+
+		return defaultcategorydataset;
+
+	}
+
+	/**
+	 * @Title:createMalfunctionChart
+	 * @Description:创建警情统计图表对象
+	 * @param categorydataset
+	 * @return
+	 * @throws
+	 */
+	private JFreeChart createAlarmChart(CategoryDataset categorydataset) {
+		// 解决中文乱码问题
+		// 创建主题样式
+		StandardChartTheme mChartTheme = new StandardChartTheme("CN");
+		// 设置标题字体
+		mChartTheme.setExtraLargeFont(new Font("黑体", Font.BOLD, 14));
+		// 设置轴向字体
+		mChartTheme.setLargeFont(new Font("宋体", Font.CENTER_BASELINE, 12));
+		// 设置图例字体
+		mChartTheme.setRegularFont(new Font("宋体", Font.CENTER_BASELINE, 12));
+		// 应用主题样式
+		ChartFactory.setChartTheme(mChartTheme);
+
+		// createLineChart,createStackedBarChart
+		JFreeChart jfreechart = ChartFactory.createLineChart("警情统计图表", "年月",
+				"数量（次）", categorydataset, PlotOrientation.VERTICAL, true, true,
+				false);
+		jfreechart.setBackgroundPaint(Color.white);
+		CategoryPlot categoryplot = (CategoryPlot) jfreechart.getPlot();
+		categoryplot.setBackgroundPaint(Color.lightGray);
+		categoryplot.setRangeGridlinePaint(Color.white);
+		// 年月日纵向排列
+		CategoryAxis categoryaxis = categoryplot.getDomainAxis();
+		categoryaxis.setLowerMargin(0.02D);
+		categoryaxis.setUpperMargin(0.02D);
+		categoryaxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
+
+		NumberAxis numberaxis = (NumberAxis) categoryplot.getRangeAxis();
+		// 设置整数
+		numberaxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits()); // 关键就是这句
+		
+		LineAndShapeRenderer lineandshaperenderer = (LineAndShapeRenderer) categoryplot.getRenderer();
+		lineandshaperenderer.setShapesVisible(true);
+		lineandshaperenderer.setDrawOutlines(true);
+		lineandshaperenderer.setUseFillPaint(true);
+		lineandshaperenderer.setBaseFillPaint(Color.white);
+		lineandshaperenderer.setSeriesStroke(0, new BasicStroke(3F));
+		lineandshaperenderer.setSeriesOutlineStroke(0, new BasicStroke(2.0F));
+		lineandshaperenderer.setSeriesShape(0, new java.awt.geom.Ellipse2D.Double(-5D, -5D, 10D, 10D));
+		
+		return jfreechart;
+	}
+
+	@Override
+	public AlarmPOJO getModel() {
+		return alarmPOJO;
+	}
+
+	public int getPage() {
+		return page;
+	}
+
+	public void setPage(int page) {
+		this.page = page;
+	}
+
+	public int getRows() {
+		return rows;
+	}
+
+	public void setRows(int rows) {
+		this.rows = rows;
+	}
+
+	public PageSelect getPageSelect() {
+		return pageSelect;
+	}
+
+	public void setPageSelect(PageSelect pageSelect) {
+		this.pageSelect = pageSelect;
+	}
+
+	public List<String> getIdList() {
+		return idList;
+	}
+
+	public void setIdList(List<String> idList) {
+		this.idList = idList;
+	}
+
+	public JFreeChart getChart() {
+		return chart;
+	}
+
+	public void setChart(JFreeChart chart) {
+		this.chart = chart;
+	}
+
+	public String getStartDateStr() {
+		return startDateStr;
+	}
+
+	public void setStartDateStr(String startDateStr) {
+		this.startDateStr = startDateStr;
+	}
+
+	public String getEndDateStr() {
+		return endDateStr;
+	}
+
+	public void setEndDateStr(String endDateStr) {
+		this.endDateStr = endDateStr;
+	}
+
+	public UserAlarmTypesPOJO getUserAlarmTypesPOJO() {
+		return userAlarmTypesPOJO;
+	}
+
+	public void setUserAlarmTypesPOJO(UserAlarmTypesPOJO userAlarmTypesPOJO) {
+		this.userAlarmTypesPOJO = userAlarmTypesPOJO;
+	}
+}

@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.UnitMapper"> 
+
+<!-- 用memcached做二级缓存
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+ -->
+    <resultMap type="UnitPOJO" id="unitMap">  
+        <id property="unitId" column="UNIT_ID" jdbcType="VARCHAR" />  
+       <result property="supperierSn" column="supperier_sn" jdbcType="VARCHAR"/>
+       <result property="supperierName" column="supperier_name" jdbcType="VARCHAR"/>
+       <result property="unitSn" column="unit_sn" jdbcType="VARCHAR"/>
+       <result property="unitTypeSn" column="unit_type_sn" jdbcType="VARCHAR"/>
+        <result property="materialNo" column="MATERIAL_NO" jdbcType="VARCHAR"/>
+        <result property="simNo" column="SIM_NO" jdbcType="VARCHAR"/>
+        <result property="steelNo" column="STEEL_NO" jdbcType="VARCHAR"/>
+        <result property="hardwareVersion" column="hardware_version" jdbcType="VARCHAR" />
+        <result property="softwareVersion" column="SOFTWARE_VERSION" jdbcType="VARCHAR" />
+        <result property="productionDate" column="production_date" jdbcType="TIMESTAMP" />
+        <result property="registedTime" column="REGISTED_TIME" jdbcType="TIMESTAMP" /> 
+        <result property="userId" column="user_id" jdbcType="INTEGER" />
+        <result property="isValid" column="is_valid" jdbcType="INTEGER"/>
+        <result property="state" column="STATE" jdbcType="INTEGER"/>  
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+        
+        <result property="username" column="user_name" jdbcType="VARCHAR" />
+        <result property="unitType" column="unit_type" jdbcType="VARCHAR"/>
+    </resultMap>
+
+	<sql id="getByPageCondition">
+		<where>
+			<if test="@Ognl@isNotBlank(unit)">
+				<if test="@Ognl@isNotBlank(unit.materialNo)"> AND U.MATERIAL_NO LIKE '%'||#{unit.materialNo}||'%'</if>
+	    		<if test="@Ognl@isNotBlank(unit.unitSn)"> AND U.unit_sn LIKE '%'||#{unit.unitSn}||'%' </if>
+	    		<if test="@Ognl@isNotBlank(unit.simNo)"> AND U.SIM_NO LIKE '%'||#{unit.simNo}||'%'</if>
+				<if test="@Ognl@isNotBlank(unit.steelNo)"> AND U.STEEL_NO LIKE '%'||#{unit.steelNo}||'%' </if>
+				<if test="@Ognl@isNotBlank(unit.userId)"> and exists (select 'X' from t_p_user pu where u.user_id=pu.user_id and pu.depart_id=#{unit.userId})</if>
+				<if test="@Ognl@isNotBlank(unit.state)"> AND U.STATE=#{unit.state}</if>
+				<if test="@Ognl@isNotBlank(unit.isValid)"> AND U.is_Valid=#{unit.isValid}</if>
+    		</if>
+		</where>
+	</sql>
+	
+	<sql id="unitSnAndSupplierIdCondition">
+		<where>
+			<if test="@Ognl@isNotBlank(unit)">
+				<if test="@Ognl@isNotBlank(unit.unitSn)">AND U.unit_sn=#{unit.unitSn}</if>
+				<if test="@Ognl@isNotBlank(unit.userId)">AND U.USER_ID=#{unit.userId}</if>
+				<if test="@Ognl@isNotBlank(unit.supperierSn)">AND U.supperier_Sn=#{unit.supperierSn}</if>
+				<if test="@Ognl@isNotBlank(unit.isValid)">AND U.is_Valid=#{unit.isValid}</if>
+			
+				<!-- 防重复 -->
+				<if test="@Ognl@isNotBlank(unit.unitId)">AND U.UNIT_ID&lt;&gt;#{unit.unitId}</if>
+			</if>
+		</where>
+	</sql>
+	
+	<!-- 分页查询用户 -->
+	<select id="getByPage" parameterType="map" resultMap="unitMap" useCache="false">
+		SELECT U.*,dut.unit_type,ds.supperier_name
+                  FROM T_UNIT U
+                  LEFT JOIN t_dic_unit_type dut ON dut.unit_type_sn=u.unit_type_sn
+                  LEFT JOIN T_DIC_SUPPERIER ds ON u.supperier_sn=ds.supperier_sn
+		<include refid="getByPageCondition"/> 
+		order by u.stamp desc  
+	</select>
+	<select id="countAll" parameterType="map" resultType="Integer" useCache="false">
+		SELECT COUNT(U.UNIT_ID) FROM T_UNIT U
+		<include refid="getByPageCondition"/>   
+	</select> 
+	
+		
+	<select id="getList" parameterType="map" resultMap="unitMap" useCache="false">
+		SELECT * FROM T_UNIT U ORDER BY U.UNIT_ID
+	</select>
+	
+	
+	
+	<select id="getBySnSID" parameterType="map" resultMap="unitMap" useCache="false">
+		SELECT U.* FROM T_UNIT U
+		<include refid="unitSnAndSupplierIdCondition"/>
+	</select>
+	
+	<select id="getBySimNo" parameterType="map" resultMap="unitMap">
+		SELECT U.* FROM T_UNIT U
+		<where>
+			<if test="@Ognl@isNotBlank(unit)">
+				<if test="@Ognl@isNotBlank(unit.simNo)">AND U.sim_no=#{unit.simNo}</if>
+				<if test="@Ognl@isNotBlank(unit.materialNo)">AND U.material_no=#{unit.materialNo}</if>
+				<if test="@Ognl@isNotBlank(unit.steelNo)">AND U.steel_no=#{unit.steelNo}</if>
+				<if test="@Ognl@isNotBlank(unit.userId)">AND U.USER_ID=#{unit.userId}</if>
+				<if test="@Ognl@isNotBlank(unit.isValid)">AND U.is_Valid=#{unit.isValid}</if>
+				<if test="@Ognl@isNotBlank(unit.unitSn)">AND U.unit_sn=#{unit.unitSn}</if>
+				<!-- 防重复 -->
+				<if test="@Ognl@isNotBlank(unit.unitId)">AND U.UNIT_ID&lt;&gt;#{unit.unitId}</if>
+			</if>
+		</where>
+	</select>
+	<select id="getById" parameterType="String" resultMap="unitMap" >
+		SELECT U.*,pu.user_name FROM T_UNIT U left join t_p_user pu on pu.user_id=u.user_id where U.UNIT_ID=#{unitId} 
+	</select>
+	
+	<update id="removeById" parameterType="String" >
+			UPDATE T_UNIT SET is_Valid=1
+			WHERE UNIT_ID=#{unitId}
+	</update>
+	
+	<insert id="add" parameterType="UnitPOJO">
+		INSERT INTO T_UNIT
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+		 	UNIT_ID,
+		 	<if test="@Ognl@isNotBlank(supperierSn)">supperier_sn,</if>
+		 	<if test="@Ognl@isNotBlank(unitSn)">unit_sn,</if>
+		 	<if test="@Ognl@isNotBlank(unitTypeSn)">unit_type_sn,</if>
+		 	<if test="@Ognl@isNotBlank(hardwareVersion)">hardware_version,</if>
+            <if test="@Ognl@isNotBlank(softwareVersion)">SOFTWARE_VERSION,</if>
+		 	<if test="@Ognl@isNotBlank(materialNo)">MATERIAL_NO,</if>
+            <if test="@Ognl@isNotBlank(simNo)">SIM_NO,</if>
+            <if test="@Ognl@isNotBlank(steelNo)">STEEL_NO,</if>
+            <if test="@Ognl@isNotBlank(productionDate)">production_date,</if>
+            <if test="@Ognl@isNotBlank(registedTime)">registed_time,</if>
+            <if test="@Ognl@isNotBlank(userId)">user_id,</if>
+            <if test="@Ognl@isNotBlank(state)">state,</if>
+            <if test="@Ognl@isNotBlank(isValid)">is_valid,</if>
+            <if test="@Ognl@isNotBlank(remark)">remark,</if>
+            stamp
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	#{supperierSn}||#{unitSn},
+		 	<if test="@Ognl@isNotBlank(supperierSn)">#{supperierSn},</if>
+		 	<if test="@Ognl@isNotBlank(unitSn)">#{unitSn},</if>
+		 	<if test="@Ognl@isNotBlank(unitTypeSn)">#{unitTypeSn},</if>
+		 	<if test="@Ognl@isNotBlank(hardwareVersion)">#{hardwareVersion},</if>
+            <if test="@Ognl@isNotBlank(softwareVersion)">#{softwareVersion},</if>
+		 	<if test="@Ognl@isNotBlank(materialNo)">#{materialNo},</if>
+            <if test="@Ognl@isNotBlank(simNo)">#{simNo},</if>
+            <if test="@Ognl@isNotBlank(steelNo)">#{steelNo},</if>
+            <if test="@Ognl@isNotBlank(productionDate)">#{productionDate},</if>
+            <if test="@Ognl@isNotBlank(registedTime)">#{registedTime},</if>
+            <if test="@Ognl@isNotBlank(userId)">#{userId},</if>
+            <if test="@Ognl@isNotBlank(state)">#{state},</if>
+		 	<if test="@Ognl@isNotBlank(isValid)">#{isValid},</if>
+            <if test="@Ognl@isNotBlank(remark)">#{remark},</if>
+            sysdate
+		 </trim>
+ 	</insert>
+ 
+	<update id="edit" parameterType="UnitPOJO">
+		UPDATE T_UNIT t
+		SET 
+    	<trim suffixOverrides=",">
+    		STAMP=sysdate, 
+    		<if test="@Ognl@isNotBlank(supperierSn)">t.SUPPERIER_SN=#{supperierSn},</if>
+		 	<if test="@Ognl@isNotBlank(unitSn)">t.UNIT_SN=#{unitSn},</if>
+		 	
+		 	<if test="@Ognl@isNotBlank(supperierSn) and @Ognl@isNotBlank(unitSn)">
+		 	t.unit_id=#{supperierSn}||#{unitSn},
+		 	</if>
+		 	<if test="@Ognl@isNotBlank(supperierSn) and @Ognl@isBlank(unitSn)">
+		 	t.unit_id=#{supperierSn}||substr(t.UNIT_SN,3),
+		 	</if>
+		 	<if test="@Ognl@isBlank(supperierSn) and @Ognl@isNotBlank(unitSn)">
+		 	t.unit_id=substr(t.UNIT_SN,0,2)||#{unitSn},
+		 	</if>
+		 	
+		 	<if test="@Ognl@isNotBlank(unitTypeSn)">UNIT_TYPE_SN=#{unitTypeSn},</if>
+		 	<if test="@Ognl@isNotBlank(hardwareVersion)">HARDWARE_VERSION=#{hardwareVersion},</if>
+            <if test="@Ognl@isNotBlank(softwareVersion)">SOFTWARE_VERSION=#{softwareVersion},</if>
+		 	<if test="@Ognl@isNotBlank(materialNo)">MATERIAL_NO=#{materialNo},</if>
+            <if test="@Ognl@isNotBlank(simNo)">SIM_NO=#{simNo},</if>
+            <if test="@Ognl@isNotBlank(steelNo)">STEEL_NO=#{steelNo},</if>
+            <if test="@Ognl@isNotBlank(productionDate)">PRODUCTION_DATE=#{productionDate},</if>
+            <if test="@Ognl@isNotBlank(registedTime)">REGISTED_TIME=#{registedTime},</if>
+            <if test="@Ognl@isNotBlank(userId)">USER_ID=#{userId},</if>
+            <if test="@Ognl@isNotBlank(state)">STATE=#{state},</if>
+		 	<if test="@Ognl@isNotBlank(isValid)">IS_VALID=#{isValid},</if>
+            <if test="@Ognl@isNotBlank(remark)">REMARK=#{remark},</if>
+      	</trim>
+ 		WHERE t.UNIT_ID=#{unitId,jdbcType=VARCHAR}
+	</update>
+	
+	<insert id="addBatchByProc" parameterType="map" statementType="CALLABLE">
+		<if test="@Ognl@isNotBlank(gpsInfo)">
+			<![CDATA[
+				{call P_INSERT_T_UNIT_BATCH(#{gpsInfo, mode=IN, jdbcType=ARRAY}, #{resNum, mode=OUT, jdbcType=INTEGER}, #{resMsg, mode=OUT, jdbcType=VARCHAR})}
+			]]>
+		</if>
+	</insert>
+	
+	<delete id="deleteUnits" parameterType="java.util.List" >
+			delete T_UNIT 
+			<where>
+           <if test="@Ognl@isNotBlank(list)">
+	    			and 
+		    		<foreach collection="list" item="item" open="(" separator=" or " close=")">
+			 			 unit_id =#{item} 
+					</foreach>
+			</if>
+		  </where>
+	</delete>
+	
+	<delete id="updateUnitsIsValid" parameterType="java.util.List" >
+			update T_UNIT set is_valid=0,STAMP=sysdate
+			<where>
+           <if test="@Ognl@isNotBlank(list)">
+	    			and 
+		    		<foreach collection="list" item="item" open="(" separator=" or " close=")">
+			 			 unit_id =#{item.unitId} 
+					</foreach>
+			</if>
+		  </where>
+	</delete>
+	
+	
+<sql id="unitSql">
+				<if test="unitId!=null and unitId!=''"> AND tu.unit_id like '%${unitId}%'</if>
+	    		<if test="unitStatus!=0 and unitStatus!='' and unitStatus!=null "> AND usu.unit_status=#{unitStatus}</if>
+	    		<if test="vehicleDef!=null and vehicleDef!=''"> AND tv.vehicle_def like '%${vehicleDef}%'</if>
+				<if test="simNo!=null and simNo!=''"> AND tu.SIM_NO like '%${simNo}%'</if>
+				<if test="departId!=null and departId!=''">
+					and  exists (select 'X' from t_p_user pu where tu.user_id=pu.user_id and pu.depart_id=#{departId})
+				</if>
+</sql>	
+	
+	
+	<select id="findUnitSetUp" parameterType="map" resultType="com.chinaGPS.gtmp.entity.UnitSetUp">
+			select usu.id as id ,
+				   usu.unit_id as unitId,
+				   usu.UNIT_STATUS as unitStatus,
+				   tv.vehicle_def as vehicleDef,
+				   tv.driver_name as driverName,
+				   tv.driver_number as driverNumber,
+				   tu.SIM_NO as simNo
+			 from 
+					T_UNIT_SETUP usu,t_unit tu,T_VEHICLE_UNIT tvu, T_VEHICLE tv
+				where 
+					  usu.UNIT_ID=tu.UNIT_ID
+				 and  tu.UNIT_ID=tvu.UNIT_ID
+				 and  tvu.VEHICLE_ID=tv.VEHICLE_ID
+				 <include refid="unitSql"/>
+				 order by usu.stamp desc
+	</select>	
+	
+	<select id="countUnitSetUp" parameterType="map" resultType="int">
+			select count(*)
+			 from 
+					T_UNIT_SETUP usu,
+					t_unit tu,
+					T_VEHICLE_UNIT tvu, 
+					T_VEHICLE tv
+				where 
+					  usu.UNIT_ID=tu.UNIT_ID
+				 and  tu.UNIT_ID=tvu.UNIT_ID
+				 and  tvu.VEHICLE_ID=tv.VEHICLE_ID
+				 <include refid="unitSql"/>
+	</select>	
+	
+	<select id="editUtilSetUp"  parameterType="map" >
+		update T_UNIT_SETUP  tus
+				  set tus.UNIT_STATUS=#{unitStatus}
+				where tus.UNIT_ID = #{unitId}
+	</select>
+	
+	<select id="addUtilSetUp"  parameterType="map" >
+			insert into T_UNIT_SETUP 
+								(ID,
+								 UNIT_ID,
+								 UNIT_STATUS,
+								 STAMP	
+								)
+								VALUES
+								(
+								SEQ_UTILSETUP.NEXTVAL,
+								(select vu.UNIT_ID from T_VEHICLE tv,T_VEHICLE_UNIT vu 
+									where tv.VEHICLE_ID=vu.VEHICLE_ID
+									 		and  tv.VEHICLE_DEF=#{vehicleDef}),
+								#{unitStatus},
+								sysdate
+								)
+	</select>
+	
+	<select id="findVehicleByvehicleDef" parameterType="string" resultType="int">
+		select count(*) from T_VEHICLE where VEHICLE_DEF=#{vehicleDef}
+	</select>
+	
+	<select id="findUtilSetUpByvehicleDef" parameterType="string" resultType="int">
+		select count(*) 
+			from T_UNIT_SETUP us,
+				 T_VEHICLE tv ,
+				 T_VEHICLE_UNIT vu
+			 where 
+			 	 us.unit_id=vu.unit_id
+			 and vu.VEHICLE_ID=tv.VEHICLE_ID
+			 and tv.VEHICLE_DEF=#{vehicleDef}
+	</select>
+</mapper>  

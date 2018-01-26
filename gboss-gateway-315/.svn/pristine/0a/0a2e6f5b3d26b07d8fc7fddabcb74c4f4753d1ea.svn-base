@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>系统登陆</title>
+<!-- Ext -->
+<link rel="stylesheet" type="text/css" href="js/ext-3.4.0/resources/css/ext-all.css"/>
+<script type="text/javascript" src="js/ext-3.4.0/ext-base.js"></script>
+<script type="text/javascript" src="js/ext-3.4.0/ext-all.js"></script>
+<script type="text/javascript" src="js/ext-3.4.0/ext-lang-zh_CN.js"></script>
+
+
+<link rel="stylesheet" type="text/css" href="resources/css/login.css"/>
+<script type="text/javascript" src="js/checksesion.js"></script>
+<script type="text/javascript" src="js/util/errorCode.js"></script>
+<script type="text/javascript" src="js/homepage/login.js"></script>
+</head>
+<body style="display:none">
+<div class="login">
+<!-- 登录背景 -->
+<div class="input-field">
+<!-- 登录输入框 -->
+<table border=0 cellpadding="0" cellspacing="5" border="0">
+<tr><td>用户名:</td><td colSpan=2 align="left"><input id="userName" type="text" class="name-password-field"/></td></tr>
+<tr><td>密&nbsp;&nbsp;码:</td><td colSpan=2 align="left"><input id="passWord" type="password" class="name-password-field"/></td></tr>
+<tr><td>验证码:</td><td><input id="loginCode" type="text" class="code-field"/></td><td align="right"><img id="loginCodeImg" onclick="refresh()" src="js/ext-3.4.0/resources/images/default/s.gif"></img></td></tr>
+</table>
+</div>
+
+<div class="btns">
+<!-- 登录按钮 -->
+<table cellpadding="0" cellspacing="5" border="0">
+<tr><td id="loginBtn" class="btn-login x-unselectable" unselectable="on"  
+onmouseover="this.style.backgroundImage='url(resources/images/login/button_02.png)'" 
+onmouseout="this.style.backgroundImage='url(resources/images/login/button_01.png)'"
+onmousedown="this.style.backgroundImage='url(resources/images/login/button_03.png)'"
+onmouseup="this.style.backgroundImage='url(resources/images/login/button_02.png)'"
+onclick="login()"
+>登录</td><td class="btn-cancel x-unselectable" unselectable="on"
+onmouseover="this.style.backgroundImage='url(resources/images/login/button_02.png)'" 
+onmouseout="this.style.backgroundImage='url(resources/images/login/button_01.png)'"
+onmousedown="this.style.backgroundImage='url(resources/images/login/button_03.png)'"
+onmouseup="this.style.backgroundImage='url(resources/images/login/button_02.png)'"
+onclick="reset()"
+>取消</td></tr>
+</table>
+</div>
+</div>
+
+<!-- 版权 -->
+<div class="copyright">
+&copy;版权所有 深圳市赛格导航科技股份有限公司
+</div>
+</body>
+</html>

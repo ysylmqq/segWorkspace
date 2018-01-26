@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chinaGPS.gtmp.mapper.SimReplaceLogMapper" >
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+  <resultMap id="BaseResultMap" type="com.chinaGPS.gtmp.entity.SimReplaceLogPOJO" >
+    <id column="id" property="id" jdbcType="DECIMAL" />
+    <result column="vehicle_def" property="vehicleDef" jdbcType="VARCHAR" />
+    <result column="new_call_letter" property="newCallLetter" jdbcType="VARCHAR" />
+    <result column="new_start_date" property="newStartDate" jdbcType="TIMESTAMP" />
+    <result column="new_end_date" property="newEndDate" jdbcType="TIMESTAMP" />
+    <result column="new_all_fee" property="newAllFee" jdbcType="DECIMAL" />
+    <result column="old_call_letter" property="oldCallLetter" jdbcType="VARCHAR" />
+    <result column="old_start_date" property="oldStartDate" jdbcType="TIMESTAMP" />
+    <result column="old_end_date" property="oldEndDate" jdbcType="TIMESTAMP" />
+    <result column="old_all_fee" property="oldAllFee" jdbcType="DECIMAL" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
+    <result column="OPER_ID" property="operId" jdbcType="VARCHAR" />
+    <result column="stamp" property="stamp" jdbcType="TIMESTAMP" />
+    <result column="replace_date" property="replaceDate" jdbcType="TIMESTAMP" />
+    <result column="replace_user" property="replaceUser" jdbcType="VARCHAR" />
+    
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+  </resultMap>
+    
+  <sql id="getByPageCondition">
+		<where>
+			<if test="simReplaceLog!=null">
+			 	<if test="@Ognl@isNotBlank(simReplaceLog.vehicleDef)">   
+	       			AND ss.vehicle_def  like concat( concat('%',#{simReplaceLog.vehicleDef}),'%')
+	  			</if>
+			 	<if test="@Ognl@isNotBlank(simReplaceLog.newCallLetter)">   
+	       			AND ss.new_call_letter  like concat( concat('%',#{simReplaceLog.newCallLetter}),'%')
+	  			</if>
+			 	<if test="@Ognl@isNotBlank(simReplaceLog.oldCallLetter)">   
+	       			AND ss.old_call_letter  like concat( concat('%',#{simReplaceLog.oldCallLetter}),'%')
+	  			</if>
+	 		</if>
+	 	</where>
+	</sql>
+  
+    <insert id="insertSelective" parameterType="com.chinaGPS.gtmp.entity.SimReplaceLogPOJO" >
+    insert into t_sim_replacelog
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="vehicleDef != null" >
+        vehicle_def,
+      </if>
+      <if test="newCallLetter != null" >
+        new_call_letter,
+      </if>
+      <if test="newStartDate != null" >
+        new_start_date,
+      </if>
+      <if test="newEndDate != null" >
+        new_end_date,
+      </if>
+      <if test="newAllFee!= null" >
+        new_all_fee,
+      </if>
+      <if test="oldCallLetter!= null" >
+        old_call_letter,
+      </if>
+      <if test="oldStartDate != null" >
+        old_start_date,
+      </if>
+      <if test="oldEndDate != null" >
+        old_end_date,
+      </if>
+      <if test="oldAllFee != null" >
+        old_all_fee,
+      </if>
+      <if test="reason != null" >
+        reason,
+      </if>
+      <if test="operId != null" >
+        oper_id,
+      </if>
+      <if test="stamp != null" >
+        stamp,
+      </if>
+      <if test="replaceDate != null" >
+        replace_date,
+      </if>
+      <if test="replaceUser != null" >
+        replace_user,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="vehicleDef != null" >
+        #{vehicleDef,jdbcType=VARCHAR},
+      </if>
+      <if test="newCallLetter != null" >
+        #{newCallLetter,jdbcType=VARCHAR},
+      </if>
+      <if test="newStartDate != null" >
+        #{newStartDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="newEndDate != null" >
+        #{newEndDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="newAllFee!= null" >
+        #{newAllFee,jdbcType=DECIMAL},
+      </if>
+      <if test="oldCallLetter != null" >
+        #{oldCallLetter,jdbcType=VARCHAR},
+      </if>
+      <if test="oldStartDate != null" >
+        #{oldStartDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="oldEndDate != null" >
+        #{oldEndDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="oldAllFee != null" >
+        #{oldAllFee,jdbcType=VARCHAR},
+      </if>
+      <if test="reason != null" >
+        #{reason,jdbcType=VARCHAR},
+      </if>
+      <if test="operId != null" >
+        #{operId,jdbcType=VARCHAR},
+      </if>
+      <if test="stamp != null" >
+        #{stamp,jdbcType=TIMESTAMP},
+      </if>
+      <if test="replaceDate != null" >
+        #{replaceDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="replaceUser != null" >
+        #{replaceUser,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <select id="countAll" parameterType="map" resultType="java.lang.Integer">
+		select count(1) from t_sim_replacelog  ss
+     	<include refid="getByPageCondition"/>  
+     	 order by ss.stamp desc
+  </select> 
+  
+   <select id="count" resultType="java.lang.Integer">
+		select count(1) from t_sim_replacelog  ss
+     	 order by ss.stamp desc
+  </select> 
+
+  	<!-- 分页查询 -->
+	<select id="getByPage" parameterType="map" resultMap="BaseResultMap" useCache="false">
+		 select id,vehicle_def,new_call_letter,new_start_date,new_end_date,new_all_fee,
+		old_call_letter,old_start_date,old_end_date,old_all_fee,reason,oper_id,ss.stamp,u.user_name,replace_date,replace_user
+ 		from t_sim_replacelog  ss left join t_p_user u on ss.oper_id = u.user_id
+     	<include refid="getByPageCondition"/>  
+     	 order by ss.stamp desc
+	</select>
+	
+	<select id="selectAll" parameterType="map" resultMap="BaseResultMap" useCache="false">
+		 select id,vehicle_def,new_call_letter,new_start_date,new_end_date,new_all_fee,
+		old_call_letter,old_start_date,old_end_date,old_all_fee,reason,oper_id,ss.stamp,u.user_name,replace_date,replace_user
+ 		from t_sim_replacelog  ss left join t_p_user u on ss.oper_id = u.user_id
+     	<include refid="getByPageCondition"/>  
+     	 order by ss.stamp desc
+	</select>
+  
+</mapper>

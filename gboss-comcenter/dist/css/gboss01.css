@@ -1,0 +1,188 @@
+/*!
+ * gboss v0.0.1
+ 	form-control 25px;
+ */
+ 
+ /*!
+ 	页面头和脚
+ */
+/*html,
+body {
+  height: 100%;
+}*/
+ 
+.navbar-info {
+  min-height: 40px;
+  margin-bottom: 5px;
+}
+
+.navbar-info,
+.dropdown-menu {
+  background-image: url(../images/bg-blue.gif);
+  background-size: 100% 100%;
+}
+
+/* Wrapper for page content to push down footer */
+#wrap {
+  min-height: 100%;
+  height: 880px;
+  /* Negative indent footer by its height */
+  margin: 0 auto -40px;
+  /* Pad bottom by footer height */
+  padding: 85px 0px 0px 0px;
+}
+
+.container .text-muted {
+  margin: 10px;
+  text-align: center;
+  /* float:left;*/
+}
+
+.container .text-dangwarning {
+  margin: 10px;
+  text-align: center;
+  float:left;
+}
+
+.navbar-nav>li>a{
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.navbar-nav>button {
+	margin: 10px;
+}
+ 
+.row {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #dddddd;
+}
+
+/* IE不支持box-align, box-pack*/
+/*.zxzcenter {
+  width: 400px;
+  height: 300px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin: 20px auto;
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-pack: center;
+  -webkit-box-align: center;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-pack: center;
+  -moz-box-align: center;
+  display: -o-box;
+  -o-box-orient: horizontal;
+  -o-box-pack: center;
+  -o-box-align: center;
+  display: -ms-box;
+  -ms-box-orient: horizontal;
+  -ms-box-pack: center;
+  -ms-box-align: center;
+  display: box;
+  box-orient: horizontal;
+  box-pack: center;
+  box-align: center;
+}
+.zxzcenter img,
+.text {
+  border: 1px solid #dedede;
+  padding: 2px;
+}*/
+
+/*
+.zxzdiv { 
+	height:200px; 
+	line-height:50%;
+	padding-top:100px; 
+	overflow:hidden; 
+	float:left;
+} */
+
+/*
+div#zxzwrap { 
+  height:400px; 
+  display:table; 
+  border:1px solid #FF0000; 
+  background-color:#0000FF; 
+} 
+div#zxzcontent { 
+  vertical-align:middle; 
+  display:table-cell; 
+  border:1px solid #FF0099; 
+  background-color:#FFCCFF; 
+  width:76px; 
+}
+
+div#zxzwrap { 
+  display:table; 
+  border:1px solid #FF0099; 
+  background-color:#FFCCFF; 
+  width:760px; 
+  height:200px; 
+  _position:relative; 
+  overflow:hidden; 
+} 
+div#zxzsubwrap { 
+  vertical-align:middle; 
+  display:table-cell; 
+  _position:absolute; 
+  _top:50%; 
+}
+
+div#zxzcontent { 
+  _position:relative; 
+  _top:-50%; 
+}
+*/
+
+.LRNavContainer{ 
+  display:table; 
+  width:100%;
+  height:100%; 
+  _position:relative; 
+  overflow:hidden; 
+}
+
+.LRNavLeft{ 
+  left:0px;
+  height:100%;
+  float:left; 
+  Width:400px;
+  /*display:table-cell;*/
+  border:1px solid #dddddd; 
+  /*background-color:#FFCCFF;*/ 
+}
+
+.LRNavbar{ 
+  vertical-align:middle; 
+  display:table-cell;
+  background-image: url(../images/bg-blue.gif);
+  background-size: 100% 100%;
+  /*background-color: #5cb85c;*/
+  width:15px;
+  height:100%; 
+  /*float:left;*/
+  /*_position:absolute;*/ 
+  _top:50%;
+}
+
+/*
+.LRNavbarContent { 
+  _position:relative; 
+  _top:-50%; 
+}*/
+
+.LRNavRight{ 
+  height:100%;
+  left:415px;
+  right:0px;
+  width:765px;
+  _position:relative; 
+  float:right; 
+  border:1px solid #dddddd; 
+  /*background-color:#ccFFcc;*/ 
+}

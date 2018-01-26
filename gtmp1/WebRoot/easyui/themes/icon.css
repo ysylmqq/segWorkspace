@@ -1,0 +1,162 @@
+.icon-blank{
+	background:url('icons/blank.gif') no-repeat;
+}
+.icon-add{
+	background:url('icons/edit_add.png') no-repeat;
+}
+.icon-edit{
+	background:url('icons/pencil.png') no-repeat;
+}
+.icon-remove{
+	background:url('icons/edit_remove.png') no-repeat;
+}
+.icon-save{
+	background:url('icons/filesave.png') no-repeat;
+}
+.icon-cut{
+	background:url('icons/cut.png') no-repeat;
+}
+.icon-ok{
+	background:url('icons/ok.png') no-repeat;
+}
+.icon-no{
+	background:url('icons/no.png') no-repeat;
+}
+.icon-cancel{
+	background:url('icons/cancel.png') no-repeat;
+}
+.icon-reload{
+	background:url('icons/reload.png') no-repeat;
+}
+.icon-search{
+	background:url('icons/search.png') no-repeat;
+}
+.icon-print{
+	background:url('icons/print.png') no-repeat;
+}
+.icon-help{
+	background:url('icons/help.png') no-repeat;
+}
+.icon-undo{
+	background:url('icons/undo.png') no-repeat;
+}
+.icon-redo{
+	background:url('icons/redo.png') no-repeat;
+}
+.icon-back{
+	background:url('icons/back.png') no-repeat;
+}
+.icon-sum{
+	background:url('icons/sum.png') no-repeat;
+}
+.icon-tip{
+	background:url('icons/tip.png') no-repeat;
+}
+
+.icon-mini-add{
+	background:url('icons/mini_add.png') no-repeat 2px 2px;
+}
+.icon-mini-edit{
+	background:url('icons/mini_edit.png') no-repeat 2px 2px;
+}
+.icon-mini-refresh{
+	background:url('icons/mini_refresh.png') no-repeat 3px 2px;
+}
+.icon-carRuiAn{
+	background:url('icons/ok.png') no-repeat;
+}
+.icon-car{
+	background:url('icons/green_s_1.png') no-repeat;
+}
+.icon-depart{
+	background:url('icons/depart.png') no-repeat;
+}
+.icon-role{
+	background:url('icons/role.png') no-repeat;
+}
+.icon-edit-save{
+	background:url('icons/editSave.png') no-repeat;
+}
+.icon-allocate{
+	background:url('icons/allocate.png') no-repeat;
+}
+.icon-black-folder{
+	background:url('icons/black_folder.png') no-repeat;
+}
+.icon-black-car{
+	background:url('icons/black_n_1.png') no-repeat;
+}
+.icon-first{
+	background:url('icons/first.png') no-repeat;
+}
+.icon-second{
+	background:url('icons/second.png') no-repeat;
+}
+/*鏍戝舰鑿滃崟 鏁呴殰*/
+.icon-guzhang{
+	background:url('icons/guzhang.png') no-repeat;
+}
+/*鏍戝舰鑿滃崟 姹借溅鍝佺墝*/
+.icon-zgyq{
+	background:url('icons/pp-zgyq.png') no-repeat;
+}
+.icon-ft{
+	background:url('icons/pp-ft.png') no-repeat;
+}
+/*鏍戝舰鑿滃崟 鎶ヨ〃*/
+.icon-baobiao{
+	background:url('icons/baobiao.png') no-repeat;
+}
+/*鍦板浘*/
+.icon-bigger{ background:url('../../images/map/zoomin.png') no-repeat center;}
+.icon-smaller{ background:url('../../images/map/zoomout.png') no-repeat center;}
+
+.icon-move{ background:url('../../images/map/pan.png') no-repeat center;}
+.icon-ceju{ background:url('../../images/map/biaochi.png') no-repeat center;}
+
+.icon-center{ background:url('../../images/map/center.png') no-repeat center;}
+.icon-biaozhu{ background:url('../../images/map/biaozhu.png') no-repeat center;}
+
+.icon-clear{ background:url('../../images/map/clear.png') no-repeat center;}
+.icon-fullscreen{ background:url('../../images/map/fullScreen.png') no-repeat center;}
+.icon-collapse{background:url('../../images/map/collapse.png') no-repeat center;}
+.icon-expand{background:url('../../images/map/expand.png') no-repeat center;}
+
+
+.icon-expand{background:url('../../images/map/expand.png') no-repeat center;}
+.icon-exportexcel {
+	background:url(../../images/excel.png) no-repeat ;
+}
+.icon-alarm {
+	background:url(../../images/alarm.png) no-repeat center;
+}
+.icon-online {
+	background:url(../../images/icon/online.png) no-repeat;
+}
+.icon-offline {
+	background:url(../../images/icon/offline.png) no-repeat center;
+}
+.icon-batch_import {
+	background:url('icons/batch_import.png') no-repeat;
+}
+.icon-refresh {
+	background:url('icons/refresh.png') no-repeat;
+}
+.icon-filter_search {
+	background:url('icons/filter_search.png') no-repeat;
+}
+.icon-recycle {
+	background:url('icons/recycle_bin.ico') no-repeat;
+}
+.icon-restore {
+	background:url('icons/restore.ico') no-repeat;
+}
+.icon-map_area {
+	background:url(../../images/map/getgps.gif) no-repeat center;
+}
+.icon-display {
+	background:url('icons/display.png') no-repeat;
+}
+.icon-clear2 {
+	background:url('icons/edit_clear.ico') no-repeat;
+}

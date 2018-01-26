@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+ 
+<struts>
+	<package name="vehicle" namespace="/vehicle" extends="global">
+		<!-- 机械 -->
+		<action name="vehicle_*" class="vehicleAction" method="{1}">
+			<result name="edit">/jsp/vehicle/vehicle_add_edit.jsp</result>
+			<result name="enterTest">/jsp/vehicle/vehicle_test.jsp</result>
+		</action>
+		
+		<!-- 机械型号 -->
+		<action name="vehicleModel_*" class="vehicleModelAction" method="{1}">
+		</action>
+		
+		<!-- 机械类型 -->
+		<action name="vehicleType_*" class="vehicleTypeAction" method="{1}">
+		</action>
+		
+		<!-- 机械测试 -->
+		<action name="vehicleTest_*" class="vehicleTestAction" method="{1}">
+		</action>
+		
+		<!-- 机械巡检 -->
+		<action name="vehiclePolling_*" class="vehiclePollingAction" method="{1}">
+		</action>
+		
+		<!-- 停机坪管理 -->
+		<action name="areaPoint_*" class="areaPointAction" method="{1}">
+		</action>
+	</package>
+</struts>

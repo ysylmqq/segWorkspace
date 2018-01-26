@@ -1,0 +1,36 @@
+##\u5982\u6709\u591a\u4e2a\u7528,\u5206\u9694
+#servers=127.0.0.1:11211
+servers=218.17.3.226:1211
+#servers=90.0.25.6:11211
+#servers=90.0.13.113:17021
+##\u8fde\u63a5\u6c60\u8bbe\u5b9a
+failover=true
+initConn=1
+minConn=1
+maxConn=10
+nagle=false
+socketTO=30000
+aliveCheck=true
+
+##\u66f4\u65b0\u8bbe\u5b9a(\u8f66\u53f0\u547c\u53f7-\u7f51\u5173\u7f16\u53f7 \u8def\u7531)
+routing_key_head=routing:
+routing_run_interval=10000
+routing_update_interval=3600000
+#30day
+routing_expired=2592000000
+
+##\u66f4\u65b0\u7f51\u5173\u72b6\u6001(key: gateway:1  value: 1377509641937)
+##\u7531\u4e8e\u4e00\u4e2a\u7f51\u5173\u53ea\u66f4\u65b0\u4e00\u6761\u8bb0\u5f55\uff0c\u53ef\u4ee5\u8bbe\u5b9a\u66f4\u5feb\u66f4\u65b0\u901f\u5ea6
+gateway_status_key_head=gateway:
+gateway_status_run_interval=60000
+gateway_status_expired=120000
+
+##\u8bfb\u53d6\u57fa\u672c\u8d44\u6599
+base_info_key_head=data:
+
+##\u6839\u636eIMEI\u67e5\u8be2\u8f66\u8f7d\u53f7\u7801
+imei_callletter_key_head=imei:
+
+##\u57fa\u7ad9\u5b9a\u4f4d\u4fe1\u606f
+base_station_info_key_head=basestation:
+

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.SystemParamMapper"> 
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+
+    <resultMap type="SystemParamPOJO" id="systemParamMap"> 
+        <id property="paramId" column="param_Id" jdbcType="BIGINT" />  
+       <result property="code" column="code" jdbcType="VARCHAR"/>
+       <result property="name" column="name" jdbcType="VARCHAR"/>
+       <result property="value" column="value" jdbcType="VARCHAR"/>
+        <result property="userId" column="userId" jdbcType="BIGINT"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+	<select id="getList" parameterType="SystemParamPOJO" resultMap="systemParamMap">
+		select sp.* from t_system_param sp
+		<where>
+		   <if test="@Ognl@isNotBlank(userId)">
+		      and sp.user_id=#{userId}
+		   </if>
+		   <!-- 防重判断 -->
+		   <choose>
+		    <when test="@Ognl@isNotBlank(paramId) and @Ognl@isNotBlank(code)">
+		      and sp.param_Id&lt;&gt;#{paramId}
+		      and sp.code=#{code}
+		   </when>
+		   <when test="@Ognl@isNotBlank(code)">
+		      and sp.code=#{code}
+		   </when>
+		   <otherwise>
+		   </otherwise>
+		   </choose>
+		  
+		</where>
+	</select>
+	<sql id="getByPageCondition">
+		<where>
+			<if test="@Ognl@isNotBlank(param)">
+				<if test="@Ognl@isNotBlank(param.userId)">
+					AND sp.user_id=#{param.userId}
+				</if>
+				
+				<if test="@Ognl@isNotBlank(param.code)">
+					AND sp.code LIKE '%'||#{param.code}||'%'
+				</if>
+				
+				<if test="@Ognl@isNotBlank(param.name)">
+					AND sp.name LIKE '%'||#{param.name}||'%'
+				</if>
+				
+				<if test="@Ognl@isNotBlank(param.value)">
+					AND sp.value LIKE '%'||#{param.value}||'%'
+				</if>
+				
+			</if>
+		</where>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="getByPage" parameterType="map" resultMap="systemParamMap">
+		select sp.* from t_system_param sp
+		<include refid="getByPageCondition"/>  
+		ORDER BY sp.stamp desc 
+	</select>
+	
+	<select id="countAll" parameterType="map" resultType="Integer">
+		select count(sp.param_id) from t_system_param sp
+			<include refid="getByPageCondition"/> 
+	</select> 
+	
+	<select id="getById" parameterType="Long" resultMap="systemParamMap">
+		SELECT sp.* FROM t_system_param sp WHERE sp.param_Id=#{paramId} 
+	</select>
+	
+	<select id="get" parameterType="SystemParamPOJO" resultMap="systemParamMap">
+		SELECT sp.* FROM t_system_param sp 
+		<where>
+				<if test="@Ognl@isNotBlank(code)">
+					AND sp.code=#{code} 
+				</if>
+		</where>
+	</select>
+	
+	<delete id="removeById" parameterType="String" >
+			delete t_system_param
+ 			where param_Id =#{paramId}
+	</delete>
+	
+	<insert id="add" parameterType="SystemParamPOJO">
+		INSERT INTO t_system_param
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+		 	param_id,
+		 	<if test="@Ognl@isNotBlank(userId)">user_id,</if>
+		 	<if test="@Ognl@isNotBlank(value)">value,</if>
+		 	<if test="@Ognl@isNotBlank(code)">code,</if>
+		 	<if test="@Ognl@isNotBlank(name)">name,</if>
+            stamp
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	seq_system_param.nextval,
+		 	<if test="@Ognl@isNotBlank(userId)">#{userId},</if>
+		 	<if test="@Ognl@isNotBlank(value)">#{value},</if>
+		 	<if test="@Ognl@isNotBlank(code)">#{code},</if>
+		 	<if test="@Ognl@isNotBlank(name)">#{name},</if>
+            sysdate
+		 </trim>
+ 	</insert>
+ 
+	<update id="edit" parameterType="SystemParamPOJO">
+		UPDATE t_system_param 
+		SET 
+    	<trim suffixOverrides=",">
+    		STAMP=sysdate, 
+    		<if test="@Ognl@isNotBlank(userId)">user_id=#{userId},</if>
+		 	<if test="@Ognl@isNotBlank(value)">value=#{value},</if>
+		 	<if test="@Ognl@isNotBlank(code)">code=#{code},</if>
+		 	<if test="@Ognl@isNotBlank(name)">name=#{name},</if>
+      	</trim>
+ 		WHERE param_id=#{paramId,jdbcType=BIGINT}
+	</update>
+</mapper>  

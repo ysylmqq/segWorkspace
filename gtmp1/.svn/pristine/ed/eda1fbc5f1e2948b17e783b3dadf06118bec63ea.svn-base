@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.UnitReplaceMapper">
+	<cache type="org.mybatis.caches.memcached.MemcachedCache" />
+
+	<sql id="getByPageCondition">
+		<if test="@Ognl@isNotBlank(unitReplace.vehicleDef)">
+			and vehicle_def like '%'||#{unitReplace.vehicleDef}||'%' 		
+		</if>
+		ORDER BY add_time DESC
+	</sql>
+
+	<select id="countAll" parameterType="map" resultType="integer">
+		SELECT COUNT(1) FROM t_unit_replacelog WHERE 1=1
+			<include refid="getByPageCondition"/>
+	</select>
+	
+	<select id="getByPage" parameterType="map" resultType="com.chinaGPS.gtmp.entity.UnitReplacePOJO" useCache="true">
+		SELECT log_id logId, vehicle_def vehicleDef, old_unit_id oldUnitId, new_unit_id newUnitId,
+       		reason, replace_man replaceMan, replace_time replaceTime, a.add_man userId,
+       		b.user_name addMan, add_time addTime
+  		FROM t_unit_replacelog a LEFT JOIN t_p_user b ON a.add_man=b.user_id
+  		where 1=1
+		<include refid="getByPageCondition"/>
+	</select>
+	
+
+	<insert id="add" parameterType="com.chinaGPS.gtmp.entity.UnitReplacePOJO" flushCache="true">
+		<selectKey keyProperty="logId" resultType="long" order="BEFORE">  
+			SELECT seq_unit_replace_log.nextval FROM dual
+		</selectKey> 
+		INSERT INTO t_unit_replacelog
+        	(log_id, vehicle_id, vehicle_def, old_unit_id, new_unit_id, reason, replace_man, replace_time, add_man, add_time)
+        VALUES
+            (#{logId}, #{vehicleId}, #{vehicleDef}, #{oldUnitId}, #{newUnitId}, #{reason}, #{replaceMan}, #{replaceTime}, #{addMan}, sysdate)
+	</insert>
+
+	<update id="unitReplace" parameterType="com.chinaGPS.gtmp.entity.UnitReplacePOJO" flushCache="true">
+		UPDATE t_vehicle_unit
+			SET unit_id = #{newUnitId}
+		WHERE vehicle_id = #{vehicleId} AND unit_id = #{oldUnitId} 
+	</update>
+</mapper>

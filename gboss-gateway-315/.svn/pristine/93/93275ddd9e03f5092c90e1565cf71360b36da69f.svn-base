@@ -1,0 +1,12 @@
+##多久未上传数据的A计划客户端踢下线(ms)
+session_timeout = 300000
+
+##检查A计划客户端是否超时的时间间隔(ms)
+check_session_inteval = 60000
+
+##发送心跳包给客户的时间间隔(ms)
+send_hear_beat_interval = 5000
+
+
+##发送队列最大缓存长度(单客户端)
+send_queue_max_size=100000

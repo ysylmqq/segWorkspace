@@ -1,0 +1,250 @@
+package cc.chinagps.gboss.comcenter.jmxtool;
+
+import cc.chinagps.gboss.activemq.AlarmThread;
+import cc.chinagps.gboss.activemq.GpsThread;
+import cc.chinagps.gboss.comcenter.CenterClientManager;
+import cc.chinagps.gboss.comcenter.ComCenter;
+import cc.chinagps.gboss.comcenter.command.CommandManager;
+import cc.chinagps.gboss.comcenter.UnitInfoManager;
+import cc.chinagps.lib.util.Util;
+
+public class GbossControl extends Thread  implements GbossControlMBean {
+
+	private int clientcountlist[] = new int[144]; //最近一天的最大连接数(10分钟一个点)
+	private int gpscountlist[] = new int[144]; 	  //最近一天的待处理GPS最大数(10分钟一个点)
+	private int alarmcountlist[] = new int[144];  //最近一天的待处理Alarm最大数(10分钟一个点)
+	private int commandcountlist[] = new int[144];//最近一天的待处理Command最大数(10分钟一个点)
+	
+	private int gpsmaxcount = 0;		//待处理GPS的最大数
+	private int alarmmaxcount = 0;		//待处理Alarm的最大数
+	private int commandmaxcount = 0;	//待处理Command的最大数
+	
+	private int gps10mcount = 0;		//10分钏内GPS最大上传数
+	private int alarm10mcount = 0;		//10分钏内Alarm最大上传数
+	private int command10mcount = 0;	//10分钏内命令S最大下发数
+	
+	GbossControl(String name){
+		super(name);	//定义线程名称
+		for(int i=0; i<144; i++) {
+			clientcountlist[i] = 0;
+			gpscountlist[i] = 0;
+			alarmcountlist[i] = 0;
+			commandcountlist[i] = 0;
+		}
+	}
+	
+	public String getStarttime() {
+		return ComCenter.starttime;
+	}
+	
+	//client------------------------------------------------------------------------
+	public int getAllClientcount() {
+		return CenterClientManager.clientManager.allunitcount;
+	}
+	
+	@Override
+	public int getClientMaxCount() {
+		return CenterClientManager.clientManager.maxclientcount;
+	}
+
+	@Override
+	public int[] getClientCountList() {
+		return clientcountlist;
+	}
+
+	//GPS------------------------------------------------------------------------
+	@Override
+	public long getGPSTotalCount() {
+		return GpsThread.gpstotalcount;
+	}
+
+	@Override
+	public int getGPS10mCount() {
+		return gps10mcount;
+	}
+
+	@Override
+	public int getGPSMaxCount() {
+		return gpsmaxcount;
+	}
+
+	@Override
+	public int[] getGPSCountList() {
+		return gpscountlist;
+	}
+
+	//alarm------------------------------------------------------------------------
+	@Override
+	public long getAlarmTotalCount() {
+		return AlarmThread.alarmtotalcount;
+	}
+
+	@Override
+	public int getAlarm10mCount() {
+		return alarm10mcount;
+	}
+
+	@Override
+	public int getAlarmMaxCount() {
+		return alarmmaxcount;
+	}
+
+	@Override
+	public int[] getAlarmCountList() {
+		return alarmcountlist;
+	}
+
+	@Override
+	public String getMaxLoginoutTime() {
+		return UnitInfoManager.unitinfomanager.getMaxLoginoutTime();
+	}
+	@Override
+	public void ClearMaxLoginoutTime() {
+		UnitInfoManager.unitinfomanager.ClearMaxLoginoutTime();
+	}
+	
+	//Command------------------------------------------------------------------------
+	@Override
+	public int getCommand10mCount() {
+		return command10mcount;
+	}
+
+	@Override
+	public int getCommandMaxCount() {
+		return commandmaxcount;
+	}
+
+	@Override
+	public int[] getCommandCountList() {
+		return commandcountlist;
+	}
+	
+	public long getCommandTotalCount() {
+		return CommandManager.commandtotalcount.get();
+	}
+	public int getCommandCount() {
+		return CommandManager.commandmanager.getCommandCount();
+	}
+	public int getDBCommandMaxCount() {
+		return CommandManager.savedbthread.maxcount;
+	}
+	public int getDBCommandCount() {
+		return CommandManager.savedbthread.getCount();
+	}
+
+	public int getUnitInfoCount() {
+		return UnitInfoManager.unitinfomanager.unitinfomap.size();
+	}
+	public int getOutInterCallletterCount() {
+		return CenterClientManager.clientManager.outintercalllettermap.size();
+	}
+	
+
+	//Command------------------------------------------------------------------------
+	/*
+	 * 透传指令     网关不用打包   0xFFFF HEX码字符串, 网关要转换成字节  网关类型：0:NET网关, 1:短信网关
+	 * 应答 发送成功就成功,终端返回的内容,解码成标准指令返回,这种情况下可能有不对应
+	 */
+	@Override
+	public boolean SendCommand(String callletters, String content, int gatewayId) {
+		try {
+			//如果内容或呼号为空，则返回失败
+			if (callletters.length() <= 0 || content.length() <= 0)
+				return false;
+			//判断content是0x开始的HEX字符串
+			String start = content.substring(0, 2);
+			start = start.toUpperCase();
+			if (start.equals("0X")) {
+				content = content.substring(2);
+				if (content.length() <= 0 || (content.length() % 2) != 0) {
+					return false;
+				}
+			} else {
+				//转换成HEX字符串
+				content = Util.bcd2str(content.getBytes());
+			}
+			CommandManager.commandmanager.appendNewCommand(callletters, content, gatewayId);
+			return true;
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	/*
+	 * 为了更新参数后，减少重启，使警情丢失，用Jmx强制读参数
+	 * 重新读数据库参数, 或从Memcache读参数
+	 */
+	public void RefreshDBParams() {
+		CenterClientManager.clientManager.haimaclientmanager.updateCmdName();
+		UnitInfoManager.unitinfomanager.freshAllUnitInfo();
+	}
+	
+	/*
+	 * 取某终端在内存中的信息
+	 */
+	public String getUnitInfo(String callletter) {
+		return UnitInfoManager.unitinfomanager.getUnitInfoString(callletter);
+	}
+	/*
+	 * 10分钟记录一次样
+	 * 
+	 */
+	@Override
+	public void run() {
+		int oldminutes = -1;
+		long oldgpstotalcount = 0;
+		long oldalarmtotalcount = 0;
+		long oldcommandtotalcount = 0;
+		while(true) {
+			try {
+				sleep(1000);	//一秒计算一次样
+				int minutes = Util.GetCurrentMinutes() / 10;
+				//先清空当前10分钟内的记录
+				if (oldminutes != minutes) {
+					oldminutes = minutes;
+					clientcountlist[minutes] = 0;
+					gpscountlist[minutes] = 0;
+					alarmcountlist[minutes] = 0;
+					commandcountlist[minutes] = 0;
+					//下面计算可能有点误差（多线程），但没大影响
+					//计算10分钟内最大GPS上传数
+					int tmp10count = (int)(GpsThread.gpstotalcount - oldgpstotalcount);
+					if (gps10mcount < tmp10count) gps10mcount = tmp10count;
+					oldgpstotalcount = GpsThread.gpstotalcount;
+
+					//计算10分钟内最大Alarm上传数
+					tmp10count = (int)(AlarmThread.alarmtotalcount - oldalarmtotalcount);
+					if (alarm10mcount < tmp10count) alarm10mcount = tmp10count;
+					oldalarmtotalcount = AlarmThread.alarmtotalcount;
+					long commandtotalcount = CommandManager.commandtotalcount.get();
+					tmp10count = (int)(commandtotalcount - oldcommandtotalcount);
+					if (command10mcount < tmp10count) command10mcount = tmp10count;
+					oldcommandtotalcount = commandtotalcount;
+				}
+				//连接数
+				int tmpcount = CenterClientManager.clientManager.clientcount.get();
+				if (clientcountlist[minutes] < tmpcount) {
+					clientcountlist[minutes] = tmpcount;
+				}
+				//当前GPS
+				tmpcount = GpsThread.gpscounter.get();
+				if (gpsmaxcount < tmpcount) gpsmaxcount = tmpcount; 
+				if (gpscountlist[minutes] < tmpcount) gpscountlist[minutes] = tmpcount; 
+				
+				//当前Alarm
+				tmpcount = AlarmThread.alarmcounter.get();
+				if (alarmmaxcount < tmpcount) alarmmaxcount = tmpcount; 
+				if (alarmcountlist[minutes] < tmpcount) alarmcountlist[minutes] = tmpcount;
+				
+				//当前Command
+				tmpcount = CommandManager.commandmanager.getCommandCount();
+				if (commandmaxcount < tmpcount) commandmaxcount = tmpcount; 
+				if (commandcountlist[minutes] < tmpcount) commandcountlist[minutes] = tmpcount;
+				
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+	}
+}

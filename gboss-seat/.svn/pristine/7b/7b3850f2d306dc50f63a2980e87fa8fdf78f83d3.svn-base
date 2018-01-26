@@ -1,0 +1,40 @@
+package cc.chinagps.seat.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import cc.chinagps.seat.auth.AuthHelper;
+import cc.chinagps.seat.auth.User;
+import cc.chinagps.seat.bean.SeatUser;
+import cc.chinagps.seat.service.LDAPService;
+import cc.chinagps.seat.util.Consts;
+
+@Service
+public class LDAPServiceImpl implements LDAPService {
+
+	@Override
+	public int authenticate(String loginName, String password) {
+		boolean userValid = AuthHelper.isUserValid(loginName, password);
+		
+		int result = Consts.SUCCEED;
+		if (!userValid) {
+			result = Consts.AUTHENTICATE_ERROR_USERNAME_OR_PWD_ERROR;
+		}
+		return result;
+	}
+	
+	@Override
+	public List<SeatUser> getOperatorList() {
+		List<User> authUserList = AuthHelper.getOperatorList();
+		List<SeatUser> userList = new ArrayList<SeatUser>(authUserList.size());
+		for (User authUser : authUserList) {
+			SeatUser user = new SeatUser();
+			user.setOpId(authUser.getOpId());
+			user.setOpName(authUser.getOpName());
+			userList.add(user);
+		}
+		return userList;
+	}
+}

@@ -1,0 +1,320 @@
+package cc.chinagps.seat.controller;
+
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import cc.chinagps.seat.auth.Organization;
+import cc.chinagps.seat.bean.BasicInfoBean;
+import cc.chinagps.seat.bean.FeeInfo;
+import cc.chinagps.seat.bean.PhoneInfo;
+import cc.chinagps.seat.bean.ReportCommonQuery;
+import cc.chinagps.seat.bean.ReportCommonResponse;
+import cc.chinagps.seat.bean.VehicleUnitInfo;
+import cc.chinagps.seat.bean.table.AppContact;
+import cc.chinagps.seat.bean.table.LinkmanTable;
+import cc.chinagps.seat.bean.table.UnitTable;
+import cc.chinagps.seat.service.InfoService;
+import cc.chinagps.seat.util.Consts;
+
+import com.googlecode.jsonplugin.JSONException;
+import com.googlecode.jsonplugin.JSONUtil;
+
+@Controller
+@RequestMapping("/data")
+public class InfoController extends BasicController{
+	
+	private static final Logger logger = Logger.getLogger(InfoController.class);
+	
+	//@Autowired
+	private InfoService infoService;
+	
+	/**
+	 * 获取基本信息。
+	 * <a>http://localhost:8080/seat/app/data/basicinfo?param=13418579707&type=1</a>
+	 * <br><a>http://localhost:8080/seat/app/data/basicinfo?param=29&type=2
+	 * @param param
+	 * @param type
+	 * @param request
+	 * @return
+	 * @throws JSONException
+	 */
+	@ResponseBody
+	@RequestMapping("basicinfo")
+	public String getBasicInfo(
+			@RequestParam String param, 
+			@RequestParam int type, HttpServletRequest request,
+			Locale locale) 
+					throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("success", false);
+		if (type != Consts.TYPE_PHONENO && 
+				type != Consts.TYPE_VEHICLEID) {
+			resultMap.put("message", getText("wrong.type", 
+					locale));
+		} else {
+			BasicInfoBean basicInfo = infoService.getBasicInfo(
+					param, type, 
+					getLoginUser(request).getCompanyInfoList());
+			if (basicInfo == null) {
+				resultMap.put("message", getText("basicdata.no.info", 
+						locale, param));
+			} else {
+				resultMap.put("success", true);
+				resultMap.put("customer", basicInfo.getCustomer());
+				resultMap.put("vehicle", basicInfo.getVehicle());
+				
+				// 解析防拆码
+				UnitTable unit = basicInfo.getUnit();
+				String tamperCode = unit.getTamperCode();
+				if (tamperCode != null && tamperCode.trim().length() > 0) {
+					Object[] objs = new Object[6];
+					objs[0] = getText(tamperCode.substring(0, 2), locale);
+					objs[1] = getText(tamperCode.substring(2, 4), locale);
+					for (int i = 2; i < objs.length; i++) {
+						if (i % 2 == 0) {
+							objs[i] = getText(Character.toString(tamperCode.charAt(i + 2)), locale);
+						} else {
+							objs[i] = tamperCode.charAt(i + 2);
+						}
+					}
+					unit.setTamperCodeTranslate(getText("tampercode.translate",locale,objs));
+				}
+				resultMap.put("unit", unit);
+			}
+		}
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	/**
+	 * 获取车牌号、车载号信息。模糊查询车牌号、车载号.
+	 * <a>http://localhost:8080/seat/app/data/vehicleinfo?param=9707&count=5</a>
+	 * @param param
+	 * @param count
+	 * @param request
+	 * @return
+	 * @throws JSONException
+	 */
+	@ResponseBody
+	@RequestMapping("vehicleinfo")
+	public String getVehicleInfo(
+			@RequestParam String param, 
+			@RequestParam int count, HttpServletRequest request) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("success", true);
+		List<VehicleUnitInfo> vehicleInfo = infoService.getVehicleInfo(
+				param, count, getLoginUser(request).getCompanyInfoList());
+		resultMap.put("info", vehicleInfo);
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	/**
+	 * 获取电话信息
+	 * @param customerId
+	 * @param vehicleId
+	 * @param request
+	 * @return
+	 * @throws JSONException
+	 */
+	@ResponseBody
+	@RequestMapping("phoneinfo")
+	public String getPhoneInfo(
+			@RequestParam("customer_id") BigInteger customerId, 
+			@RequestParam("vehicleId") BigInteger vehicleId, 
+			HttpServletRequest request) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("success", true);
+		List<PhoneInfo> phoneInfo = infoService.getPhoneInfo(
+				customerId, vehicleId);
+		resultMap.put("phone", phoneInfo);
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@ResponseBody
+	@RequestMapping("bind")
+	public String saveLinkman(
+			@Valid LinkmanTable linkman, 
+			Locale locale) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		int result = infoService.saveLinkman(linkman);
+		if (result != Consts.SUCCEED) {
+			resultMap.put("success", false);
+			resultMap.put("message", getText(
+					"SaveLinkman_" + result, locale,
+					linkman.getCustomerId(),linkman.getVehicleId()));
+		} else {
+			resultMap.put("success", true);
+		}
+		return JSONUtil.serialize(resultMap);
+	}
+		
+	/**
+	 * 修改用户密码.
+	 * <a>http://localhost:8080/seat/app/data/modifyPrivatePwd?vehicle_id=1&privacy_pwd_old=&privacy_pwd_new=1</a>
+	 * @param vehicleId
+	 * @param privatePwdOld
+	 * @param privatePwdNew
+	 * @param request
+	 * @return
+	 * @throws JSONException
+	 */
+	@ResponseBody
+	@RequestMapping(value = "modifyPrivatePwd")
+	public String modifyPrivatePwd(
+			@RequestParam("vehicle_id") BigInteger vehicleId, 
+			@RequestParam("privacy_pwd_old") String privatePwdOld, 
+			@RequestParam("privacy_pwd_new") String privatePwdNew, 
+			Locale locale) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		int result = infoService.modifyPrivatePwd(vehicleId, 
+				privatePwdOld, privatePwdNew);
+		if (result != Consts.SUCCEED) {
+			resultMap.put("success", false);
+			resultMap.put("message", getText(
+					"ModifyPrivatePwd_" + result,
+					locale));
+		} else {
+			resultMap.put("success", true);
+		}
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	/**
+	 * 修改车辆备注.
+	 * <a>http://localhost:8080/seat/app/data/modifyVehicleRemark?vehicle_id=1&remark=1</a>
+	 * @param vehicleId
+	 * @param remark
+	 * @param request
+	 * @return
+	 * @throws JSONException
+	 */
+	@ResponseBody
+	@RequestMapping(value = "modifyVehicleRemark")
+	public String modifyVehicleRemark(
+			@RequestParam("vehicle_id") BigInteger vehicleId, 
+			@RequestParam String remark, Locale locale) 
+					throws JSONException {
+		logger.info("##备注修改开始##");
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		logger.info(String.format("[vehicleID：%s,备注：%s]", vehicleId.toString(),remark));
+		int result = infoService.modifyVehicleRemark(vehicleId, remark);
+		if (result != Consts.SUCCEED) {
+			resultMap.put("success", false);
+			resultMap.put("message", getText("ModifyVehicleRemark_" + result,locale));
+		} else {
+			resultMap.put("success", true);
+		}
+		logger.info("##备注修改结束##");
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "4sshop")
+	public String get4sShop(@RequestParam("s4Id")BigInteger s4Id,
+			Locale locale) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		Organization shop = infoService.get4sShop(s4Id);
+		if (shop != null) {
+			resultMap.put("success", true);
+			resultMap.put("data", shop);
+		} else {
+			resultMap.put("success", false);
+			resultMap.put("message", getText("basicdata.no.4sshop", locale, s4Id));
+		}
+		return JSONUtil.serialize(resultMap);
+	}
+	/**
+	 * 获取缴费信息.
+	 * <a>http://localhost:8080/seat/app/data/feeinfo?param=13418579707&type=1</a>
+     * <a>http://localhost:8080/seat/app/data/feeinfo?param=1&type=2</a>
+	 * @param param
+	 * @param type
+	 * @param request
+	 * @return
+	 * @throws JSONException
+	 */
+	@ResponseBody
+	@RequestMapping("feeinfo")
+	public String getFeeInfo(
+			@RequestParam String param, 
+			@RequestParam int type, Locale locale) 
+					throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("success", false);
+		if (type != Consts.TYPE_PHONENO && 
+				type != Consts.TYPE_VEHICLEID) {
+			resultMap.put("message", getText("wrong.type", 
+					locale));
+		} else {
+			FeeInfo feeInfo = infoService.getFeeInfo(param, type);
+			if (feeInfo == null) {
+				resultMap.put("message", getText("feeInfo.no.info", 
+						locale, param));
+			} else {
+				resultMap.put("success", true);
+				resultMap.put("paytxt", feeInfo.getFeePaytxt());
+				resultMap.put("fee_info", feeInfo.getFeeInfoList());
+				resultMap.put("insurance", feeInfo.getInsurance());
+				resultMap.put("sum_monthly", feeInfo.getSumMonthly());
+				resultMap.put("sum_annually", feeInfo.getSumAnnually());
+			}
+		}
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@ResponseBody
+	@RequestMapping("areacode")
+	public String getAreaCode(
+			@RequestParam String province, 
+			@RequestParam String city, HttpServletRequest request)
+					throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("success", true);
+		resultMap.put("areacode", infoService.getAreaCode(province, city));
+		
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@ResponseBody
+	@RequestMapping("telbook")
+	public String getTelphoneBook(
+			@RequestParam String draw,
+			@RequestParam String customerId, 
+			@RequestParam(required = false, value="search[value]") String queryString, 
+			ReportCommonQuery query) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		
+		List<AppContact> contactList = infoService.getAppContactList(
+				customerId, queryString, query);
+		resultMap.put("success", true);
+		ReportCommonResponse resp = infoService.getCommonResponse(customerId, queryString);
+		resultMap.putAll(resp.getCommonRespMap());
+		resultMap.put("data", contactList);
+		resultMap.put("draw", draw);
+		
+		return JSONUtil.serialize(resultMap);
+	}
+	
+	@ResponseBody
+	@RequestMapping("bindseat")
+	public String setPhoneToAgent(
+			@RequestParam String phone, 
+			@RequestParam String seatNo) throws JSONException {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		infoService.setPhoneToAgent(phone, seatNo);
+		resultMap.put("success", true);
+		return JSONUtil.serialize(resultMap);
+	}
+}

@@ -1,0 +1,42 @@
+package cc.chinagps.gateway.unit.oem.util;
+
+import cc.chinagps.gateway.unit.UnitSocketSession;
+import cc.chinagps.gateway.unit.oem.pkg.OEMPackage;
+
+public class OEMPkgUtil {
+
+	/**
+	 * 获取指令sn
+	 */
+	public static byte getSn(UnitSocketSession unitSession){
+		synchronized (unitSession) {
+			Object obj = unitSession.getAttribute(OEMConstants.OEM_SESSION_KEY_SN);
+			Byte v;
+			if(obj == null){
+				v = 1;
+			}else{
+				v = (Byte) obj;
+				v++;
+			}
+			
+			unitSession.setAttribute(OEMConstants.OEM_SESSION_KEY_SN, v);
+			return v;
+		}
+	}
+	
+	/**
+	 * 获取下发指令缓存sn
+	 */
+	public static String getCmdCacheSn(String callLetter, byte headSN){
+		return callLetter + "_" + headSN;
+	}
+	
+	public static byte[] getCommonResponseToUnit(UnitSocketSession session, byte responseCmdId,OEMPackage pkg) throws Exception{
+		pkg.setData(new byte[0]);
+		pkg.setMainCmdId(responseCmdId);
+		pkg.setBodyLen((short) 6);
+		byte[] source = pkg.encode();
+		
+		return source;
+	}
+}

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.DicUnitTypeMapper"> 
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+    <resultMap type="DicUnitTypePOJO" id="dicUnitTypeMap">  
+        <id property="unitTypeSn" column="unit_type_sn" jdbcType="VARCHAR"/>
+        <result property="unitType" column="unit_type" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="INTEGER"/>
+         <result property="supperierSn" column="supperier_sn" jdbcType="VARCHAR"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+        
+         <result property="supperierName" column="supperier_name" jdbcType="VARCHAR"/>
+    </resultMap>
+	
+	<select id="getList" parameterType="map" resultMap="dicUnitTypeMap">
+		select * from t_dic_unit_type dut
+		<where>
+		  <if test="@Ognl@isNotBlank(isValid)">
+		    and dut.is_valid=#{isValid}
+		  </if>
+		  
+		  <if test="@Ognl@isNotBlank(unitTypeSn)">
+		      and dut.unit_type_sn=#{unitTypeSn}
+		   </if>
+		   
+		   <if test="@Ognl@isNotBlank(supperierSn)">
+		      and dut.supperier_sn=#{supperierSn}
+		   </if>
+		   <if test="@Ognl@isNotBlank(userId)"> and exists (select 'X' from t_p_user pu where dut.user_id=pu.user_id and pu.depart_id=#{userId})</if>
+		</where>
+	</select>
+	
+	<sql id="getByPageCondition">
+		<where>
+			<if test="@Ognl@isNotBlank(unitType)">
+				
+				<if test="@Ognl@isNotBlank(unitType.unitTypeSn)">
+					AND dut.unit_type_sn LIKE '%'||#{unitType.unitTypeSn}||'%'
+				</if>
+				
+				<if test="@Ognl@isNotBlank(unitType.unitType)">
+					AND dut.unit_type LIKE '%'||#{unitType.unitType}||'%'
+				</if>
+				
+				<if test="@Ognl@isNotBlank(unitType.userId)"> and exists (select 'X' from t_p_user pu where dut.user_id=pu.user_id and pu.depart_id=#{unitType.userId})</if>
+			</if>
+		</where>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="getByPage" parameterType="map" resultMap="dicUnitTypeMap">
+		select dut.*,ds.SUPPERIER_NAME from t_dic_unit_type dut
+		left join T_DIC_SUPPERIER ds on ds.SUPPERIER_SN=dut.SUPPERIER_SN
+		<include refid="getByPageCondition"/>  
+		ORDER BY dut.stamp desc 
+	</select>
+	
+	<select id="countAll" parameterType="map" resultType="Integer">
+		select count(dut.unit_type_sn) from t_dic_unit_type dut
+			<include refid="getByPageCondition"/> 
+	</select> 
+	
+	<select id="get" parameterType="DicUnitTypePOJO" resultMap="dicUnitTypeMap">
+		SELECT sp.* FROM t_dic_unit_type sp WHERE sp.unit_type_sn=#{unitTypeSn} 
+	</select>
+	
+	<delete id="remove" parameterType="DicUnitTypePOJO" >
+			delete t_dic_unit_type
+ 			where unit_type_sn =#{unitTypeSn}
+	</delete>
+	
+	<insert id="add" parameterType="DicUnitTypePOJO">
+		INSERT INTO t_dic_unit_type
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+		 	<if test="@Ognl@isNotBlank(unitTypeSn)">unit_type_sn,</if>
+		 	<if test="@Ognl@isNotBlank(supperierSn)">supperier_sn,</if>
+		 	<if test="@Ognl@isNotBlank(unitType)">unit_type,</if>
+		 	<if test="@Ognl@isNotBlank(isValid)">is_Valid,</if>
+		 	<if test="@Ognl@isNotBlank(userId)">
+		      USER_ID,
+		   </if>
+            stamp
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	<if test="@Ognl@isNotBlank(unitTypeSn)">#{unitTypeSn},</if>
+		 	<if test="@Ognl@isNotBlank(supperierSn)">#{supperierSn},</if>
+		 	<if test="@Ognl@isNotBlank(unitType)">#{unitType},</if>
+		 	<if test="@Ognl@isNotBlank(isValid)">#{isValid},</if>
+		 	<if test="@Ognl@isNotBlank(userId)">#{userId},</if>
+            sysdate
+		 </trim>
+ 	</insert>
+ 
+	<update id="edit" parameterType="DicUnitTypePOJO">
+		UPDATE t_dic_unit_type 
+		SET 
+    	<trim suffixOverrides=",">
+    		STAMP=sysdate, 
+		 	<if test="@Ognl@isNotBlank(unitTypeSn)">unit_type_sn=#{unitTypeSn},</if>
+		 	<if test="@Ognl@isNotBlank(supperierSn)">SUPPERIER_SN=#{supperierSn},</if>
+		 	<if test="@Ognl@isNotBlank(unitType)">unit_type=#{unitType},</if>
+		 	<if test="@Ognl@isNotBlank(isValid)">is_Valid=#{isValid},</if>
+      	</trim>
+ 		WHERE unit_type_sn=#{unitTypeSn,jdbcType=VARCHAR}
+	</update>
+</mapper>  

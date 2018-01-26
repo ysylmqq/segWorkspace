@@ -1,0 +1,12 @@
+/*!
+ * alarmleveldef.css v0.0.1
+ */
+/*
+ * 警情级别表格宽高
+ */
+.alarmleveldeftableheight {
+	max-height:800px;
+	align-content: center;
+	overflow:auto;
+}
+

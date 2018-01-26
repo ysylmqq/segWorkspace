@@ -1,0 +1,24 @@
+package cc.chinagps.gateway.unit.oem.upload.cmd;
+
+import cc.chinagps.gateway.unit.UnitSocketSession;
+import cc.chinagps.gateway.unit.oem.pkg.OEMPackage;
+import cc.chinagps.gateway.unit.oem.upload.UploadHandler;
+import cc.chinagps.gateway.unit.oem.util.OEMPkgUtil;
+import cc.chinagps.gateway.unit.udp.UdpServer;
+
+/**
+ * °²Á¼ÖÕ¶ËÁ´Â·°ü
+ */
+public class Cmd99 implements UploadHandler {
+	@Override
+	public boolean handlerPackage(OEMPackage pkg, UdpServer server,
+			UnitSocketSession session) throws Exception {
+		// TODO Auto-generated method stub
+		// ack
+		byte[] source = OEMPkgUtil.getCommonResponseToUnit(session, (byte)0x20, pkg);
+		session.sendData(source);
+
+		return true;
+	}
+
+}

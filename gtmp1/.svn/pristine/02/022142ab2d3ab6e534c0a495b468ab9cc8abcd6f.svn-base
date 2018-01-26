@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.AlarmMapper">
+
+<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+
+    <resultMap type="AlarmPOJO" id="alarmMap">
+        <id property="alarmId" column="alarm_id" jdbcType="BIGINT" /> 
+        <result property="unitId" column="UNIT_ID" jdbcType="VARCHAR" />
+        <result property="alarmTypeGenre" column="genre" jdbcType="INTEGER"/> 
+        <result property="alarmTypeId" column="alarm_type_id" jdbcType="INTEGER"/>
+        <result property="alarmStatus" column="alarm_status" jdbcType="VARCHAR" />  
+        <result property="alarmSource" column="alarm_source" jdbcType="INTEGER"/>
+        <result property="lon" column="lon" jdbcType="FLOAT"/>
+        <result property="lat" column="lat" jdbcType="FLOAT" />
+        <result property="direction" column="direction" jdbcType="INTEGER"/>
+        <result property="speed" column="speed" jdbcType="FLOAT"/>  
+        <result property="locationState" column="location_state" jdbcType="INTEGER"/>
+        <result property="vehicleState" column="vehicle_state" jdbcType="VARCHAR"/>
+        <result property="gpsTime" column="gps_time" jdbcType="TIMESTAMP"/>
+        <result property="referencePosition" column="reference_position" jdbcType="VARCHAR"/>
+        <result property="rawData" column="raw_data" jdbcType="VARCHAR"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+        <result property="isRead" column="IS_READ" jdbcType="INTEGER"/>
+        <result property="dealerId" column="NAME" jdbcType="VARCHAR"/>
+        
+      
+        <result property="startTime" column="start_time" jdbcType="DATE"/>
+        <result property="endTime" column="end_time" jdbcType="DATE"/>
+        <result property="vehicleDef" column="VEHICLE_DEF" jdbcType="VARCHAR"/>
+        <result property="alarmTypeName" column="alarm_type_name" jdbcType="VARCHAR"/>
+        
+        <result property="vehicleStatus" column="VEHICLE_STATUS" jdbcType="INTEGER"/> 
+        <result property="vehicleModel" column="VEHICLE_MODEL" jdbcType="VARCHAR"/> 
+        <result property="vehicleCode" column="VEHICLE_CODE" jdbcType="VARCHAR"/> 
+        <result property="vehicleArg" column="VEHICLE_ARG" jdbcType="VARCHAR"/> 
+        <result property="vehicleModelName" column="MODEL_NAME" jdbcType="VARCHAR"/> 
+    </resultMap>
+    
+      <resultMap type="AlarmTypePOJO" id="alarmTypeMap">
+         <id property="alarmTypeId" column="ALARM_TYPE_ID"></id>
+	     <result property="alarmTypeName" column="ALARM_TYPE_NAME"></result>
+	     <result property="isValid" column="is_valid" jdbcType="INTEGER"/>
+        <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/>
+       </resultMap>
+       
+	<resultMap id="userAlarmTypesMap" type="UserAlarmTypesPOJO">
+		<id property="userId" column="USER_ID" jdbcType="BIGINT" />
+		<result property="alarmTypes" column="ALARM_TYPES" jdbcType="VARCHAR" />
+		<result property="showColumns" column="SHOW_COLUMNS" jdbcType="VARCHAR" />
+		<result property="stamp" column="STAMP" jdbcType="TIMESTAMP" />
+		<result property="startTime" column="STARTTIME" jdbcType="INTEGER" />
+		<result property="endTime" column="ENDTIME" jdbcType="INTEGER" />
+		
+	</resultMap>  
+         
+	<sql id="listCondision">
+		<where>
+				 and v.vehicle_def is not null
+				  <if test="@Ognl@isNotBlank(alarmStatus)">
+						AND a.ALARM_STATUS=#{alarmStatus}
+				</if>
+					
+					<if test="@Ognl@isNotBlank(vehicleDef)">
+						AND lower(v.vehicle_def) like '%'||lower(#{vehicleDef})||'%' 
+					</if>
+					<if test="@Ognl@isNotBlank(alarmTypeId)">
+						AND a.alarm_Type_Id=#{alarmTypeId}
+					</if>
+					 <if test="@Ognl@isNotBlank(alarmTypeIds)">
+				  	     and a.alarm_type_id in 
+				  	    <foreach collection="alarmTypeIds" item="id" open="(" separator="," close=")">
+						      <if test="@Ognl@isNotBlank(id)">
+							   #{id} 
+							 </if>
+						</foreach>
+					   </if>
+					   
+					  <if test="@Ognl@isNotBlank(startTime)">
+					AND a.stamp &gt;=#{startTime}
+				</if>
+				<if test="@Ognl@isNotBlank(endTime)">
+					AND a.stamp &lt;#{endTime}
+				</if>
+				<if test="@Ognl@isNotBlank(vehicleModel)">
+        		  	AND v.vehicle_model = #{vehicleModel}
+        		</if>
+        		<if test="@Ognl@isNotBlank(vehicleCode)">
+        			AND v.vehicle_code = #{vehicleCode}
+        		</if>
+        		<if test="@Ognl@isNotBlank(vehicleArg)">
+        		  	AND v.vehicle_arg = #{vehicleArg}
+       		  	</if>
+		</where>
+	</sql>
+		
+	<select id="getList" parameterType="AlarmPOJO" resultMap="alarmMap">
+	 SELECT a.*, v.vehicle_def,v.vehicle_model,dvm.model_name,dat.genre,v.vehicle_code,v.vehicle_arg,dv.dealer_id,da.name, dat.Alarm_Type_Name fROM t_alarm a
+    left join t_vehicle_unit vu on vu.unit_id = a.unit_id
+    left join t_vehicle v on v.vehicle_id = vu.vehicle_id
+    left join t_dic_alarm_type dat on dat.alarm_type_id = a.alarm_type_id
+    LEFT JOIN t_dic_vehicle_model dvm ON v.vehicle_model = dvm.model_id
+    left join t_dealer_vehicle dv on v.vehicle_def = dv.vehicle_def
+    left join t_dealer_area da on da.id = dv.dealer_id 
+		<include refid="listCondision"/>
+		ORDER BY a.stamp desc
+	</select>
+	
+	<sql id="getByPageCondition">
+		<where>
+		    and v.vehicle_def is not null
+		    and a.alarm_type_id is not null
+		    AND dat.alarm_type_name is not null
+			<if test="@Ognl@isNotBlank(alarm)">
+				 <if test="@Ognl@isNotBlank(alarm.isRead)">
+						AND a.is_Read=#{alarm.isRead}
+				 </if>
+				  <if test="@Ognl@isNotBlank(alarm.alarmStatus)">
+						AND a.ALARM_STATUS=#{alarm.alarmStatus}
+				</if>
+				<if test="@Ognl@isNotBlank(alarm.dealerId)">
+						AND dv.dealer_id = #{alarm.dealerId}
+				</if>
+					<if test="@Ognl@isNotBlank(alarm.vehicleDef)">
+						AND lower(v.vehicle_def) like '%'||lower(#{alarm.vehicleDef})||'%' 
+					</if>
+					<if test="@Ognl@isNotBlank(alarm.vehicleModel)"> 
+	       			 	AND V.vehicle_model = #{alarm.vehicleModel}
+	  			    </if>
+					<if test="@Ognl@isNotBlank(alarm.vehicleCode)">
+						AND v.vehicle_code = #{alarm.vehicleCode}
+					</if>
+					<if test="@Ognl@isNotBlank(alarm.vehicleArg)">
+						AND v.vehicle_arg = #{alarm.vehicleArg}
+					</if>
+					<if test="@Ognl@isNotBlank(alarm.alarmTypeId)">
+						AND a.alarm_Type_Id=#{alarm.alarmTypeId}
+					</if>
+					<if test="@Ognl@isNotBlank(alarm.alarmTypeIds)">
+				  	     and a.alarm_type_id in 
+				  	    <foreach collection="alarm.alarmTypeIds" item="id" open="(" separator="," close=")">
+						      <if test="@Ognl@isNotBlank(id)">
+							   #{id} 
+							 </if>
+						</foreach>
+					   </if>
+					 <if test="@Ognl@isNotBlank(alarm.dealerIds)">
+				  	     and dv.dealer_id in 
+				  	    <foreach collection="alarm.dealerIds" item="id" open="(" separator="," close=")">
+						      <if test="@Ognl@isNotBlank(id)">
+							   #{id} 
+							 </if>
+						</foreach>
+					   </if>  
+					  <if test="@Ognl@isNotBlank(alarm.startTime)">
+					AND a.stamp &gt;=#{alarm.startTime}
+				</if>
+				<if test="@Ognl@isNotBlank(alarm.endTime)">
+					AND a.stamp &lt;=#{alarm.endTime}
+				</if>
+				 <!-- 所属经销商 -->
+				 <if test="@Ognl@isNotBlank(dealerIds)">
+                   and 
+						<foreach collection="dealerIds" item="item" open="(" separator=" or " close=")">
+			 			<if test="@Ognl@isNotBlank(item)">
+			 			 dv.dealer_id=#{item} 
+			 			 </if>
+					</foreach>
+        		 </if>
+        		 <!-- 机械状态组 -->
+        		  <if test="@Ognl@isNotBlank(vehicleStatus)">
+                   and 
+						<foreach collection="vehicleStatus" item="item" open="(" separator=" or " close=")">
+			 			<if test="@Ognl@isNotBlank(item)">
+			 			 v.vehicle_status=#{item} 
+			 			 </if>
+					</foreach>
+        		 </if>
+        		 <!-- 判断是否是融资租赁的用户 -->
+        		 <if test="@Ognl@isNotBlank(leaseFlag)">
+					AND v.lease_flag = #{leaseFlag} 
+				</if>
+				<!-- 过滤用户自己设置查看哪些警情 -->
+				 <if test="@Ognl@isNotBlank(alarmTypes)">
+				    <![CDATA[ and a.alarm_type_id in (${alarmTypes})]]>
+				  </if>
+				<if test="@Ognl@isNotBlank(alarm.vehicleStatus)">
+        			AND v.vehicle_status = #{alarm.vehicleStatus}
+        		</if>
+       		  	<!--  警情大类过滤-->
+       		  	<if test="@Ognl@isNotBlank(alarm.alarmTypeGenre)">
+        		  	AND dat.genre = #{alarm.alarmTypeGenre}
+       		  	</if>
+			</if>
+		</where>
+	</sql>
+	<!-- 分页查询 -->
+	<select id="getByPage" parameterType="map" resultMap="alarmMap">
+		 SELECT a.*, v.vehicle_def,v.vehicle_status,v.vehicle_model,dvm.model_name,v.vehicle_code,v.vehicle_arg,dv.dealer_id,da.name, dat.genre,dat.Alarm_Type_Name fROM t_alarm a
+    left join t_vehicle_unit vu on vu.unit_id = a.unit_id
+    left join t_vehicle v on v.vehicle_id = vu.vehicle_id
+    left join t_dic_alarm_type dat on dat.alarm_type_id = a.alarm_type_id
+    left join t_dealer_vehicle dv on v.vehicle_def = dv.vehicle_def
+    left join t_dealer_area da on da.id = dv.dealer_id 
+    LEFT JOIN t_dic_vehicle_model dvm ON v.vehicle_model = dvm.model_id
+		<include refid="getByPageCondition"/>  
+		ORDER BY a.stamp desc 
+	</select>
+	<select id="countAll" parameterType="map" resultType="Integer">
+		SELECT count(a.alarm_id) fROM t_alarm a
+    left join t_vehicle_unit vu on vu.unit_id = a.unit_id
+    left join t_vehicle v on v.vehicle_id = vu.vehicle_id
+    left join t_dic_alarm_type dat on dat.alarm_type_id = a.alarm_type_id
+    left join t_dealer_vehicle dv on v.vehicle_def = dv.vehicle_def
+    left join t_dealer_area da on da.id = dv.dealer_id 
+    LEFT JOIN t_dic_vehicle_model dvm ON v.vehicle_model = dvm.model_id
+		<include refid="getByPageCondition"/> 
+		ORDER BY a.stamp desc  
+	</select> 
+	
+	<update id="edit" parameterType="AlarmPOJO">
+		update t_alarm set 
+		<trim suffixOverrides=",">	
+        <if test="@Ognl@isNotBlank(isRead)" >
+        is_read=#{isRead},
+                 </if>  
+        </trim>
+		where alarm_id = #{alarm_id}
+	</update>
+	
+	<update id="editAlarms" parameterType="java.util.List">
+		update t_alarm set 
+        IS_READ=0
+		  <where>
+           <if test="@Ognl@isNotBlank(list)">
+	    			and 
+		    		<foreach collection="list" item="item" open="(" separator=" or " close=")">
+			 			 alarm_id =#{item} 
+					</foreach>
+			</if>
+		  </where>
+	</update>
+	
+	<select id="getAllAlarmType" resultMap="alarmTypeMap" parameterType="map">
+	select at.* from t_dic_alarm_type at	
+	<where>
+	  <if test="@Ognl@isNotBlank(alarmTypes)">
+	    <![CDATA[ and at.alarm_type_id in (${alarmTypes})]]>
+	  </if>
+	</where>
+</select>
+
+
+
+	<select id="statisticAlarm" parameterType="map" resultType="map"> 
+		SELECT
+			<choose>
+				<when test="reportType==1">
+					<choose>
+						<when test="@Ognl@isNotBlank(vehicleCode) and @Ognl@isNotBlank(vehicleArg)">
+							sa.vehicle_code || sa.vehicle_arg as type_id,sa.vehicle_code,sa.vehicle_arg
+						</when>
+						<when test="@Ognl@isNotBlank(vehicleCode) and @Ognl@isBlank(vehicleArg)">
+							sa.vehicle_code as type_id,sa.vehicle_code
+						</when>
+						<otherwise>
+							sa.model_type_id as type_id,dvm.model_name
+						</otherwise>
+					</choose>
+				</when>
+				<otherwise>
+					sa.alarm_type_id as type_id,dat.alarm_type_name,dat.genre
+				</otherwise>
+			</choose>
+			<foreach collection="columns" item="id" >
+				, <![CDATA[
+					SUM(DECODE(TO_CHAR(sa.date_ymd, 'yyyymm'), REPLACE('${id}','m',''), sa.mcount, 0)) AS "${id}"
+		          ]]>
+			</foreach>
+		 FROM t_stat_alarm sa
+  LEFT JOIN t_dic_vehicle_model dvm ON dvm.model_id = sa.model_type_id
+  LEFT JOIN t_dic_alarm_type dat ON dat.alarm_type_id = sa.alarm_type_id
+		 <where>
+		 	AND dat.alarm_type_name is not null
+		 	and to_char(sa.date_ymd, 'yyyy')=to_char(sysdate, 'yyyy')
+		    <if test="@Ognl@isNotBlank(alarmTypeId)">
+		    	AND sa.alarm_type_id IN (${alarmTypeId})
+		    </if>
+		   	<if test="@Ognl@isNotBlank(vehicleModel)">
+		    	AND sa.model_type_id = #{vehicleModel}
+		   	</if>
+		   	<if test="@Ognl@isNotBlank(vehicleCode)">
+		       	AND sa.vehicle_code = #{vehicleCode}
+		   	</if>
+		   	<if test="@Ognl@isNotBlank(vehicleArg)">
+		       	AND sa.vehicle_arg = #{vehicleArg}
+		   	</if>
+		   	<if test="@Ognl@isNotBlank(startTime)">
+				AND sa.date_ymd &gt;= #{startTime}
+			</if>
+			<if test="@Ognl@isNotBlank(endTime)">
+				AND sa.date_ymd &lt;= #{endTime}
+			</if>
+			<!--  警情大类过滤-->
+       		<if test="@Ognl@isNotBlank(alarmTypeGenre)">
+        		AND dat.genre = #{alarmTypeGenre}
+       		</if>
+		 </where>
+		 group by to_char(sa.date_ymd, 'yyyy'),
+		 <choose>
+		 	<when test="reportType==1">
+		 		<choose>
+		 			<when test="@Ognl@isNotBlank(vehicleCode) and @Ognl@isNotBlank(vehicleArg)">
+		 				sa.vehicle_code,sa.vehicle_arg
+		 			</when>
+		 			<when test="@Ognl@isNotBlank(vehicleCode) and @Ognl@isBlank(vehicleArg)">
+		 				sa.vehicle_code
+		 			</when>
+		 			<otherwise>
+		 				sa.model_type_id,dvm.model_name
+		 			</otherwise>
+		 		</choose>
+		 	</when>
+		 	<otherwise>
+		 		sa.alarm_type_id,dat.alarm_type_name,dat.genre
+		 	</otherwise>
+		 </choose>
+	</select>
+	
+	<select id="getUserAlarmTypesCount" parameterType="UserAlarmTypesPOJO" resultType="int">
+		SELECT COUNT(1) FROM t_user_alarm_types WHERE user_id=#{userId}
+	</select>
+	
+	<select id="getUserAlarmTypes" parameterType="Long" resultMap="userAlarmTypesMap">
+	 SELECT user_id, alarm_types, show_columns, stamp,starttime,endtime
+	 	FROM t_user_alarm_types
+	 WHERE user_id=#{id}
+	</select>
+	
+	<delete id="deleteUserAlarmTypes" parameterType="Long">
+		delete t_user_alarm_types where user_id=#{userId}
+	</delete>
+	
+	<update id="updateUserAlarmTypes" parameterType="UserAlarmTypesPOJO">
+		UPDATE t_user_alarm_types
+			SET
+		<trim suffixOverrides="," >
+		 	<if test="@Ognl@isNotBlank(alarmTypes)" >
+       			alarm_types = #{alarmTypes},
+            </if>
+		 	<if test="@Ognl@isNotBlank(showColumns)" >
+       			show_columns = #{showColumns},
+            </if>
+            <if test="@Ognl@isNotBlank(startTime)" >
+       			STARTTIME = #{startTime},
+            </if>
+            <if test="@Ognl@isNotBlank(endTime)" >
+       			ENDTIME = #{endTime},
+            </if>
+            stamp = sysdate
+       	</trim>
+       	WHERE user_id = #{userId}
+	</update>
+	
+	<insert id="insertUserAlarmTypes" parameterType="UserAlarmTypesPOJO">
+		INSERT INTO t_user_alarm_types
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+		 	<if test="@Ognl@isNotBlank(userId)" >
+       		user_id,
+            </if>
+		 	<if test="@Ognl@isNotBlank(alarmTypes)" >
+       		alarm_types,
+            </if>
+		 	<if test="@Ognl@isNotBlank(showColumns)" >
+       		show_columns,
+            </if>
+            <if test="@Ognl@isNotBlank(startTime)" >
+       		starttime,
+            </if>
+            <if test="@Ognl@isNotBlank(endTime)" >
+       		endtime,
+            </if>
+            stamp
+       	</trim>
+       	 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	<if test="@Ognl@isNotBlank(userId)" >
+       		#{userId},
+            </if>
+            <if test="@Ognl@isNotBlank(alarmTypes)" >
+       		#{alarmTypes},
+            </if>
+            <if test="@Ognl@isNotBlank(showColumns)" >
+       		#{showColumns},
+            </if>
+             <if test="@Ognl@isNotBlank(startTime)" >
+       		#{starTtime},
+            </if>
+            <if test="@Ognl@isNotBlank(endTime)" >
+       		#{endTime},
+            </if>
+            sysdate
+          </trim>
+	</insert>
+</mapper>  

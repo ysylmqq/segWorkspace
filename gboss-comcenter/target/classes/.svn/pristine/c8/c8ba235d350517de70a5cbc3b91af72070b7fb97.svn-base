@@ -1,0 +1,51 @@
+/*!
+ * visitorscreen.css v0.0.1
+ */
+ body,
+ html {
+	margin:0px;
+	width:100%;
+	height:100%;
+}
+
+.container {
+	width:100%;
+	height:100%;
+	background-image: url(../images/bg-blue.gif);
+	background-size: 100% 100%;
+}
+
+.mainpanel-left {
+	width:20%;
+	float:left !important;
+}
+
+.mainpanel-right {
+	width:80%;
+	float:right !important;
+}
+
+.mainpanel-height {
+	height:880px;
+  	border:1px solid #dddddd;
+}
+
+.table > tbody > tr {
+	height: 60px;
+}
+
+.table > tbody > tr > td {
+	vertical-align: middle;
+	text-align: right;
+}
+
+.text-left {
+	text-align: left !important;
+}
+
+#mainCanvas {
+	left:auto;
+	top:auto;
+	width:100%;
+	height:100%;
+}

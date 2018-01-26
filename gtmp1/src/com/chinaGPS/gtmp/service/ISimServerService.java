@@ -1,0 +1,151 @@
+package com.chinaGPS.gtmp.service;
+
+import java.util.HashMap;
+import java.util.List;
+
+import com.chinaGPS.gtmp.entity.SimReplaceLogPOJO;
+import com.chinaGPS.gtmp.entity.SimServerPOJO;
+import com.chinaGPS.gtmp.entity.UnitPOJO;
+import com.chinaGPS.gtmp.util.page.PageSelect;
+
+/**
+ * @Package:com.chinaGPS.gtmp.service
+ * @ClassName:ISimServerService
+ * @Description:玉柴重工使用SIM卡service
+ * @author:于松亚
+ * @date:2017-3-21 上午10:15:43
+ */
+public interface ISimServerService extends BaseService<SimServerPOJO> {
+	
+	/**
+	 * 根据simNo获取sim_server
+	 * @param simNo
+	 * @return
+	 */
+	public SimServerPOJO getSimServerPOJOById(String simNo);
+	
+	/**
+	 * 根据simNo删除 sim_server
+	 * @param simNo
+	 * @return
+	 */
+	public void delSimServerPOJOById(String simNo);
+	
+	/**
+	 * 更新sim_server 状态
+	 * @param record
+	 */
+    public void updateStatus(SimServerPOJO record)throws Exception;
+    
+	/**
+	 * 更新sim_server
+	 * @param record
+	 */
+    public void updateByPrimaryKeySelective(SimServerPOJO record)throws Exception;
+    
+    /**
+	 * 分页t_sim_server的缴费情况
+	 * @param customerPayPOJO
+	 * @param pageSelect
+	 * @return
+	 * @throws Exception
+	 */
+	public HashMap<String, Object> getSimServer(SimServerPOJO simServerPOJO,PageSelect pageSelect) throws Exception;
+
+	/**
+	 * 插入
+	 * @param simServerPOJO
+	 * @throws Exception
+	 */
+	public boolean insertSelective(SimServerPOJO simServerPOJO) throws Exception;
+	
+	/**
+	 * 批量导入
+	 * @param simServerPOJO
+	 * @throws Exception
+	 */
+	//public List<SimServerPOJO> batchInsert(List<SimServerPOJO> list) throws Exception;
+	/**
+	 * 查询t_unit
+	 * @return
+	 */
+    public List<UnitPOJO> getUnitList();
+    
+    /**
+     * 导出SimServer
+     * @param simServerPOJO
+     * @return
+     */
+    public List<SimServerPOJO> exportSimServer(SimServerPOJO simServerPOJO);
+    
+    /**
+     * 更换终端
+     * @param simServerPOJO
+     * @return
+     */
+    public List<SimServerPOJO> exportChangeUnit(SimServerPOJO simServerPOJO);
+    
+    
+    public List<SimServerPOJO> simServerList();
+
+    public List<SimServerPOJO> allSimServer(SimServerPOJO simServerPOJO);
+    
+    /**
+     * 批量注销公司SIM卡
+     * @param list
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    public List<SimServerPOJO> batchCancelSim(List<SimServerPOJO> list,String userId) throws Exception;
+    
+	public List<SimServerPOJO> batchInsert(List<SimServerPOJO> list,String userId) throws Exception;
+
+	/**
+	 * 更换终端
+	 * @param simServerPOJO
+	 * @param pageSelect
+	 * @return
+	 * @throws Exception 
+	 */
+	public  HashMap<String, Object> changeUnitsearch(SimServerPOJO simServerPOJO,
+			PageSelect pageSelect) throws Exception;
+	
+	/**
+	 * 终端更换SIM
+	 * @param simServerPOJO
+	 * @return
+	 * @throws Exception 
+	 */
+	int changeSim(SimReplaceLogPOJO simReplaceLog) throws Exception;
+	
+	/**
+	 * 终端换装
+	 * @param simServerPOJO
+	 * @return
+	 * @throws Exception 
+	 */
+	int changeUnit(SimServerPOJO simServerPOJO,String oldSimNo) throws Exception;
+	
+	/**
+	 * 根据simNo获取gai卡的收益
+	 * @param simNo
+	 * @return
+	 * @throws Exception 
+	 */
+	int[] getAllFee(String simNo) throws Exception;
+
+	/**
+	 * 机械收益
+	 * @param simServerPOJO
+	 * @param pageSelect
+	 * @return
+	 * @throws Exception
+	 */
+	public HashMap<String, Object> allProfit(SimServerPOJO simServerPOJO,
+			PageSelect pageSelect) throws Exception;
+
+	List<SimServerPOJO> allVehicleProfit(SimServerPOJO simServerPOJO)
+			throws Exception;
+
+}

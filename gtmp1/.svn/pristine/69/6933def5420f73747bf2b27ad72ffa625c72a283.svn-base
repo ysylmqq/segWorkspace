@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinaGPS.gtmp.mapper.WorkhourMapper">
+
+	<resultMap type="com.chinaGPS.gtmp.entity.VehicleWorkPOJO" id="workMap">  
+       <result property="modelId" column="VEHICLE_MODEL" jdbcType="BIGINT"/>
+       <result property="modelName" column="model_name" jdbcType="VARCHAR"/>
+       <result property="vehicleCode" column="VEHICLE_CODE" jdbcType="VARCHAR"/>
+       <result property="vehicleArg" column="VEHICLE_ARG" jdbcType="VARCHAR"/>
+    </resultMap>
+
+	<!-- 用memcached做二级缓存 -->
+	<cache type="org.mybatis.caches.memcached.MemcachedCache" />
+	
+	<sql id="totalWorkhourCondition">
+		<where>
+		 v.vehicle_status in(3,8,9) and lc.productcode is not null
+		
+			<if test="@Ognl@isNotBlank(dealerIds)">
+	                   and 
+						<foreach collection="dealerIds" item="item" open="(" separator=" or " close=")">
+				 			 dv.dealer_id=#{item} 
+						</foreach>
+	          </if>
+				 <if test="@Ognl@isNotBlank(modelId)">
+				     AND v.vehicle_model = #{modelId}
+				 </if>
+				 <if test="@Ognl@isNotBlank(vehicleCode)">
+				     AND v.vehicle_code = #{vehicleCode}
+				 </if>
+				 <if test="@Ognl@isNotBlank(vehicleArg)">
+				     AND v.vehicle_arg = #{vehicleArg}
+				 </if>
+				 <if test="@Ognl@isNotBlank(vehicleStatus)">
+				    AND v.vehicle_status=#{vehicleStatus}
+				 </if>
+			
+		</where>
+	</sql>
+	
+	<sql id="totalWOrkhourDetailCondition">
+		<where>
+			 v.vehicle_status in(3,8,9) and v.vehicle_def is not null
+			<if test="work.beginWorkhour != null and work.endWorkhour != null">
+				AND lc.totalworkinghours BETWEEN ${work.beginWorkhour} AND ${work.endWorkhour}
+			</if>
+			<if test="@Ognl@isNotBlank(work.dealerIds)">
+	                   and 
+						<foreach collection="work.dealerIds" item="item" open="(" separator=" or " close=")">
+				 			 dv.dealer_id=#{item} 
+						</foreach>
+	          </if>
+			<if test="work.modelId != null and work.modelId != ''">
+			  	AND v.vehicle_model=#{work.modelId}
+			</if>
+			<if test="work.vehicleCode != null and work.vehicleCode != ''">
+				AND v.vehicle_code=#{work.vehicleCode}
+			</if>
+			<if test="work.vehicleArg != null and work.vehicleArg != ''">
+				AND v.vehicle_arg=#{work.vehicleArg}
+			</if>
+			<if test="work.vehicleStatus != null and work.vehicleStatus != ''">
+				AND v.vehicle_status=#{work.vehicleStatus}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="totalWorkhour" parameterType="com.chinaGPS.gtmp.entity.VehicleWorkPOJO" resultType="map" useCache="false">
+		SELECT da.name dealerName,
+        da.id as dealerId,
+        daa.name as areaName,
+        v.vehicle_model as modelId,
+        v.VEHICLE_CODE as vehicleCode,
+        v.VEHICLE_ARG as vehicleArg,
+        dvm.model_name modelName,
+        COUNT(da.name) vehicleCount,
+        SUM(lc.totalworkinghours) totalWorkhour,
+        ROUND(SUM(lc.totalworkinghours) / COUNT(da.name),1) avgWorkhour
+   FROM  t_dealer_vehicle dv
+   LEFT JOIN t_vehicle v ON v.vehicle_def = dv.vehicle_def
+   LEFT JOIN t_dealer_area da ON dv.dealer_id = da.id
+   left join t_Dealer_Area daa on daa.id=da.pid
+   LEFT JOIN t_dic_vehicle_model dvm ON v.vehicle_model = dvm.model_id
+   LEFT JOIN t_vehicle_unit vu ON v.vehicle_id = vu.vehicle_id
+   LEFT JOIN t_worktimecount lc on lc.unit_id=vu.unit_id
+	  	<include refid="totalWorkhourCondition"/>
+  		GROUP BY
+  			da.name,daa.name, dvm.model_name,da.id,v.vehicle_model,v.VEHICLE_CODE,v.VEHICLE_ARG
+  		order by daa.name,da.name
+	</select>
+
+	<select id="totalWorkhourDetail" parameterType="map" resultType="map" useCache="false">
+		 SELECT
+			da.name dealerName, 
+			daa.name areaName,
+			decode(v.vehicle_status,1,'测试组',2,'已测组',3,'销售组',8,'法务组',9,'停用组') as vehicleStatus, 
+			dvm.model_name modelName, 
+			v.vehicle_def vehicleDef, 
+			v.VEHICLE_CODE as vehicleCode,
+        	v.VEHICLE_ARG as vehicleArg,
+			(lc.totalworkinghours) as totalWork
+		FROM
+			t_last_conditions lc
+		LEFT JOIN t_vehicle_unit vu ON lc.unit_id = vu.unit_id
+		LEFT JOIN t_vehicle v ON vu.vehicle_id = v.vehicle_id
+		LEFT JOIN t_dealer_vehicle dv ON v.vehicle_def = dv.vehicle_def
+		LEFT JOIN t_dealer_area da ON dv.dealer_id = da.id
+		left join t_Dealer_Area daa on daa.id=da.pid
+		LEFT JOIN t_dic_vehicle_model dvm ON v.vehicle_model = dvm.model_id
+		<include refid="totalWOrkhourDetailCondition"/>
+		order by daa.name,da.name
+	</select>
+	
+	<select id="totalWorkhourDetailCountAll" parameterType="map" resultType="integer" useCache="false">
+		SELECT COUNT(1) 
+		FROM
+			t_last_conditions lc
+		LEFT JOIN t_vehicle_unit vu ON lc.unit_id = vu.unit_id
+		LEFT JOIN t_vehicle v ON vu.vehicle_id = v.vehicle_id
+		LEFT JOIN t_dealer_vehicle dv ON v.vehicle_def = dv.vehicle_def
+		LEFT JOIN t_dealer_area da ON dv.dealer_id = da.id
+		LEFT JOIN t_dic_vehicle_model dvm ON v.vehicle_model = dvm.model_id
+		<include refid="totalWOrkhourDetailCondition"/>
+	</select>
+	
+	
+	<select id="dailyWorkhour" parameterType="com.chinaGPS.gtmp.entity.VehicleWorkPOJO" resultType="map" useCache="false">
+		SELECT
+			swh.vehicleDef,  swh.totalWork ,
+			da.name dealerName, 
+			daa.name areaName,
+			decode(v.vehicle_status,1,'测试组',2,'已测组',3,'销售组',8,'法务组',9,'停用组') as vehicleStatus, 
+			dvm.model_name modelName, 
+			v.vehicle_def vehicleDef, 
+			v.VEHICLE_CODE as vehicleCode,
+        	v.VEHICLE_ARG as vehicleArg
+		FROM
+			(
+				SELECT
+					sw.vehicle_def vehicleDef, sum(sw.worked_hours) totalWork 
+				FROM
+					t_stat_workhours sw 
+				<where>
+					<if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+						AND sw.date_ymd between to_date(#{beginTime},'yyyy-mm-dd') and to_date(#{endTime},'yyyy-mm-dd')	
+					</if>
+				</where>
+				GROUP BY
+					sw.vehicle_def
+			) swh
+		LEFT JOIN t_vehicle v ON swh.vehicleDef=v.vehicle_def
+		LEFT JOIN t_dealer_vehicle dv ON v.vehicle_def=dv.vehicle_def
+		LEFT JOIN t_dealer_area da ON dv.dealer_id=da.id
+		left join t_Dealer_Area daa on daa.id=da.pid
+		LEFT JOIN t_dic_vehicle_model dvm ON v.vehicle_model=dvm.model_id
+		<where>
+		 v.vehicle_status in(3,8,9)
+			<if test="@Ognl@isNotBlank(dealerIds)">
+	                   and 
+						<foreach collection="dealerIds" item="item" open="(" separator=" or " close=")">
+				 			 dv.dealer_id=#{item} 
+						</foreach>
+	        </if>
+			<if test="vehicleStatus != null and vehicleStatus != ''">
+					AND v.vehicle_status=#{vehicleStatus}
+			</if>
+			<if test="modelId != null and modelId != ''">
+			  	AND v.vehicle_model=#{modelId}
+			</if>
+			<if test="vehicleCode != null and vehicleCode != ''">
+			  	AND v.vehicle_code=#{vehicleCode}
+			</if>
+			<if test="vehicleArg != null and vehicleArg != ''">
+			  	AND v.vehicle_arg=#{vehicleArg}
+			</if>
+			<if test="vehicleDef != null and vehicleDef != ''">
+				AND lower(v.vehicle_Def) like '%'||lower(#{vehicleDef})||'%'
+			</if>
+		</where>
+		order by daa.name,da.name
+	</select>
+	
+	<sql id="dailyWorkhourDetailCondition">
+		<where>
+		     v.vehicle_status in(3,8,9) and wt.worked_hours>0
+			<if test="work.vehicleDef != null and work.vehicleDef != ''">
+				AND v.vehicle_Def=#{work.vehicleDef}
+			</if>
+			<if test="work.dealerId != null and work.dealerId != ''">
+				AND dv.dealer_id=#{work.dealerId}
+			</if>
+			<if test="work.vehicleStatus != null and work.vehicleStatus !=''">
+				AND v.vehicle_status=#{work.vehicleStatus}
+			</if>
+			<if test="work.beginTime != null and work.beginTime != '' and work.endTime != null and work.endTime !=''">
+				AND wt.date_ymd BETWEEN to_date(#{work.beginTime}, 'yyyy-mm-dd') AND to_date(#{work.endTime}, 'yyyy-mm-dd') 
+			</if>
+		</where>
+	</sql>
+	
+	<select id="dailyWorkhourDetailCountAll" parameterType="map" resultType="integer" useCache="false">
+		SELECT COUNT(1) 
+		FROM t_stat_workhours wt 
+		LEFT JOIN t_vehicle v ON wt.vehicle_def=v.vehicle_def
+		LEFT JOIN t_dealer_vehicle dv ON wt.vehicle_def=dv.vehicle_def
+		LEFT JOIN t_dealer_area da ON dv.dealer_id=da.id
+		LEFT JOIN t_dic_vehicle_model dvm ON v.vehicle_model=dvm.model_id
+		<include refid="dailyWorkhourDetailCondition"/>
+	</select>
+	
+	<select id="dailyWorkhourDetail" parameterType="map" resultType="map" useCache="false">
+		SELECT
+			wt.vehicle_def vehicleDef, da.name dealerName, dvm.model_name modelName, v.vehicle_status vehicleStatus, to_char(wt.date_ymd,'yyyy-mm-dd') as date_ymd, wt.worked_hours 
+		FROM t_stat_workhours wt 
+		LEFT JOIN t_vehicle v ON wt.vehicle_def=v.vehicle_def
+		LEFT JOIN t_dealer_vehicle dv ON wt.vehicle_def=dv.vehicle_def
+		LEFT JOIN t_dealer_area da ON dv.dealer_id=da.id
+		LEFT JOIN t_dic_vehicle_model dvm ON v.vehicle_model=dvm.model_id
+		<include refid="dailyWorkhourDetailCondition"/>
+		order by date_ymd desc
+	</select>
+	
+	<select id="getListCode" parameterType="com.chinaGPS.gtmp.entity.VehicleWorkPOJO" resultMap="workMap" useCache="false">
+		SELECT
+			distinct t.VEHICLE_CODE 
+		FROM t_vehicle_type t 
+		WHERE t.MODEL_ID = #{modelId,jdbcType=BIGINT}
+	</select>
+	
+	<select id="getListArg" parameterType="com.chinaGPS.gtmp.entity.VehicleWorkPOJO" resultMap="workMap" useCache="false">
+		SELECT
+			t.VEHICLE_ARG 
+		FROM t_vehicle_type t 
+		WHERE t.VEHICLE_CODE = #{vehicleCode}
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>

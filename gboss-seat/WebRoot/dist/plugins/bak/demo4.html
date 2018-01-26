@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<title>DataTables example</title>
+		<!-- bootstrap -->
+		<link rel="stylesheet" href="dist/css/bootstrap.min.css">
+	
+		<script src="http://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
+		<script src="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
+		
+		<!-- dataTables -->
+		<link rel="stylesheet" href="dist/plugins/css/datatables.css">
+		<script type="text/javascript" src="dist/plugins/js/jquery.dataTables.min.js"></script>
+		<script type="text/javascript" src="dist/plugins/js/datatables.js"></script>
+		<script type="text/javascript">
+			var oTable;
+			var aSelected = [];
+			$(document).ready(function() {
+				oTable = $('#example').dataTable( {
+		        	"bFilter": true,
+					//"sPaginationType": "bs_full",
+					"sPaginationType": "bs_full",
+					
+					"bSort": false,
+					"bProcessing": true,
+					"oLanguage": {
+						"oPaginate": {
+							"sPrevious": "上一页",
+							"sNext": "下一页"
+						},
+						"sProcessing": "正在加载...",
+						"sInfo": "显示 _START_ 到 _END_, 共 _TOTAL_ 条",
+					},
+					
+					//"sDom": "lfrtip",
+					//"sDom": "rtip",
+					"sDom": "rt<'row'<'col-sm-12'<'pull-left'i><'pull-right'p><'clearfix'>>>",
+					
+					//"oTableTools": {
+					//	"sRowSelect": "single"
+					//},
+					
+				    "bServerSide": true,
+				    "sAjaxSource": "datatable",
+				    "sServerMethod": "POST",
+				    "aoColumns": [
+				    	{"mData": "info1"},
+				    	{"mData": "info2"},
+				    	{"mData": "info3"},
+				        {"mData": "info4"},
+				        {"mData": "info5"}
+				    ]
+		     	});
+				
+				 /* Click event handler */
+			    $('#example tbody tr').on('click', function () {
+			        alert(556677);
+			    } );
+
+				$('#searchBtn').click( function() {
+					var testTxt = $("#searchTxt").val();
+					//alert("testTxt:" + testTxt);
+					oTable.fnFilter(testTxt);
+				});
+	    	});
+		</script>
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+			  <div class="col-xs-8"><input id=searchTxt type="text" class="form-control" placeholder="search" /></div>
+			  <div class="col-xs-2"><button id="searchBtn" class="btn btn-default"> Search </button></div>
+			</div>
+		
+			<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="example">
+				<thead>
+					<tr>
+						<th>Rendering engine</th>
+						<th>Browser</th>
+						<th>Platform(s)</th>
+						<th>Engine version</th>
+						<th>CSS grade</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>A</td>
+						<td>B</td>
+						<td>C</td>
+						<td>D</td>
+						<td>E</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>

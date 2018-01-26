@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="com.chinaGPS.gtmp.mapper.CommandMapper"> 
+	
+	<!-- 用memcached做二级缓存 -->
+<cache-ref namespace="com.chinaGPS.gtmp.mapper.StatisticsQueryMapper"/> 
+	
+	
+	<resultMap type="CommandPOJO" id="commandMap">
+	    <id property="commandId" column="COMMAND_ID" jdbcType="BIGINT" />  
+	    <result property="commandSn" column="COMMAND_SN" jdbcType="INTEGER"/>
+	    <result property="pathFlag" column="PATH_FLAG" jdbcType="INTEGER"/>
+	    <result property="unitId" column="UNIT_ID" jdbcType="VARCHAR"/>
+	    <result property="userId" column="USER_ID" jdbcType="BIGINT" />  
+	    <result property="commandTypeId" column="COMMAND_TYPE_ID" jdbcType="INTEGER"/>
+	    <result property="param" column="PARAM" jdbcType="VARCHAR"/>
+	    <result property="gatewayBack" column="GATEWAY_BACK" jdbcType="VARCHAR" />
+	    <result property="unitBack" column="UNIT_BACK" jdbcType="VARCHAR"/>
+	    <result property="rawData" column="RAW_DATA" jdbcType="VARCHAR"/>
+	    <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/> 
+	    
+	    <result property="userName" column="USER_NAME" jdbcType="VARCHAR" />
+	    <result property="commandTypeName" column="COMMAND_TYPE_NAME" jdbcType="VARCHAR" />
+	    <result property="unitSn" column="unit_sn" jdbcType="VARCHAR"/>
+	    <result property="simNo" column="sim_no" jdbcType="VARCHAR"/>
+        <result property="vehicleDef" column="VEHICLE_DEF" jdbcType="VARCHAR"/>
+        <result property="commandTypeName" column="command_type_name" jdbcType="INTEGER"/>
+        <result property="vehicleModel" column="VEHICLE_MODEL" jdbcType="VARCHAR"/> 
+        <result property="vehicleCode" column="VEHICLE_CODE" jdbcType="VARCHAR"/> 
+        <result property="vehicleArg" column="VEHICLE_ARG" jdbcType="VARCHAR"/> 
+        <result property="vehicleModelName" column="MODEL_NAME" jdbcType="VARCHAR"/> 
+        <result property="dealerName" column="dealer_Name" jdbcType="VARCHAR"/>
+        <result property="areaName" column="area_Name" jdbcType="VARCHAR"/>
+        <result property="vehicleStatus" column="VEHICLE_STATUS" jdbcType="VARCHAR"/>
+        <result property="departName" column="DEPART_NAME" jdbcType="VARCHAR"/>
+        
+	</resultMap>
+	
+	<resultMap type="DicCommandType" id="commandTypeMap">
+	    <id property="commandTypeId" column="command_type_id" jdbcType="INTEGER" />  
+	    <result property="commandTypeName" column="command_type_name" jdbcType="INTEGER"/>
+	    <result property="commandParam" column="command_param" jdbcType="VARCHAR"/>
+	    <result property="isValid" column="is_valid" jdbcType="INTEGER" />  
+	    <result property="stamp" column="STAMP" jdbcType="TIMESTAMP"/> 
+	</resultMap>
+	
+	<resultMap type="RemoteUpgradePOJO" id="upgradeMap">
+	    <id property="upgradeId" column="upgrade_id" jdbcType="BIGINT" />  
+	    <result property="supperierSn" column="supperier_sn" jdbcType="INTEGER"/>
+	    <result property="upgradeType" column="upgrade_type" jdbcType="VARCHAR"/>
+	    <result property="deviceType" column="device_type" jdbcType="BIGINT" />  
+	    <result property="softwareVersion" column="software_version" jdbcType="INTEGER"/>
+	    <result property="unitTypeSn" column="unit_type_sn" jdbcType="VARCHAR"/>
+	    <result property="ip" column="ip" jdbcType="VARCHAR" />
+	    <result property="apn" column="apn" jdbcType="VARCHAR"/>
+	   <result property="serverPort" column="server_port" jdbcType="VARCHAR"/>
+	   <result property="localPort" column="local_port" jdbcType="VARCHAR"/>
+	    <result property="unitId" column="unit_id" jdbcType="VARCHAR"/>
+	    <result property="operateTime" column="operate_time" jdbcType="TIMESTAMP"/> 
+	    <result property="result" column="result" jdbcType="VARCHAR"/> 
+	    <result property="upgradeState" column="UPGRADE_STATE" jdbcType="VARCHAR"/>
+	    <result property="pathFlag" column="PATH_FLAG" jdbcType="INTEGER"/>
+	   
+	    <result property="userName" column="USER_NAME" jdbcType="VARCHAR" />
+	    <result property="simNo" column="sim_no" jdbcType="VARCHAR"/>
+	    <result property="unitSn" column="unit_sn" jdbcType="VARCHAR"/>
+        <result property="vehicleDef" column="VEHICLE_DEF" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<insert id="add" parameterType="CommandPOJO">
+		<selectKey keyProperty="commandId" resultType="Long" order="BEFORE">  
+			select SEQ_SEND_COMMAND.nextval from dual
+		</selectKey> 
+		INSERT INTO T_SEND_COMMAND (COMMAND_ID,COMMAND_SN,UNIT_ID,USER_ID,COMMAND_TYPE_ID,PARAM,STAMP,GATEWAY_BACK,UNIT_BACK,PATH_FLAG)VALUES
+		(#{commandId},MOD(#{commandId},16000000),#{unitId,jdbcType=VARCHAR},#{userId,jdbcType=BIGINT},#{commandTypeId,jdbcType=INTEGER},#{param,jdbcType=VARCHAR},sysdate,9999,9999,#{pathFlag,jdbcType=INTEGER})
+ 	</insert>
+ 	
+ 	<insert id="addLockTime" parameterType="CommandSendPOJO">
+		<selectKey keyProperty="timinglockid" resultType="Long" order="BEFORE">  
+			select SEQ_TIMING_LOCK.nextval from dual
+		</selectKey> 
+		INSERT INTO T_TIMING_LOCK (timinglockid,unitids,commandtypeid,userid,pcanid,pheartbeatcontent,pHeartbeatInterval,plocktime,sendstatus)VALUES
+		(#{timinglockid},#{unitIds},#{commandTypeId},#{userId},#{pCanId},#{pHeartbeatContent},#{pHeartbeatInterval},#{plockTime},0)
+ 	</insert>
+ 	
+ 	<select id="getTiminglock" resultType="CommandSendPOJO">
+        <![CDATA[ select * from t_timing_lock  where sendstatus = 0 and plocktime<=sysdate]]>
+	</select> 
+	<update id="updateTiminglock" parameterType="Long">
+		UPDATE t_timing_lock SET sendstatus = 1
+ 		WHERE timinglockid = #{id}
+	</update>
+ 	<!-- add jcb -->
+ 	
+ 		<select id="getCommandSn" parameterType="Long" resultType="Integer">
+		select COMMAND_SN
+ 		 from T_SEND_COMMAND 
+ 		where COMMAND_ID = #{num}
+	</select> 
+	
+	<!-- add  jcb  指令下发结果：0 成功 1 失败，此标志从网关回应-->
+		<update id="updateTestCommand" parameterType="com.chinaGPS.gtmp.business.memcache.GatewayBack">
+		UPDATE T_TEST_COMMAND
+   			SET 
+	       		COMMAND_RESULT = 0
+ 			WHERE COMMAND_SN = #{commandSn}
+	</update>
+	
+	<!-- add jcb -->
+	
+ 	<insert id="addTestCommand" parameterType="CommandPOJO">
+		<selectKey keyProperty="commandId" resultType="Long" order="BEFORE">  
+			select SEQ_SEND_COMMAND.nextval from dual
+		</selectKey> 
+		INSERT INTO T_TEST_COMMAND
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+		 	
+       		COMMAND_ID,
+           
+       		COMMAND_SN,
+            <if test="@Ognl@isNotBlank(unitId)" >
+       		UNIT_ID,
+            </if>
+            <if test="@Ognl@isNotBlank(userId)" >
+       		USER_ID,
+            </if>
+             <if test="@Ognl@isNotBlank(commandTypeId)" >
+       		COMMAND_TYPE_ID,
+            </if>
+       		STAMP,
+            <if test="@Ognl@isNotBlank(pHeartbeatContent)" >
+       		PARAM,
+            </if>
+              <if test="@Ognl@isNotBlank(pathFlag)" >
+       		path_flag,
+            </if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," > 
+		 	
+       		#{commandId},
+            
+       		MOD(#{commandId},16000000),
+            
+            <if test="@Ognl@isNotBlank(unitId)" >
+       		#{unitId,jdbcType=VARCHAR},
+            </if>
+            <if test="@Ognl@isNotBlank(userId)" >
+       		#{userId,jdbcType=VARCHAR},
+            </if>
+             <if test="@Ognl@isNotBlank(commandTypeId)" >
+       		#{commandTypeId},
+            </if>
+            sysdate,
+            <if test="@Ognl@isNotBlank(pHeartbeatContent)" >
+       		#{pHeartbeatContent,jdbcType=VARCHAR},
+            </if>
+               <if test="@Ognl@isNotBlank(pathFlag)" >
+       		#{pathFlag},
+            </if>
+		 </trim>
+		
+ 	</insert>
+ 	
+ 	
+ 	<!-- add  jcb   -->
+ 	<update id="updateTab" parameterType="com.chinaGPS.gtmp.business.memcache.GatewayBack">
+		UPDATE T_SEND_COMMAND
+		<set>
+		<if test="pathFlag!=null and pathFlag!=''">
+		PATH_FLAG=#{pathFlag},
+		</if>
+		<if test="isSuccess == 00 ">
+		GATEWAY_BACK='00',
+		</if>
+		<if test="sucFlag == 1 ">
+		UNIT_BACK='00',
+		</if>
+		STAMP=sysdate
+		</set>
+ 			WHERE COMMAND_SN = #{commandSn}
+	</update>
+	
+	 	<!-- add  jcb  2013-07-02 -->
+ 	<update id="updateTab1" parameterType="com.chinaGPS.gtmp.business.memcache.GatewayBack">
+		UPDATE t_test_command
+		set
+		GPRS_RESULT= 0
+
+ 			WHERE COMMAND_SN = #{commandSn}
+	</update>
+	
+ 	
+ 	
+ 	
+ 	<insert id="addUpgrade" parameterType="com.chinaGPS.gtmp.entity.CommandUpgradePOJO">
+		<selectKey keyProperty="commandId" resultType="Long" order="BEFORE">  
+			select SEQ_SEND_COMMAND.nextval from dual
+		</selectKey> 
+		INSERT INTO T_REMOTE_UPGRADE (upgrade_id,SUPPERIER_SN,UPGRADE_TYPE,DEVICE_TYPE,
+		SOFTWARE_VERSION,UNIT_TYPE_SN,IP,APN,SERVER_PORT,
+		LOCAL_PORT,UNIT_ID,USER_ID,OPERATE_TIME,STAMP)
+		VALUES
+		(#{commandId},#{supperierSn,jdbcType=VARCHAR},#{updateType,jdbcType=VARCHAR},#{deviceType,jdbcType=VARCHAR},
+		#{softwareVersion,jdbcType=VARCHAR},#{unitTypeSn,jdbcType=VARCHAR},#{ip,jdbcType=VARCHAR},#{APN,jdbcType=VARCHAR},#{serverPort,jdbcType=INTEGER},
+		#{localPort,jdbcType=INTEGER},#{unitId,jdbcType=VARCHAR},#{userId,jdbcType=BIGINT},
+		sysdate,sysdate)
+ 	</insert>
+ 	
+ 	<select id="getCommandType" parameterType="DicCommandType" resultMap="commandTypeMap">
+	    select command_type_id,
+            command_type_name,
+            command_param,
+            is_valid,
+            stamp
+       from t_dic_command_type
+       <where>
+           <if test="@Ognl@isNotBlank(commandTypeName)">
+            and command_type_id=
+	(select sc.command_type_id from <![CDATA[${commandParam} ]]> sc where sc.command_sn=#{commandTypeName})
+          </if>
+       </where>
+	</select>
+	
+	<!-- ADD JCB 2013-06-29 -->
+	<select id="getCommandTypeTest" parameterType="DicCommandType" resultMap="commandTypeMap">
+	    select command_type_id,
+            command_type_name,
+            command_param,
+            is_valid,
+            stamp
+       from t_dic_command_type
+       <where>
+           <if test="@Ognl@isNotBlank(commandTypeName)">
+            and command_type_id=
+	(select sc.command_type_id from t_test_command sc where sc.command_sn=#{commandTypeName})
+          </if>
+       </where>
+	</select>
+	
+	<sql id="getByPageCondition">
+		<where>
+			<if test="@Ognl@isNotBlank(command)">
+    			 <if test="@Ognl@isNotBlank(command.commandTypeId)">
+                 and s.COMMAND_TYPE_ID=#{command.commandTypeId}
+        		  </if>
+				<if test="@Ognl@isNotBlank(command.userName)">
+				 AND pU.user_Name LIKE '%'||#{command.userName}||'%'
+				 </if>
+				 <if test="@Ognl@isNotBlank(command.vehicleDef)">
+				 AND lower(v.vehicle_def) LIKE '%'||lower(#{command.vehicleDef})||'%'
+				 </if>
+    			<if test="@Ognl@isNotBlank(command.stamp)">
+					AND s.stamp &gt;=#{command.stamp}
+				</if>
+				<if test="@Ognl@isNotBlank(command.stamp2)">
+					AND s.stamp &lt;=#{command.stamp2}
+				</if>
+				 <if test="@Ognl@isNotBlank(command.gatewayBack)">
+                 and s.GATEWAY_BACK=#{command.gatewayBack}
+        		  </if>
+        		   <if test="@Ognl@isNotBlank(command.unitBack)">
+                 and s.UNIT_BACK=#{command.unitBack}
+        		  </if>
+        		    <if test="@Ognl@isNotBlank(command.pathFlag)">
+                 and s.PATH_FLAG=#{command.pathFlag}
+        		  </if>
+                 <!-- <if test="@Ognl@isNotBlank(command.dealerIds)">
+                   and 
+						<foreach collection="command.dealerIds" item="item" open="(" separator=" or " close=")">
+			 			 dv.dealer_id=#{item} 
+					</foreach>
+        		  </if> -->
+        		  <if test="@Ognl@isNotBlank(command.dealerIds)">
+                         and dv.dealer_id in 
+                        <foreach collection="command.dealerIds" item="id" open="(" separator="," close=")">
+                              <if test="@Ognl@isNotBlank(id)">
+                               #{id} 
+                             </if>
+                        </foreach>
+                       </if>  
+        		  <if test="@Ognl@isNotBlank(command.vehicleModel)">
+        		  	AND v.vehicle_model = #{command.vehicleModel}
+        		  </if>
+        		  <if test="@Ognl@isNotBlank(command.vehicleCode)">
+        		  	AND v.vehicle_code = #{command.vehicleCode}
+        		  </if>
+        		  <if test="@Ognl@isNotBlank(command.vehicleArg)">
+        		  	AND v.vehicle_arg = #{command.vehicleArg}
+        		  </if>
+    		</if>
+		</where>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="getByPage" parameterType="map" resultMap="commandMap">
+		select s.*,u.unit_sn,u.sim_no,v.vehicle_def,v.vehicle_model,
+		v.vehicle_code,v.vehicle_arg,dvm.model_name,pu.user_name,pd.depart_name,
+		dct.command_type_name,da.name as dealer_name,daa.name as area_name,
+	    decode(v.vehicle_status,1,'测试组',2,'已测组',3,'销售组',8,'法务组',9,'停用组') as vehicle_status
+  from t_send_command s
+ left join t_vehicle_unit vu on s.unit_id=vu.unit_id
+ left join t_unit u on s.unit_id=u.unit_id
+ left join t_vehicle v on v.vehicle_id=vu.vehicle_id
+ left join t_p_user pu on pu.user_id=s.user_id
+ left join t_dic_command_type dct on dct.command_type_id=s.command_type_id
+ left join t_dealer_vehicle dv on  dv.vehicle_def = v.vehicle_def
+ left join t_dic_vehicle_model dvm ON v.vehicle_model = dvm.model_id
+ left join t_Dealer_Area da on da.id=dv.dealer_id
+ left join t_Dealer_Area daa on daa.id=da.pid
+ left join t_p_depart pd on pu.depart_id = pd.depart_id
+		<include refid="getByPageCondition"/>   
+		 order by s.stamp desc
+	</select>
+	<select id="countAll" parameterType="map" resultType="Integer">
+		select count(s.command_id)
+  from t_send_command s
+ left join t_vehicle_unit vu on s.unit_id=vu.unit_id
+ left join t_unit u on s.unit_id=u.unit_id
+ left join t_vehicle v on v.vehicle_id=vu.vehicle_id
+ left join t_p_user pu on pu.user_id=s.user_id
+ left join t_dic_command_type dct on dct.command_type_id=s.command_type_id
+ left join t_dealer_vehicle dv on  dv.vehicle_def = v.vehicle_def
+ LEFT JOIN t_dic_vehicle_model dvm ON v.vehicle_model = dvm.model_id
+	<include refid="getByPageCondition"/>   
+		 order by s.stamp desc
+	</select> 
+	
+	<select id="getList" parameterType="CommandPOJO" resultMap="commandMap">
+		<!-- select s.*,u.unit_sn,u.sim_no,v.vehicle_def,v.vehicle_model,v.vehicle_code,v.vehicle_arg,dvm.model_name,pu.user_name,dct.command_type_name
+  from t_send_command s
+ left join t_vehicle_unit vu on s.unit_id=vu.unit_id
+ left join t_unit u on s.unit_id=u.unit_id
+ left join t_vehicle v on v.vehicle_id=vu.vehicle_id
+ left join t_p_user pu on pu.user_id=s.user_id
+ left join t_dic_command_type dct on dct.command_type_id=s.command_type_id
+ left join t_dealer_vehicle dv on  dv.vehicle_def = v.vehicle_def
+ LEFT JOIN t_dic_vehicle_model dvm ON v.vehicle_model = dvm.model_id -->
+	 		select s.*,
+	       u.unit_sn,
+	       u.sim_no,
+	       v.vehicle_def,
+	       v.vehicle_model,
+	       v.vehicle_code,
+	       v.vehicle_arg,
+	       dvm.model_name,
+	       pu.user_name,
+	        pd.depart_name,
+	       dct.command_type_name,
+	       da.name as dealer_name,
+	        daa.name as area_name,
+	        decode(v.vehicle_status,
+	               1,
+	               '测试组',
+	               2,
+	               '已测组',
+	               3,
+	               '销售组',
+	               8,
+	               '法务组',
+	               9,
+	               '停用组') as vehicle_status
+			  from t_send_command s
+			  left join t_vehicle_unit vu
+			    on s.unit_id = vu.unit_id
+			  left join t_unit u
+			    on s.unit_id = u.unit_id
+			  left join t_vehicle v
+			    on v.vehicle_id = vu.vehicle_id
+			  left join t_p_user pu
+			    on pu.user_id = s.user_id
+			  left join t_dic_command_type dct
+			    on dct.command_type_id = s.command_type_id
+				  left join t_dealer_vehicle dv
+				    on dv.vehicle_def = v.vehicle_def
+				 left join t_Dealer_Area da
+				     on da.id = dv.dealer_id
+				   left join t_Dealer_Area daa
+				     on daa.id = da.pid
+				   left join t_p_depart pd
+				     on pu.depart_id = pd.depart_id
+				  LEFT JOIN t_dic_vehicle_model dvm
+				    ON v.vehicle_model = dvm.model_id
+ <where>
+    			 <if test="@Ognl@isNotBlank(commandTypeId)">
+                 and s.COMMAND_TYPE_ID=#{commandTypeId}
+        		  </if>
+				<if test="@Ognl@isNotBlank(userName)">
+				 AND pU.user_Name LIKE '%'||#{userName}||'%'</if>
+				  <if test="@Ognl@isNotBlank(vehicleDef)">
+				 AND lower(v.vehicle_def) LIKE '%'||lower(#{vehicleDef})||'%'
+				 </if>
+    			<if test="@Ognl@isNotBlank(stamp)">
+					AND s.stamp &gt;=#{stamp}
+				</if>
+				<if test="@Ognl@isNotBlank(stamp2)">
+					AND s.stamp &lt;=#{stamp2}
+				</if>
+				 <if test="@Ognl@isNotBlank(gatewayBack)">
+                 and s.GATEWAY_BACK=#{gatewayBack}
+        		  </if>
+        		   <if test="@Ognl@isNotBlank(unitBack)">
+                 and s.UNIT_BACK=#{unitBack}
+        		  </if>
+        		    <if test="@Ognl@isNotBlank(pathFlag)">
+                 and s.PATH_FLAG=#{pathFlag}
+        		  </if>
+                <!--  <if test="@Ognl@isNotBlank(dealerIds)">
+                   and 
+						<foreach collection="dealerIds" item="item" open="(" separator=" or " close=")">
+			 			 dv.dealer_id=#{item} 
+					</foreach>
+        		  </if> -->
+        		  <if test="@Ognl@isNotBlank(dealerIds)">
+                         and dv.dealer_id in 
+                        <foreach collection="dealerIds" item="id" open="(" separator="," close=")">
+                              <if test="@Ognl@isNotBlank(id)">
+                               #{id} 
+                             </if>
+                        </foreach>
+                       </if>  
+        		  <if test="@Ognl@isNotBlank(vehicleModel)">
+        		  	AND v.vehicle_model = #{vehicleModel}
+        		  </if>
+        		  <if test="@Ognl@isNotBlank(vehicleCode)">
+        		  	AND v.vehicle_code = #{vehicleCode}
+        		  </if>
+        		  <if test="@Ognl@isNotBlank(vehicleArg)">
+        		  	AND v.vehicle_arg = #{vehicleArg}
+        		  </if>
+				</where>
+				order by s.stamp desc
+	</select>
+	
+	
+	<sql id="getByPageUpgradeCondition">
+		<where>
+		    and v.vehicle_Def is not null
+			
+    			<if test="@Ognl@isNotBlank(command.vehicleDef)">
+				 AND lower(v.vehicle_Def) LIKE '%'||lower(#{command.vehicleDef})||'%'
+				 </if>
+				<if test="@Ognl@isNotBlank(command.userName)">
+				 AND pU.user_Name LIKE '%'||#{command.userName}||'%'
+				 </if>
+				 <if test="@Ognl@isNotBlank(command.softwareVersion)">
+				 AND ru.software_version LIKE '%'||#{command.softwareVersion}||'%'
+				 </if>
+    			<if test="@Ognl@isNotBlank(command.deviceType)">
+					AND ru.DEVICE_TYPE=#{command.deviceType}
+				</if>
+				<if test="@Ognl@isNotBlank(command.upgradeState)">
+				    <choose>
+				      <when test="command.upgradeState==02">
+				        AND ru.upgrade_State&lt;&gt;'00'
+				        AND ru.upgrade_State&lt;&gt;'01'
+				      </when>
+				      <otherwise>
+				      AND ru.upgrade_State=#{command.upgradeState}
+				      </otherwise>
+				    </choose>
+				</if>
+				<if test="@Ognl@isNotBlank(command.result)">
+					AND ru.result=#{command.result}
+				</if>
+				
+				<if test="@Ognl@isNotBlank(command.stamp)">
+					AND ru.stamp &gt;=#{command.stamp}
+				</if>
+				<if test="@Ognl@isNotBlank(command.stamp2)">
+					AND ru.stamp &lt;=#{command.stamp2}
+				</if>
+				   <if test="@Ognl@isNotBlank(command.pathFlag)">
+                 and ru.PATH_FLAG=#{command.pathFlag}
+        		  </if>
+                <!--  <if test="@Ognl@isNotBlank(command.dealerIds)">
+                   and 
+						<foreach collection="command.dealerIds" item="item" open="(" separator=" or " close=")">
+			 			 dv.dealer_id=#{item} 
+					</foreach>
+        		  </if> -->
+    				<if test="@Ognl@isNotBlank(alarm.dealerIds)">
+                         and dv.dealer_id in 
+                        <foreach collection="alarm.dealerIds" item="id" open="(" separator="," close=")">
+                              <if test="@Ognl@isNotBlank(id)">
+                               #{id} 
+                             </if>
+                        </foreach>
+                       </if>  
+		</where>
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="getByPageUpgrade" parameterType="map" resultMap="upgradeMap">
+		select ru.*,v.vehicle_def,u.unit_sn,u.sim_no,pu.user_name
+  from t_remote_upgrade ru
+ left join t_vehicle_unit vu on ru.unit_id=vu.unit_id
+ left join t_unit u on ru.unit_id=u.unit_id
+ left join t_vehicle v on v.vehicle_id=vu.vehicle_id
+ left join t_p_user pu on pu.user_id=ru.user_id
+  left join t_dealer_vehicle dv on  dv.vehicle_def = v.vehicle_def
+	<include refid="getByPageUpgradeCondition"/>   
+		 order by ru.stamp desc
+	</select>
+	<select id="countUpgrade" parameterType="map" resultType="Integer">
+		select count(ru.upgrade_id)
+  from t_remote_upgrade ru
+ left join t_vehicle_unit vu on ru.unit_id=vu.unit_id
+ left join t_unit u on ru.unit_id=u.unit_id
+ left join t_vehicle v on v.vehicle_id=vu.vehicle_id
+ left join t_p_user pu on pu.user_id=ru.user_id
+  left join t_dealer_vehicle dv on  dv.vehicle_def = v.vehicle_def
+	<include refid="getByPageUpgradeCondition"/>   
+		 order by ru.stamp desc
+	</select> 
+	
+	<select id="getById" parameterType="Long" resultMap="commandMap">
+		SELECT s.* FROM T_SEND_COMMAND s WHERE s.COMMAND_SN=#{commandSn} 
+	</select>
+	
+		<select id="getByIdUpgrade" parameterType="Long" resultMap="upgradeMap">
+		SELECT s.* FROM t_remote_upgrade s WHERE s.upgrade_id=#{commandSn} 
+	</select>
+	
+		
+	<select id="getById4Test" parameterType="Long" resultMap="com.chinaGPS.gtmp.mapper.VehicleMapper.vehicleTestMap">
+		SELECT s.* FROM T_TEST_COMMAND s WHERE s.COMMAND_SN=#{commandSn} 
+	</select>
+	
+</mapper>  

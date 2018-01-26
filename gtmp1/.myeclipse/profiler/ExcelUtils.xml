@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="profiler.settings.instrument.empty.methods">true</entry>
+<entry key="ProfilerCPUSettings_profile_runnables">true</entry>
+<entry key="ProfilerCPUSettings_filter_type">2</entry>
+<entry key="ProfilerMemorySettings_track_every">10</entry>
+<entry key="ProfilerMemorySettings_mode">4</entry>
+<entry key="ProfilerCPUSettings_root_classes">com.chinaGPS.gtmp.action.common.**
+com.chinaGPS.gtmp.action.filter.**
+com.chinaGPS.gtmp.action.interceptor.**
+com.chinaGPS.gtmp.action.permission.**
+com.chinaGPS.gtmp.action.report.**
+com.chinaGPS.gtmp.action.run.**
+com.chinaGPS.gtmp.action.servicemanage.**
+com.chinaGPS.gtmp.action.sim.**
+com.chinaGPS.gtmp.action.system.**
+com.chinaGPS.gtmp.action.unit.**
+com.chinaGPS.gtmp.action.vehicle.**
+com.chinaGPS.gtmp.business.command.**
+com.chinaGPS.gtmp.business.memcache.**
+com.chinaGPS.gtmp.entity.**
+com.chinaGPS.gtmp.mapper.**
+com.chinaGPS.gtmp.service.**
+com.chinaGPS.gtmp.servlet.**
+com.chinaGPS.gtmp.util.**
+test.**
+</entry>
+<entry key="ProfilerCPUSettings_filter_value">com.chinaGPS.gtmp.action.common.*,
+com.chinaGPS.gtmp.action.filter.*,
+com.chinaGPS.gtmp.action.interceptor.*,
+com.chinaGPS.gtmp.action.permission.*,
+com.chinaGPS.gtmp.action.report.*,
+com.chinaGPS.gtmp.action.run.*,
+com.chinaGPS.gtmp.action.servicemanage.*,
+com.chinaGPS.gtmp.action.sim.*,
+com.chinaGPS.gtmp.action.system.*,
+com.chinaGPS.gtmp.action.unit.*,
+com.chinaGPS.gtmp.action.vehicle.*,
+com.chinaGPS.gtmp.business.command.*,
+com.chinaGPS.gtmp.business.memcache.*,
+com.chinaGPS.gtmp.entity.*,
+com.chinaGPS.gtmp.mapper.*,
+com.chinaGPS.gtmp.service.*,
+com.chinaGPS.gtmp.servlet.*,
+com.chinaGPS.gtmp.util.*,
+test.*</entry>
+<entry key="profiler.settings.istrument.getter.setter.methods">true</entry>
+<entry key="myeclipse.profiling.mode">0</entry>
+<entry key="ProfilerMemorySettings_stacktraces">-1</entry>
+</properties>

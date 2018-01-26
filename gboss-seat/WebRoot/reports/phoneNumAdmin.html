@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="电话编组">
+<meta name="description" content="电话编组">
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../assets/bootstrap-tree/css/bootstrap-tree.css" rel="stylesheet" />
+<link href="../css/base.css" rel="stylesheet" />
+<title>电话编组</title>
+</head>
+<body style="background-color:white;">
+	<div class="container-fluid Reports_page phoneCallNum_page">
+		<h1>电话编组</h1>
+        <div class="row r_scroll">
+            <div class="Reports_box sub_page sub_page1">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <p class="title">群组列表</p>
+                        <div class="retrieve" style="max-height:800px;overflow-y: auto;">
+                            <ul class="tree" id="numGroupList"></ul>
+                        </div>
+                    </div>
+                    <div class="col-xs-9">
+                        <div class="callIn_list_block">
+                            <p class="title">赛格导航</p>
+                            <input type="hidden" id="groupId">
+                            <span class="handle_btn">
+                                <button class="btn btn-xs btn-primary" id="addNum_btn">增加电话</button>
+                                <button class="btn btn-xs btn-default" id="delete_btn">删除</button>
+                                <button class="btn btn-xs btn-default" id="alter_btn">修改</button>
+                            </span>
+                        </div>
+                        <div style="max-height:800px;overflow: auto;">
+                            <div style="width:1200px;">
+                                <table id="detailInf-tab" class="display compact" cellspacing="0" width="100%" border="1">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:10px;"></th>
+                                            <th style="min-width:60px;">姓名</th>
+                                            <th style="min-width:30px;">拼音</th>
+                                            <th style="min-width:25px;">性别</th>
+                                            <th style="min-width:70px;">职务</th>
+                                            <th style="min-width:70px;">部门</th>
+                                            <th style="min-width:120px;">办公电话</th>
+                                            <th style="min-width:60px;">移动电话</th>
+                                            <th style="min-width:100px;">传真</th>
+                                            <th style="min-width:150px;">地址</th>
+                                            <th style="min-width:80px;">E-mail</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</div>
+<!-- 弹窗 电话修改 START -->
+<div class="modal fade Casereg" id="p_edit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">编辑资料</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="p_edit_phonebookId" >
+                <div class="row">
+                    <p class="col-xs-6">姓名：<input type="text" id="p_edit_xm" class="form-control" ></p>
+                    <p class="col-xs-6">拼音：<input type="text" id="p_edit_py" class="form-control" ></p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-6">职务：<input type="text" id="p_edit_zw" class="form-control"></p>
+                    <p class="col-xs-6">部门：<input type="text" id="p_edit_bm" class="form-control"></p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-6">办公电话：<input type="text" id="p_edit_bgdh" class="form-control"></p>
+                    <p class="col-xs-6">传真：<input type="text" id="p_edit_cz" class="form-control"></p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-6">性别：<input type="text" id="p_edit_xb" class="form-control"></p>
+                    <p class="col-xs-6">移动电话：<input type="text" id="p_edit_yddh" class="form-control"></p>
+                </div>
+                <div class="row">
+                    <p class="col-xs-6">E-mail：<input type="text" id="p_edit_dzyj" class="form-control"></p>
+                    <p class="col-xs-6">地址：<input type="text" id="p_edit_dz" class="form-control"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" id="p_edit_submit">修改提交</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 修改记录 END -->
+<!-- 弹窗 电话新增 START -->
+<div class="modal fade Casereg" id="p_add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">新增资料</h4>
+            </div>
+            <div class="modal-body">
+                <form id="add_area">
+                    <div class="row">
+                        <p class="col-xs-6">姓名：<input type="text" id="p_add_xm" class="form-control" ></p>
+                        <p class="col-xs-6">拼音：<input type="text" id="p_add_py" class="form-control" ></p>
+                    </div>
+                    <div class="row">
+                        <p class="col-xs-6">职务：<input type="text" id="p_add_zw" class="form-control"></p>
+                        <p class="col-xs-6">部门：<input type="text" id="p_add_bm" class="form-control"></p>
+                    </div>
+                    <div class="row">
+                        <p class="col-xs-6">办公电话：<input type="text" id="p_add_bgdh" class="form-control"></p>
+                        <p class="col-xs-6">传真：<input type="text" id="p_add_cz" class="form-control"></p>
+                    </div>
+                    <div class="row">
+                        <p class="col-xs-6">性别：<input type="text" id="p_add_xb" class="form-control"></p>
+                        <p class="col-xs-6">移动电话：<input type="text" id="p_add_yddh" class="form-control"></p>
+                    </div>
+                    <div class="row">
+                        <p class="col-xs-6">E-mail：<input type="text" id="p_add_dzyj" class="form-control"></p>
+                        <p class="col-xs-6">地址：<input type="text" id="p_add_dz" class="form-control"></p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="p_add_submit">确定</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 新增记录 END -->
+<!-- 弹窗 电话删除 START -->
+<div class="modal fade Casereg" id="p_delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">删除号码</h4>
+            </div>
+            <div class="modal-body">
+                <p>是否删除勾选的全部号码？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="p_delete_submit">确定</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 电话删除 END -->
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../assets/bootstrap-tree/js/bootstrap-tree.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        initNumList();
+        $("#numGroupList a").live('click', function(){
+            var a = $(this);
+            var name = $(this).find("b").html();
+            var id = $(this).find("span").html();
+            $(".title").html(name);
+            $("#groupId").val(id);
+            if(a.siblings("ul").length>0){//为标题
+                // alert("为标题");
+                $("#detailInf-tab tbody").empty();//写入表格
+            } else{//为最末枝
+                // alert("为最末枝");
+                phoneNumSearchByID(id);//点击列表查询
+            }
+            
+        });
+
+    });
+
+function initNumList(){
+    var api_url = '../app/nl/telsearch/group';//url
+    var params = {};//参数无
+    $.getJSON(api_url, params, function(result){
+        if(result && result.success==true){
+            $("#numGroupList").empty();//清空
+            $.each(result.data, function(i,item){
+                var row = '';
+                var group1 = item.children;//数组
+                if(group1.length==0){
+                    row = returnleaf(item.name,item.groupId);
+                } else{
+                    row = returnbranch(item.name,item.groupId);
+                    //var a=0;
+                    $.each(group1, function(i,item){
+                        var group2 = item.children;//数组
+                        if(group2.length==0){
+                            row += returnleaf(item.name,item.groupId);
+                        } else{
+                            row += returnbranch(item.name,item.groupId);
+                            $.each(group2, function(i,item){
+                                var group3 = item.children;//数组
+                                if(group3.length==0){
+                                    row += returnleaf(item.name,item.groupId);
+                                } else{
+                                    row += returnbranch(item.name,item.groupId);
+                                    $.each(group3, function(i,item){
+                                        row += returnleaf(item.name,item.groupId);
+                                    });
+                                    row +='</ul></li>';
+                                }
+                            });
+                            row +='</ul></li>';
+                        }
+                    });
+                    row +='</ul></li>';
+                }
+                $("#numGroupList").append(row);//写入表格
+            });
+        }
+    });
+    function returnleaf(name,groupid){
+        var str = '<li><a href="javascript:void(0)" role="leaf" class="detail"><b>'+name+'</b><span class="hide">'+groupid+'</span></a><li>';
+        return str;
+    }
+    function returnbranch(name,groupid){
+        var str = '<li><a href="javascript:void(0)" role="branch" class="tree-toggle closed" data-toggle="branch" data-value="Bootstrap_Tree"><b>'+name+'</b><span class="hide">'+groupid+'</span></a><ul class="branch">';
+        return str;
+    }
+}
+
+function phoneNumSearchByID(id){//通过群组id搜索
+    $("#detailInf-tab tbody").empty();//写入表格
+    var api_url = '../app/nl/telsearch/phonebook';//url
+    var params = {groupId:id};//参数
+    $.getJSON(api_url, params, function(result){
+        if(result && result.success==true){
+            if(result.data!==[null]){
+                var row = '';
+                $.each(result.data, function(i,item){
+                    row = '<tr><td><input type="checkbox" phonebookId="'+item.phonebookId+'"></td><td>'+item.name+'</td><td>'+item.pyname+'</td><td>'+item.sex+'</td><td>'+item.headship+'</td><td>'+item.department+'</td><td>'+item.ophone+'</td><td>'+item.mobile+'</td><td>'+item.fax+'</td><td>'+item.address+'</td><td>'+item.email+'</td></tr>';
+                    $("#detailInf-tab tbody").prepend(row);//写入表格
+                });
+            }
+                
+        }
+    });
+}
+
+$("#alter_btn").click(function(){//修改资料弹窗
+    var tr_input = $("#detailInf-tab input:checked");
+    if(tr_input.length==0){
+        alert("请选择一条记录");
+    } else if(tr_input.length>1){
+        alert("只能选择一条记录");
+    } else{
+        var tr = tr_input.parent().parent();
+        $("#p_edit_phonebookId").val(tr_input.attr("phonebookId"));//phonebookId
+        $("#p_edit_xm").val(tr.children("td").eq(1).html());//姓名
+        $("#p_edit_py").val(tr.children("td").eq(2).html());//拼音
+        $("#p_edit_xb").val(tr.children("td").eq(3).html());//性别
+        $("#p_edit_zw").val(tr.children("td").eq(4).html());//职务
+        $("#p_edit_bm").val(tr.children("td").eq(5).html());//部门
+        $("#p_edit_bgdh").val(tr.children("td").eq(6).html());//办公电话
+        $("#p_edit_yddh").val(tr.children("td").eq(7).html());//移动电话
+        $("#p_edit_cz").val(tr.children("td").eq(8).html());//传真
+        $("#p_edit_dz").val(tr.children("td").eq(9).html());//地址
+        $("#p_edit_dzyj").val(tr.children("td").eq(10).html());//e-mail
+
+        $("#p_edit").modal("show");
+    }
+});
+
+$("#p_edit_submit").click(function(){//提交修改
+    var renew_groupId = $("#groupId").val();//组id(成功返回调用)
+
+    var p_id = $("#p_edit_phonebookId").val();//phonebookId
+    var p_xm = $("#p_edit_xm").val();//姓名
+    var p_py = $("#p_edit_py").val();//拼音
+    var p_xb = $("#p_edit_xb").val();//性别
+    var p_zw = $("#p_edit_zw").val();//职务
+    var p_bm = $("#p_edit_bm").val();//部门
+    var p_bgdh = $("#p_edit_bgdh").val();//办公电话
+    var p_yddh = $("#p_edit_yddh").val();//移动电话
+    var p_cz = $("#p_edit_cz").val();//传真
+    var p_dz = $("#p_edit_dz").val();//地址
+    var p_dzyj = $("#p_edit_dzyj").val();//e-mail
+
+    var api_url = '../app/nl/telsearch/add';//url
+    var params = {groupId:renew_groupId,phonebookId:p_id,address:p_dz,name:p_xm,department:p_bm,email:p_dzyj,fax:p_cz,headship:p_zw,mobile:p_yddh,ophone:p_bgdh,pyname:p_py,sex:p_xb};//参数（主键、地址、姓名、部门、邮件、传真、职务、移动电话、办公电话、拼音、性别）
+    $.getJSON(api_url, params, function(result){
+        if(result && result.success==true){
+            phoneNumSearchByID(renew_groupId);//通过群组id搜索
+        } else{
+            alert("电话号码保存失败");
+        }
+    });
+});
+
+$("#addNum_btn").click(function(){//新增资料弹窗
+    $("#p_add").modal("show");
+    document.getElementById("add_area").reset();//表单重置
+});
+
+$("#p_add_submit").click(function(){//提交新增
+    var renew_groupId = $("#groupId").val();//组id(成功返回调用)
+
+    var p_id = "";//phonebookId新增为无
+    var p_xm = $("#p_add_xm").val();//姓名
+    var p_py = $("#p_add_py").val();//拼音
+    var p_xb = $("#p_add_xb").val();//性别
+    var p_zw = $("#p_add_zw").val();//职务
+    var p_bm = $("#p_add_bm").val();//部门
+    var p_bgdh = $("#p_add_bgdh").val();//办公电话
+    var p_yddh = $("#p_add_yddh").val();//移动电话
+    var p_cz = $("#p_add_cz").val();//传真
+    var p_dz = $("#p_add_dz").val();//地址
+    var p_dzyj = $("#p_add_dzyj").val();//e-mail
+
+    var api_url = '../app/nl/telsearch/add';//url
+    var params = {groupId:renew_groupId,phonebookId:p_id,address:p_dz,name:p_xm,department:p_bm,email:p_dzyj,fax:p_cz,headship:p_zw,mobile:p_yddh,ophone:p_bgdh,pyname:p_py,sex:p_xb};//参数（主键、地址、姓名、部门、邮件、传真、职务、移动电话、办公电话、拼音、性别）
+    $.getJSON(api_url, params, function(result){
+        if(result && result.success==true){
+            phoneNumSearchByID(renew_groupId);//通过群组id搜索
+        } else{
+            alert("电话号码保存失败");
+        }
+    });
+
+});
+
+//p_delete_submit
+$("#delete_btn").click(function(){//删除弹窗
+    var tr_input = $("#detailInf-tab input:checked");
+    if(tr_input.length==0){
+        alert("请选择要修改的记录");
+    } else{
+        $("#p_delete").modal("show");
+    }
+});
+
+$("#p_delete_submit").click(function(){//提交删除
+    var renew_groupId = $("#groupId").val();//组id(成功返回调用)
+    var phonebook_id = [];//phonebookId参数
+    var tr_input = $("#detailInf-tab input:checked");//选中的条目
+    $.each(tr_input,function(i,item){
+        phonebook_id.push($(item).attr("phonebookid"));
+    });
+    // console.log(phonebook_id);
+    var api_url = '../app/nl/telsearch/del';//url
+    var params = {phonebook_ids:phonebook_id};//参数
+    var params_t = decodeURIComponent($.param(params,true));
+    $.getJSON(api_url+"?"+params_t,function(result){
+    // $.getJSON(api_url, params, function(result){
+        if(result && result.success==true){
+            phoneNumSearchByID(renew_groupId);//通过群组id搜索
+        } else{
+            alert("电话号码删除失败");
+        }
+    });
+});
+</script>
+</body>
+</html>

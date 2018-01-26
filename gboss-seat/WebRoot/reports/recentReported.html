@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="座席">
+<meta name="description" content="座席">
+
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/jquery.dataTables.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/data_style.css" rel="stylesheet" />
+<link href="../dist/plugins/css/datepicker.css" rel="stylesheet">
+<link href="../css/base.css" rel="stylesheet" />
+<title>未上报统计</title>
+</head>
+<body style="background-color:white;">
+	<div class="container-fluid Reports_page">
+		<h1>未上报统计</h1>
+		<div class="row c_area">
+            <div class="filter_box">
+                <!--<span class="control-label filter_term">查询条件：</span>-->
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">分公司：</h6>
+                    <div class="filter_content">
+                        <span class="filiale">
+                            <input type="text" class="form-control reports_search_4_engine" id="stolenR_Com_search" />
+                            <i class="glyphicon glyphicon-chevron-down filialeDown"></i>
+                            <input type="hidden" class="search_filiale_id" id="recR_ID_search">
+                            <ul class="reports_search_4_list" style="display:none;"></ul>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">客户名称：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control" id="recRName">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">卡类型：</h6>
+                    <div class="filter_content">
+                        <select id="recRCardType">
+                            <option value="0">全部</option>
+                            <option value="1">自带卡</option>
+                            <option value="2">公司卡</option>
+                            <option value="3">总部卡</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">通信模式：</h6>
+                    <div class="filter_content">
+                        <span id="recRCommType">
+                            <label><input type="radio" name="recentRep_option2" value="1" />显示GSM</label>
+                            <label><input type="radio" name="recentRep_option2" value="0" checked="checked"/>全部</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix" style="width:100%;">
+                    <h6 class="control-label control_title">大类：</h6>
+                    <div class="filter_content">
+                        <span id="RepType">
+                            <label id="underreport_btn"><input type="radio" name="recentRep_option1" checked="checked" value="0"/>未上报</label>
+                            <label id="beenreported_btn"><input type="radio" name="recentRep_option1" value="1" />已上报</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">时间条件：</h6>
+                    <div class="filter_content" id="underreport">
+                        <span>
+                            <label><input type="radio" name="recentRep_option3" value="1" checked="checked" id="UnRdaysnow" />当天未上报</label>
+                            <label><input type="radio" name="recentRep_option3" value="3" id="UnRdays3" />3天未上报</label>
+                            <label><input type="radio" name="recentRep_option3" value="5" id="UnRdays5" />5天未上报</label>
+                        </span>
+                        <span>
+                            <label><input type="radio" name="recentRep_option3" value="0"/>选择时间段</label>
+                            <input type="text" class="form-control form_datetime" id="unRStartTime">
+                            <span class="input-group-addon">至</span>
+                            <input type="text" class="form-control form_datetime" id="unREndTime">
+                        </span>
+                    </div>
+                    <div class="filter_content" id="beenreported" style="display:none">
+                        <span>
+                            <!--<label><input type="radio" name="recentRep_option4" checked="checked"/>选择时间段</label>-->
+                            <input type="text" class="form-control form_datetime" id="beenRStartTime">
+                            <span class="input-group-addon">至</span>
+                            <input type="text" class="form-control form_datetime" id="beenREndTime">
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix btns">
+                    <a href="#" class="exportExcel" id="recRSearch"><i class="glyphicon glyphicon-search"></i>查询</a>
+                    <a href="#" class="exportExcel" id="recRExport"><i class="glyphicon glyphicon-export"></i>导出Excel</a>
+                </div>
+            </div>            
+        </div>
+        <div class="row r_scroll">
+            <div class="Reports_box recentReported">
+                <table id="recentReported-example" class="display compact table_borders dataTable" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+	                        <th style="min-width:30px;"></th>
+	                        <th style="min-width:100px;">客户名称</th>
+	                        <th style="min-width:100px;">客户电话</th>
+	                        <th style="min-width:100px;">车牌号</th>
+	                        <th style="min-width:100px;">车载电话</th>
+	                        <th style="min-width:100px;">车型</th>
+	                        <th style="min-width:200px;">车辆状态</th>
+	                        <th style="min-width:150px;">最后上报时间</th>
+	                        <th style="min-width:150px;">安装时间</th>
+	                        <th style="min-width:60px;">通信模式</th>
+	                        <th style="min-width:100px;">营销经理</th>
+	                    </tr>
+                    </thead>
+                    <tbody>
+                        <!--
+                        <tr>
+	                        <td>10004</td>
+	                        <td>金海斌</td>
+	                        <td>13567412569</td>
+	                        <td>粤B.326Y2</td>
+	                        <td>13521023654</td>
+	                        <td>汉兰达</td>
+	                        <td>2014-11-16 23:25:15</td>
+	                        <td>2012-11-16 10:30:19</td>
+	                        <td>GSM</td>
+	                        <td>陈月琳</td>
+	                    </tr>
+                        -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+	</div>
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/fnReloadAjax.js"></script>
+<script type="text/javascript" src="../dist/plugins/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/reports.js"></script>
+
+<script type="text/javascript">
+$("#beenreported_btn").click(function(){
+    $("#beenreported").show();
+    $("#underreport").hide();
+});
+$("#underreport_btn").click(function(){
+    $("#underreport").show();
+    $("#beenreported").hide();
+});
+</script>
+</body>
+</html>

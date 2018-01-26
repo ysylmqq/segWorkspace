@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="呼入业务统计">
+<meta name="description" content="呼入业务统计">
+
+<link href="../css/bootstrap.min.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/jquery.dataTables.css" rel="stylesheet" />
+<link href="../assets/data-tables/css/data_style.css" rel="stylesheet" />
+<link href="../dist/plugins/css/datepicker.css" rel="stylesheet">
+<link href="../css/base.css" rel="stylesheet" />
+<title>呼入业务统计</title>
+
+</head>
+<body style="background-color:white;">
+	<div class="container-fluid Reports_page">
+		<h1>呼入业务统计</h1>
+		<div class="row c_area">
+            <div class="filter_box">
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">归属公司：</h6>
+                    <div class="filter_content">
+                        <span class="filiale">
+                            <input type="text" class="form-control reports_search_4_engine" id="callinStatistics_Com_search" value="全部" />
+                            <i class="glyphicon glyphicon-chevron-down filialeDown"></i>
+                            <input type="hidden" class="search_filiale_id" id="callinStatistics_ID_search" value="0">
+                            <ul class="reports_search_4_list" style="display:none;"></ul>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">搜索：</h6>
+                    <div class="filter_content">
+                        <span class="reports_search_1">
+                            <input type="text" id="callinStatisticsCar_partNo" class="form-control reports_search_1_engine" placeholder="车牌号码或车载电话" style="width:250px;">
+                            <input type="hidden" class="search_plate_no">
+                            <input type="hidden" class="search_call_letter">
+                            <input type="hidden" class="search_vehicle_id" id="callinStatisticsCarID">
+                            <ul class="reports_search_1_list" style="display:none;">
+                                <!--
+                            	<li><span class="p_plate_no">粤B.123456</span> <span class="p_call_letter">13698521459</span></li>
+                            	-->
+                            </ul>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="form-group clearfix">
+                    <h6 class="control-label control_title">呼入时间：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <input type="text" class="form-control form_datetime starTime">
+                            <span class="input-group-addon">至</span>
+                            <input type="text" class="form-control form_datetime endTime" >
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix" style="width:100%;">
+                    <h6 class="control-label control_title">服务大类：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <label class="TOS_checkall"><input type="checkbox" id="TOS_opt_in_checkall"/>全选</label>
+                        </span>
+                        <span class="TOS_opt" id="TOS_opt_in1"></span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix" style="width:100%;height:auto;">
+                    <h6 class="control-label control_title">业务类型：</h6>
+                    <div class="filter_content">
+                        <span>
+                            <label class="TOS_checkall"><input type="checkbox" id="TOS_opt_in2_checkall"/>全选</label>
+                        </span>
+                        <span class="TOS_opt" id="TOS_opt_in2"></span>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <h6 class="control-label  control_title">颗粒度：</h6>
+                    <div class="filter_content">
+                        <select id="kld">
+                            <option value="1">小时</option>
+                            <option value="2">天</option>
+                            <option value="3">月</option>
+                            <option value="4">年</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group clearfix btns">
+                    <a href="#" class="exportExcel" id="callinStatisticsSearch"><i class="glyphicon glyphicon-search"></i>查询</a>
+                    <a href="#" class="exportExcel" id="callinStatisticsExport"><i class="glyphicon glyphicon-export"></i>导出Excel</a>
+                </div>
+            </div>            
+        </div>
+        <div class="row r_scroll">
+            <div class="Reports_box" style="width:800px;">
+                <table id="callinStatistics-tab" cellspacing="0" width="100%" border="1"><!-- class="display compact table_borders dataTable" -->
+                    <thead>
+                        <tr>
+                            <th style="width:30px;"></th>
+                            <th style="width:50px;">所属公司</th>
+                            <th style="width:90px;">时间</th>
+                            <th style="width:80px;">服务类型</th>
+                            <th style="width:50px;">数量</th>
+                            <th style="width:80px;">业务类型</th>
+                            <th style="width:50px;">数量</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- <tr>
+                            <td rowspan="3">1</td>
+                            <td rowspan="3">2015-02-25 12:13:07</td>
+                            <td rowspan="3">咨询</td>
+                            <td rowspan="3">10</td>
+                            <td>服务费</td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>发票</td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>违章</td>
+                            <td>6</td>
+                        </tr>
+
+                        <tr>
+                            <td rowspan="3">2</td>
+                            <td rowspan="3">2015-08-25 12:13:07</td>
+                            <td rowspan="3">受理</td>
+                            <td rowspan="3">10</td>
+                            <td>来电解除警情</td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>定位</td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>开门/锁门</td>
+                            <td>6</td>
+                        </tr> -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+	</div>
+<script src="../js/jquery-1.8.3.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="../assets/data-tables/js/fnReloadAjax.js"></script>
+<script type="text/javascript" src="../dist/plugins/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="../js/util.js"></script>
+<script type="text/javascript" src="../js/reports.js"></script>
+<script type="text/javascript">
+    var params_t = "";//参数
+    $("#callinStatisticsSearch").click(function(){//查询
+        $("#callinStatistics-tab tbody").empty();//清空
+        var ValcompanyNo = [];//所属公司id
+        ValcompanyNo[0] = $("#callinStatistics_ID_search").val();
+        var ValvehicleId = $("#callinStatisticsCarID").val();//车辆id（隐藏）
+        var ValpartNo =  $("#callinStatisticsCar_partNo").val();//部分车牌或车载
+        var ValbeginTime = $(".starTime").val();//开始时间
+        var ValendTime = $(".endTime").val();//结束时间
+        var ValserverType = [];//服务大类
+        if ($("#TOS_opt_in_checkall").is(":checked")){//（是否全选）服务大类
+            ValserverType = [];
+        }else{
+            if($("#TOS_opt_in1 label input:checked").length>0){
+                $.each($("#TOS_opt_in1 label input:checked"),function(i,item){
+                    ValserverType.push(parseInt($(item).val()));
+                });
+            }
+        };
+        var ValbusinessType = [];//业务类型
+        if ($("#TOS_opt_in2_checkall").is(":checked")){//（是否全选）业务类型拼接
+            ValbusinessType = [];
+        }else{
+            if($("#TOS_opt_in2 label input:checked").length>0){
+                $.each($("#TOS_opt_in2 label input:checked"),function(i,item){
+                    ValbusinessType.push(parseInt($(item).val()));
+                });
+            }
+        };
+        var ValKLD = $("#kld").val();//颗粒度
+
+        var api_url = '../app/callbrief/call_in_statistics';
+        var params = {companyNo:ValcompanyNo,vehicleId:ValvehicleId,beginTime:ValbeginTime,endTime:ValendTime,serverType:ValserverType,businessType:ValbusinessType,kld:ValKLD};
+        params_t = decodeURIComponent($.param(params,true));
+        $.getJSON(api_url+"?"+params_t, function(result){
+            if(result && result.success==true){
+                if(result.data.length>0){
+                    var html1 = "";
+                    var d_length = "";
+
+                    var mTr = "";
+                    var mTd1 = "";
+                    var mTd2 = "";
+                    $.each(result.data,function(i,item){
+                        d_length = item.sub_data.length;//明细长度
+                        html1 = "<td rowspan='"+d_length+"'>"+ item.sn +"</td><td rowspan='"+d_length+"'>"+ item.company_name +"</td><td rowspan='"+d_length+"'>"+ item.super_time +"</td><td rowspan='"+d_length+"'>"+ item.super_st_name +"</td><td rowspan='"+d_length+"'>"+ item.super_num+"</td>";
+                        //alert(html1);
+                        if(item.sub_data.length>0){
+                            $.each(item.sub_data,function(v,k){
+                                mTr = $('<tr></tr>');
+                                mTd1 = $('<td></td>').html(k.sub_st_name);
+                                mTd2 = $('<td></td>').html(k.sub_num);
+                                mTr.append(mTd1).append(mTd2);
+                                if(v==0){//第一条数据
+                                    mTr.prepend(html1);
+                                }
+                                $("#callinStatistics-tab tbody").append(mTr);
+                            });
+                        } else{
+                            mTr = $('<tr></tr>');
+                            mTd1 = $('<td></td>');
+                            mTd2 = $('<td></td>');
+                            mTr.append(mTd1).append(mTd2).prepend(html1);
+                            $("#callinStatistics-tab tbody").append(mTr);
+                        }
+                    });
+                } else{//查询成功无数据
+                    $("#callinStatistics-tab tbody").html("<tr><td colspan='7'>没有数据</td></tr>");
+                }
+            } else{//success==false
+                $("#callinStatistics-tab tbody").html("<tr><td colspan='7'>查询失败</td></tr>");
+            }
+        });
+    });
+
+    //导出
+
+    $("#callinStatisticsExport").click(function(){
+        $(this).attr("href","../app/callbrief/call_in_statistics/export?"+params_t);
+    });
+
+</script>
+</body>
+</html>

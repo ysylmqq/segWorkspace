@@ -1,0 +1,6 @@
+zookeeperhost=90.0.13.114\:2181,90.0.13.115\:2181,90.0.13.116\:2181
+zksessiontimeout=5000
+udpport=23456
+multicastip=90.0.255.255
+callerhandleseattimeout=30
+alarmrootdir=/chinagps-alarm-zxz

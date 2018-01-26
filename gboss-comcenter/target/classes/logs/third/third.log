@@ -1,0 +1,647 @@
+2016-10-31 14:39:15 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-10-31 14:39:15 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:278)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:300)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:293)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:76)
+	at org.apache.hadoop.conf.Configuration.getStrings(Configuration.java:1514)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.makeZKProps(ZKConfig.java:113)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.getZKQuorumServersString(ZKConfig.java:265)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:159)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:134)
+	at org.apache.hadoop.hbase.client.ZooKeeperKeepAliveConnection.<init>(ZooKeeperKeepAliveConnection.java:43)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.getKeepAliveZooKeeperWatcher(HConnectionManager.java:1768)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:82)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-10-31 14:39:15 - Process identifier=hconnection-0x4201c465 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-10-31 14:39:16 - Failed to identify the fs of dir hdfs://HBASEDB/hbase/lib, ignored
+java.io.IOException: No FileSystem for scheme: hdfs
+	at org.apache.hadoop.fs.FileSystem.getFileSystemClass(FileSystem.java:2421)
+	at org.apache.hadoop.fs.FileSystem.createFileSystem(FileSystem.java:2428)
+	at org.apache.hadoop.fs.FileSystem.access$200(FileSystem.java:88)
+	at org.apache.hadoop.fs.FileSystem$Cache.getInternal(FileSystem.java:2467)
+	at org.apache.hadoop.fs.FileSystem$Cache.get(FileSystem.java:2449)
+	at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:367)
+	at org.apache.hadoop.fs.Path.getFileSystem(Path.java:287)
+	at org.apache.hadoop.hbase.util.DynamicClassLoader.<init>(DynamicClassLoader.java:104)
+	at org.apache.hadoop.hbase.protobuf.ProtobufUtil.<clinit>(ProtobufUtil.java:201)
+	at org.apache.hadoop.hbase.ClusterId.parseFrom(ClusterId.java:64)
+	at org.apache.hadoop.hbase.zookeeper.ZKClusterId.readClusterIdZNode(ZKClusterId.java:69)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:83)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-10-31 14:39:16 - Process identifier=hconnection-0x3e7dd664 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-10-31 14:39:16 - Process identifier=hconnection-0x294a6b8e connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-10-31 14:39:16 - Process identifier=hconnection-0x1b835480 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-10-31 14:39:16 - Process identifier=hconnection-0x4f25b795 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-10-31 14:39:16 - Process identifier=hconnection-0x736caf7a connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-10-31 14:39:16 - Process identifier=hconnection-0x497486b3 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-10-31 14:39:16 - Process identifier=hconnection-0x75f95314 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-10-31 14:39:16 - Process identifier=hconnection-0x76012793 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-10-31 14:39:16 - Process identifier=hconnection-0x3212a8d7 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-10-31 14:39:16 - Process identifier=hconnection-0x495b0487 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-10-31 14:39:16 - Process identifier=hconnection-0x222eb8aa connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-10-31 14:39:16 - Process identifier=hconnection-0x25bfcafd connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-10-31 14:39:16 - Process identifier=hconnection-0x46268f08 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 15:28:14 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-01 15:28:15 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:278)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:300)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:293)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:76)
+	at org.apache.hadoop.conf.Configuration.getStrings(Configuration.java:1514)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.makeZKProps(ZKConfig.java:113)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.getZKQuorumServersString(ZKConfig.java:265)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:159)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:134)
+	at org.apache.hadoop.hbase.client.ZooKeeperKeepAliveConnection.<init>(ZooKeeperKeepAliveConnection.java:43)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.getKeepAliveZooKeeperWatcher(HConnectionManager.java:1768)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:82)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-01 15:28:15 - Process identifier=hconnection-0x7e057f43 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 15:28:15 - Failed to identify the fs of dir hdfs://HBASEDB/hbase/lib, ignored
+java.io.IOException: No FileSystem for scheme: hdfs
+	at org.apache.hadoop.fs.FileSystem.getFileSystemClass(FileSystem.java:2421)
+	at org.apache.hadoop.fs.FileSystem.createFileSystem(FileSystem.java:2428)
+	at org.apache.hadoop.fs.FileSystem.access$200(FileSystem.java:88)
+	at org.apache.hadoop.fs.FileSystem$Cache.getInternal(FileSystem.java:2467)
+	at org.apache.hadoop.fs.FileSystem$Cache.get(FileSystem.java:2449)
+	at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:367)
+	at org.apache.hadoop.fs.Path.getFileSystem(Path.java:287)
+	at org.apache.hadoop.hbase.util.DynamicClassLoader.<init>(DynamicClassLoader.java:104)
+	at org.apache.hadoop.hbase.protobuf.ProtobufUtil.<clinit>(ProtobufUtil.java:201)
+	at org.apache.hadoop.hbase.ClusterId.parseFrom(ClusterId.java:64)
+	at org.apache.hadoop.hbase.zookeeper.ZKClusterId.readClusterIdZNode(ZKClusterId.java:69)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:83)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-01 15:28:15 - Process identifier=hconnection-0x65a15628 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 15:28:15 - Process identifier=hconnection-0x3fc9504b connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 15:28:15 - Process identifier=hconnection-0x149dd36b connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 15:28:15 - Process identifier=hconnection-0x2c1156a7 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 15:28:15 - Process identifier=hconnection-0x4982cc36 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 15:28:15 - Process identifier=hconnection-0x4f1bfe23 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 15:28:15 - Process identifier=hconnection-0x512535ff connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 15:28:15 - Process identifier=hconnection-0x5adb0db3 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 15:28:15 - Process identifier=hconnection-0x70f59913 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 15:28:15 - Process identifier=hconnection-0x5dcd8c7a connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 15:28:15 - Process identifier=hconnection-0x7e3181aa connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 15:28:15 - Process identifier=hconnection-0x41d426b5 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 15:28:15 - Process identifier=hconnection-0xf316aeb connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 17:09:31 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-01 17:09:31 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:278)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:300)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:293)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:76)
+	at org.apache.hadoop.conf.Configuration.getStrings(Configuration.java:1514)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.makeZKProps(ZKConfig.java:113)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.getZKQuorumServersString(ZKConfig.java:265)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:159)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:134)
+	at org.apache.hadoop.hbase.client.ZooKeeperKeepAliveConnection.<init>(ZooKeeperKeepAliveConnection.java:43)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.getKeepAliveZooKeeperWatcher(HConnectionManager.java:1768)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:82)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-01 17:09:32 - Process identifier=hconnection-0x5b03b9fe connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 17:09:32 - Failed to identify the fs of dir hdfs://HBASEDB/hbase/lib, ignored
+java.io.IOException: No FileSystem for scheme: hdfs
+	at org.apache.hadoop.fs.FileSystem.getFileSystemClass(FileSystem.java:2421)
+	at org.apache.hadoop.fs.FileSystem.createFileSystem(FileSystem.java:2428)
+	at org.apache.hadoop.fs.FileSystem.access$200(FileSystem.java:88)
+	at org.apache.hadoop.fs.FileSystem$Cache.getInternal(FileSystem.java:2467)
+	at org.apache.hadoop.fs.FileSystem$Cache.get(FileSystem.java:2449)
+	at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:367)
+	at org.apache.hadoop.fs.Path.getFileSystem(Path.java:287)
+	at org.apache.hadoop.hbase.util.DynamicClassLoader.<init>(DynamicClassLoader.java:104)
+	at org.apache.hadoop.hbase.protobuf.ProtobufUtil.<clinit>(ProtobufUtil.java:201)
+	at org.apache.hadoop.hbase.ClusterId.parseFrom(ClusterId.java:64)
+	at org.apache.hadoop.hbase.zookeeper.ZKClusterId.readClusterIdZNode(ZKClusterId.java:69)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:83)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-01 17:09:32 - Process identifier=hconnection-0x291f18 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 17:09:32 - Process identifier=hconnection-0x5ddcc487 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 17:09:32 - Process identifier=hconnection-0x5ef5c734 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 17:09:32 - Process identifier=hconnection-0x36b4091c connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 17:09:32 - Process identifier=hconnection-0x36cda2c2 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 17:09:32 - Process identifier=hconnection-0x1583741e connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 17:09:32 - Process identifier=hconnection-0x36060e connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 17:09:32 - Process identifier=hconnection-0x1efe439d connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 17:09:32 - Process identifier=hconnection-0x7e5c856f connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 17:09:32 - Process identifier=hconnection-0x1f53a5dc connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 17:09:32 - Process identifier=hconnection-0x1984b1f connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 17:09:32 - Process identifier=hconnection-0x4ff8d125 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-01 17:09:32 - Process identifier=hconnection-0x3403e2ac connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-02 11:36:44 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-02 11:36:44 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:278)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:300)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:293)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:76)
+	at org.apache.hadoop.conf.Configuration.getStrings(Configuration.java:1514)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.makeZKProps(ZKConfig.java:113)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.getZKQuorumServersString(ZKConfig.java:265)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:159)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:134)
+	at org.apache.hadoop.hbase.client.ZooKeeperKeepAliveConnection.<init>(ZooKeeperKeepAliveConnection.java:43)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.getKeepAliveZooKeeperWatcher(HConnectionManager.java:1768)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:82)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-02 11:36:44 - Process identifier=hconnection-0x5d534f5d connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-02 11:36:44 - Failed to identify the fs of dir hdfs://HBASEDB/hbase/lib, ignored
+java.io.IOException: No FileSystem for scheme: hdfs
+	at org.apache.hadoop.fs.FileSystem.getFileSystemClass(FileSystem.java:2421)
+	at org.apache.hadoop.fs.FileSystem.createFileSystem(FileSystem.java:2428)
+	at org.apache.hadoop.fs.FileSystem.access$200(FileSystem.java:88)
+	at org.apache.hadoop.fs.FileSystem$Cache.getInternal(FileSystem.java:2467)
+	at org.apache.hadoop.fs.FileSystem$Cache.get(FileSystem.java:2449)
+	at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:367)
+	at org.apache.hadoop.fs.Path.getFileSystem(Path.java:287)
+	at org.apache.hadoop.hbase.util.DynamicClassLoader.<init>(DynamicClassLoader.java:104)
+	at org.apache.hadoop.hbase.protobuf.ProtobufUtil.<clinit>(ProtobufUtil.java:201)
+	at org.apache.hadoop.hbase.ClusterId.parseFrom(ClusterId.java:64)
+	at org.apache.hadoop.hbase.zookeeper.ZKClusterId.readClusterIdZNode(ZKClusterId.java:69)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:83)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-02 11:36:44 - Process identifier=hconnection-0x51fadaff connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-02 11:36:44 - Process identifier=hconnection-0x31ff43be connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-02 11:36:44 - Process identifier=hconnection-0x5c44c582 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-02 11:36:44 - Process identifier=hconnection-0x2c78d320 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-02 11:36:44 - Process identifier=hconnection-0x7b205dbd connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-02 11:36:44 - Process identifier=hconnection-0x7a67e3c6 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-02 11:36:44 - Process identifier=hconnection-0x15713d56 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-02 11:36:44 - Process identifier=hconnection-0x7c8c9a05 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-02 11:36:44 - Process identifier=hconnection-0x78d6692f connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-02 11:36:44 - Process identifier=hconnection-0x3d9c13b5 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-02 11:36:45 - Process identifier=hconnection-0x27216cd connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-02 11:36:45 - Process identifier=hconnection-0x67545b57 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-02 11:36:45 - Process identifier=hconnection-0x5f354bcf connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-03 08:56:09 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-03 08:56:10 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:278)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:300)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:293)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:76)
+	at org.apache.hadoop.conf.Configuration.getStrings(Configuration.java:1514)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.makeZKProps(ZKConfig.java:113)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.getZKQuorumServersString(ZKConfig.java:265)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:159)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:134)
+	at org.apache.hadoop.hbase.client.ZooKeeperKeepAliveConnection.<init>(ZooKeeperKeepAliveConnection.java:43)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.getKeepAliveZooKeeperWatcher(HConnectionManager.java:1768)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:82)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-03 08:56:10 - Process identifier=hconnection-0x738dd1b3 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-03 08:56:10 - Failed to identify the fs of dir hdfs://HBASEDB/hbase/lib, ignored
+java.io.IOException: No FileSystem for scheme: hdfs
+	at org.apache.hadoop.fs.FileSystem.getFileSystemClass(FileSystem.java:2421)
+	at org.apache.hadoop.fs.FileSystem.createFileSystem(FileSystem.java:2428)
+	at org.apache.hadoop.fs.FileSystem.access$200(FileSystem.java:88)
+	at org.apache.hadoop.fs.FileSystem$Cache.getInternal(FileSystem.java:2467)
+	at org.apache.hadoop.fs.FileSystem$Cache.get(FileSystem.java:2449)
+	at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:367)
+	at org.apache.hadoop.fs.Path.getFileSystem(Path.java:287)
+	at org.apache.hadoop.hbase.util.DynamicClassLoader.<init>(DynamicClassLoader.java:104)
+	at org.apache.hadoop.hbase.protobuf.ProtobufUtil.<clinit>(ProtobufUtil.java:201)
+	at org.apache.hadoop.hbase.ClusterId.parseFrom(ClusterId.java:64)
+	at org.apache.hadoop.hbase.zookeeper.ZKClusterId.readClusterIdZNode(ZKClusterId.java:69)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:83)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-03 08:56:10 - Process identifier=hconnection-0x29e971bf connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-03 08:56:10 - Process identifier=hconnection-0xec3ae61 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-03 08:56:10 - Process identifier=hconnection-0x2e6bc023 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-03 08:56:11 - Process identifier=hconnection-0x45b988d connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-03 08:56:11 - Process identifier=hconnection-0xd9f88de connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-03 08:56:11 - Process identifier=hconnection-0x78a7f540 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-03 08:56:11 - Process identifier=hconnection-0x38208582 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-03 08:56:11 - Process identifier=hconnection-0x3bb4d2cb connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-03 08:56:11 - Process identifier=hconnection-0x60d134d3 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-03 08:56:11 - Process identifier=hconnection-0x6beb2c5a connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-03 08:56:11 - Process identifier=hconnection-0x164146a7 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-03 08:56:11 - Process identifier=hconnection-0x19d5f3ea connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-03 08:56:11 - Process identifier=hconnection-0x44eef74f connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-04 17:26:59 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-04 17:27:00 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:278)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:300)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:293)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:76)
+	at org.apache.hadoop.conf.Configuration.getStrings(Configuration.java:1514)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.makeZKProps(ZKConfig.java:113)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.getZKQuorumServersString(ZKConfig.java:265)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:159)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:134)
+	at org.apache.hadoop.hbase.client.ZooKeeperKeepAliveConnection.<init>(ZooKeeperKeepAliveConnection.java:43)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.getKeepAliveZooKeeperWatcher(HConnectionManager.java:1768)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:82)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-04 17:27:00 - Process identifier=hconnection-0x7ac38fd3 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-04 17:27:00 - Failed to identify the fs of dir hdfs://HBASEDB/hbase/lib, ignored
+java.io.IOException: No FileSystem for scheme: hdfs
+	at org.apache.hadoop.fs.FileSystem.getFileSystemClass(FileSystem.java:2421)
+	at org.apache.hadoop.fs.FileSystem.createFileSystem(FileSystem.java:2428)
+	at org.apache.hadoop.fs.FileSystem.access$200(FileSystem.java:88)
+	at org.apache.hadoop.fs.FileSystem$Cache.getInternal(FileSystem.java:2467)
+	at org.apache.hadoop.fs.FileSystem$Cache.get(FileSystem.java:2449)
+	at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:367)
+	at org.apache.hadoop.fs.Path.getFileSystem(Path.java:287)
+	at org.apache.hadoop.hbase.util.DynamicClassLoader.<init>(DynamicClassLoader.java:104)
+	at org.apache.hadoop.hbase.protobuf.ProtobufUtil.<clinit>(ProtobufUtil.java:201)
+	at org.apache.hadoop.hbase.ClusterId.parseFrom(ClusterId.java:64)
+	at org.apache.hadoop.hbase.zookeeper.ZKClusterId.readClusterIdZNode(ZKClusterId.java:69)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:83)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-04 17:27:00 - Process identifier=hconnection-0x678930b7 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-04 17:27:00 - Process identifier=hconnection-0x4634b96 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-04 17:27:00 - Process identifier=hconnection-0x4668ba4b connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-04 17:27:01 - Process identifier=hconnection-0x4744ca4d connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-04 17:27:01 - Process identifier=hconnection-0x29cb53c5 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-04 17:27:01 - Process identifier=hconnection-0x14841479 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-04 17:27:01 - Process identifier=hconnection-0x6d5c3cf8 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-04 17:27:01 - Process identifier=hconnection-0x7bb2aefa connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-04 17:27:01 - Process identifier=hconnection-0x31a12f5f connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-04 17:27:01 - Process identifier=hconnection-0x631ed292 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-04 17:27:01 - Process identifier=hconnection-0x49a4f0cd connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-04 17:27:01 - Process identifier=hconnection-0x3fc086ba connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-04 17:27:01 - Process identifier=hconnection-0x11fbe23d connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-11 12:19:10 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-11 12:19:10 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:278)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:300)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:293)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:76)
+	at org.apache.hadoop.conf.Configuration.getStrings(Configuration.java:1514)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.makeZKProps(ZKConfig.java:113)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.getZKQuorumServersString(ZKConfig.java:265)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:159)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:134)
+	at org.apache.hadoop.hbase.client.ZooKeeperKeepAliveConnection.<init>(ZooKeeperKeepAliveConnection.java:43)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.getKeepAliveZooKeeperWatcher(HConnectionManager.java:1768)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:82)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-11 12:19:10 - Process identifier=hconnection-0xa8b228a connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-11 12:19:11 - Failed to identify the fs of dir hdfs://HBASEDB/hbase/lib, ignored
+java.io.IOException: No FileSystem for scheme: hdfs
+	at org.apache.hadoop.fs.FileSystem.getFileSystemClass(FileSystem.java:2421)
+	at org.apache.hadoop.fs.FileSystem.createFileSystem(FileSystem.java:2428)
+	at org.apache.hadoop.fs.FileSystem.access$200(FileSystem.java:88)
+	at org.apache.hadoop.fs.FileSystem$Cache.getInternal(FileSystem.java:2467)
+	at org.apache.hadoop.fs.FileSystem$Cache.get(FileSystem.java:2449)
+	at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:367)
+	at org.apache.hadoop.fs.Path.getFileSystem(Path.java:287)
+	at org.apache.hadoop.hbase.util.DynamicClassLoader.<init>(DynamicClassLoader.java:104)
+	at org.apache.hadoop.hbase.protobuf.ProtobufUtil.<clinit>(ProtobufUtil.java:201)
+	at org.apache.hadoop.hbase.ClusterId.parseFrom(ClusterId.java:64)
+	at org.apache.hadoop.hbase.zookeeper.ZKClusterId.readClusterIdZNode(ZKClusterId.java:69)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:83)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-11 12:19:11 - Process identifier=hconnection-0x64a21666 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-11 12:19:11 - Process identifier=hconnection-0x29e971bf connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-11 12:19:11 - Process identifier=hconnection-0xec3ae61 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-11 12:19:11 - Process identifier=hconnection-0x2e6bc023 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-11 12:19:11 - Process identifier=hconnection-0x45b988d connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-11 12:19:11 - Process identifier=hconnection-0x44dc688f connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-11 12:19:11 - Process identifier=hconnection-0x43ffdd03 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-11 12:19:11 - Process identifier=hconnection-0x2de4877c connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-11 12:19:11 - Process identifier=hconnection-0x7a2ff499 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-11 12:19:14 - Process identifier=hconnection-0xdd82ed7 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:04:36 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 09:04:36 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:278)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:300)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:293)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:76)
+	at org.apache.hadoop.conf.Configuration.getStrings(Configuration.java:1514)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.makeZKProps(ZKConfig.java:113)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.getZKQuorumServersString(ZKConfig.java:265)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:159)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:134)
+	at org.apache.hadoop.hbase.client.ZooKeeperKeepAliveConnection.<init>(ZooKeeperKeepAliveConnection.java:43)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.getKeepAliveZooKeeperWatcher(HConnectionManager.java:1768)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:82)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-14 09:04:36 - Process identifier=hconnection-0x7193802f connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:04:37 - Failed to identify the fs of dir hdfs://HBASEDB/hbase/lib, ignored
+java.io.IOException: No FileSystem for scheme: hdfs
+	at org.apache.hadoop.fs.FileSystem.getFileSystemClass(FileSystem.java:2421)
+	at org.apache.hadoop.fs.FileSystem.createFileSystem(FileSystem.java:2428)
+	at org.apache.hadoop.fs.FileSystem.access$200(FileSystem.java:88)
+	at org.apache.hadoop.fs.FileSystem$Cache.getInternal(FileSystem.java:2467)
+	at org.apache.hadoop.fs.FileSystem$Cache.get(FileSystem.java:2449)
+	at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:367)
+	at org.apache.hadoop.fs.Path.getFileSystem(Path.java:287)
+	at org.apache.hadoop.hbase.util.DynamicClassLoader.<init>(DynamicClassLoader.java:104)
+	at org.apache.hadoop.hbase.protobuf.ProtobufUtil.<clinit>(ProtobufUtil.java:201)
+	at org.apache.hadoop.hbase.ClusterId.parseFrom(ClusterId.java:64)
+	at org.apache.hadoop.hbase.zookeeper.ZKClusterId.readClusterIdZNode(ZKClusterId.java:69)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:83)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-14 09:04:37 - Process identifier=hconnection-0x79db5779 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:04:37 - Process identifier=hconnection-0x565197a2 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:04:37 - Process identifier=hconnection-0x41368e1 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:04:37 - Process identifier=hconnection-0x5f1d3697 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:04:37 - Process identifier=hconnection-0x1346d0cc connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:04:37 - Process identifier=hconnection-0xf1cb8ac connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:04:37 - Process identifier=hconnection-0x3cbea6af connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:04:37 - Process identifier=hconnection-0x758fd559 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:04:37 - Process identifier=hconnection-0x63450f7c connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:04:44 - Process identifier=hconnection-0x3f9b4e74 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:04:44 - Process identifier=hconnection-0x445e0565 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:04:44 - Process identifier=hconnection-0x6ea4ca0 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:04:44 - Process identifier=hconnection-0x53f5fcb6 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:07:38 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-14 09:07:38 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:278)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:300)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:293)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:76)
+	at org.apache.hadoop.conf.Configuration.getStrings(Configuration.java:1514)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.makeZKProps(ZKConfig.java:113)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.getZKQuorumServersString(ZKConfig.java:265)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:159)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:134)
+	at org.apache.hadoop.hbase.client.ZooKeeperKeepAliveConnection.<init>(ZooKeeperKeepAliveConnection.java:43)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.getKeepAliveZooKeeperWatcher(HConnectionManager.java:1768)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:82)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-14 09:07:38 - Process identifier=hconnection-0x48b565d2 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:07:38 - Failed to identify the fs of dir hdfs://HBASEDB/hbase/lib, ignored
+java.io.IOException: No FileSystem for scheme: hdfs
+	at org.apache.hadoop.fs.FileSystem.getFileSystemClass(FileSystem.java:2421)
+	at org.apache.hadoop.fs.FileSystem.createFileSystem(FileSystem.java:2428)
+	at org.apache.hadoop.fs.FileSystem.access$200(FileSystem.java:88)
+	at org.apache.hadoop.fs.FileSystem$Cache.getInternal(FileSystem.java:2467)
+	at org.apache.hadoop.fs.FileSystem$Cache.get(FileSystem.java:2449)
+	at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:367)
+	at org.apache.hadoop.fs.Path.getFileSystem(Path.java:287)
+	at org.apache.hadoop.hbase.util.DynamicClassLoader.<init>(DynamicClassLoader.java:104)
+	at org.apache.hadoop.hbase.protobuf.ProtobufUtil.<clinit>(ProtobufUtil.java:201)
+	at org.apache.hadoop.hbase.ClusterId.parseFrom(ClusterId.java:64)
+	at org.apache.hadoop.hbase.zookeeper.ZKClusterId.readClusterIdZNode(ZKClusterId.java:69)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:83)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-14 09:07:38 - Process identifier=hconnection-0x4be0a19e connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:07:39 - Process identifier=hconnection-0x7ed5d456 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:07:39 - Process identifier=hconnection-0x4fd86469 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:07:39 - Process identifier=hconnection-0x528d54de connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:07:39 - Process identifier=hconnection-0x70917c5c connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:07:39 - Process identifier=hconnection-0x406fcbe8 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:07:39 - Process identifier=hconnection-0x4ffec595 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:07:39 - Process identifier=hconnection-0x2bf11e9f connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:07:39 - Process identifier=hconnection-0x2bef2ab4 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:07:39 - Process identifier=hconnection-0x5e5c659 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:07:39 - Process identifier=hconnection-0x63e8bff2 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:07:39 - Process identifier=hconnection-0x26bebcf connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-14 09:07:39 - Process identifier=hconnection-0x2e2e1615 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-15 15:00:57 - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2016-11-15 15:00:57 - Failed to locate the winutils binary in the hadoop binary path
+java.io.IOException: Could not locate executable null\bin\winutils.exe in the Hadoop binaries.
+	at org.apache.hadoop.util.Shell.getQualifiedBinPath(Shell.java:278)
+	at org.apache.hadoop.util.Shell.getWinUtilsPath(Shell.java:300)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:293)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:76)
+	at org.apache.hadoop.conf.Configuration.getStrings(Configuration.java:1514)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.makeZKProps(ZKConfig.java:113)
+	at org.apache.hadoop.hbase.zookeeper.ZKConfig.getZKQuorumServersString(ZKConfig.java:265)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:159)
+	at org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher.<init>(ZooKeeperWatcher.java:134)
+	at org.apache.hadoop.hbase.client.ZooKeeperKeepAliveConnection.<init>(ZooKeeperKeepAliveConnection.java:43)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.getKeepAliveZooKeeperWatcher(HConnectionManager.java:1768)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:82)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-15 15:00:57 - Process identifier=hconnection-0x1a6032ce connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-15 15:00:57 - Failed to identify the fs of dir hdfs://HBASEDB/hbase/lib, ignored
+java.io.IOException: No FileSystem for scheme: hdfs
+	at org.apache.hadoop.fs.FileSystem.getFileSystemClass(FileSystem.java:2421)
+	at org.apache.hadoop.fs.FileSystem.createFileSystem(FileSystem.java:2428)
+	at org.apache.hadoop.fs.FileSystem.access$200(FileSystem.java:88)
+	at org.apache.hadoop.fs.FileSystem$Cache.getInternal(FileSystem.java:2467)
+	at org.apache.hadoop.fs.FileSystem$Cache.get(FileSystem.java:2449)
+	at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:367)
+	at org.apache.hadoop.fs.Path.getFileSystem(Path.java:287)
+	at org.apache.hadoop.hbase.util.DynamicClassLoader.<init>(DynamicClassLoader.java:104)
+	at org.apache.hadoop.hbase.protobuf.ProtobufUtil.<clinit>(ProtobufUtil.java:201)
+	at org.apache.hadoop.hbase.ClusterId.parseFrom(ClusterId.java:64)
+	at org.apache.hadoop.hbase.zookeeper.ZKClusterId.readClusterIdZNode(ZKClusterId.java:69)
+	at org.apache.hadoop.hbase.client.ZooKeeperRegistry.getClusterId(ZooKeeperRegistry.java:83)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.retrieveClusterId(HConnectionManager.java:857)
+	at org.apache.hadoop.hbase.client.HConnectionManager$HConnectionImplementation.<init>(HConnectionManager.java:662)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source)
+	at java.lang.reflect.Constructor.newInstance(Unknown Source)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:414)
+	at org.apache.hadoop.hbase.client.HConnectionManager.createConnection(HConnectionManager.java:309)
+	at cc.chinagps.gboss.hbase.GetHistoryInfoThread.<init>(GetHistoryInfoThread.java:37)
+	at cc.chinagps.gboss.hbase.HbaseClientManager.start(HbaseClientManager.java:53)
+	at cc.chinagps.gboss.comcenter.ComCenter.main(ComCenter.java:128)
+2016-11-15 15:00:58 - Process identifier=hconnection-0x63b6ae9d connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-15 15:00:58 - Process identifier=hconnection-0x12c04f11 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-15 15:00:58 - Process identifier=hconnection-0x7054f87c connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-15 15:00:58 - Process identifier=hconnection-0x313b4cf3 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-15 15:00:58 - Process identifier=hconnection-0x23c7a1e5 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-15 15:00:58 - Process identifier=hconnection-0x75658888 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-15 15:00:58 - Process identifier=hconnection-0x3f947e20 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-15 15:00:58 - Process identifier=hconnection-0x598ff546 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-15 15:00:58 - Process identifier=hconnection-0x2eb0778a connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-15 15:00:58 - Process identifier=hconnection-0x5f1d3697 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-15 15:00:58 - Process identifier=hconnection-0x145a5140 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-15 15:00:58 - Process identifier=hconnection-0x68757c30 connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
+2016-11-15 15:00:58 - Process identifier=hconnection-0x5fdd737b connecting to ZooKeeper ensemble=HBASE03:2181,HBASE02:2181,HBASE01:2181
